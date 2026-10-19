@@ -1,0 +1,340 @@
+{
+ "batch": "W2-cli_invocation-1",
+ "file": "aisef2/probe/cli_invocation.py",
+ "targets": [
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+  "aisef2/probe/cli_invocation.py::HARNESS/answer_to",
+  "aisef2/probe/cli_invocation.py::HARNESS/conclude",
+  "aisef2/probe/cli_invocation.py::HARNESS/finish",
+  "aisef2/probe/cli_invocation.py::HARNESS/inside",
+  "aisef2/probe/cli_invocation.py::HARNESS/main",
+  "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+  "aisef2/probe/cli_invocation.py::_compiles",
+  "aisef2/probe/cli_invocation.py::_said",
+  "aisef2/probe/cli_invocation.py::search_in_worker"
+ ],
+ "new": [
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 53,
+   "mutant": "L360 string 'the search did not finish within the harness watchdog (' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 72,
+   "mutant": "L337 string ')' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 73,
+   "mutant": "L343 string 'the worker did not start (' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 74,
+   "mutant": "L343 string ')' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 75,
+   "mutant": "L369 string 'the worker ' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 76,
+   "mutant": "L369 string ' before it gave its result' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 0,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->UNSUPPORTED"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 1,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->SUBJECT_ABSENT"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 4,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->NON_CONTROLLER_SIGNAL"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 2,
+   "mutant": "L387 returns None"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 3,
+   "mutant": "L388 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 5,
+   "mutant": "L385 string 'replace' emptied"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_compiles",
+   "index": 5,
+   "mutant": "L448 returns None"
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+   "index": 15,
+   "mutant": "L1164 string 'probe ' emptied"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 96,
+   "mutant": "HARNESS L134 string 'subject_signal' emptied",
+   "class": "AUDITED",
+   "group": "RESULT body differs by a key no reader consults, because the signal branch wins in _concluded",
+   "grounds": "`'' in r` is always False for a dict of str keys, so a signal-ended pre-step takes the hard-exit tail: r['pre_failed'] = i; return r. The returned facts become {subject_signal: N, pre_failed: i} instead of {subject_signal: N}. Nothing can raise (a dict store) and the module level still skips finish() because 'subject_signal' is in facts. In the parent _watch reads RESULT only for facts.get('deadline') and then _concluded, whose first branch is `if 'subject_signal' in facts` and builds the detail from facts['subject_signal'] alone, returning facts None; pre_failed is read only by verdict_of (467) and _half_ok (448), which are reached through decide() at the end of _concluded or in _equality_verdict, never for a signal. The Observation and the product outcome are identical; only the RESULT body in the (disposed) protocol file differs, and no document promises the body of a signal RESULT.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:1090-1113 (_watch: facts.get('deadline') then _concluded)",
+    "aisef2/probe/cli_invocation.py:1131-1141 (_concluded: signal branch first, facts None)",
+    "aisef2/probe/cli_invocation.py:447-448, 462-467 (_half_ok, verdict_of: the only pre_failed readers; grep over aisef2, validation, tests, docs)",
+    "aisef2/probe/cli_invocation.py:972-995 (_observe_equality: a non-OBSERVED half returns the observation, halves hold facts only for OBSERVED)",
+    "aisef2/probe/cli_invocation.py:845-852 (module level: 'subject_signal' in facts skips finish() in both)",
+    "tests/v2/test_c2_cli_protocol.py (RESULT {subject_signal: 9} -> NON_CONTROLLER_SIGNAL, 246-269); validation/ and docs: no reader of a signal RESULT body"
+   ],
+   "exceptions_checked": [
+    "hard-exit pre-step: `'' in r` and `'subject_signal' in r` are both False there, so pre_failed is set in both (unchanged)",
+    "equality halves: a signal half returns the observation before any facts are used",
+    "a reader that tests pre_failed before subject_signal: none exists (_concluded takes the signal first); that would be a future reader, not a present consumer",
+    "kept scratch / evidence archive of protocol.log: the evaluation directory is disposed (or removed with the story scratch); tests read only tags"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 96,
+    "mutant": "HARNESS L131 string 'subject_signal' emptied",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 115,
+   "mutant": "HARNESS L130 string '.stdout.bin' emptied",
+   "class": "AUDITED",
+   "group": "capture file names of pre-steps inside the evaluation directory: only distinctness matters and every variant keeps it",
+   "grounds": "Stdout capture of pre-step i is work/pre<i> instead of work/pre<i>.stdout.bin; its stderr capture stays work/pre<i>.stderr.bin, so the pair is still two files. The path is an internal handle: AGENT.redirect opens it O_CREAT|O_TRUNC per invocation (531-537), the controller sizes and hashes it right after the invocation (stream_fact 780-784), _public strips `path` from every stdout/stderr dict including inside the `pre` list (495-510), and only the main invocation's top-level facts['stdout'/'stderr'] paths are opened by the parent (_stream_bytes 395-401, _equality_verdict 451-460); verdict_of never reads facts['pre']. Distinctness is the only property the name needs and it holds for every i: pre<i> vs pre<j>, pre<j>.stderr.bin, stdout.bin, stderr.bin, stdin.bin, request.json, protocol.log, harness.log, agent.log, ws, pycache, pycache-agent, tmp.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:395-410, 451-480 (parent streams: main invocation only)",
+    "aisef2/probe/cli_invocation.py:495-510 (_public)",
+    "aisef2/probe/cli_invocation.py:531-538 (AGENT.redirect)",
+    "aisef2/probe/cli_invocation.py:1063-1087 (_prepare: the other creator of names in the directory)",
+    "grep -rI stdout.bin/stderr.bin/pre0 over the whole repo: only the main-invocation names, tests/v2/test_c2_cli_protocol.py:453-454 fake facts, and closure-evidence mutation records"
+   ],
+   "exceptions_checked": [
+    "pre1 vs pre10 or the stderr name of any step: different strings",
+    "an existing directory pre<i>: nothing creates one; ws, pycache, pycache-agent, tmp are the only directories",
+    "Windows reserved device names / case folding: pre<i> is neither",
+    "the subject sees the evaluation directory (cwd=ws, weakest path) and could pre-create ../pre0: possible with the original names too; no document promises a name"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 115,
+    "mutant": "HARNESS L127 string '.stdout.bin' emptied",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 116,
+   "mutant": "HARNESS L131 string '.stderr.bin' emptied",
+   "class": "AUDITED",
+   "group": "capture file names of pre-steps inside the evaluation directory: only distinctness matters and every variant keeps it",
+   "grounds": "Stderr capture of pre-step i is work/pre<i> instead of work/pre<i>.stderr.bin; stdout stays work/pre<i>.stdout.bin. Same flow as [115] for stderr: opened by AGENT.redirect, sized and hashed by stream_fact, `path` stripped by _public, never opened by the parent; verdict_of reads facts['stderr'] of the main invocation only. pre<i> is distinct from pre<i>.stdout.bin of the same step and from every other name in the directory.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:395-410 (_stream_bytes/_stream_matches: main invocation streams only)",
+    "aisef2/probe/cli_invocation.py:462-480 (verdict_of: facts['stderr'] of the main invocation, never facts['pre'])",
+    "aisef2/probe/cli_invocation.py:495-510 (_public) and 531-537 (AGENT.redirect)",
+    "grep -rI stdout.bin/stderr.bin over the whole repo: no pre-step name"
+   ],
+   "exceptions_checked": [
+    "pre<i> equals the stdout capture of the same step: stdout is pre<i>.stdout.bin",
+    "pre<i> equals another step's name: pre<j> / pre<j>.stdout.bin differ for j != i",
+    "main stderr.bin: different string",
+    "a name visible to the subject: not a documented contract"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 116,
+    "mutant": "HARNESS L128 string '.stderr.bin' emptied",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 123,
+   "mutant": "HARNESS L130 string 'pre' emptied",
+   "class": "AUDITED",
+   "group": "capture file names of pre-steps inside the evaluation directory: only distinctness matters and every variant keeps it",
+   "grounds": "Stdout capture of pre-step i is work/<i>.stdout.bin instead of work/pre<i>.stdout.bin (digit-led name). Same flow as [115]. Distinct from the stderr name pre<i>.stderr.bin of the same step (different prefix and suffix), from other steps' names (<i> differs; 1.stdout.bin vs 11.stdout.bin), from stdout.bin/stderr.bin (no digits) and from the fixed names; no directory with a numeric name exists.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:395-410, 451-480 (parent streams: main invocation only)",
+    "aisef2/probe/cli_invocation.py:495-510 (_public) and 531-537 (AGENT.redirect, O_CREAT|O_TRUNC)",
+    "aisef2/probe/cli_invocation.py:1063-1087 (_prepare: request.json, stdin.bin, ws, pycache, pycache-agent, tmp: none numeric)",
+    "grep -rI stdout.bin/stderr.bin over the whole repo: no pre-step name"
+   ],
+   "exceptions_checked": [
+    "collision of <i>.stdout.bin with pre<j>.stdout.bin: different prefix",
+    "collision between steps (1.stdout.bin vs 11.stdout.bin): distinct strings",
+    "Windows: digit-led file names are valid and not reserved",
+    "a name visible to the subject: not a documented contract"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 123,
+    "mutant": "HARNESS L127 string 'pre' emptied",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 124,
+   "mutant": "HARNESS L131 string 'pre' emptied",
+   "class": "AUDITED",
+   "group": "capture file names of pre-steps inside the evaluation directory: only distinctness matters and every variant keeps it",
+   "grounds": "Stderr capture of pre-step i is work/<i>.stderr.bin instead of work/pre<i>.stderr.bin; stdout stays work/pre<i>.stdout.bin. Same flow as [115]/[116]: only the agent and the controller touch it, `path` is stripped by _public, the parent never opens a pre-step stream. Distinct from the same step's stdout name and from every fixed name.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:395-410, 451-480 (parent streams: main invocation only)",
+    "aisef2/probe/cli_invocation.py:495-510 (_public) and 531-537 (AGENT.redirect)",
+    "tests/v2/test_c2_cli_invocation.py::test_CLI_5 (pre-step captured on its own: size/hash facts, name not asserted)",
+    "grep -rI stdout.bin/stderr.bin over the whole repo: no pre-step name"
+   ],
+   "exceptions_checked": [
+    "collision of <i>.stderr.bin with the stdout name of the same or another step: different suffix",
+    "step indices sharing a digit prefix: distinct strings",
+    "Windows reserved names: not matched",
+    "a name visible to the subject: not a documented contract"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 124,
+    "mutant": "HARNESS L128 string 'pre' emptied",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/finish",
+   "index": 6,
+   "mutant": "HARNESS L70 string \"an answer on the subject's channel is not the agent's\" emptied",
+   "class": "AUDITED",
+   "group": "Same sentence as answer_to[10], different path (closing exchange).",
+   "grounds": "HARNESS tail: `wrong = finish(); if wrong is not None: facts = {'subject':'present','tampered': wrong}`: '' is not None, so the facts and the REFUTED stand (the whole final file passes on the mutant). Downstream only the key is read (_concluded `'tampered' in facts`); the detail is dropped by classify_failure for OBSERVED. Constant sentence, same for every cause; no document promises it.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py HARNESS tail (`if wrong is not None`; its single caller)",
+    "aisef2/probe/cli_invocation.py::_concluded L1146 (`'tampered' in facts`)",
+    "aisef2/probe/protocol.py classify_failure L185 (detail dropped for OBSERVED)",
+    "validation/qualification/c2_cli_harness.py, c2_cli_calibration.py, p5_falsifiability.diagnose (no read of a tampered value)",
+    "docs/ (no promise of the sentence)"
+   ],
+   "exceptions_checked": [
+    "`if wrong:` instead of `is not None` would make the emptied reason decision-bearing: the source says `is not None`",
+    "the sibling probes' copies (process_effect, python_callable_v2) are other targets with their own pinned strings (test_s2_kills, test_python_callable_v2 pin the whole Observation there)",
+    "an observe() caller that parses the sentence: none found"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 6,
+    "mutant": "HARNESS L70 string \"an answer on the subject's channel is not the agent's\" emptied",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/answer_to",
+   "index": 10,
+   "mutant": "HARNESS L56 string \"an answer on the subject's channel is not the agent's\" emptied",
+   "class": "AUDITED",
+   "group": "Same sentence as finish[6], but each mutant reaches it by its own path; consumers listed per mutant.",
+   "grounds": "Emptied reason: the observation is still OBSERVED/REFUTED with {subject:'present', tampered:''}. The reason is a constant sentence (the same for every cause, it names no object, number or command); the cause class is carried by the KEY 'tampered' and by kind/verdict, both pinned by the tamper tests (exact key set, subject == 'present', value is a str). The value flows only into Observation.detail = json.dumps(facts), which classify_failure drops for OBSERVED (protocol.py:185 Executed(verdict); HarnessProbe.evaluate protocol.py:161), so no ProbeRecord, journal or evidence holds it. No document promises the text (docs/ grep).",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py HARNESS invoke (`'tampered' in got`: key only)",
+    "HARNESS main, both positions (`'tampered' in r`, then r['tampered'] copied into the facts)",
+    "HARNESS tail (`'tampered' in facts` skips the closing exchange: key only)",
+    "aisef2/probe/cli_invocation.py::_concluded L1146 (`'tampered' in facts` then detail=json.dumps(facts))",
+    "aisef2/probe/protocol.py classify_failure L185 / HarnessProbe.evaluate L161 (detail dropped)",
+    "validation/qualification/c2_cli_harness.py, c2_cli_calibration.py (no .detail read); p5_falsifiability.diagnose (detail[:1200], fixture specs only, none tampers)",
+    "tests: test_c2_cli_protocol L255-271 feeds tampered:'x' and refutes (value-agnostic)"
+   ],
+   "exceptions_checked": [
+    "a truthiness consumer (`if facts.get('tampered')`, `got.get('tampered')`): none in aisef2/ validation/ tests/ (it would turn '' into 'no tampering' and crash invoke on got['raw'])",
+    "an equality half: _observe_equality returns the tampered observation untouched (kind OBSERVED, REFUTED)",
+    "a committed evidence file recording the sentence: only mutation records mention it"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 10,
+    "mutant": "HARNESS L56 string \"an answer on the subject's channel is not the agent's\" emptied",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/inside",
+   "index": 2,
+   "mutant": "HARNESS L73 And swapped",
+   "class": "EQUIVALENT",
+   "group": "A21",
+   "grounds": "`spec.origin and spec.has_location` vs `or` differ only on (bool(origin), has_location) = (T,F) or (F,T). Every spec given to inside() (single call at 807) comes from PathFinder.find_spec (resolve at 802/804, the __main__ lookup at 806); under -I -S sys.path_hooks is exactly zipimporter + FileFinder (printed by my spec_pairs.py). A PathFinder spec is either spec_from_file_location (origin=location and _set_fileattr=True set together -> (T,T); also for zipimporter, which goes spec_from_loader -> spec_from_file_location because it has get_filename) or a namespace portion ModuleSpec(name, None) whose origin PathFinder.find_spec sets to None (CPython >= 3.7; requires-python >= 3.11) -> (F,F). (T,F) is only produced by spec_from_loader for loaders without get_filename (built-in/frozen importers), which PathFinder never consults; (F,T) cannot be built. Corroboration (not the proof): spec_pairs.py on 3.14.7 under -I -S over 291 specs (stdlib roots incl. __pycache__ dirs, a tree with regular, namespace, empty dir, module, sourceless .pyc, and a zip with module, package and namespace): 287 (T,T), 4 (F,F), 0 mixed.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:757-759 (inside) and its single call site at 807",
+    "aisef2/probe/cli_invocation.py:760-769 (resolve) and 802-806 (every producer of the spec; PathFinder only, with SEARCH roots or sys.path)",
+    "tests/v2/test_c2_cli_invocation.py::test_CLI_6 (absent / resolves-outside cases: same branch under both operators)",
+    "pyproject.toml requires-python >= 3.11 (the interpreter running the controller is the kernel's, -I -S)"
+   ],
+   "exceptions_checked": [
+    "namespace package spec: origin None, has_location False -> (F,F), both operators take the locations list",
+    "zip on sys.path (embeddable Windows layout): (T,T) for module and package, (F,F) for namespace (measured)",
+    "built-in/frozen spec (origin without location): FrozenImporter/BuiltinImporter are in sys.meta_path, not consulted by PathFinder.find_spec; no path hook can be added under -S (no site, no .pth, controller imports only stdlib)",
+    "origin '<unknown>' with has_location True: truthy, (T,T)",
+    "CPython < 3.7 namespace origin 'namespace' (would be (T,F)): excluded by requires-python >= 3.11"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 2,
+    "mutant": "HARNESS L73 And swapped",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/conclude",
+   "index": 1,
+   "mutant": "HARNESS L29 False->True",
+   "class": "EQUIVALENT",
+   "group": "A21",
+   "grounds": "HARNESS L29 False->True is `said.acquire(blocking=False)` -> `blocking=True` in conclude(), reached only from the daemon Timer built in deadline() (cli_invocation.py:718-720; timer is never joined or cancelled). `said` (703) is acquired at 711 (settle, non-blocking) and 714 (conclude) and never released anywhere in the script, so after the first successful acquire it stays held for the life of the process. A blocking acquire on a free lock returns at once and writes RESULT/END exactly like the non-blocking one; on a held lock the non-blocking call returns without writing and the blocking call never returns and therefore never writes: protocol file, RESULT winner, exit status identical. The one difference is a parked daemon thread, which interpreter exit does not wait for (measured with park.py under python -I -S 3.14.7: wrote [] in both, exit 0.46 s vs 0.47 s, only 'timer alive' differs). No reader sees a thread of another process.",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:703-720 (every use of said, held, settle, conclude, deadline; grep: no release/cancel/join)",
+    "aisef2/probe/cli_invocation.py:845-852 (module level: settle() then RESULT/END, same lock)",
+    "aisef2/probe/cli_invocation.py:1090-1113 (_watch: reads the protocol file and the range's wait status only; threads are not members of the range)",
+    "tests/v2/test_c2_cli_invocation.py stallbye case (timer fires with the lock held): passes under the mutant too (campaign survivor)"
+   ],
+   "exceptions_checked": [
+    "timer fires while the main thread holds the lock (the only differing case): mutant parks, original returns, nothing written either way",
+    "timer wins the free lock: acquire is identical in both, main's settle() then fails in both",
+    "interpreter shutdown waiting for the parked thread: Timer.daemon is set at 719; measured exit time equal",
+    "a release or cancel that would wake the parked call: none in the script",
+    "fork or spawn with a parked thread alive: the only Popen (the agent, line 722) runs before main() calls deadline(), so no process is spawned afterwards"
+   ],
+   "source_sha256": "95a3b98e4e96f9a1fcb7378470100226eb62e4d5d6f61c58c347ae2c695858c2",
+   "remapped_from": {
+    "index": 1,
+    "mutant": "HARNESS L29 False->True",
+    "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  }
+ ]
+}

@@ -1,0 +1,135 @@
+{
+ "batch": "W2-run-1",
+ "file": "aisef2/app/run.py",
+ "targets": [
+  "aisef2/app/run.py::OCR_CHECKS",
+  "aisef2/app/run.py::check_repository",
+  "aisef2/app/run.py::evidence_manifest",
+  "aisef2/app/run.py::ocr_refusal",
+  "aisef2/app/run.py::unfinished"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 9,
+   "mutant": "L157 string '). ' emptied"
+  },
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 10,
+   "mutant": "L159 string \"The file's bytes are the ones review.ocr.sha256 pins, but `<exe> version` did not print the version line of Open Code Review \" emptied"
+  },
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 11,
+   "mutant": "L160 string ' (' emptied"
+  },
+  {
+   "target": "aisef2/app/run.py::evidence_manifest",
+   "index": 17,
+   "mutant": "L432 sorted() -> list()"
+  },
+  {
+   "target": "aisef2/app/run.py::ocr_refusal",
+   "index": 7,
+   "mutant": "L224 string '. ' emptied"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/app/run.py::check_repository",
+   "index": 32,
+   "mutant": "L237 string 'aisef-check-' emptied",
+   "class": "AUDITED",
+   "group": "A14",
+   "grounds": "Only the basename of the --check clone's scratch directory changes ('aisef-check-<8>' -> '<8>'; tempfile.TemporaryDirectory keeps prefix='' as given and draws the 8 characters from [a-z0-9_]). The directory is `-C <abs tmp>` of the clone (run.py:143) and Path(tmp)/'repo' (run.py:146); nothing branches on its name and its TemporaryDirectory handle removes it either way. The name reaches operator-read text in two refusals: run.py:149 RunRefused(held.stderr) and run.py:145 'the project repository could not be cloned: <first 200 chars of git's stderr>' (reproduced at the snapshot with TMPDIR inside a repository holding core.fsmonitor: '...configuration at <tmp>/aisef-check-xxxxxxxx...' becomes '<tmp>/xxxxxxxx...'). cli.py:92-94 prints them as 'aisef run: refused: ...', exit 2; the key and '(not inert)' are carried unchanged; what goes is the word that says the path is --check's own scratch clone and not the operator's repository. No document, test or reader depends on that word; it is a label.",
+   "consumers_checked": [
+    "git grep 'aisef-check' over the tree (closure-evidence aside): aisef2/app/run.py:142 only; the other temp prefixes (aisef-confine- cli.py:84, aisef-mut- validation/v2/mutation.py:1439 and validation/mutate.py:175, aisef-p5f-, aisef-acceptance-, aisef-sim-) are other directories; no startswith/glob/listdir pattern over aisef2, validation, tests, docs, bin, framework, .github reads this one",
+    "aisef2/orchestrate/workspace.py:52-71 config_problems/git: tmp enters as `-C <absolute tmp>`; its REFUSED text (:70) is what run.py:149 and run.py:145 carry",
+    "aisef2/app/cli.py:80 (--check calls check_repository), :92-94 (RunRefused printed, exit 2): nothing parses the text; the caller in run.py:391 passes clone=False (no scratch directory)",
+    "tests that assert these refusals: tests/v2/test_v21_inputs.py:142-173 ('not inert', no 'does not hold', \"does not hold the plan's baseline\"), tests/v2/test_app_units.py:509-522, tests/v2/test_s2_kills.py:244-261 (the message names `repo`, the operator's path, never the scratch), tests/v2/test_v21_kills3_T14a.py:272-318 (cause class and git's words, via a mocked git): none asserts the scratch path",
+    "validation/v2/mutation.py:1334-1365 (_residue: listing set differences) and :1556-1562 (_tail: normalises only a test's own `tmp<8>` under <run>/tmp): mutation-runner text, not product behaviour; neither reads this prefix",
+    "line coverage: L142 is executed by test_app_units, test_s2_kills, test_app_run, test_v21_bundle_tools, test_v21_confine, test_v21_inputs, test_v21_kills3_T14a; the target's kill set holds all but bundle_tools and confine; the mutant run against those two: SURVIVED (confine re-run in a fresh process: SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "an operator or script that cleans leftovers of a killed --check by name: none in repo, docs, .github (the OS reaps TMPDIR; the handle removes the directory)",
+    "a refusal where the label disambiguates: exists (run.py:145, run.py:149), reproduced. What a reader acts on (the key, '(not inert)', exit 2) is retained and the path is of a directory already deleted; whether these two texts should name `shown` as run.py:151 does is an owner question, not this mutant's",
+    "run.py:145's 200-character cut: with a long TMPDIR the cut falls inside the path in both variants (pre-existing); with a short TMPDIR the mutant leaves 12 more characters for the key",
+    "uniqueness / collision / Windows reserved names: delegated to mkdtemp's 8 random characters, not to the prefix; a leading '-' cannot occur and the path is absolute (mkdtemp abspaths it on 3.11-3.14)",
+    "created by round 3: confine.py, process_range.py and cleanup_authority.py changed; none names or matches this directory (grep above); cleanup_authority's name-prefix boundaries are the mutation runner's own aisef-mut-<worker>- scratch"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 32,
+    "mutant": "L142 string 'aisef-check-' emptied",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 32,
+     "mutant": "L138 string 'aisef-check-' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 32,
+      "mutant": "L138 string 'aisef-check-' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 32,
+      "mutant": "L142 string 'aisef-check-' emptied",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/run.py::unfinished",
+   "index": 2,
+   "mutant": "L410 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "A14",
+   "grounds": "run.py:279 sorted(...) -> list(...) changes only the order of the returned names: first story/begin (or story/end) in the journal (dict insertion order, fixed by the hash chain) instead of alphabetical; membership and count are unchanged (the n > 0 filter is untouched). The single product caller, verify.py:172, uses `refused` once (:183) to build [{'story': x, 'error': ...}] dicts concatenated with rec['story_errors'] and handed to R.delivery (:184), which reads only truthiness and len(errors) (run.py:254-256) and whose `blocked` list verify discards (`verdict, _, committed`); verify's returned dict (:204-205) carries no name from `refused`. Not EQUIVALENT: the order is visible to a caller of unfinished() itself, which no one but verify is. Round 3's verify boundary (verify.py:148-155: a journal the six control projections refuse gives events=[], so unfinished([]) is []) narrows its domain; it does not touch order.",
+   "consumers_checked": [
+    "git grep -w unfinished: run.py:272 (definition), verify.py:172 (the only call), validation/v2/mutation.py (target name); other hits are other words ('unfinished work', 'session:unfinished' note, run_scope 'unfinished operation')",
+    "aisef2/app/verify.py:172, :183-184, :204-205: `refused` -> errors -> delivery -> (len, truthiness); the result dict holds no story name from it; the earlier `refused` at :149 is a different value (the projection refusal tuple), consumed at :150-155 before :172 rebinds the name",
+    "aisef2/app/run.py:242-258 delivery: blocked text is f'{len(errors)} stories were refused'; story names never printed",
+    "aisef2/app/lineage.py:212-214 computes its own open_stories set from the same begin/end counting (used at :224 and :242 for membership); it does not call unfinished and is a set",
+    "tests/v2/test_v21_kills3_T14b.py:141-179: assertCountEqual with the comment 'which and how many; no reader takes the order'; docs/v2.1/ADR-V2.1.md ADR-3 and verify.py:8: 'a story begun and never ended is a refused story' - membership only",
+    "line coverage: L279 is executed by 16 test modules outside this target's kill set (test_s2_kills, release_acceptance, defects_lineageusage, defects_verify, A22, R01, T13a, T14a, T22a, T22b, T23a, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_usage_review, r3_detail_product): the mutant run against all: SURVIVED (test_s2_kills showed a same-process re-run artifact, reproduced with the null mutant; re-run in a fresh process: SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "sorted() raising where list() does not (TypeError on mixed ids): unreachable - story/begin and story/end carry story_id: _str (non-empty str; journal/event.py:95-96, :201, :211; format3.py:283-285 refuses a wrong kind) and, since round 3, verify hands the function only journals the six projections admit",
+    "another reader that prints, hashes or iterates the list for effect: none in aisef2, validation, docs; rec['story_errors'] comes from execute's own `errors` (run.py:473), not from unfinished()",
+    "flakiness introduced by list(): none, the order is the journal's and the journal is fixed",
+    "created by round 3: the projection boundary (above) and review_verify.artifact_problems (verify.py:164) take `events`, not this list"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 2,
+    "mutant": "L279 sorted() -> list()",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 2,
+     "mutant": "L275 sorted() -> list()",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 2,
+      "mutant": "L275 sorted() -> list()",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 2,
+      "mutant": "L279 sorted() -> list()",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+{
+ "batch": "W2-catalog-1",
+ "file": "aisef2/probe/catalog.py",
+ "targets": [
+  "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+  "aisef2/probe/catalog.py::CatalogEntry.capability_version"
+ ],
+ "new": [
+  {
+   "target": "aisef2/probe/catalog.py::CatalogEntry.capability_version",
+   "index": 0,
+   "mutant": "L66 False->True"
+  },
+  {
+   "target": "aisef2/probe/catalog.py::CatalogEntry.capability_version",
+   "index": 1,
+   "mutant": "L66 False->True"
+  },
+  {
+   "target": "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+   "index": 0,
+   "mutant": "L67 False->True"
+  },
+  {
+   "target": "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+   "index": 1,
+   "mutant": "L67 False->True"
+  }
+ ],
+ "carried": []
+}

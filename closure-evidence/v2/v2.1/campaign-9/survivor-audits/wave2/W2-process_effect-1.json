@@ -1,0 +1,226 @@
+{
+ "batch": "W2-process_effect-1",
+ "file": "aisef2/probe/process_effect.py",
+ "targets": [
+  "aisef2/probe/process_effect.py::HARNESS/answer_to",
+  "aisef2/probe/process_effect.py::HARNESS/finish",
+  "aisef2/probe/process_effect.py::HARNESS/inside",
+  "aisef2/probe/process_effect.py::HARNESS/main"
+ ],
+ "new": [],
+ "carried": [
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/main",
+   "index": 27,
+   "mutant": "HARNESS L285 dict entry 0 dropped",
+   "class": "EQUIVALENT",
+   "group": "T19-STATE-DEAD: the `instance` entry (and MISSING) is never read",
+   "grounds": "No reader of state['instance'] and no enumeration of state exists in the script.",
+   "consumers_checked": [
+    "HARNESS script (AST): L15 MISSING = object(), L301 the literal; no other mention of MISSING or 'instance'",
+    "process_effect.py L756-767: facts built from state['bound'/'raised'/'before'/'last'/'trace']"
+   ],
+   "exceptions_checked": [
+    "`if state` at L275/L276 with a smaller dict: still non-empty (8 entries), still truthy",
+    "json.dumps(state) / dict(state) / **state / len(state) / iteration: none (AST)"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 27,
+    "mutant": "HARNESS L301 dict entry 0 dropped",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/main",
+   "index": 34,
+   "mutant": "HARNESS L285 dict entry 7 dropped",
+   "class": "EQUIVALENT",
+   "group": "T19-STATE-DOMINATED: the initial i / fired values are overwritten by run before any read",
+   "grounds": "Dominated by run's per-step assignment (script L259) before any read.",
+   "consumers_checked": [
+    "readers of state['i']: script L147 (guarded's Leak text), L156 (subject_call), L238 (do_subprocess prefix), L276 (ended)",
+    "the store: script L259"
+   ],
+   "exceptions_checked": [
+    "an empty scenario (loop never entered): refused at admission (units Vocabulary test_the_scenario_rules 'empty') and, if it ever got through, nothing after the loop reads i (script L309-315 use before/bound/raised/last and the local trace only)",
+    "ended(got, state) before the first store: Ended comes only from a handler",
+    "files_now() / emit before the store (script L256-258): neither reads state['i']"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 34,
+    "mutant": "HARNESS L301 dict entry 7 dropped",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/main",
+   "index": 35,
+   "mutant": "HARNESS L285 dict entry 8 dropped",
+   "class": "EQUIVALENT",
+   "group": "T19-STATE-DOMINATED: the initial i / fired values are overwritten by run before any read",
+   "grounds": "Dominated by run's per-step assignment (script L259) before any read.",
+   "consumers_checked": [
+    "readers of state['fired']: script L135, L158, L263",
+    "the store: script L259"
+   ],
+   "exceptions_checked": [
+    "`fired = state['fired']` at L135 before the store: guarded runs only from do_subprocess, a handler",
+    "a trace entry written before the store: trace.append is script L264, after the handler"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 35,
+    "mutant": "HARNESS L301 dict entry 8 dropped",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/main",
+   "index": 74,
+   "mutant": "HARNESS L285 string 'instance' emptied",
+   "class": "EQUIVALENT",
+   "group": "T19-STATE-DEAD: the `instance` entry (and MISSING) is never read",
+   "grounds": "As [27]: no subscript of state with the key 'instance' or '' exists; no enumeration.",
+   "consumers_checked": [
+    "HARNESS script (AST of every `state[...]`: keys are fault, last, raised, trace, fired, before, bound, i)"
+   ],
+   "exceptions_checked": [
+    "a read of state['']: none; the constant-key subscripts of state are exactly the eight named ones above, and '' is not among them"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 74,
+    "mutant": "HARNESS L301 string 'instance' emptied",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/main",
+   "index": 81,
+   "mutant": "HARNESS L286 string 'i' emptied",
+   "class": "EQUIVALENT",
+   "group": "T19-STATE-DOMINATED: the initial i / fired values are overwritten by run before any read",
+   "grounds": "Dominated by the store at script L259; '' is never subscripted.",
+   "consumers_checked": [
+    "readers of state['i'] (as [34])"
+   ],
+   "exceptions_checked": [
+    "a read of state['']: none (AST)",
+    "`state['i'] if state else None` in ended (L276): reached only after a handler, i.e. after the store"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 81,
+    "mutant": "HARNESS L302 string 'i' emptied",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/main",
+   "index": 82,
+   "mutant": "HARNESS L286 string 'fired' emptied",
+   "class": "EQUIVALENT",
+   "group": "T19-STATE-DOMINATED: the initial i / fired values are overwritten by run before any read",
+   "grounds": "Dominated by the store at script L259; '' is never subscripted.",
+   "consumers_checked": [
+    "readers of state['fired'] (as [35])"
+   ],
+   "exceptions_checked": [
+    "a read of state['']: none (AST)",
+    "state['fired'] read before the store: none (see [35])"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 82,
+    "mutant": "HARNESS L302 string 'fired' emptied",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/answer_to",
+   "index": 10,
+   "mutant": "HARNESS L41 string \"an answer on the subject's channel is not the agent's\" emptied",
+   "class": "AUDITED",
+   "group": "T19-TAMPER-TEXT: the reason sentence under facts['tampered'] has no identifying element; the key carries the cause class; no code reads the value",
+   "grounds": "The value under facts['tampered'] is prose explaining a key whose presence is the whole signal: every decision tests `'tampered' in got/facts`, the value is copied once (L716) and reported inside Observation.detail = json.dumps(facts). Observation.detail of an OBSERVED/REFUTED observation is dropped by protocol.classify_failure (-> Executed(verdict)); the one reader of it is a diagnostic copy in validation/qualification/p5_falsifiability.diagnose (detail[:1200], 'never a verdict's evidence').",
+   "consumers_checked": [
+    "grep 'tampered' over aisef2/, validation/, docs/, references/, tests/: in process_effect.py only L508, L733, L739, L773 (membership), L716 and L776 (copies), L940 (membership in _concluded)",
+    "aisef2/probe/protocol.py L172-185 classify_failure: OBSERVED -> Executed(observation.verdict), detail dropped",
+    "validation/qualification/p5_falsifiability.py L223-227: diagnostic row copy, writer only",
+    "tests/v2/test_probe_process_effect_units.py L373-375, L502: opaque value"
+   ],
+   "exceptions_checked": [
+    "a reader that tests the value's truthiness (facts.get('tampered') / `if facts['tampered']`): none anywhere in aisef2/ or validation/ (grep above)",
+    "Observation.__post_init__ 'says why' (protocol.py L111): applies to HARNESS_FAILED / UNSUPPORTED / NON_CONTROLLER_SIGNAL only; this observation is OBSERVED with a non-empty json.dumps(facts) either way",
+    "the first reply, answer_to(0) at script L279: its dict is only compared with None; the text is not used there",
+    "a journal/report that starts recording Observation.detail (PROBE-DIAGNOSTIC-GAP-001 is open): then the sentence becomes operator-visible and its cause class is what to pin; today nothing prints it"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 10,
+    "mutant": "HARNESS L41 string \"an answer on the subject's channel is not the agent's\" emptied",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/inside",
+   "index": 2,
+   "mutant": "HARNESS L67 And swapped",
+   "class": "EQUIVALENT",
+   "group": "T19-INSIDE-ORIGIN: origin and has_location are never split for a spec PathFinder returns",
+   "grounds": "origin is truthy exactly when has_location is True for every spec PathFinder can return (importlib/_bootstrap_external.py spec_from_file_location L596-597, PathFinder.find_spec L1297-1301; zipimport.py L110 and L123).",
+   "consumers_checked": [
+    "process_effect.py L511-513 inside() and its one call site, L730 `spec is None or not inside(spec)` (AST)",
+    "process_effect.py L514-523 resolve(): the only producer of the spec, PathFinder.find_spec twice (L727, L729)",
+    "cli_invocation.py L757-759 carries its own copy (its mutants are its own target)"
+   ],
+   "exceptions_checked": [
+    "a built-in or frozen spec (origin truthy, has_location False): PathFinder.find_spec('sys'/'_thread'/'builtins'/'posix', None) is None in my sample and resolve never consults sys.meta_path",
+    "a hand-assigned has_location: nothing in the controller assigns it",
+    "the <=3.6 namespace spec whose origin was the string 'namespace': pyproject requires >= 3.11",
+    "a spec found through a custom sys.path_hooks entry: the controller runs -I -S, so only the default zipimporter and FileFinder hooks exist"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 2,
+    "mutant": "HARNESS L67 And swapped",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/finish",
+   "index": 6,
+   "mutant": "HARNESS L55 string \"an answer on the subject's channel is not the agent's\" emptied",
+   "class": "AUDITED",
+   "group": "T19-TAMPER-TEXT: the reason sentence under facts['tampered'] has no identifying element; the key carries the cause class; no code reads the value",
+   "grounds": "Same mechanism as answer_to [10], checked again for this line: the returned sentence is only ever stored into facts['tampered'] and the decision on it is None-ness.",
+   "consumers_checked": [
+    "process_effect.py L773-776: `wrong = finish(); if wrong is not None: facts = {..., 'tampered': wrong}`; L773 also membership-tests 'tampered' before calling finish",
+    "process_effect.py L940 _concluded: membership of the key",
+    "protocol.py classify_failure and p5_falsifiability.diagnose, as for answer_to [10]"
+   ],
+   "exceptions_checked": [
+    "truthiness instead of is-not-None at L775: not the code (read the line)",
+    "a second caller of finish(): AST finds exactly one, script L329",
+    "a consumer of facts['tampered'] by truthiness: none (grep as for answer_to [10])"
+   ],
+   "source_sha256": "741019925621fcffbb0e7b60288da4e401b7a52f24da3bf012f59e0e2d6bdc7e",
+   "remapped_from": {
+    "index": 6,
+    "mutant": "HARNESS L55 string \"an answer on the subject's channel is not the agent's\" emptied",
+    "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  }
+ ]
+}

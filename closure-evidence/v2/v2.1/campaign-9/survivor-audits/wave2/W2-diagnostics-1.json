@@ -1,0 +1,71 @@
+{
+ "batch": "W2-diagnostics-1",
+ "file": "aisef2/app/diagnostics.py",
+ "targets": [
+  "aisef2/app/diagnostics.py::Sink.__init__",
+  "aisef2/app/diagnostics.py::artifact_problems"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 19,
+   "mutant": "L273 sorted() -> list()"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 31,
+   "mutant": "L286 element 0 dropped"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 47,
+   "mutant": "L275 string '.tmp' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 64,
+   "mutant": "L320 string ' is incomplete; no verdict depends on it): see RUN.json diagnostics.failures' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 78,
+   "mutant": "L303 element 0 dropped"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 84,
+   "mutant": "L315 And swapped"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 115,
+   "mutant": "L311 string ', revision ' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 121,
+   "mutant": "L311 string 'spec_id' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::artifact_problems",
+   "index": 122,
+   "mutant": "L312 string 'revision' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink.__init__",
+   "index": 6,
+   "mutant": "L144 tuple() -> list()"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink.__init__",
+   "index": 7,
+   "mutant": "L140 tuple() -> list()"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink.__init__",
+   "index": 8,
+   "mutant": "L144 element 0 dropped"
+  }
+ ],
+ "carried": []
+}

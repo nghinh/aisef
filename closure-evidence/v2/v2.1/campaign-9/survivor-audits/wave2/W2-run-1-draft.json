@@ -1,0 +1,146 @@
+{
+ "batch": "W2-run-1",
+ "file": "aisef2/app/run.py",
+ "role": "author",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "run_py_source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+ "measured": {
+  "date": "Mon Oct 19 22:07-22:40 +07 2026 (date command)",
+  "method": "fresh copy of the archived snapshot tree; one mutant at a time via validation.v2.mutation.mutants (desc asserted); env PATH stripped of any dir with an executable opencode, HOME/TMPDIR/XDG under the copy, LC_ALL=C; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest; code/tests never changed",
+  "OCR_CHECKS::9": "test_v21_ocr_identity PASS (Ran 15, OK); baseline PASS -> SURVIVED",
+  "OCR_CHECKS::10": "test_v21_ocr_identity PASS (Ran 15, OK); baseline PASS -> SURVIVED",
+  "OCR_CHECKS::11": "test_v21_ocr_identity PASS (Ran 15, OK); baseline PASS -> SURVIVED",
+  "ocr_refusal::7": "test_v21_ocr_identity PASS (Ran 15) + test_v21_ocr_preflight PASS (Ran 21); baseline PASS -> SURVIVED",
+  "evidence_manifest::17": "12 registered kill files; 11 PASS; test_v21_identity errored=7 identically baseline+mutant (missing closure-evidence/v2/release/LEDGERLOCK-PROJECT.json, excluded by prescribed archive paths) -> added via git show -> PASS baseline+mutant; no kill -> SURVIVED"
+ },
+ "registered_kill_files": {
+  "aisef2/app/run.py::OCR_CHECKS": [
+   "tests/v2/test_v21_ocr_identity.py"
+  ],
+  "aisef2/app/run.py::ocr_refusal": [
+   "tests/v2/test_v21_ocr_identity.py",
+   "tests/v2/test_v21_ocr_preflight.py"
+  ],
+  "aisef2/app/run.py::evidence_manifest": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_inputs.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_verify.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_v21_continue_integrity.py",
+   "tests/v2/test_app_run.py",
+   "tests/v2/test_v21_kills3_T14a.py",
+   "tests/v2/test_v21_r3_detail_artifact.py",
+   "tests/v2/test_v21_pm8_diagnostics.py",
+   "tests/v2/test_v21_pm8_diagnostics_run.py"
+  ]
+ },
+ "groups": {
+  "A-OCR-CONN": "OCR operator-text connector/punctuation losses: a paren, ' (', or '. '/'). ' separator emptied inside an operator-read refusal string. Every content word, value and DECLARED_WAYS marker survives; the text is operator-visible (refusal print exit 2, RUN.json rec['ocr_identity'], and `--check`) but no consumer/contract/document/test keys on the removed punctuation. AUDITED.",
+  "A-OCR-SENTENCE": "OCR declared-check help loses a whole diagnostic proposition (not punctuation): the clause stating the bytes matched the pin while the version line failed, read by the operator and persisted to RUN.json, and the designated operator-text pinner omits it. REFUTED.",
+  "A14": "sorted()->list() ordering mutants: the result is a mapping/sequence whose membership is unchanged; readers use sort_keys or dict ==; observable only via a direct caller's list(), which no consumer does. AUDITED (not EQUIVALENT)."
+ },
+ "entries": [
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 9,
+   "mutant": "L157 string '). ' emptied",
+   "class": "AUDITED",
+   "group": "A-OCR-CONN",
+   "grounds": "OCR_CHECKS['pinned'][1] (run.py:152-157) is the operator 'what to do' help for the pinned check. The f-string \"...to its sha256 ({SHA256_OF}). {OCR_INSTEAD}\" loses only the '). ' that closes the parenthetical around SHA256_OF and separates it from OCR_INSTEAD; mutated it reads \"...sha256 (`shasum -a 256 <exe>`...hexdigest())\\\" <exe>`Or have the model review instead...\" -- an unclosed '(' and '<exe>`Or' jammed. SHA256_OF (the two hash commands) and OCR_INSTEAD (switch-to-model / new --out / never-reused) are untouched; every content word survives. Operator-visible via ident['operator']=OCR_CHECKS[check][1] (run.py:215); ocr_refusal embeds it (run.py:224); on a REFUSED status it is raised as RunRefused (run.py:517) and printed 'aisef run: refused: <it>' exit 2 (cli.py:99); persisted as rec['ocr_identity']['operator'] in RUN.json (run.py:515, written sort_keys at run.py:675); and printed by `aisef run --check` as ready['ocr_identity'] (cli.py:90-94). All carry it verbatim; none parses it. No consumer keys on the removed '). ': the designated pinner test_each_check_says_what_it_is_and_what_the_operator_does (test_v21_ocr_identity.py:170-177) asserts only content substrings of pinned[1] (shasum -a 256, python -c, hashlib, BUILD-RECIPE.md, 'Find out why before changing the pin', 'Re-pin only a file you have checked', 'remove review.ocr and set review.finder to \"model\"', 'give it a new --out', 'a run directory is never reused', 'run again'), all of which survive; ocr_preflight.py:327 asserts 'give it a new --out' (in OCR_INSTEAD, survives); :159 asserts (check,operator)==OCR_CHECKS['pinned'] which is tautological (both sides from the mutated module). Punctuation/connector only. RAN tests.v2.test_v21_ocr_identity on the mutant: PASS (Ran 15, OK, ~9s); baseline PASS -> not killed -> SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:215/224/515/675, cli.py:90-99: ident['operator']=OCR_CHECKS[check][1] (run.py:215); ocr_refusal embeds it (run.py:224); on a REFUSED status it is raised as RunRefused (run.py:517) and printed 'aisef run: refused: <it>' exit 2 (cli.py:99); persisted as rec['ocr_identity']['operator'] in RUN.json (run.py:515, written sort_keys at run.py:675); and printed by `aisef run --check` as ready['ocr_identity'] (cli.py:90-94). All carry it verbatim; none parses it.",
+    "tests/v2/test_v21_ocr_identity.py:170-177 pinned do-list asserts content substrings, none containing '). '; :159 (check,operator)==OCR_CHECKS['pinned'] is a self-comparison of the mutated module",
+    "tests/v2/test_v21_ocr_preflight.py:327 assertIn('give it a new --out', OCR_CHECKS['pinned'][1]) -- in OCR_INSTEAD, survives",
+    "grep OCR_CHECKS over aisef2/validation/tests/docs: run.py:152/215, the asserts above, mutation.py:1208 (registration), docs/v2/V2.1-BACKLOG.md (names the target, quotes no literal)"
+   ],
+   "exceptions_checked": [
+    "an operator who needs the ')' to parse the hash commands: SHA256_OF is intact and self-delimited by its own backticks; the lost ')' is cosmetic",
+    "a doc or verifier quoting pinned[1] verbatim: none (BACKLOG names the function, not the text)",
+    "whether '<exe>`Or' merges two tokens a reader splits on: no reader tokenizes this field"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 10,
+   "mutant": "L159 string \"The file's bytes are the ones review.ocr.sha256 pins, but `<exe> version` did not print the version line of Open Code Review \" emptied",
+   "class": "REFUTED",
+   "group": "A-OCR-SENTENCE",
+   "grounds": "OCR_CHECKS['declared'][1] (run.py:158-166) is the operator 'what to do' help for the declared check. The mutant empties the whole opening sentence, so declared[1] begins \"v1.12.12 (182898c); what it did instead is the observed value above (another release or commit, ...). Run `<exe> version` yourself. ...\". The removed clause is the ONLY place that states the diagnosis of a declared-check failure: the bytes matched the pin (so it is NOT a pin problem) but the binary's `version` line did not name the pinned release. After mutation the help opens mid-thought with a bare version number and the surviving 'the observed value above' is left with a dangling referent. Operator-read via ident['operator']=OCR_CHECKS[check][1] (run.py:215); ocr_refusal embeds it (run.py:224); on a REFUSED status it is raised as RunRefused (run.py:517) and printed 'aisef run: refused: <it>' exit 2 (cli.py:99); persisted as rec['ocr_identity']['operator'] in RUN.json (run.py:515, written sort_keys at run.py:675); and printed by `aisef run --check` as ready['ocr_identity'] (cli.py:90-94). All carry it verbatim; none parses it. An operator depends on it to tell a declared failure (do not re-pin; investigate the version declaration) from a pinned failure (re-hash/re-pin). The designated pinner test_each_check_says_what_it_is_and_what_the_operator_does exists to pin 'the words an operator reads in a refusal' (test_v21_ocr_identity.py:168) yet its declared do-list (:180-182) asserts review.ocr.sha256, v1.12.12, 182898c, '`<exe> version` yourself', 'review.finder to \"model\"', 'pin the sha256 of a build of Open Code Review v1.12.12 (182898c)', 'give it a new --out', 'run again' -- each of which ALSO occurs after the deleted sentence, so none fails; test_the_declared_operator_text_is_true_of_every_way_the_check_fails (:186-191) asserts DECLARED_WAYS.values(), all in the surviving '(another release or commit, ...)' clause. grep shows 'did not print the version line' / 'The file's bytes are the ones review.ocr.sha256 pins' occur only at run.py:159. REFUTED -- a test is owed. RAN tests.v2.test_v21_ocr_identity on the mutant: PASS (Ran 15, OK); baseline PASS -> not killed -> SURVIVED.",
+   "refutation": "INPUT: R.OCR_CHECKS['declared'][1] (equivalently ident['operator'] / R.ocr_refusal(ident) for an ident whose pin passes but version declaration fails -- the REFUSED cases at test_v21_ocr_identity.py:112). READER: test_each_check_says_what_it_is_and_what_the_operator_does, the operator-text pinner. SKETCH: add to the declared do-list (:180-182) self.assertIn(\"The file's bytes are the ones review.ocr.sha256 pins, but\", do) (or self.assertIn('did not print the version line of Open Code Review', do)); that phrase occurs only at run.py:159, so it passes unmutated and fails on the mutant -- pinning that the declared refusal states the bytes matched the pin while the version line did not.",
+   "consumers_checked": [
+    "aisef2/app/run.py:215/224/515/675, cli.py:90-99: ident['operator']=OCR_CHECKS[check][1] (run.py:215); ocr_refusal embeds it (run.py:224); on a REFUSED status it is raised as RunRefused (run.py:517) and printed 'aisef run: refused: <it>' exit 2 (cli.py:99); persisted as rec['ocr_identity']['operator'] in RUN.json (run.py:515, written sort_keys at run.py:675); and printed by `aisef run --check` as ready['ocr_identity'] (cli.py:90-94). All carry it verbatim; none parses it.",
+    "tests/v2/test_v21_ocr_identity.py:178-184 declared do-list -- every asserted substring also occurs after the deleted sentence (v1.12.12/182898c/'pin the sha256 ... v1.12.12 (182898c)' at run.py:163-164; review.ocr.sha256 at 'in review.ocr.sha256'); :186-191 asserts DECLARED_WAYS.values() in the surviving clause",
+    "DECLARED_WAYS keys are matched against ident['reason'] not OCR_CHECKS text (test_v21_ocr_identity.py:197), so no marker is lost",
+    "grep 'did not print the version line' / \"The file's bytes are the ones review.ocr.sha256 pins\": only run.py:159 across aisef2/validation/tests/docs"
+   ],
+   "exceptions_checked": [
+    "an automated reader keying on the removed clause: none -- markers live in ident['reason']",
+    "the fact stated elsewhere: no -- 'the bytes match the pin, but the version line failed' is stated nowhere else in declared[1]; 'pin the sha256 ... v1.12.12 (182898c)' (run.py:163-164) is a different, surviving instruction",
+    "whether this is a mere connector like 9/11/7: no -- a whole subject+verb+object proposition is removed and 'the observed value above' is left with a dangling referent"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 11,
+   "mutant": "L160 string ' (' emptied",
+   "class": "AUDITED",
+   "group": "A-OCR-CONN",
+   "grounds": "In declared[1]'s opening sentence the f-string \"line of Open Code Review {version} ({commit[:7]}); what it did \" loses the ' (' between {version} and {commit[:7]}: \"...version line of Open Code Review v1.12.12182898c); what it did...\". The release version and commit glue ('v1.12.12182898c') and a ')' dangles. Both values survive as substrings, and the release identifier is also stated cleanly later as 'v1.12.12 (182898c)' at run.py:163-164 (a different literal the mutant does not touch), plus structurally in ident['expected']['version'/'commit'] (run.py:212) and in ocr_refusal's own '({commit[:7]})' (run.py:223). test_each_check...(:180-182) asserts 'v1.12.12' and '182898c' (both substrings of 'v1.12.12182898c') and 'pin the sha256 of a build of Open Code Review v1.12.12 (182898c)' (the later untouched occurrence) -- all pass. Connector/punctuation only; operator-visible via the same paths; no reader keys on the ' ('. RAN tests.v2.test_v21_ocr_identity on the mutant: PASS (Ran 15, OK); baseline PASS -> not killed -> SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:215/224/515/675, cli.py:90-99: ident['operator']=OCR_CHECKS[check][1] (run.py:215); ocr_refusal embeds it (run.py:224); on a REFUSED status it is raised as RunRefused (run.py:517) and printed 'aisef run: refused: <it>' exit 2 (cli.py:99); persisted as rec['ocr_identity']['operator'] in RUN.json (run.py:515, written sort_keys at run.py:675); and printed by `aisef run --check` as ready['ocr_identity'] (cli.py:90-94). All carry it verbatim; none parses it.",
+    "tests/v2/test_v21_ocr_identity.py:180-182 asserts v1.12.12 and 182898c (substrings of the glued token) and the untouched 'v1.12.12 (182898c)' at run.py:163-164",
+    "ident carries version/commit as structured fields ident['expected']['version'/'commit'] (run.py:212); ocr_refusal prints '({commit[:7]})' from exp (run.py:223)"
+   ],
+   "exceptions_checked": [
+    "a reader parsing the release/commit out of declared[1] prose: none -- they are structured in ident['expected'] and printed cleanly at run.py:163-164 and in ocr_refusal",
+    "ambiguity of 'v1.12.12182898c' to an operator: the same pair is shown cleanly at run.py:163-164, in ident['expected'], and in the ocr_refusal line"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::ocr_refusal",
+   "index": 7,
+   "mutant": "L224 string '. ' emptied",
+   "class": "AUDITED",
+   "group": "A-OCR-CONN",
+   "grounds": "ocr_refusal (run.py:219-225) is the run-refusal string raised at run.py:517 and printed at cli.py:99 (exit 2). The mutant empties the '. ' between the observed reason and the operator instruction: \"...observed {ident['reason']}{ident['operator']} No session...\" -- reason and the operator help run together with no sentence break (e.g. '...observed not the pinned sha256Find out why before changing the pin: ...'). Both pieces survive whole; only the separator is gone. The kill tests assert the surviving parts: test_v21_ocr_identity.py:130-133 asserts in `said` the parts f'observed {reason}' (the 'observed <reason>' prefix is intact), ident['operator'], and 'No session was started and no provider request was sent.'; :160-162 assertIn(said,reason) and assertIn('shasum -a 256', ocr_refusal); :220 assertIn(reason, ocr_refusal); ocr_preflight likewise -- all pass. Connector/punctuation only; the structured pieces remain available as ident['reason']/ident['operator'] on the persisted record. RAN tests.v2.test_v21_ocr_identity (PASS, Ran 15) + tests.v2.test_v21_ocr_preflight (PASS, Ran 21) on the mutant; baseline both PASS -> not killed -> SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:517 raise RunRefused(ocr_refusal(ident)); cli.py:99 print 'aisef run: refused: ...' exit 2",
+    "tests/v2/test_v21_ocr_identity.py:130-133 (parts in `said`), :160-162, :220 -- assert the surviving 'observed <reason>' prefix, operator text, and the tail sentence; none asserts the '. ' separator",
+    "tests/v2/test_v21_ocr_preflight.py (registered) exercises the refusal; no assertion on the separator",
+    "the reason/operator are also carried structurally in rec['ocr_identity']['reason'/'operator'] (run.py:515), not re-parsed from this string"
+   ],
+   "exceptions_checked": [
+    "a reader splitting the refusal on '. ' to separate reason from instruction: none -- the structured pieces are on the persisted record",
+    "whether the merge hides which text is the observed value vs the instruction: the observed value is also in rec['ocr_identity']['reason']"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::evidence_manifest",
+   "index": 17,
+   "mutant": "L432 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "A14",
+   "grounds": "evidence_manifest (run.py:425-434) builds `files` as a list ending with the probe-observations glob; the mutant makes ONLY that last glob list(...) instead of sorted(...), so probe-observations entries are inserted into the returned {path: sha} dict in filesystem-glob order instead of name order (the four earlier globs stay sorted). The dict's key set and values are unchanged; only the insertion order of the probe-observations keys can differ, and only where the glob returns them out of name order. Every reader treats the result as a mapping: anchor_of (run.py:447) and the on-disk manifest write (run.py:677) both json.dumps(..., sort_keys=True) -- order-independent; verify.py:123/129 and bundle_cli.py:814/824 compare by dict == and by anchor -- order-independent; verify.py:130-131 / bundle_cli.py:825 sort the diff. The only order-asserting test, test_every_group_is_listed_in_name_order (test_v21_r3_detail_artifact.py:359-372), checks the groups sessions/, run/journals/, preflight/, review-findings/ -- NEVER probe-observations/; T14a (test_v21_kills3_T14a.py:144,190) names [..17..] but asserts by dict == with no probe-observations members; pm8_diagnostics_run.py:233-234 reads manifest[f'{DIR}/{name}'] by key and compares anchors. The function docstring (run.py:360-362 in the test, i.e. the manifest contract) states 'The manifest is a mapping and nothing reads its order'. Not EQUIVALENT: a direct caller's list(evidence_manifest(out)['files']) exposes the order (demonstrated: two mappings equal under == and under anchor_of/sort_keys differ under list()); AUDITED: no consumer, contract, document, test or operator the entry names depends on probe-observations order. RAN all 12 registered kill files on the mutant: 11 PASS; tests.v2.test_v21_identity errored=7 at BOTH baseline and mutant for a missing closure-evidence/v2/release/LEDGERLOCK-PROJECT.json (excluded by the prescribed archive paths) -- mutation-independent; after adding that file via `git show 4ec961e...:...LEDGERLOCK-PROJECT.json`, test_v21_identity PASSES at baseline and on the mutant. No kill file fails on the mutant while passing unmutated -> SURVIVED. Matches docs/v2.1/decisions/B03-R3-detail.md:185 (these sorted()->list() manifest mutants are FS-order-dependent survivors).",
+   "consumers_checked": [
+    "aisef2/app/run.py:447 anchor_of = _sha(json.dumps(manifest, sort_keys=True, separators=(',',':'))) -- order-independent",
+    "aisef2/app/run.py:677 (out/MANIFEST) json.dumps(evidence_manifest(out), indent=1, sort_keys=True) -- order-independent on disk",
+    "aisef2/app/verify.py:123 anchor_of(stored); :125 fresh=evidence_manifest; :129 stored!=fresh (dict ==); :130-131 sorted(diff) -- order-independent",
+    "aisef2/app/bundle_cli.py:814 anchor_of(stored); :820 fresh=evidence_manifest; :824 stored!=fresh; :825 sorted(diff) -- order-independent",
+    "validation/v21/cli_integration/e2e_guest.py:714 json.dumps(..., sort_keys=True)",
+    "tests: test_v21_r3_detail_artifact.py:359-372 asserts name-order for sessions/journals/preflight/review-findings, NOT probe-observations; T14a:160-164/235-241 dict ==/anchor; pm8_diagnostics_run.py:233-234 key access + anchor; r3_detail_failclosed.py:112 dict ==; other registered modules (test_app_units:638, test_v21_verify:85, continue_integrity:579, inputs, continue_usage, review_chain, app_run, pm8_diagnostics) write/compare via sort_keys or =="
+   ],
+   "exceptions_checked": [
+    "a filesystem that globs probe-observations out of name order + a reader iterating the dict in order: iteration order would differ, but no current reader iterates probe-observations (all use sort_keys/==); on this machine the glob returns name order so even list() matches and the mutant is byte-identical here",
+    "the manifest's on-disk reproducibility (the docstring's stated purpose of sorting): already guaranteed by run.py:677's sort_keys, independent of in-dict order",
+    "a future group that IS read in order: none today; the docstring documents the no-order contract",
+    "EQUIVALENT instead of AUDITED: rejected -- list(evidence_manifest(out)['files']) is observable to a direct caller (consistent with the carried A14 unfinished/check_repository calls)"
+   ]
+  }
+ ],
+ "owed_tests": [
+  "aisef2/app/run.py::OCR_CHECKS index 10: in tests/v2/test_v21_ocr_identity.py::test_each_check_says_what_it_is_and_what_the_operator_does, add to the declared do-list (:180-182) self.assertIn(\"The file's bytes are the ones review.ocr.sha256 pins, but\", do) (or 'did not print the version line of Open Code Review'); the phrase is only at run.py:159, so it passes unmutated and fails on the mutant."
+ ],
+ "notes": "5/5 new survivors confirmed SURVIVED by running their registered kill files (one mutant at a time; code/tests unchanged; env PATH stripped of opencode, HOME/TMPDIR/XDG under the copy, LC_ALL=C). 4 AUDITED (OCR_CHECKS 9/11, ocr_refusal 7 = operator-text connectors; evidence_manifest 17 = A14 ordering), 1 REFUTED (OCR_CHECKS 10). All four OCR strings are operator-read report fields: printed on refusal (cli.py:99, exit 2), persisted as rec['ocr_identity']['operator'/'reason'] in RUN.json (run.py:515,675), and printed by `aisef run --check` (cli.py:94). The AUDITED/REFUTED line follows the owner rule and the W2-review_ocr wave precedent: a connector/punctuation loss with every value and marker intact is AUDITED; the loss of a whole operator-read proposition that the designated pinner fails to assert is REFUTED. evidence_manifest 17 note: test_v21_identity's 7 errors were a mutation-independent artifact of the prescribed archive paths excluding closure-evidence/v2/release/LEDGERLOCK-PROJECT.json; added via git show, it passes at baseline and on the mutant (not a kill). Matches docs/v2.1/decisions/B03-R3-detail.md:185. Possible skeptic dispute: OCR_CHECKS 10 could be argued AUDITED by the 'no automated consumer' test; kept REFUTED per the round-3 rule (operator-read field, owed when disputed)."
+}

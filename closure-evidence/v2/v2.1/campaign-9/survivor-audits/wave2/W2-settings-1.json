@@ -1,0 +1,74 @@
+{
+ "batch": "W2-settings-1",
+ "file": "aisef2/app/settings.py",
+ "targets": [
+  "aisef2/app/settings.py::read"
+ ],
+ "new": [],
+ "carried": [
+  {
+   "target": "aisef2/app/settings.py::read",
+   "index": 5,
+   "mutant": "L218 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "T26-READ-PUNCTUATION: [5], [6], [8] each drop one separator/closing character of a refusal that only the operator reads (cli.py prints it, exit 2); path, cause class and the exception's own text stay present, in order and delimited; the only tests that kill them pin that punctuation (shown: kc-scratch-read-candidates.json, optional-read-punctuation.py).",
+   "grounds": "Mutant text: `<path>: cannot be read (FileNotFoundError[Errno 2] No such file ...)` (settings.py:218). Path, cause class and the exception's own text stay present, in order and delimited. Tried to refute with a test of what an operator needs: the class as a word of its own passes on the mutant (the next character is '['); only the literal '(FileNotFoundError: ' kills it, i.e. the colon. Every OSError text begins with '[' ([Errno n]; [WinError n] on Windows) and UnicodeDecodeError's with a quote, so class and text stay separable on both arms.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:77, :92-94: the only caller of settings.read (git grep 'settings.read(' over aisef2 and validation); prints `aisef run: refused: {e}` to stderr, returns 2",
+    "aisef2/app/verify.py:38-39 and :144-145: settings.load only; read's text never reaches it; run.py takes a loaded Settings",
+    "validation/qualification/release_smoke.py:199-216 (runs `aisef run --settings`, keeps stderr_tail[-400:] as a record field, parses nothing); git grep of 'cannot be read (' / 'not JSON (' over aisef2, validation, tests, docs finds only the producers (settings.py:218,222; bundle.py:211,215) and tests of bundle.read",
+    "tests: test_v21_inputs.py::InputFiles (SettingsError type, exit 2, 'refused' in stderr), test_app_units.py:140 (read == load), test_v21_kills3_T26a.py ReadRefusal (path and class as words; the separator and the closing parenthesis are not asserted)",
+    "docs: TRACEABILITY.md P-V2-04 / R-P1-13 promise exit 2 and the path; nothing promises '(Class: text)'"
+   ],
+   "exceptions_checked": [
+    "an OSError whose text begins with a word character (would make 'OSErrordisk'): none reachable from read_text (FileNotFound, IsADirectory, NotADirectory, Permission, ENAMETOOLONG, ELOOP all begin '[Errno')",
+    "UnicodeDecodeError arm: begins with a quote",
+    "a reader splitting on ': ' to get the class: none by grep",
+    "sibling bundle.read pins '(FileNotFoundError: ' and the whole not-JSON text in test_v21_kills_bundle.py:55-65 (B-03b); settings.read has no such pin - a divergence of decision, already flagged to the owner by the entry, not a change of ground"
+   ],
+   "source_sha256": "d24e645641798243016f0656b293fed944456633c0de138c1dcf4b858017dc1e",
+   "remapped_from": null
+  },
+  {
+   "target": "aisef2/app/settings.py::read",
+   "index": 6,
+   "mutant": "L218 string ')' emptied",
+   "class": "AUDITED",
+   "group": "T26-READ-PUNCTUATION: [5], [6], [8] each drop one separator/closing character of a refusal that only the operator reads (cli.py prints it, exit 2); path, cause class and the exception's own text stay present, in order and delimited; the only tests that kill them pin that punctuation (shown: kc-scratch-read-candidates.json, optional-read-punctuation.py).",
+   "grounds": "The message ends one character short (`...({type}: {e}`); cli.py:93 prints it as the last element of the line. Only a test that the parenthesis is closed (endswith ')' or balanced count) kills it. The path, class and OS text are unchanged and the OS text ends in the quoted path, so the cause is complete.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:77, :92-94: the only caller of settings.read (git grep 'settings.read(' over aisef2 and validation); prints `aisef run: refused: {e}` to stderr, returns 2",
+    "aisef2/app/verify.py:38-39, :144-145 (load only)",
+    "validation/qualification/release_smoke.py:216 (stderr_tail[-400:] is a diagnostic field, not parsed)",
+    "tests: test_v21_inputs.py::InputFiles (type and exit code only); test_v21_kills_bundle.py pins endswith(')') for bundle.read, a different function"
+   ],
+   "exceptions_checked": [
+    "text appended after the message by a caller (an unclosed '(' would misparse): none, the only caller prints it verbatim",
+    "a parser that balances parentheses or strips ')': none by grep of aisef2/, validation/, tests/, docs/",
+    "a path that contains '(' (ambiguity about where the cause starts): the path comes first and is delimited by ': cannot be read (', which the mutant keeps"
+   ],
+   "source_sha256": "d24e645641798243016f0656b293fed944456633c0de138c1dcf4b858017dc1e",
+   "remapped_from": null
+  },
+  {
+   "target": "aisef2/app/settings.py::read",
+   "index": 8,
+   "mutant": "L222 string ')' emptied",
+   "class": "AUDITED",
+   "group": "T26-READ-PUNCTUATION: [5], [6], [8] each drop one separator/closing character of a refusal that only the operator reads (cli.py prints it, exit 2); path, cause class and the exception's own text stay present, in order and delimited; the only tests that kill them pin that punctuation (shown: kc-scratch-read-candidates.json, optional-read-punctuation.py).",
+   "grounds": "Mutant text (settings.py:222): `<path>: not JSON (Expecting property name enclosed in double quotes: line 1 column 2 (char 1` - file, category 'not JSON' and the decoder's text with its line/column/char are unchanged and the decoder's text ends in its own ')'; only the outer ')' is missing.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:77, :92-94: the only caller of settings.read (git grep 'settings.read(' over aisef2 and validation); prints `aisef run: refused: {e}` to stderr, returns 2",
+    "tests: test_v21_inputs.py::InputFiles::test_cli_exit_2_for_unreadable_inputs (settings file '[1, 2': exit 2 and 'refused', not the text); T26a ReadRefusal::test_a_file_that_is_not_json (path then JSON as words); test_v21_kills_bundle.py:65 pins bundle.read's whole not-JSON text, a different function",
+    "aisef2/app/verify.py (load only), validation/, docs/: no reader of settings.read's 'not JSON (' text"
+   ],
+   "exceptions_checked": [
+    "a ValueError from json.loads that is not a JSONDecodeError (the except catches ValueError): still the decoder's own text after the path and 'not JSON'",
+    "a reader keyed on the decoder's '(char N)' to locate the error: none by grep; the position stays in the text",
+    "a settings path containing ': ' or '(': the path is first, delimited by the following ': not JSON (', which the mutant keeps"
+   ],
+   "source_sha256": "d24e645641798243016f0656b293fed944456633c0de138c1dcf4b858017dc1e",
+   "remapped_from": null
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+  "batch": "W2-client-1",
+  "file": "aisef2/app/client.py",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "role": "skeptic",
+  "date": "Mon Oct 19 22:57 +07 2026",
+  "entries": [
+    {
+      "target": "aisef2/app/client.py::Budget.spend",
+      "index": 24,
+      "mutant": "L101 string \"the lineage's evidence cannot be read, or is gone: \" emptied",
+      "class_before": "SURVIVED",
+      "verdict": "CONFIRMED",
+      "class_after": "SURVIVED (test owed)",
+      "grounds": "Mutant verified at the snapshot: mutant_view and a live mutants() build both show client.py:101 `unaccounted += [f\"the lineage's evidence cannot be read, or is gone: {u}\" for u in self.inherited_unread]` becoming bare `[f'{u}' for u in self.inherited_unread]`; the campaign builds mutants by AST round-trip (250->206 lines, comments dropped), and in the built mutant 'cannot be read' occurs 0 times -- the only runtime-observable copy of that text is this prefix. All six registered kill files reproduced from V21_TARGETS['aisef2/app/client.py::Budget.spend'] match the author exactly (test_s2_kills_deterministic, test_v21_transport, test_app_units, test_app_run, test_s2_kills, test_v21_x_lineage_proof); test_v21_x_lineage_gone.py is NOT among them (confirmed by resolving the dict after all its .update() passes). Consumers verified real: reached() joins unaccounted at client.py:118-119; exceeded() at client.py:129-130; account() embeds spend() at client.py:137; run.execute() surfaces reached() as the NOT_RUN story reason at run.py:623-626 and writes account()+budget_stop to RUN.json at run.py:656/663. RAN the registered proof sibling against the mutant: test_v21_x_lineage_proof 55 OK (does NOT kill) and test_app_units 41 OK -- their 'cannot be read' assertions are a different path (proof:724 asserts 'cannot be read' for a journal-there-but-not-text scenario whose {u} SUFFIX already carries it; app_units:756 is a bundle-read refusal 'absent.json: cannot be read'), neither touches the inherited_unread prefix. The other four registered files reference no inherited_unread / 'unread' / 'is gone' scenario at all (grep clean), so none can assert the prefix. Survivor independently confirmed.",
+      "refutation": "input: client.Budget(limits far above the known part, base={k:0}, logs=<empty dir>, requests=lambda:0, inherited=lineage.lineage_account(d, next)) with d a run whose sessions directory was moved away so inherited['unread'] is non-empty. reader: Budget.reached() and Budget.exceeded() return 'unaccounted: '+'; '.join(spent['unaccounted']); Budget.account()['spent']['unaccounted']; the operator reads these via run.py NOT_RUN story reason + RUN.json rec['budget'] and budget_stop. sketch: assert \"the lineage's evidence cannot be read, or is gone:\" is in b.reached(), in b.exceeded(), and prefixes each inherited-unread entry of b.spend()['unaccounted']. Fix: register tests/v2/test_v21_x_lineage_gone.py in V21_TARGETS['aisef2/app/client.py::Budget.spend'] (Gone.test_the_budget_never_computes_a_remaining_from_the_known_part, line 297 already proves the kill) or move that assertion into an already-registered kill file (test_v21_x_lineage_proof.py). RAN it both ways on a copy tree (PATH stripped of opencode, HOME/TMPDIR under the tree): unmutated 29 tests OK; on mutant 24 it FAILS at line 297 `assertIn('cannot be read, or is gone', stop)` with the live stop = \"unaccounted: the-sessions-directory-is-moved-away: RUN.json records ... the evidence ... is not there ...\" -- the {u} suffix carries NO 'cannot be read, or is gone', so the emptied prefix is the sole source and the unregistered test is a real, currently-owed kill.",
+      "consumers_checked": [
+        "aisef2/app/client.py:118-119 Budget.reached -> 'unaccounted: '+'; '.join(spent['unaccounted']) (real)",
+        "aisef2/app/client.py:129-130 Budget.exceeded -> same join (real; author's 128-130 is within the function, trivially off by one)",
+        "aisef2/app/client.py:137 Budget.account -> {'spent': self.spend(), ...} embeds unaccounted (real)",
+        "aisef2/app/run.py:623-626 why=budget.reached() -> results[story]=['NOT_RUN: '+why] + not_run (real)",
+        "aisef2/app/run.py:656,663 stop=budget_stops(...); rec['budget']=budget.account(); budget_stop=stop -> RUN.json (real)",
+        "tests/v2/test_v21_x_lineage_gone.py:295-297 loop over (reached(), exceeded()) asserting assertIn('cannot be read, or is gone', stop) -- reader; NOT registered for this target (verified against resolved V21_TARGETS)"
+      ],
+      "exceptions_checked": [
+        "reached()/exceeded() stop DECISION only tests `if spent['unaccounted']:` (non-empty); the mutant keeps one entry per inherited_unread item, so the decision is unchanged -- behaviour equivalent, message not (this is why it is a string-only survivor, not a behaviour kill)",
+        "the {u} suffix is produced by lineage.lineage_account and is untouched by this mutant; live-captured suffix for the moved-away case = 'the-sessions-directory-is-moved-away: RUN.json records ... is not there ...' -- it does NOT contain 'cannot be read, or is gone', so dropping the prefix is observable",
+        "the two registered files that literally contain 'cannot be read' do NOT kill: test_v21_x_lineage_proof (55 OK on mutant) asserts it via a journal-not-text SUFFIX that already carries the words (proof:721,724), and test_app_units (41 OK) via an unrelated bundle-read refusal (app_units:756); the other four registered files contain no inherited_unread/unread/is-gone scenario (grep clean)"
+      ]
+    }
+  ],
+  "owed_tests": [
+    "aisef2/app/client.py::Budget.spend index 24 (L101 inherited-unread prefix emptied): register tests/v2/test_v21_x_lineage_gone.py (Gone.test_the_budget_never_computes_a_remaining_from_the_known_part, line 297) in V21_TARGETS for this target -- it FAILS on the mutant (line 297) and PASSES unmutated (both verified by run) -- or move that assertion into an already-registered kill file (test_v21_x_lineage_proof.py). Owed because the prefix is operator/record-facing (reached/exceeded/account -> RUN.json + NOT_RUN story reason) and no REGISTERED kill file asserts it; the {u} suffix does not reproduce it for the moved-away-sessions case."
+  ],
+  "notes": "1 entry (0 carried). Author's REFUTED (test owed) CONFIRMED on independent verification. Mutant verified at snapshot; all six registered kill files resolved and match the author; two string-bearing registered files (test_v21_x_lineage_proof 55 OK, test_app_units 41 OK) RUN against the mutant and do not kill -- their 'cannot be read' is a different scenario (suffix / bundle-read), not this prefix; the other four reference no inherited-unread scenario. Unregistered test_v21_x_lineage_gone RUN both ways: 29 OK unmutated, FAILS at line 297 on the mutant, with the live stop string proving the {u} suffix lacks 'cannot be read, or is gone'. class_after = SURVIVED (test owed). No code or test changed; measurement left pinned. Both trees (W2-client-1-skeptic, -copy) removed at end."
+}

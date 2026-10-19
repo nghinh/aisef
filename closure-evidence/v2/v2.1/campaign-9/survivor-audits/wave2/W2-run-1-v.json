@@ -1,0 +1,174 @@
+{
+ "batch": "W2-run-1",
+ "role": "skeptic",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "run_py_source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+ "measured": {
+  "date": "Mon Oct 19 23:03-23:32 +07 2026 (date command)",
+  "method": "independent archive of the snapshot (git archive 4ec961e aisef2 aisef tests validation docs pyproject.toml) into a skeptic tree + a COPY tree; one mutant at a time via validation.v2.mutation.mutants (desc asserted equal to the entry's mutant); env -i, PATH stripped of every dir with an executable opencode (/Users/nghinh/.opencode/bin, /Users/nghinh/.npm-global/bin), HOME/TMPDIR/XDG under the copy, LC_ALL=C; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest; code/tests never changed. closure-evidence/ is excluded by the prescribed archive paths; the one file two tests read (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json) was added read-only via git show when a baseline==mutant error pointed at it.",
+  "baselines": "test_v21_ocr_identity+test_v21_ocr_preflight OK (36); test_v21_kills3_T14b OK (15); test_v21_r3_detail_artifact+pm8_diagnostics+pm8_diagnostics_run OK (117); test_s2_kills OK (43, with LEDGERLOCK); test_v21_identity OK (13, with LEDGERLOCK)",
+  "OCR_CHECKS::9": "test_v21_ocr_identity PASS (Ran 15) on mutant; baseline PASS -> SURVIVED",
+  "OCR_CHECKS::10": "test_v21_ocr_identity PASS (Ran 15) on mutant; baseline PASS -> SURVIVED",
+  "OCR_CHECKS::11": "test_v21_ocr_identity PASS (Ran 15) on mutant; baseline PASS -> SURVIVED",
+  "ocr_refusal::7": "test_v21_ocr_identity PASS (15) + test_v21_ocr_preflight PASS (21) on mutant; baseline PASS -> SURVIVED",
+  "evidence_manifest::17": "all 12 registered kill files PASS on mutant (r3_detail_artifact/pm8_diagnostics/pm8_diagnostics_run/T14a + app_units/inputs/verify/continue_usage/review_chain/continue_integrity/app_run 139 OK + identity 13 OK with LEDGERLOCK); baseline PASS -> SURVIVED",
+  "check_repository::32": "test_v21_kills3_T14a PASS (18) + test_s2_kills PASS (43 with LEDGERLOCK) on mutant; baseline PASS -> SURVIVED",
+  "unfinished::2": "test_v21_kills3_T14b PASS (15) on mutant; baseline PASS -> SURVIVED"
+ },
+ "entries": [
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 9,
+   "mutant": "L157 string '). ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed via mutant_view: index 9 = L157 '). ' emptied, the f-string literal between {SHA256_OF} and {OCR_INSTEAD} in pinned[1] (run.py:157). After emptying, pinned[1] reads '...to its sha256 (`shasum...hexdigest())\" <exe>`Or have the model...' -- an unclosed '(' and SHA256_OF's closing backtick jammed against OCR_INSTEAD. Every content word of SHA256_OF and OCR_INSTEAD survives; only the ')' + '. ' separator is lost. Operator-visible: ident['operator']=OCR_CHECKS[check][1] (run.py:215), embedded by ocr_refusal (run.py:224), raised RunRefused on REFUSED (run.py:517) printed 'aisef run: refused:' exit 2 (cli.py:99), persisted rec['ocr_identity']['operator'] in RUN.json (run.py:515, sort_keys 675), printed by --check (cli.py:90-94); none parses it. Verified consumers: grep OCR_CHECKS over aisef2/validation/tests/docs = run.py:152/215, mutation.py:1208 registration, docs/v2/V2.1-BACKLOG.md (names target, no literal). Only tests referencing OCR_CHECKS/ocr_refusal/ocr_identity are the two registered kill files (grep). The pinner test_each_check_says_what_it_is_and_what_the_operator_does (test_v21_ocr_identity.py:170-177) asserts only content substrings (shasum -a 256, python -c, hashlib, BUILD-RECIPE.md, 'Find out why...', 'Re-pin only...', 'remove review.ocr and set review.finder to \"model\"', 'give it a new --out', 'a run directory is never reused', 'run again') -- all survive; :159 self-compares the mutated module. ocr_preflight.py:327 asserts 'give it a new --out' (in OCR_INSTEAD) -- survives. RAN test_v21_ocr_identity on mutant: PASS (15); baseline PASS -> SURVIVED. Pure connector/punctuation loss.",
+   "refutation": "",
+   "consumers_checked": [
+    "run.py:215/224/515/517/675 + cli.py:90-99 carry pinned[1] verbatim (refusal exit 2, RUN.json operator field, --check); none parses it -- confirmed by reading",
+    "grep OCR_CHECKS aisef2/validation/tests/docs: run.py:152/215, mutation.py:1208, V2.1-BACKLOG.md; no listdir/parse of the string",
+    "only test_v21_ocr_identity + test_v21_ocr_preflight reference OCR_CHECKS (grep tests); pinner :170-177 asserts content substrings, none containing '). '"
+   ],
+   "exceptions_checked": [
+    "operator needing the ')' to parse the hash commands: SHA256_OF is self-delimited by its own backticks; the lost ')' is cosmetic",
+    "a verifier/doc quoting pinned[1] verbatim: none (BACKLOG names the function only)"
+   ],
+   "note": "Independently reproduced. AUDITED sound: connector loss, every content word and the operator action survive, no reader keys on '). '."
+  },
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 10,
+   "mutant": "L159 string \"The file's bytes are the ones review.ocr.sha256 pins, but `<exe> version` did not print the version line of Open Code Review \" emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant confirmed via mutant_view: index 10 empties the leading Constant of declared[1]'s combined f-string (run.py:159 + the literal start of 160, folded because 160/163/164/166 are f-strings). After emptying, declared[1] begins 'v1.12.12 (182898c); what it did instead is the observed value above (another release or commit, ...)' -- the whole opening diagnostic sentence (subject+verb+object: the bytes MATCHED review.ocr.sha256's pin but `<exe> version` did NOT print the pinned release's version line) is gone and 'the observed value above' is left dangling. This is the ONLY statement that distinguishes a declared-check failure (bytes OK, version wrong -> investigate the version declaration, do NOT re-pin) from a pinned-check failure (bytes wrong -> re-hash/re-pin); it is operator-read (same paths as index 9: refusal exit 2, RUN.json rec['ocr_identity']['operator'], --check). Per the owner rule, a string an operator reads is not harmless. I verified the designated operator-text pinner does NOT assert it: test_each_check...(:178-184) declared do-list asserts review.ocr.sha256 / v1.12.12 / 182898c / '`<exe> version` yourself' / 'review.finder to \"model\"' / 'pin the sha256 of a build of Open Code Review v1.12.12 (182898c)' / 'give it a new --out' / 'run again' -- each ALSO occurs AFTER the deleted sentence (run.py:161-164), so none fails; test_the_declared_operator_text_is_true_of_every_way_the_check_fails (:186-202) asserts DECLARED_WAYS.values() = {'another release or commit','an error','no answer in time','no version line','could not be started'}, ALL of which live in the surviving '(another release or commit, ...no version line, or it could not be started)' clause (run.py:161-162), NOT in the emptied constant. grep: 'did not print the version line' and \"The file's bytes are the ones review.ocr.sha256 pins\" occur ONLY at run.py:159 across aisef2/validation/tests/docs. RAN test_v21_ocr_identity on mutant: PASS (15); baseline PASS -> SURVIVED. The author's refutation sketch is valid.",
+   "refutation": "INPUT: R.OCR_CHECKS['declared'][1] (equivalently ident['operator'] for an ident whose pin passes but version declaration fails -- the REFUSED cases at test_v21_ocr_identity.py:112). READER: test_each_check_says_what_it_is_and_what_the_operator_does, the operator-text pinner. SKETCH: add to the declared do-list (:180-182) self.assertIn(\"The file's bytes are the ones review.ocr.sha256 pins, but\", do) (or 'did not print the version line of Open Code Review'); the phrase occurs only at run.py:159, so it passes unmutated and fails on this mutant -- pinning that the declared refusal states the bytes matched the pin while the version line did not. VERIFIED: grep confirms the phrase is nowhere else; emptying the constant removes it; the current do-list omits it.",
+   "consumers_checked": [
+    "run.py:215/224/515/517/675 + cli.py:90-99 carry declared[1] verbatim; none parses it",
+    "test_v21_ocr_identity.py:178-184 declared do-list -- every asserted substring also occurs after the deleted sentence (verified by reading 161-164); :186-191 DECLARED_WAYS.values() all in the surviving clause (verified against DECLARED_WAYS at :51-52)",
+    "DECLARED_WAYS markers are matched against ident['reason'] not OCR_CHECKS text (:197), so no marker is lost",
+    "grep 'did not print the version line' / \"The file's bytes are the ones review.ocr.sha256 pins\": only run.py:159"
+   ],
+   "exceptions_checked": [
+    "an automated reader keying on the removed clause: none -- diagnosis markers live in ident['reason']",
+    "the fact stated elsewhere in declared[1]: no -- 'bytes match the pin but the version line failed' appears nowhere else; run.py:163-164's 'pin the sha256 ... v1.12.12 (182898c)' is a different, surviving instruction",
+    "a mere connector like 9/11/7: no -- a whole proposition is removed and 'the observed value above' dangles"
+   ],
+   "note": "Independently reproduced; REFUTED (test owed) upheld. The AUDITED-by-'no automated consumer' reading is available but rejected per the owner rule (operator-read field) and the round-3 rule (owed when disputed). Principled split from indices 9/11: those lose a connector with every content word intact; 10 loses an operator-read diagnostic proposition. class_after = SURVIVED (test owed)."
+  },
+  {
+   "target": "aisef2/app/run.py::OCR_CHECKS",
+   "index": 11,
+   "mutant": "L160 string ' (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed via mutant_view: index 11 = L160 ' (' emptied, the f-string literal between {version} and {commit[:7]} in declared[1]'s opening sentence. After emptying: '...version line of Open Code Review v1.12.12182898c); what it did...' -- version and commit glue into 'v1.12.12182898c' with a dangling ')'. Both values survive as substrings, AND the pair is stated cleanly later at run.py:163-164 ('...Open Code Review v1.12.12 (182898c)', a different untouched literal) and structurally in ident['expected']['version'/'commit'] (run.py:212) and in ocr_refusal's own '({commit[:7]})' (run.py:223). The pinner test_each_check...(:180-181) asserts 'v1.12.12' and '182898c' (both substrings of 'v1.12.12182898c') and 'pin the sha256 of a build of Open Code Review v1.12.12 (182898c)' (the untouched 163-164 occurrence) -- all pass. grep 'version line of Open Code Review' in tests = none, so no test asserts the opening prose's space-paren. RAN test_v21_ocr_identity on mutant: PASS (15); baseline PASS -> SURVIVED. Connector/punctuation only; operator-visible via the same paths; no reader parses version/commit out of the prose.",
+   "refutation": "",
+   "consumers_checked": [
+    "run.py:215/224/515/517/675 + cli.py:90-99 carry declared[1] verbatim; none parses it",
+    "test_v21_ocr_identity.py:180-181 asserts v1.12.12 and 182898c (substrings of the glued token) + 'pin the sha256 of a build of Open Code Review v1.12.12 (182898c)' at the untouched run.py:163-164",
+    "ident carries version/commit structurally (run.py:212); ocr_refusal prints '({commit[:7]})' from exp (run.py:223)"
+   ],
+   "exceptions_checked": [
+    "a reader parsing release/commit from declared[1] prose: none -- structured in ident['expected'], printed cleanly at 163-164 and in ocr_refusal",
+    "ambiguity of 'v1.12.12182898c' to an operator: the clean pair is shown at 163-164 / ident['expected'] / ocr_refusal"
+   ],
+   "note": "Independently reproduced. Borderline (glues two semantic tokens) but AUDITED holds: both values remain as substrings and appear cleanly in the same string's actionable instruction and in the structured ident; it is a ' (' punctuation loss, no proposition lost."
+  },
+  {
+   "target": "aisef2/app/run.py::ocr_refusal",
+   "index": 7,
+   "mutant": "L224 string '. ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed via mutant_view: index 7 = L224 '. ' emptied, the f-string literal between {ident['reason']} and {ident['operator']} in ocr_refusal (run.py:219-225, raised run.py:517, printed cli.py:99 exit 2). After emptying: '...observed {reason}{operator} No session...' -- reason and operator run together with no sentence break. Both pieces survive whole; only the separator is gone, and the 'observed <reason>' prefix stays contiguous. Verified the kill tests assert the surviving parts: test_v21_ocr_identity.py:130-133 asserts in `said` the parts f'observed {reason}', ident['operator'], 'No session was started and no provider request was sent.' (also ident['check'], 'expected sha256 <sha>', 'naming v1.12.12 (182898c)'); test_v21_ocr_preflight.py:294 asserts 'expected sha256','observed','No session was started','no provider request' -- all survive. The structured reason/operator are also on rec['ocr_identity'] (run.py:515), not re-parsed from this string. RAN test_v21_ocr_identity (15) + test_v21_ocr_preflight (21) on mutant: PASS; baseline PASS -> SURVIVED. Pure connector/punctuation loss.",
+   "refutation": "",
+   "consumers_checked": [
+    "run.py:517 raise RunRefused(ocr_refusal(ident)); cli.py:99 print exit 2",
+    "test_v21_ocr_identity.py:130-133 asserts surviving parts (observed<reason> prefix, operator, tail sentence); none asserts '. '",
+    "test_v21_ocr_preflight.py:294 asserts 'observed'/'No session was started'/'no provider request' -- all survive",
+    "reason/operator carried structurally in rec['ocr_identity'] (run.py:515), not parsed from the string"
+   ],
+   "exceptions_checked": [
+    "a reader splitting the refusal on '. ' to separate reason from instruction: none -- structured pieces on the record",
+    "the merge hiding which text is the observed value vs the instruction: the observed value is also in rec['ocr_identity']['reason']"
+   ],
+   "note": "Independently reproduced. AUDITED sound: the '. ' is a sentence separator; reason, operator and tail all survive and are asserted."
+  },
+  {
+   "target": "aisef2/app/run.py::evidence_manifest",
+   "index": 17,
+   "mutant": "L432 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed via mutant_view: index 17 = L432 sorted()->list() on the LAST glob only (out / diagnostics.ARTIFACT_DIR = 'probe-observations').glob('*.json'); the four earlier globs (run/journals, sessions, preflight, review-findings) stay sorted(). So only probe-observations keys' INSERTION order into the returned {path:sha} dict can differ, and only when the glob returns them out of name order; key set and values unchanged. Verified every reader treats the result as a mapping: anchor_of json.dumps(sort_keys=True) (run.py:447), on-disk MANIFEST json.dumps(sort_keys=True) (run.py:677), verify.py:123/129-131 (anchor + dict == + sorted diff), bundle_cli.py anchor/==/sorted. The ONLY test that iterates the manifest in order is test_v21_r3_detail_artifact.py:368-372 test_every_group_is_listed_in_name_order, which asserts name order for sessions/ run/journals/ preflight/ review-findings/ and DELIBERATELY NOT probe-observations/ (verified by reading). Other probe-observations tests use key-access/dict==/sort_keys: r3_detail_product:197/200/227, r3_detail_failclosed:106(sorted)/112(==), s2_kills:570(writes, read back via anchor), T14a:82/163(key)/241(assertIn), pm8_diagnostics_run:233-234(key+anchor). RAN all 12 registered kill files on the mutant: ALL PASS (r3_detail_artifact/pm8_diagnostics/pm8_diagnostics_run/T14a; then app_units/inputs/verify/continue_usage/review_chain/continue_integrity/app_run = 139 OK; then identity = 13 OK after adding LEDGERLOCK-PROJECT.json which both baseline and mutant also needed). No kill -> SURVIVED. Not EQUIVALENT: list(evidence_manifest(out)['files']) exposes probe-observations order to a direct caller on a FS that globs out of name order (glob order is not guaranteed sorted); AUDITED because no consumer/test/contract does so, consistent with the A14 unfinished/check_repository entries and docs/v2.1/decisions/B03-R3-detail.md:185.",
+   "refutation": "",
+   "consumers_checked": [
+    "run.py:447 anchor_of sort_keys; run.py:677 MANIFEST json.dumps sort_keys -- order-independent",
+    "verify.py:123 anchor_of(stored), :129 stored!=fresh dict==, :130-131 sorted(diff); bundle_cli anchor/==/sorted -- order-independent",
+    "ordered iteration: ONLY test_v21_r3_detail_artifact.py:368-372, groups sessions/journals/preflight/review-findings, NOT probe-observations (read and confirmed)",
+    "probe-observations tests r3_detail_product/r3_detail_failclosed/s2_kills/pm8_diagnostics(_run)/T14a all use key-access, dict==, sorted(), or sort_keys (grepped and read)",
+    "all 12 registered kill files run on the mutant: PASS"
+   ],
+   "exceptions_checked": [
+    "a FS globbing probe-observations out of name order + a reader iterating the dict in order: no current reader iterates probe-observations; on this machine the glob returns name order so the mutant is byte-identical here",
+    "on-disk manifest reproducibility (the docstring's reason for sorting): already guaranteed by run.py:677 sort_keys, independent of in-dict order",
+    "EQUIVALENT instead of AUDITED: rejected -- list(evidence_manifest(out)['files']) is observable to a direct caller; matches the carried A14 entries"
+   ],
+   "note": "Independently reproduced across all 12 registered kill files. The errors=1/7 the author saw were a mutation-independent archive-scope artifact (missing closure-evidence/v2/release/LEDGERLOCK-PROJECT.json): confirmed identical at baseline, resolved by git show -> both PASS. AUDITED (not EQUIVALENT) upheld."
+  },
+  {
+   "target": "aisef2/app/run.py::check_repository",
+   "index": 32,
+   "mutant": "L237 string 'aisef-check-' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "CARRIED (remapped_from base 289885ef L142 -> snapshot L237). Mutant confirmed via mutant_view: index 32 = L237 'aisef-check-' emptied -> tempfile.TemporaryDirectory(prefix='') for the --check scratch clone (run.py:237). Only the basename of that scratch dir changes; the dir is used as `git -C <abs tmp> clone ... repo` (238) and Path(tmp)/'repo' (241), nothing branches on its name, the handle reaps it either way. The name can surface in operator text only in the clone-failure refusal 'the project repository could not be cloned: <git stderr[:200]>' (run.py:240). Verified: grep 'aisef-check' over aisef2/validation/tests/docs/bin/framework/.github = ONLY run.py:237; no startswith/glob/listdir matches the prefix. Registered kill file test_v21_kills3_T14a (mutation.py:831) mocks git and asserts cause class + git's words, not the scratch path. Other reaching tests: test_s2_kills.py:484 asserts the clone-failure message .startswith('the project repository could not be cloned: ') (the fixed prefix, unchanged by the mutant); test_v21_kills3_T23a mocks check_repository entirely; test_v21_inputs/test_app_units assert 'not inert'/baseline messages naming the operator's repo, never the scratch. RAN test_v21_kills3_T14a (18) PASS + test_s2_kills (43, with LEDGERLOCK) PASS on mutant; baseline PASS -> SURVIVED. The lost word is a label of a directory already deleted; no reader depends on it.",
+   "refutation": "",
+   "consumers_checked": [
+    "grep 'aisef-check' aisef2/validation/tests/docs/bin/framework/.github: only run.py:237 (no match/listdir of the prefix)",
+    "run.py:237-241/240/244/246: scratch dir used only as `-C <abs>`/Path(tmp)/'repo'; name reaches operator text only in the clone-failure stderr (240)",
+    "registered kill file test_v21_kills3_T14a (mutation.py:831) mocks git, asserts cause class + git's words",
+    "test_s2_kills.py:484 asserts the clone-failure message via .startswith(fixed prefix); T23a mocks check_repository; inputs/app_units name the operator repo"
+   ],
+   "exceptions_checked": [
+    "an operator/script cleaning a killed --check's leftovers by name: none in repo/docs/.github; the OS reaps TMPDIR and the handle removes the dir",
+    "a refusal where the scratch label disambiguates: clone-failure refusal reproduces git's dynamic stderr whatever it says (both baseline and mutant), and s2_kills asserts only the fixed prefix",
+    "uniqueness/collision: delegated to mkdtemp's 8 random chars, not the prefix"
+   ],
+   "note": "Independently reproduced at the snapshot. AUDITED upheld. Minor: the carried grounds/consumers cite pre-remap line numbers (run.py:143/145/146/149/151); at the snapshot the function is run.py:228-249 (TemporaryDirectory 237, clone 238, clone-failure 240, recursive 241, held.stderr 244, 'does not hold' 246). Substance verified at the snapshot lines; conclusion unchanged."
+  },
+  {
+   "target": "aisef2/app/run.py::unfinished",
+   "index": 2,
+   "mutant": "L410 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "CARRIED (remapped_from base 289885ef L279 -> snapshot L410). Mutant confirmed via mutant_view: index 2 = L410 sorted()->list() -> unfinished (run.py:403-410) returns the refused story ids in journal insertion order instead of alphabetical; membership and the n>0 filter unchanged. Verified the single product caller is verify.py:183 (grep -w unfinished across aisef2/validation = run.py:403 def, verify.py:183 call, mutation.py target name; other hits are other words). Traced: verify.py:183 refused -> :201 errors=[{story:x,...} for x in refused]+story_errors -> :202 R.delivery(..., errors) where delivery (run.py:373-390) uses errors ONLY via 'f\"{len(errors)} stories were refused\" if errors else []' (len + truthiness); verify discards delivery's blocked list (:202 `verdict,_,committed`) and its returned dict (:222) carries no story name from refused. So order is unobservable to every consumer. Registered kill file test_v21_kills3_T14b (mutation.py:835) pins membership not order: :155 assertCountEqual(unfinished(events), ['S1','S2']) with the comment 'which and how many; no reader takes the order' (the only multi-story case); other cases single/empty. RAN test_v21_kills3_T14b on mutant: PASS (15); baseline PASS -> SURVIVED. Not EQUIVALENT: a direct caller's list(unfinished(events)) would see the order, but only verify calls it and it is order-blind. AUDITED, consistent with the A14 rule.",
+   "refutation": "",
+   "consumers_checked": [
+    "grep -w unfinished aisef2/validation: run.py:403 def, verify.py:183 only call, mutation.py target name; run_scope.py:104 is a comment, not this function",
+    "verify.py:183->201->202: refused -> error dicts -> delivery; delivery (run.py:373-390) reads errors via len()/truthiness only; blocked discarded (:202), returned dict (:222) holds no refused name",
+    "registered kill file test_v21_kills3_T14b:155 assertCountEqual (membership), comment 'no reader takes the order'; :147/150/160/166 single or empty"
+   ],
+   "exceptions_checked": [
+    "sorted() raising where list() does not (mixed-type ids): unreachable -- story_id is always a non-empty str (journal schema)",
+    "another reader printing/hashing/iterating the list for effect: none; rec['story_errors'] is execute's own errors, not unfinished()",
+    "flakiness from list(): none -- the order is the fixed journal's"
+   ],
+   "note": "Independently reproduced at the snapshot. AUDITED upheld. Minor: the carried grounds cite pre-remap lines (run.py:279, verify.py:172/183-184/204-205, run.py:254-256); at the snapshot unfinished is run.py:403-410, the call verify.py:183, delivery run.py:373-390. Substance verified at the snapshot lines; conclusion unchanged."
+  }
+ ],
+ "owed_tests": [
+  "aisef2/app/run.py::OCR_CHECKS index 10: in tests/v2/test_v21_ocr_identity.py::test_each_check_says_what_it_is_and_what_the_operator_does, add to the declared do-list (:180-182) self.assertIn(\"The file's bytes are the ones review.ocr.sha256 pins, but\", do) (or 'did not print the version line of Open Code Review'); the phrase is only at run.py:159, so it passes unmutated and fails on the mutant. VERIFIED by grep + reading the current do-list."
+ ],
+ "disagreements": [],
+ "notes": "Skeptic verification of W2-run-1: 5 new (OCR_CHECKS 9/10/11, ocr_refusal 7, evidence_manifest 17) + 2 carried (check_repository 32, unfinished 2). ALL 7 verdicts CONFIRMED -- every mutant description matches the snapshot (mutant_view), every named consumer/test/document is real (grep + read), and no unregistered test kills any of them. 6 AUDITED, 1 SURVIVED (test owed) (OCR_CHECKS 10). I ran each mutant one at a time against its registered kill files (all SURVIVE) plus the order/clone-failure-relevant reaching modules; for evidence_manifest 17 I ran all 12 registered kill files. The only scare -- test_s2_kills errors=1 (and test_v21_identity) -- was a mutation-independent archive-scope artifact: test_the_unknown_specs_are_named_in_order reads closure-evidence/v2/release/LEDGERLOCK-PROJECT.json, excluded by the prescribed archive paths; identical error at baseline, resolved by adding the file via git show -> baseline and mutant both PASS. The AUDITED/REFUTED split is principled: 9/11/refusal-7 lose a connector with every content word and operator action intact; 10 loses an operator-read diagnostic proposition no pinner asserts (owed). The two A14 ordering mutants are AUDITED not EQUIVALENT because a direct caller's list() is order-observable though no consumer does it (B03-R3-detail.md:185). Two carried entries carry pre-remap line numbers in their grounds prose (the remapped_from chain documents the base); I re-verified their substance at the snapshot lines -- conclusions unchanged (noted per entry). No test was added or changed; code/tests pinned throughout."
+}

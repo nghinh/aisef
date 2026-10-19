@@ -1,0 +1,36 @@
+{
+  "batch": "W2-cli_invocation-2",
+  "role": "skeptic",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "verified_at": "Mon Oct 19 22:21:24 +07 2026",
+  "entries": [
+    {
+      "target": "aisef2/probe/cli_invocation.py::_stream_matches",
+      "index": 29,
+      "mutant": "L596 string \"a regex shape is searched by the harness's bounded search: none was given\" emptied",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "grounds": "Mutant is as stated. mutant_view and the builder (validation.v2.mutation.mutants(src,'_stream_matches',enums)[29]) give desc EXACTLY 'L596 string \"a regex shape is searched by the harness's bounded search: none was given\" emptied'; the diff turns TypeError(\"...\") into TypeError('') at the regex/search-is-None guard; the exception TYPE is unchanged and the branch is taken on the same input. Independently confirmed the three load-bearing claims. (1) Reachability: grep shows _stream_matches is called only at cli_invocation.py:662 inside cli_invocation's own verdict_of, and only when cls=='exits_streams'. The only two production callers of that verdict_of are _observe (1162-1166), which always binds a concrete `search` closure over search_in_worker via functools.partial, and verdict_of('equality',...) at 1192, which never reaches the regex branch. So search-is-None+regex is unreachable in production. (The draft's mention of file_artifact/python_callable/python_callable_v2/process_effect verdict_of callers is loose but harmless: those are entirely separate verdict_of functions in separate modules that never call _stream_matches at all.) (2) No reader of the message: grep of the message fragments ('none was given','bounded search','a regex shape is searched') across aisef2/validation/tests/docs finds it only at the source (596), an unrelated bundle_cli.py message, and a DOCSTRING paraphrase in test_c2_cli_verdicts.py:240 (not an assertion). F7 (test_c2_cli_verdicts.py:244-247) reaches the exact branch but uses assertRaises(TypeError) on the TYPE only. _Later.settle (1343-1348) catches StreamSearchFailed only; a TypeError propagates uncaught and the OBSERVED detail is json.dumps(_public(facts)), not the message. (3) Kill-file runs (snapshot 4ec961e, isolated env: PATH stripped of both opencode dirs, HOME/TMPDIR under my tree, PYTHONPATH=tree, python3 -P -B). I resolved the FULL registered set from V21_TARGETS = ['tests/v2/test_c2_cli_verdicts.py','tests/v2/test_v21_identity.py','tests/v2/test_v21_r5_regex_worker.py'] (the draft named only the last). All three PASS unmutated (20 / 13 / 34 tests OK; test_v21_identity needed closure-evidence/v2/release/LEDGERLOCK-PROJECT.json, which I supplied via git show) and all three PASS on the mutant (20 / 13 / 34 OK). None kills it. Survivor confirmed; AUDITED stands.",
+      "consumers_checked": [
+        "aisef2/probe/cli_invocation.py:662 verdict_of -> the only call site of _stream_matches; reached only when cls=='exits_streams'",
+        "aisef2/probe/cli_invocation.py:1162-1166 _observe -> always builds a concrete search closure (search_in_worker) and binds it via functools.partial(verdict_of, cls, observable, facts, search); search-is-None unreachable here",
+        "aisef2/probe/cli_invocation.py:1192 verdict_of('equality',...) -> cls=='equality', never enters the regex branch; the only other production verdict_of call",
+        "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle -> except StreamSearchFailed only; TypeeError not caught; OBSERVED detail is json.dumps(_public(facts)), not the message",
+        "tests/v2/test_c2_cli_verdicts.py:244-247 (F7) -> reaches the exact search-is-None+regex branch but asserts assertRaises(TypeError) on the TYPE; message not read; PASSES on mutant",
+        "tests/v2/test_v21_r5_regex_worker.py:158-173,198-199 -> exercises _stream_matches/verdict_of only with a search supplied (recording/oracle); never search=None on a regex shape; PASSES on mutant",
+        "tests/v2/test_v21_identity.py -> base identity kill file; reads only closure-evidence/v2/release/LEDGERLOCK-PROJECT.json; does not call _stream_matches; PASSES on mutant (empirically insensitive to the source-string change)",
+        "grep message fragments across aisef2/validation/tests/docs -> message text appears only at cli_invocation.py:596 (source), test_c2_cli_verdicts.py:240 (docstring, not an assert), and an unrelated bundle_cli.py:521 message"
+      ],
+      "exceptions_checked": [
+        "Owner rule 'a string read by an operator or a verifier is not harmless': does not apply -- verified the message never reaches an operator report or a review verifier (settle catches only StreamSearchFailed; detail is facts JSON; the branch itself is unreachable in a real run because observe always supplies a bounded search). It is a developer diagnostic for a missing-argument programmer error.",
+        "The contract that matters -- 'a regex shape without a search is a TypeError, not an unbounded re.search' -- is the TYPE, preserved by the mutant and pinned by test_c2_cli_verdicts.py F7 via assertRaises(TypeError).",
+        "Not EQUIVALENT: the mutant IS observably different on a search=None+regex call (TypeError('') vs the worded TypeError), so it is not provably indistinguishable; it is AUDITED because no reader depends on the wording and the branch cannot be reached in production.",
+        "No test owed: adding a message-text assertion would only pin wording no operator/verifier reads -- adding a test merely to reach a number, which the owner rule forbids."
+      ],
+      "grounds_correction": "The draft's grounds and consumers_checked call test_v21_r5_regex_worker.py 'the registered kill file' (singular) and ran only it. The resolved V21_TARGETS set for this target is THREE files (test_c2_cli_verdicts.py, test_v21_identity.py, test_v21_r5_regex_worker.py). This understates the measurement; I ran all three (unmutated + mutant) and the survivor conclusion is unchanged. Correction only -- classification unaffected."
+    }
+  ],
+  "owed_tests": [],
+  "notes": "1 entry verified. CONFIRMED / AUDITED. Independently reproduced: mutant matches index 29 exactly; the search-is-None+regex branch is unreachable in production (observe always supplies a bounded search, the only other production verdict_of call is cls=='equality'); the emptied TypeError message is read by no test (type-only assert in F7), no operator/verifier (settle catches StreamSearchFailed only; detail is facts JSON), and no doc. Ran the FULL resolved registered kill set (3 files, not the 1 the draft named) unmutated and on the mutant in an isolated env; all pass both ways, so none kills -> survivor confirmed. One grounds correction recorded (registered kill set is 3 files). My audit trees removed."
+}

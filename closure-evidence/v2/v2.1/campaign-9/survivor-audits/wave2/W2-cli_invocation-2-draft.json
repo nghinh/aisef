@@ -1,0 +1,28 @@
+{
+  "batch": "W2-cli_invocation-2",
+  "entries": [
+    {
+      "target": "aisef2/probe/cli_invocation.py::_stream_matches",
+      "index": 29,
+      "mutant": "L596 string \"a regex shape is searched by the harness's bounded search: none was given\" emptied",
+      "class": "AUDITED",
+      "group": "typeerror-message-emptied",
+      "grounds": "At cli_invocation.py:594-596, `_stream_matches` raises TypeError when a `regex` shape is given with no `search`. The mutant empties only the message string (TypeError('')); the exception TYPE is unchanged and the branch is still taken on exactly the same input. The branch is unreachable in production: the only caller that reaches the regex path is `exits_streams` via `verdict_of`, and the `observe` path (cli_invocation.py:1162-1166) always builds a concrete `search` closure over `search_in_worker` and passes it in; the other probes that call `verdict_of` (file_artifact.py:890, python_callable.py:338, python_callable_v2.py:575, process_effect.py:940) never use cls=='exits_streams', so never reach `_stream_matches`'s regex branch. The guard is a programmer-error defense (a caller that forgot the argument). No test pins the message text: tests/v2/test_c2_cli_verdicts.py:238-247 asserts `assertRaises(TypeError)` on the TYPE only (passes with an empty message), and the registered kill file tests/v2/test_v21_r5_regex_worker.py never exercises the `search is None` branch at all (every call supplies a search). No operator/verifier reads the message: _Later.settle (cli_invocation.py:1343-1348) catches only StreamSearchFailed and str()'s that into HARNESS_FAILED detail; a TypeError propagates uncaught (a crash in a buggy caller's traceback), never into a verdict or a report string. Docs (USAGE-2.1.md:628, V2.1-BACKLOG.md V21-68/V21-82) reference `_stream_matches` by line range and structure, not this message. REGISTERED KILL FILE RUN (snapshot 4ec961e, 2026-10-19): tests/v2/test_v21_r5_regex_worker.py PASSES unmutated (OK, 34 tests) and PASSES on the mutant (OK, 34 tests) -> does not kill; survivor confirmed.",
+      "consumers_checked": [
+        "aisef2/probe/cli_invocation.py:1162-1166 observe -> always supplies a concrete `search` (search_in_worker closure); the search is None + regex branch is unreachable here",
+        "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle -> catches StreamSearchFailed only (str()'d into HARNESS_FAILED detail); TypeError is not caught, so its message never enters a report",
+        "aisef2/probe/file_artifact.py:887,890 / python_callable.py:338 / python_callable_v2.py:575 / process_effect.py:940 verdict_of callers -> none use cls=='exits_streams'; never reach the regex branch",
+        "tests/v2/test_c2_cli_verdicts.py:238-247 -> asserts assertRaises(TypeError) on the type only; message not read",
+        "tests/v2/test_v21_r5_regex_worker.py (registered kill file) -> never calls _stream_matches/verdict_of with search=None on a regex shape; message not read",
+        "docs/v2.1/USAGE-2.1.md:628 and docs/v2/V2.1-BACKLOG.md V21-68/V21-82 -> cite _stream_matches by line range/structure, not the message text"
+      ],
+      "exceptions_checked": [
+        "Owner rule 'a string read by an operator or a verifier is not harmless': checked and does not apply -- this message is a developer diagnostic for a missing-argument programmer error that cannot occur in a real run (observe always supplies search); it is never surfaced to an operator report or a review verifier.",
+        "The contract that matters -- 'a regex shape without a search is a TypeError, not an unbounded re.search' -- is the TYPE, pinned by test_c2_cli_verdicts.py; the mutant preserves the type, so that contract still holds.",
+        "Not added a test to reach a number: no reader depends on the wording."
+      ]
+    }
+  ],
+  "owed_tests": [],
+  "notes": "1 new survivor, 0 carried. Classified AUDITED. Registered kill file test_v21_r5_regex_worker.py run once against the mutant: PASSES unmutated and PASSES on mutant (does not kill) -- the kill file never exercises the search-is-None/regex branch. The exception type (the real contract) is preserved by the mutant and is already pinned by test_c2_cli_verdicts.py:238-247 via assertRaises(TypeError); only the incidental message wording is emptied, and no named consumer/operator/verifier/doc depends on it."
+}

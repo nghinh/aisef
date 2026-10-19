@@ -1,0 +1,56 @@
+{
+  "batch": "W2-verify-1",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "role": "author",
+  "module": "aisef2/app/verify.py",
+  "source_sha256": "2555fdca1107d19f16cd0165da3dacfd2bcb112efec228a3045b4a573807b72b",
+  "entries": [
+    {
+      "target": "aisef2/app/verify.py::_spend",
+      "index": 18,
+      "mutant": "L93 string ' — and verify again): ' emptied",
+      "class": "AUDITED",
+      "group": "Two string-emptying mutants on verify.py L93, both inside the single human-readable `cannot` finding the lineage-unreadable branch builds (L89-93). `cannot` is returned as _spend's third element (L94) and, in verify(), appended verbatim to `problems` (L191-192); the verdict is REFUTED iff `problems` is non-empty (final return, L223), and `cannot` stays a long non-empty truthy string under BOTH mutations, so `None if cannot else b.exceeded()` keeps stop=None and the verdict stays REFUTED with the same recovery action (restore the unreadable evidence). The decision, the subject (lineage evidence unreadable / inherited spend not re-derivable), the per-run basenames (`lineage.unread_runs`) and the per-item detail list (`inherited['unread']`) are all still present; only delimiter/guidance characters move. Registered kill files run once against each mutant in a PATH-stripped copy (HOME/TMPDIR under the tree): tests.v2.test_v21_x_lineage_proof 55 OK and tests.v2.test_v21_x_lineage_gone 29 OK on the unmutated module and on BOTH mutants — neither kill file kills either mutant (genuine survivors).",
+      "grounds": "The mutant empties the literal ' — and verify again): ' that joins the `unread_runs(inherited)` run-basename summary to the '; '-joined per-item detail list: `f\"...run directories at {lineage.unread_runs(inherited)}\" + \"\" + '; '.join(inherited['unread'])[:600]` (verify.py:92-93). Lost text: the operator guidance '— and verify again' and the ': ' that introduces the detail list; the basename summary then abuts the first detail entry (e.g. '...directories at firstfirst: the preflight\\'s ledger does not read...'). `cannot` remains non-empty/truthy, so verify.py:94 keeps stop=None, verify.py:191-192 appends `cannot` to problems, and the verdict is REFUTED either way (verify.py:223, by `problems` truthiness). The three tests that reach this message assert only 'lineage\\'s evidence cannot be read now' / 'cannot be read now' / 'ledger' (verify.py:90 prefix + a single unread entry's own text), all intact. Kill-file outcome on this mutant: test_v21_x_lineage_proof 55 OK, test_v21_x_lineage_gone 29 OK (both PASS unmutated too) — does not kill.",
+      "consumers_checked": [
+        "aisef2/app/verify.py:76-94 is the only producer of `cannot`; verify.py:188-192 the only caller (`spent, stop, cannot = _spend(...)`; `if cannot: problems.append(cannot)`), by `git grep '_spend'` over aisef2/ validation/ tests/ (verify.py defn+call; mutation.py target registration at L678/L1221; unrelated budget.developer_spend / lineage._recorded_spend)",
+        "aisef2/app/cli.py: verify's document is serialized to JSON for the operator and the exit status is taken from v['verdict'] only, never from the problem text (grep of cli.py `verdict`/`_print`)",
+        "validation/qualification/release_acceptance.py:144 reads v['verdict'] == 'VERIFIED' for the gate and stores `problems` whole at L155; it never parses a problem string",
+        "validation/qualification/release_rehearsal.py:153-154 formats the `problems` list repr into a human message only when verdict != VERIFIED; no parse, no dependence on the delimiter",
+        "tests reaching this exact message: tests/v2/test_v21_x_lineage_proof.py::VerifyCannotRederive (L1134-1154) asserts 'lineage\\'s evidence cannot be read now' + 'ledger', and 'cannot be read now'; ::JournalCutUnderItsRecord.test_verify_cannot_rederive_the_inherited_share (L1178-1180) asserts 'lineage\\'s evidence cannot be read now' — none reads the ' — and verify again): ' delimiter, and all pass on the mutant (measured)",
+        "docs/v2.1/USAGE-2.1.md:312 quotes the message only up to '...the spend the record inherited cannot be re-derived' (verify.py:90-91 prefix); it does not quote L92-93 at all",
+        "validation/v21/cli_integration/e2e_guest.py: no reference to this message, to `inherited['unread']`, or to 'verify again' (grep)"
+      ],
+      "exceptions_checked": [
+        "a parser/split that relies on ': ' or ' — and verify again): ' to separate the run-basename summary from the detail list: none exists (git grep 'verify again' over aisef2/ validation/ tests/ docs/ hits only verify.py:80,93 and the USAGE prose, which stops before it)",
+        "the CLI refusal needles ('Make it readable again', 'faithful copy', 'not 0', '--accept-unaccounted does not cover it' in test_v21_x_lineage_proof assert_what_to_do / test_v21_x_lineage_gone THE_REFUSAL) belong to the R.RunRefused / bundle_cli refusal text, a DIFFERENT message; they are not substrings of this _spend `cannot` string, so they do not pin it",
+        "the [:600] cap applies to '; '.join(...) only, not to the emptied literal, so truncation behaviour is unchanged",
+        "a run that ended before its RunSpec, or whose journal a projection refuses, never reaches _spend's unreadable-lineage branch (verify.py:184-192 guard `if s is not None` and the `inherited['unread']` guard at L89), so no new path reads the mutated line"
+      ]
+    },
+    {
+      "target": "aisef2/app/verify.py::_spend",
+      "index": 22,
+      "mutant": "L93 string '; ' emptied",
+      "class": "AUDITED",
+      "group": "Two string-emptying mutants on verify.py L93, both inside the single human-readable `cannot` finding the lineage-unreadable branch builds (L89-93). `cannot` is returned as _spend's third element (L94) and, in verify(), appended verbatim to `problems` (L191-192); the verdict is REFUTED iff `problems` is non-empty (final return, L223), and `cannot` stays a long non-empty truthy string under BOTH mutations, so `None if cannot else b.exceeded()` keeps stop=None and the verdict stays REFUTED with the same recovery action (restore the unreadable evidence). The decision, the subject (lineage evidence unreadable / inherited spend not re-derivable), the per-run basenames (`lineage.unread_runs`) and the per-item detail list (`inherited['unread']`) are all still present; only delimiter/guidance characters move. Registered kill files run once against each mutant in a PATH-stripped copy (HOME/TMPDIR under the tree): tests.v2.test_v21_x_lineage_proof 55 OK and tests.v2.test_v21_x_lineage_gone 29 OK on the unmutated module and on BOTH mutants — neither kill file kills either mutant (genuine survivors).",
+      "grounds": "The mutant empties the join separator '; ' → `''.join(inherited['unread'])` (verify.py:93). The difference is observable ONLY when `inherited['unread']` has ≥ 2 entries: for a single entry '; '.join(x) == ''.join(x) (confirmed: both give 'run1: ledger does not read'). Every test that reaches this _spend path spoils exactly one evidence file (spoil_ledger_of one run; one journal cut) → one unread entry → no observable difference at all in the measured paths. With ≥ 2 unread entries the per-item details run together without a separator, but `cannot` stays non-empty/truthy, the verdict is REFUTED unchanged (verify.py:94,191-192,223) and the recovery action (restore the evidence) is identical; no consumer parses or splits the joined list. Kill-file outcome on this mutant: test_v21_x_lineage_proof 55 OK, test_v21_x_lineage_gone 29 OK (both PASS unmutated too) — does not kill.",
+      "consumers_checked": [
+        "aisef2/app/verify.py:76-94 is the only producer; verify.py:188-192 the only caller (same chain as index 18); `inherited['unread']` is built by aisef2/app/lineage.py (lineage_account L497-551 appends one string per unreadable piece of evidence; account_of L777 flattens per-run); nothing downstream re-splits it",
+        "aisef2/app/cli.py: JSON-serializes the document, exit status from v['verdict'] only",
+        "validation/qualification/release_acceptance.py:144 uses v['verdict'] only; release_rehearsal.py:153-154 prints the problems list repr — neither splits the joined `unread` text on '; '",
+        "tests reaching the message (test_v21_x_lineage_proof.py::VerifyCannotRederive L1134-1154; ::JournalCutUnderItsRecord L1178-1180) each produce a SINGLE unread entry and assert a substring ('cannot be read now', 'ledger') present regardless of the separator; all pass on the mutant (measured)",
+        "docs/v2.1/USAGE-2.1.md:312 quotes only the L90-91 prefix, not the joined detail list",
+        "validation/v21/cli_integration/e2e_guest.py: no reference to `inherited['unread']` or to this message (grep)"
+      ],
+      "exceptions_checked": [
+        "a reader that splits the joined `unread` detail list on '; ' to recover individual entries: none exists anywhere in aisef2/ validation/ tests/ (git grep); the list is emitted only as display text",
+        "a test exercising ≥ 2 simultaneous unread entries through verify._spend (the only way the separator becomes observable): none — the x_lineage_proof/gone cases that reach this branch each spoil one file, so the separator is never produced in any measured path (this is why the mutant is unobservable, not a reader-dependency)",
+        "the companion lineage/CLI refusal messages (lineage.py:302,320,376; bundle_cli.py) build their own per-item text and do not flow through this '; '.join; they are covered by their own targets",
+        "the [:600] cap is applied after the join in both the baseline and the mutant, so it adds no separator-dependent behaviour"
+      ]
+    }
+  ],
+  "owed_tests": [],
+  "notes": "Both NEW survivors are string-emptying mutants inside the single operator-facing `cannot` finding of verify._spend (L89-93); neither changes the REFUTED verdict, the recovery action, or any value a named consumer reads — only delimiter/guidance characters, so AUDITED (not EQUIVALENT: the emitted string does differ when >=1 unread entry is present for index 18, and >=2 for index 22). No test is owed: no reader depends on the mutated tokens (consistent with the carried index-33 ruling that the closing ')' of a human-readable aside is AUDITED). Kill files run once per mutant (both registered: test_v21_x_lineage_proof, test_v21_x_lineage_gone): unmutated 55 OK / 29 OK; index 18 55 OK / 29 OK; index 22 55 OK / 29 OK — confirmed survivors. Module digest verified == carried entry's source_sha256 2555fdca...807b72b. Carried entry (_runspec_problems index 33) was not re-audited; its existing AUDITED grounds are consistent with this batch. Author tree removed at end."
+}

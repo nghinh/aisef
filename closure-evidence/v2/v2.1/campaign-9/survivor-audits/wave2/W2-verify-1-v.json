@@ -1,0 +1,85 @@
+{
+  "batch": "W2-verify-1",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "role": "skeptic",
+  "module": "aisef2/app/verify.py",
+  "source_sha256": "2555fdca1107d19f16cd0165da3dacfd2bcb112efec228a3045b4a573807b72b",
+  "source_sha256_verified": true,
+  "date": "Mon Oct 19 22:54:46 +07 2026 .. 2026-10-19 (skeptic run, same session)",
+  "entries": [
+    {
+      "target": "aisef2/app/verify.py::_spend",
+      "index": 18,
+      "mutant": "L93 string ' — and verify again): ' emptied",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "grounds": "Mutant reproduced at the snapshot via validation.v2.mutation.mutants(src,'_spend',...)[18]; desc == the entry's text exactly. The emptied literal is the implicitly-concatenated ' — and verify again): ' between the f-string ending '{lineage.unread_runs(inherited)}' and \"; \".join(inherited['unread'])[:600], so the mutant reads '...run directories at <path>' immediately abutting the first detail entry (guidance '— and verify again' and the introducing '): ' gone). `cannot` stays a long truthy string, so verify.py:94 keeps stop=None, verify.py:191-192 appends `cannot`, and the verdict is REFUTED (verify.py:222 'REFUTED' if problems). Verdict, subject ('lineage's evidence cannot be read now'), restore path (unread_runs) and every detail entry survive. EMPIRICAL (I ran ALL 7 registered _spend kill files against the written mutant in a PATH-stripped copy, HOME/TMPDIR under the tree): test_app_units 41 OK, test_v21_verify 8 OK, test_v21_continue_usage 10 OK, test_v21_continue_integrity 24 OK, test_app_run 17 OK, test_v21_x_lineage_proof 55 OK, test_v21_x_lineage_gone 29 OK — none kills it (lineage baselines unmutated also 55/29 OK). Genuine survivor.",
+      "refutation": "",
+      "consumers_checked": [
+        "aisef2/app/verify.py:76-94 is the only producer of `cannot`; verify.py:188 is the ONLY code caller of _spend (git grep '_spend' over the whole repo at the snapshot: every other hit is a test-method name like test_spend_* or docs prose) — author's 'only caller' claim CONFIRMED",
+        "aisef2/app/cli.py:78-80 — verify()->_print(v) (json.dumps, so `cannot` is printed verbatim to the operator) but exit status is `0 if v['verdict']=='VERIFIED' else 1`; no parse of the problem text (CONFIRMED)",
+        "validation/qualification/release_acceptance.py:128 verify(); :144 gates on v['verdict']=='VERIFIED'; :153 stores the WHOLE v (incl. v['problems'] carrying `cannot`) under 'verification' — operator-visible, never parsed (author said 'stores problems whole at L155'; precise location is 'verification': v at L153, substance correct)",
+        "validation/qualification/release_rehearsal.py:124 verify(); :133 keeps {'verdict', v['problems']}; :153-154 formats r['verification']['problems'] (a list repr) into a human message only when verdict!=VERIFIED — no parse, no delimiter dependence (CONFIRMED)",
+        "validation/v21/cli_integration/e2e_guest.py (blob fb4879f): no reference to this message, to inherited['unread'] or to 'verify again' (git show | grep: none) — CONFIRMED",
+        "docs/v2.1/USAGE-2.1.md:312 quotes only '...cannot be read now, so the spend the record inherited cannot be re-derived' (the L90-91 prefix), stopping before L92-93 — CONFIRMED",
+        "tests reaching this message: ONLY test_v21_x_lineage_proof.py (VerifyCannotRederive L1134-1154 asserts 'lineage's evidence cannot be read now'+'ledger' and 'cannot be read now'; JournalCutUnderItsRecord L1178-1180 asserts 'lineage's evidence cannot be read now') and test_v21_x_lineage_gone.py:332 ('cannot be read now' and 'is gone' and 'RUN.json records', independent `in` checks) — both files are registered and both pass on the mutant (measured). git grep of the exact message over the whole repo returns only verify.py + USAGE-2.1.md + these two test files"
+      ],
+      "exceptions_checked": [
+        "a parser/split on ': ' or '): ' or ' — and verify again): ' separating the basenames from the detail list: NONE in the repo (git grep of split('; ')/split('): ')/rsplit over aisef2 validation tests returns only unrelated journal-byte/error-type/URL/test-id splits); 'verify again' occurs only at verify.py:93 — CONFIRMED",
+        "the lineage_gone:332 and lineage_proof:1142 assertions use independent substring `in` checks whose needles lie wholly inside the surviving L90 prefix ('is gone', 'cannot be read now') or wholly inside a single detail entry ('ledger', 'RUN.json records'); the mutant removes only the literal BEFORE the join, never a detail's content nor a needle — empirically both files pass (55/29 OK)",
+        "lineage.unread_runs is also read at aisef2/app/bundle_cli.py:965 and aisef2/app/run.py:536 (sibling refusal messages with their OWN mutation targets); the mutant leaves '{lineage.unread_runs(inherited)}' intact and touches only verify.py's own literal, so those two call sites are untouched (author did not list them; they are not consumers of the mutated tokens)",
+        "the [:600] cap binds to \"; \".join(...) only (slice precedence), not to the emptied literal — truncation unchanged (CONFIRMED)"
+      ],
+      "note": "CONFIRMED AUDITED. Measurement-completeness correction: the author ran only 2 of the 7 registered _spend kill files (test_v21_x_lineage_proof, test_v21_x_lineage_gone) and the grounds' phrase 'both registered' is true but understates the registered set (V21_TARGETS lists 7 for _spend); I ran all 7 against the written mutant and all pass, closing the gap — conclusion unchanged. Substantive nuance a skeptic should record: this mutant removes operator-guidance WORDS ('— and verify again') plus the '): ' delimiter, not mere punctuation, and the string IS operator-visible (cli.py _print JSON, release_acceptance 'verification':v, release_rehearsal message). It stays AUDITED (not EQUIVALENT: the emitted string differs with >=1 unread entry) and no test is owed, consistent with the carried index-33 round-3 ruling, because no automated reader's decision/exit/parse/anchor depends on the removed tokens and the verdict+subject+restore-path+details all survive and are independently pinned. Closest call in the batch; not a real gap."
+    },
+    {
+      "target": "aisef2/app/verify.py::_spend",
+      "index": 22,
+      "mutant": "L93 string '; ' emptied",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "grounds": "Mutant reproduced at the snapshot: mutants(src,'_spend',...)[22], desc == entry text. The join separator '; ' is emptied to '' — \"\".join(inherited['unread'])[:600] — the guidance literal ' — and verify again): ' is retained. Observable ONLY with >=2 unread entries (for one entry '; '.join(x)==''.join(x)); with >=2 the per-item details run together but `cannot` stays truthy, verdict REFUTED unchanged (verify.py:94,191-192,222), restore action identical. EMPIRICAL (all 7 registered _spend kill files against the written mutant): test_app_units 41 OK, test_v21_verify 8 OK, test_v21_continue_usage 10 OK, test_v21_continue_integrity 24 OK, test_app_run 17 OK, test_v21_x_lineage_proof 55 OK, test_v21_x_lineage_gone 29 OK — none kills it. Genuine survivor.",
+      "refutation": "",
+      "consumers_checked": [
+        "same producer/caller chain as index 18 (verify.py:76-94 producer, verify.py:188 sole caller); inherited['unread'] built by aisef2/app/lineage.py (one string appended per unreadable piece) and never re-split downstream",
+        "cli.py:78-80 exit from v['verdict'] only; release_acceptance.py:144/153 and release_rehearsal.py:153-154 gate on verdict / print the list repr — neither splits the joined text on '; ' (CONFIRMED)",
+        "the two registered lineage test files each produce exactly ONE unread entry on the paths that reach verify._spend (spoil one ledger / one journal cut), so the separator is never emitted in any measured path and the assertions ('cannot be read now','ledger','RUN.json records') are single-entry substrings — pass regardless of the separator (measured 55/29 OK)",
+        "docs/v2.1/USAGE-2.1.md:312 quotes only the L90-91 prefix, not the joined detail list; e2e_guest.py has no reference to inherited['unread'] or the message (CONFIRMED)"
+      ],
+      "exceptions_checked": [
+        "a reader that splits the joined `unread` list on '; ' to recover entries: NONE anywhere in aisef2/ validation/ tests/ (git grep) — the list is emitted only as display text (CONFIRMED)",
+        "a test exercising >=2 simultaneous unread entries through verify._spend (the only way the separator is observable): none — the lineage_proof/gone cases that reach this branch each spoil one file; so the separator is never produced in any measured path (this is why it is unobservable, not a reader-dependency). Author's claim CONFIRMED",
+        "companion per-item refusal text in lineage.py / bundle_cli.py builds its own strings and does not flow through this '; '.join (separate targets)",
+        "[:600] cap applied after the join in both baseline and mutant — no separator-dependent truncation (CONFIRMED)"
+      ],
+      "note": "CONFIRMED AUDITED. Same measurement-completeness correction as index 18: author ran 2 of 7 registered _spend kill files; I ran all 7 and all pass. NOT EQUIVALENT is the right call — real lineages can carry >=2 unreadable pieces, so the emitted (operator-visible) string genuinely differs; but no decision/parse/anchor depends on the separator and no reader splits the joined list, so no test is owed. Consistent with the carried index-33 ruling."
+    },
+    {
+      "target": "aisef2/app/verify.py::_runspec_problems",
+      "index": 33,
+      "mutant": "L72 string ')' emptied",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "grounds": "Carried entry (remapped). Mutant reproduced at the snapshot: mutants(src,'_runspec_problems',...)[33], desc=='L72 string ')' emptied' exactly. It drops the trailing ')' from the f-string of the one return of the `derived != spec['runspec_hash']` branch (verify.py:70-72), so the problem reads '(re-derived <h1>, journaled <h2>' with no closing paren. Both 12-hex prefixes (derived[:12], spec['runspec_hash'][:12]) and both labels ('re-derived','journaled') remain as separate tokens; verdict REFUTED unchanged (problems non-empty, verify.py:222). EMPIRICAL (all 8 registered _runspec_problems kill files against the written mutant): test_v21_kills3_A22 7 OK, test_v21_verify 8 OK, test_v21_kills3_T22a 13 OK, test_v21_kills3_R01 8 OK, test_app_units 41 OK, test_app_run 17 OK, test_v21_continue_usage 10 OK, test_v21_continue_integrity 24 OK — none kills it. The decisive A22 token test (TheHashPrefixesOfARefutedRunSpecAreTwoTokens, HEX12=\\b[0-9a-f]{12}\\b, asserts findall==[h1[:12],h2[:12]]) PASSES unmutated (7 OK / 1 OK) AND on the mutant (7 OK): end-of-string is a word boundary, so the trailing h2 prefix is still a standalone 12-hex token. Genuine survivor.",
+      "refutation": "",
+      "consumers_checked": [
+        "aisef2/app/verify.py:70-72 is the only producer; verify.py:184-185 is the only caller (`bound, s = _runspec_problems(...)`; `problems += bound`) at the SNAPSHOT (the grounds' L173-174 is the pre-remap base's numbering) — only caller CONFIRMED",
+        "cli.py:78-80 / release_acceptance.py:144 / release_rehearsal.py:153-154: verdict-gated, problem text printed/stored but never parsed (same as the _spend entries)",
+        "tests importing _runspec_problems (git grep over tests at snapshot): A22, R01, T22a (all 3 registered) + T14b and T26a (NOT registered). T14b L232/L242 asserts 'runspec hash' substring only (present with or without the ')'); T26a pins settings.py targets (endpoint_problem/REVIEW_ABSENT/load) and does not assert on the runspec-binds message — neither kills the mutant",
+        "test_v21_verify.py:62 (ceiling-raised) asserts any('runspec' in p) — substring survives the ')' removal (CONFIRMED)",
+        "git grep of 'runspec hash binds' and 'are not the ones the journal' over the whole tests tree: NO test asserts the full string or a substring spanning the trailing ')' — CONFIRMED"
+      ],
+      "exceptions_checked": [
+        "a regex/split extracting h2 by its closing ')': none (A22's HEX12 is the only token reader; end-of-text delimits the trailing prefix, so the mutant does not change its findall result — verified unmutated==mutated, 7 OK both ways)",
+        "the problem concatenated with following text so the open '(' swallows it: it is one list element; cli.py prints JSON, release_rehearsal prints the list repr — each element is quoted/delimited by the container, not by the inline ')'",
+        "round-3 reset path: a run that ended before its RunSpec (spec is None, verify.py:58-59 returns ([],None)) or whose journal a projection refuses (events==[]) never reaches L70-72 — nothing new reaches the mutated line (CONFIRMED)"
+      ],
+      "note": "CONFIRMED AUDITED. The mutant at snapshot index 33 matches the entry and survives the FULL registered kill-file set (8 files) plus the two unregistered consumers (T14b, T26a). Line numbers in the carried grounds are from the pre-remap base (remapped_from base 289885e/ b5c2457): at the snapshot the caller is verify.py:184-185 and the verdict is at verify.py:222, not the L173-174/L204 the grounds cite — substance holds, only numbering drifted. The grounds correctly explain that A22 (which PINS sibling [32]) does not kill [33] because the trailing hex prefix remains a word-bounded token at end-of-string."
+    }
+  ],
+  "owed_tests": [],
+  "notes": "All three entries CONFIRMED as AUDITED genuine survivors. Independent verification: (1) source digest 2555fdca... matches; (2) all three mutants reproduced at the snapshot via validation.v2.mutation and written byte-for-byte into COPY trees (desc asserted == each entry); (3) I ran the COMPLETE registered kill-file set against each mutant — 7/7 for _spend index 18 and 22 (the author measured only 2/7), 8/8 for _runspec_problems index 33 — and NONE kills its mutant; decisive baselines unmutated (lineage_proof 55, lineage_gone 29, A22 7/1) pass, so these are passes-both-ways non-kills; (4) whole-repo git grep at the snapshot confirms verify.py:188 is the sole _spend caller, verify.py:184-185 the sole _runspec_problems caller, no splitter on '; '/'): ', the _spend message appears only in verify.py+USAGE-2.1.md+the two registered lineage tests, and no test asserts the runspec-binds full string or the trailing ')'. Consumer claims (cli.py verdict-only exit, release_acceptance/release_rehearsal gate-on-verdict, e2e_guest silent, USAGE quotes only the L90-91 prefix) all hold. Only corrections, none changing a verdict: (a) author's _spend kill-file measurement was 2 of 7 registered — I closed it to 7/7; (b) the carried index-33 grounds carry pre-remap line numbers (caller L184-185 / verdict L222 at the snapshot); (c) index 18 removes operator-guidance words not just punctuation and the string is operator-visible — still AUDITED, no test owed, under the round-3 rule. No test is owed for any entry. Skeptic trees (W2-verify-1-skeptic, copy-18/22/33) removed at end."
+}

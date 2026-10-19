@@ -1,0 +1,248 @@
+{
+ "batch": "W2-file_artifact-1",
+ "file": "aisef2/probe/file_artifact.py",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "role": "author",
+ "entries": [
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 26,
+   "mutant": "L517 element 0 dropped",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "except-tuple element dropped on the result read (:516-518): the real GREP_WORKER is the fixed trusted script and the step is pre-guarded, so the dropped branch is unreachable in the product flow",
+   "grounds": "file_artifact.py:516-518: `obj = json.loads(pathlib.Path(result).read_bytes())` under `except (OSError, ValueError, RecursionError)`. The mutant drops OSError, so an OSError raised by `read_bytes()` would escape grep_facts uncaught (it is not a Refused, so observe's `except Refused` :880 would not convert it, and run_probe does not wrap evaluate -> the probe would raise instead of returning an Observation). But OSError at :516 is unreachable in the product flow: the immediately preceding `os.path.getsize(result)` at :508 is itself wrapped `except OSError -> WorkerFailed('NO_RESULT')` (:507-509), the worker has already exited (`run.wait`+`run.release` :491-496) and `result` lives in observe's own `tempfile.TemporaryDirectory` (:874) that nothing else writes; between getsize and read_bytes there is no yield and no other actor. size==0 -> NO_RESULT and size>cap -> BAD_RESULT (:510-514) are also already past. So the only way to reach the dropped branch is to inject an OSError at read_bytes (mock), which no test does. ValueError (the JSONDecodeError path) stays and is what every BAD_RESULT/not-json case exercises. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (42 tests, survives); baseline unmutated PASS.",
+   "consumers_checked": [
+    "file_artifact.py: getsize guard :507-509 (OSError->NO_RESULT) already covers a missing/unreadable result; read_bytes OSError at :516 is a redundant second guard for a race the single-threaded flow cannot open",
+    "observe :880 only catches Refused; protocol.run_probe :264-287 does not wrap evaluate(), so an escaping OSError is an uncaught crash, not a ProbeResult",
+    "tests/v2/test_v21_fa_grep_worker.py FailureModes CASES :473-537 exercise CRASHED/NO_RESULT/BAD_RESULT via stand-in workers; 'BAD_RESULT/not json' (:479) hits ValueError, none injects OSError at read_bytes"
+   ],
+   "exceptions_checked": [
+    "a test that mocks pathlib.Path.read_bytes to raise OSError after a valid getsize: none in tests/v2",
+    "a product path where getsize succeeds but read_bytes raises OSError (special file, deletion race): the worker is dead and the TemporaryDirectory is observe's own; not reachable",
+    "a consumer that depends on read_result-OSError being BAD_RESULT rather than a raised OSError: none (no detail parser; file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none).)"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 28,
+   "mutant": "L517 element 2 dropped",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "except-tuple element dropped on the result read (:516-518): the real GREP_WORKER is the fixed trusted script and the step is pre-guarded, so the dropped branch is unreachable in the product flow",
+   "grounds": "Mutant drops RecursionError from the same `except (OSError, ValueError, RecursionError)` at :517. json.loads raises RecursionError only on very deep nesting: measured on this interpreter (python3 -P -B), `json.loads('['*n+']'*n)` parses at n=32820/50000/100000 and first raises RecursionError near n=200000 (~400000 bytes). The result size is capped at `cap = _RESULT_FLOOR + 8*sum(len(rel)+8 for rel in rels)` = 65536 + ... (:505); a payload big enough to trigger RecursionError (~400 KB) exceeds the cap of any request short of thousands of files and is rejected by the size check `size>cap -> BAD_RESULT` at :513-514 before json.loads ever runs. The real worker GREP_WORKER (:382-408) emits JSON of depth <=3 (a dict with a flat list of [index,line] pairs), never deep. So the dropped branch is unreachable for any realistic request; it defends only an adversarial worker emitting ~400 KB of nested brackets on a multi-thousand-file request. ValueError stays. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives); baseline PASS.",
+   "consumers_checked": [
+    "file_artifact.py: size cap :505,:513-514 rejects an oversized (hence deeply-nestable) result as BAD_RESULT before json.loads; GREP_WORKER :382-408 produces depth<=3 JSON",
+    "tests/v2/test_v21_fa_grep_worker.py: 'BAD_RESULT/too large' (:508-510) writes '['+'0,'*400000+'0]' which is caught by the size cap, not by RecursionError; 'BAD_RESULT/not json' hits ValueError; no case writes a within-cap deeply-nested result",
+    "the same no-detail-parser flow as the other BAD_RESULT messages (file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none).)"
+   ],
+   "exceptions_checked": [
+    "a within-cap JSON that raises RecursionError for a small request: impossible (RecursionError needs ~400 KB > cap unless the request has ~4600+ files)",
+    "a test feeding a within-cap deeply-nested worker result: none",
+    "a consumer depending on RecursionError->BAD_RESULT specifically: none; the 'never trusted for its shape' contract is pinned for the reachable shapes (ValueError, wrong fields/types, too large) but a RecursionError is not reachable under the size cap"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 71,
+   "mutant": "L502 string \"; it is not retried here: a harness that ends the same way again is the environment's to fix\" emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "CRASHED-detail wording (:502-504): a diagnostic string appended to a HARNESS_FAILED detail; tests pin the reason prefix and the fact phrase, not this clause; the run-once/no-retry behaviour is enforced by code, not by the text",
+   "grounds": "file_artifact.py:502-504 builds the CRASHED detail `f'the worker {how} before it gave its result' + _said(log) + '; it is not retried here: ...'`. The mutant empties the trailing advice clause. The detail is only operator-facing prose in a HARNESS_FAILED observation; no code parses it (file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none).). The 'run once, never retried' property is enforced by the control flow (the worker's ProcessRange is started once) and pinned by test_v21_fa_grep_worker.py:556 `assertEqual(len(made), 1)`, not by this sentence. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives).",
+   "consumers_checked": [
+    "tests/v2/test_v21_fa_grep_worker.py FailureModes :552-563 asserts only `o.detail.startswith('grep_count worker CRASHED: ')` and `assertIn('exited with status 7'/'ended by signal 15', o.detail)`; the trailing advice is never asserted",
+    "the run-once behaviour is pinned by `assertEqual(len(made), 1)` :556 (a counting ProcessRange), independent of the message",
+    "grep over aisef2/ validation/ docs/ for 'it is not retried'/'environment''s to fix': only file_artifact.py:502 (sibling cli_invocation.py:369 has the analogous message but is a different target); no parser/doc/contract reads it"
+   ],
+   "exceptions_checked": [
+    "a doc stating the CRASHED detail must carry the no-retry advice: none (docs search for 'not retried'/'environment''s to fix' finds no contract)",
+    "an operator procedure keyed to the advice text: none named; the behaviour it describes is enforced by code",
+    "an exact-match comparison of the detail in a stored record/golden: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 88,
+   "mutant": "L502 string 'the worker ' emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "CRASHED-detail wording (:502-504): a diagnostic string appended to a HARNESS_FAILED detail; tests pin the reason prefix and the fact phrase, not this clause; the run-once/no-retry behaviour is enforced by code, not by the text",
+   "grounds": "Mutant empties the 'the worker ' prefix at :502 -> the CRASHED detail reads 'grep_count worker CRASHED: exited with status N before it gave its result; ...' (or 'ended by signal N ...'). The reason prefix and the '{how}' phrase both remain. test_v21_fa_grep_worker FailureModes asserts the reason prefix and `assertIn('exited with status 7'/'ended by signal 15')`, both still present. No parser reads the detail. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives).",
+   "consumers_checked": [
+    "tests/v2/test_v21_fa_grep_worker.py :552-561: `startswith('grep_count worker CRASHED: ')` + `assertIn(phrase)` where phrase is 'exited with status 7' / 'ended by signal 15' / 'ZeroDivisionError' (from _said); 'the worker ' is not part of any asserted phrase",
+    "file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none)."
+   ],
+   "exceptions_checked": [
+    "a reader that splits the detail on the word 'worker' or a fixed offset: none",
+    "a doc/operator procedure requiring the literal subject 'the worker': none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 89,
+   "mutant": "L502 string ' before it gave its result' emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "CRASHED-detail wording (:502-504): a diagnostic string appended to a HARNESS_FAILED detail; tests pin the reason prefix and the fact phrase, not this clause; the run-once/no-retry behaviour is enforced by code, not by the text",
+   "grounds": "Mutant empties ' before it gave its result' at :502 -> detail reads 'grep_count worker CRASHED: the worker exited with status N; it is not retried here: ...'. The asserted phrase 'exited with status N' (and signal/traceback phrases) remains. No parser reads the detail. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives).",
+   "consumers_checked": [
+    "tests/v2/test_v21_fa_grep_worker.py :552-561 asserts the reason prefix and the '{how}' phrase, not the ' before it gave its result' clause",
+    "file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none)."
+   ],
+   "exceptions_checked": [
+    "a reader depending on the clause ' before it gave its result': none",
+    "a doc/contract requiring it: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 80,
+   "mutant": "L477 string ')' emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "cosmetic balancing ')' emptied in a WorkerFailed f-string detail: the closing paren of a '(<type>)' suffix; tests assert only the prefix up to '(' or a separate phrase, and no code parses a probe detail",
+   "grounds": "file_artifact.py:477 `raise WorkerFailed('INPUT', f'the request cannot be written ({type(e).__name__})')`. The mutant empties the literal ')' -> '...cannot be written (OSError' (unbalanced paren, still valid Python; the f-string replacement field {type(e).__name__} is untouched). test_v21_fa_grep_worker.py:614 asserts `str(exc).startswith('grep_count worker INPUT: the request cannot be written (')` \u2014 only up to the '('. No reader parses the detail. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives).",
+   "consumers_checked": [
+    "tests/v2/test_v21_fa_grep_worker.py:605-614 test_a_request_that_cannot_be_written_is_INPUT: asserts reason=='INPUT' and startswith up to '(' only",
+    "file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none)."
+   ],
+   "exceptions_checked": [
+    "a reader matching a balanced '(<type>)' with the closing paren: none",
+    "a doc/operator procedure requiring the paren: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 86,
+   "mutant": "L518 string ')' emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "cosmetic balancing ')' emptied in a WorkerFailed f-string detail: the closing paren of a '(<type>)' suffix; tests assert only the prefix up to '(' or a separate phrase, and no code parses a probe detail",
+   "grounds": "file_artifact.py:518 `raise WorkerFailed('BAD_RESULT', f'the result is not JSON ({type(e).__name__})')`. Mutant empties the trailing ')' -> '...is not JSON (ValueError'. test_v21_fa_grep_worker 'BAD_RESULT/not json' (:479) asserts `assertIn('is not JSON', o.detail)` and the reason prefix \u2014 both survive the dropped paren. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives).",
+   "consumers_checked": [
+    "tests/v2/test_v21_fa_grep_worker.py:479,561 'BAD_RESULT/not json': `assertIn('is not JSON', detail)` + reason prefix; the closing ')' is not asserted",
+    "file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none)."
+   ],
+   "exceptions_checked": [
+    "a reader parsing the '(<type>)' of the not-JSON message: none",
+    "a doc/contract requiring the paren: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::_worker_facts",
+   "index": 71,
+   "mutant": "L423 string ')' emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "cosmetic balancing ')' emptied in a WorkerFailed f-string detail: the closing paren of a '(<reason>)' suffix; tests assert only the prefix up to '(' or a separate phrase, and no code parses a probe detail",
+   "grounds": "file_artifact.py:423 `raise WorkerFailed('BAD_RESULT', f'the result is not the facts of this request ({why})')`. Mutant empties the trailing ')' -> '...of this request ({why}'. The ~24 bad-shape cases in test_v21_fa_grep_worker (:660-684) assert `str(exc).startswith('grep_count worker BAD_RESULT: the result is not the facts of this request (')` \u2014 only up to '(' \u2014 plus reason=='BAD_RESULT'. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives).",
+   "consumers_checked": [
+    "tests/v2/test_v21_fa_grep_worker.py:660-684 (BadShapes): startswith up to '(' and reason=='BAD_RESULT'; the closing ')' of the {why} suffix is not asserted",
+    "the 'skipped out of order'/type/index etc. {why} texts ('a list, not an object', 'fields [...]', 'matches is not a count', ...) are the asserted content via assertIn in FailureModes; unaffected by the paren",
+    "file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none)."
+   ],
+   "exceptions_checked": [
+    "a reader matching a balanced '(<why>)': none",
+    "a doc/contract requiring the paren: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::FileArtifactProbe.observe",
+   "index": 137,
+   "mutant": "L877 string 'grep' emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "single mutant in this batch",
+   "grounds": "file_artifact.py:875-878 passes `work=os.path.join(home, 'grep')` to grep_facts. The mutant empties 'grep' -> `os.path.join(home, '')` == home + os.sep, so the worker's scratch files (request/result/progress/worker.log, built at :456) are written in `home` itself instead of the `home/grep` subdirectory. `home` is observe's own `tempfile.TemporaryDirectory(prefix='aisef2-file-artifact-')` (:874), deleted on `with` exit; grep_facts does `os.makedirs(work, exist_ok=True)` (:465) which succeeds either way (home exists). The computed grep facts, the verdict (verdict_of :343-351 reads matches/present/sha256 only), the serialised detail (:883), `hosting` and `on_range` are identical; the only difference is the on-disk path of ephemeral scratch files, never exposed. No name collides: the reader runs git with HOME=home via git_env (:625-633) but writes none of request/result/progress/worker.log; PlainTree writes nothing. No test inspects the scratch path. Ran tests.v2.test_v21_fa_grep_worker AND tests.v2.test_v21_fa_grep_runpath on the mutant: both PASS (survives).",
+   "consumers_checked": [
+    "file_artifact.py: grep_facts :456 names request/result/progress/worker.log under `work`, :465 makedirs(exist_ok=True); observe :874 home is an ephemeral TemporaryDirectory removed on exit; verdict_of :343-351 reads only matches/present/sha256",
+    "git_env :625-633 / ObjectStore / PlainTree :892-... run git with HOME=home but create none of the worker's four filenames; no collision in home",
+    "tests/v2/test_v21_fa_grep_worker.py (worker()/counting() stand-ins, run with cwd=work) and tests/v2/test_v21_fa_grep_runpath.py (real story, assert_disposed) \u2014 neither asserts a home/grep path"
+   ],
+   "exceptions_checked": [
+    "a test asserting the worker scratch lives in a 'grep' subdirectory: none",
+    "a file in home that collides with request/result/progress/worker.log written by git or the reader: none produced by git_env/ObjectStore/PlainTree",
+    "an error/detail/hosting value that embeds the work path: none (_stopped reads the progress file but never prints its path; messages carry type names, not paths)"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::_stopped",
+   "index": 30,
+   "mutant": "L550 string 'g' emptied",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "AUDITED",
+   "group": "single mutant in this batch",
+   "grounds": "file_artifact.py:550 formats the watchdog in the DEADLINE message as `{timeout_s:g}s`. The mutant empties the 'g' conversion -> `{timeout_s:}` (empty format spec). For a float this differs only when the value is integer-valued: `format(30.0,'g')`=='30' vs `format(30.0,'')`=='30.0'; for 1.5/2.5 both give '1.5'/'2.5'. The DEADLINE-message tests use non-integer timeouts: test_v21_fa_grep_worker.py:240 asserts `assertIn('1.5s: timeouts_s.probe', text)` (SHORT.timeout_s=1.5) and :744 asserts startswith '... (2.5s: ' (direct _stopped call), both formatting identically under :g and the empty spec, so the mutant survives. The value is diagnostic prose that points the operator to the config key `timeouts_s.probe` by name; no code parses the number. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives).",
+   "consumers_checked": [
+    "tests/v2/test_v21_fa_grep_worker.py:240 (observe via SHORT=1.5s) and :744 (direct _stopped with 2.5s): both use non-integer timeouts, so '1.5s'/'2.5s' are identical under :g and ''",
+    "the DEADLINE detail flows as a HARNESS_FAILED/Unrunnable message (file_artifact.py: observe :840-889 catches Refused at :880 -> Observation(HARNESS_FAILED, detail=str(e)); WorkerFailed(Refused) :615-622 opens the message `grep_count worker <REASON>: <message>`. protocol.py classify_failure :164-185 maps HARNESS_FAILED -> Unrunnable(detail); run_probe :264-287 seals it into a ProbeRecord whose typed result is read by bound_result, never the detail text. No in-product reader parses a WorkerFailed detail (git grep over aisef2/ validation/ for split/regex/json.loads/startswith on a probe detail: none).); the window-expired message at observe :886 uses a separate {window:g}, not this mutant",
+    "grep for 'timeouts_s.probe' across aisef2/ validation/: it is a config key name in prose (cli_invocation.py:360 shares the same {timeout_s:g} pattern as a sibling), never parsed out of this message"
+   ],
+   "exceptions_checked": [
+    "a test or consumer that asserts the DEADLINE message for an integer-valued timeout (where '30s' vs '30.0s' would diverge): none; FULL=60.0 is never used on a DEADLINE-detail assertion, the deadline tests use SHORT=1.5 and the direct 2.5",
+    "a reader extracting the numeric timeout from the message: none (the message names the config key; the value is prose)",
+    "an exact-match of the DEADLINE detail in a stored record/golden: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::_worker_facts",
+   "index": 56,
+   "mutant": "L432 sorted() -> list()",
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "class": "REFUTED",
+   "group": "single mutant in this batch",
+   "grounds": "file_artifact.py:431-433 validates the worker's skipped_binary: `if not isinstance(skipped, list) or not all(index(i) for i in skipped) or skipped != sorted(set(skipped)): bad('skipped_binary is not an ascending list of file indexes')`. The contract is that skipped_binary is a strictly ascending, de-duplicated list of file indexes (the real GREP_WORKER :382-408 appends indexes as it iterates, so it emits them ascending). The mutant replaces `sorted(set(skipped))` with `list(set(skipped))`, i.e. it compares against CPython set-iteration order instead of ascending order. Measured on this interpreter (python3 -P -B): `list(set([2,1]))`==[1,2]==`sorted(set([2,1]))`, which is why the existing 'skipped out of order' case {skipped_binary:[2,1]} (test_v21_fa_grep_worker.py:680) does NOT distinguish the two and the mutant survives. But `list(set([7,8]))`==[8,7] while `sorted(set([7,8]))`==[7,8]: so the mutant (a) WRONGLY ACCEPTS a non-ascending result skipped_binary=[8,7] (original rejects it as BAD_RESULT) and, worse, (b) WRONGLY REJECTS a VALID ascending result skipped_binary=[7,8] (original accepts it) \u2014 a real repository with binary (NUL) files at indexes 7 and 8 and >=9 files sent yields the ascending [7,8] from the real worker, which the mutant turns into a BAD_RESULT -> HARNESS_FAILED. A reader depends on the ascending-order check: a test is owed. Ran tests.v2.test_v21_fa_grep_worker on the mutant: PASS (survives) \u2014 the gap is real, the kill is missing.",
+   "consumers_checked": [
+    "file_artifact.py: GREP_WORKER :382-408 emits skipped indexes in ascending iteration order; _worker_facts :431-434 is the shape check; :438/:449 build `named=[rels[i] for i in skipped]` in the given order; verdict_of :343-351 reads only matches (so the verdict itself does not change, but the accept/reject decision does)",
+    "tests/v2/test_v21_fa_grep_worker.py BadShapes :680-682 'skipped out of order' [2,1], 'skipped twice' [1,1]; FailureModes 'BAD_RESULT/skipped index' [3], 'skipped twice' [0,0], 'skipped type' 5 \u2014 none uses an index pair (like [7,8]/[8,7]) whose set-iteration order differs from sorted",
+    "tests/v2/test_v21_fa_empty_selection.py:247,268 and test_v21_python_imports.py:255,292 read skipped_binary but only with 0 or 1 element (order irrelevant)",
+    "docs/v2.1/USAGE-2.1.md:469 documents the key exists and the verdict stays SATISFIED; it does not pin ordering"
+   ],
+   "exceptions_checked": [
+    "a good-case test feeding a multi-element ascending skipped_binary whose set order differs from sorted (e.g. [7,8]): none -> the valid-case regression (mutant refuses [7,8]) is unpinned",
+    "a bad-case test feeding a non-ascending skipped_binary that equals list(set(...)) (e.g. [8,7]): none -> the invalid-case acceptance is unpinned",
+    "a de-dup-only reader that would mask the ordering change: no \u2014 dedup is still caught by both sorted and list (lengths differ), but ordering is not"
+   ],
+   "refutation": "Input: call fa._worker_facts({'files':9,'matches':0,'skipped_binary':[7,8],'locations':[]}, rels) with rels of length 9 (e.g. ['f0.py',...,'f8.py']). Reader: _worker_facts' contract that a valid ascending skipped_binary is accepted and named (file_artifact.py:431-434,438,449) \u2014 and conversely that a non-ascending one is BAD_RESULT. Sketch: assert the ORIGINAL returns {'present':True, ..., 'skipped_binary':['f7.py','f8.py'], ...} (a normal multi-binary-file result accepted) AND that skipped_binary=[8,7] raises WorkerFailed('BAD_RESULT') with 'skipped_binary is not an ascending list of file indexes'. The existing suite only uses skipped_binary of length 0/1 in good cases and [2,1] in the bad case (all of which set-iterate ascending), so none exercises an index pair whose set-iteration order differs from sorted; [7,8]/[8,7] does. This test FAILS on the mutant (it refuses the valid [7,8], or accepts the invalid [8,7]) and PASSES unmutated -> kills index 56."
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/probe/file_artifact.py::import_facts",
+   "index": 38,
+   "mutant": "L604 string 'python ' emptied",
+   "class": "AUDITED",
+   "group": "single mutant in this batch",
+   "grounds": "With the one literal replaced (file_artifact.py:283 f'python {major}.{minor}' -> f'{major}.{minor}'), import_facts returns the same keys in the same order and the same files/matches/locations; only `stdlib_of` differs ('python 3.14' vs '3.14'); verdict_of (:215-223 reads present/sha256/matches only), observe() kind/verdict, spec id/semantic hash and evaluate() are identical. The value is written at one place and parsed at none in code. Reach: observe() puts facts into Observation.detail only for OBSERVED, SUBJECT_ABSENT and SUBJECT_DEADLINE (:540-548); classify_failure (protocol.py:164-185) turns those into Executed(verdict)/on_subject_absent and keeps detail only for HARNESS_FAILED/UNSUPPORTED, whose details (:506-538) are built from locator/path/git text and never from facts; every in-product caller goes through run_probe (review_verify.py:146-148 bound_result(run_probe(...)), orchestrate/proof.py:73, plan/story_admission.py, probe/calibration.py) and a ProbeRecord holds the typed result, not the detail; review_verify.verify's 'did not execute' message (:150) embeds only an Unrunnable/InvalidSpec detail. The prefix is a constant and sys.version_info has no implementation name, so 'python X.Y' and 'X.Y' are in bijection and nothing is lost; major.minor, the identifying element, remains and is asserted by T27a (test_v21_kills3_T27a.py:176 assertIn(f'{major}.{minor}', stdlib_of)), which the mutant survives by design. Interpreter identity itself is bound independently by the RunSpec 'python' capability. file_artifact.py is unchanged at the snapshot.",
+   "consumers_checked": [
+    "aisef2/probe/file_artifact.py: writer :283; facts_of :477 merges it; observe :540-548 serialises it into detail; verdict_of :215-223 reads only present/sha256/matches",
+    "aisef2/probe/protocol.py: Observation :94-120, classify_failure :164-185 (detail kept only for HARNESS_FAILED/UNSUPPORTED), run_probe/ProbeRecord :189-215 (the record holds the typed result)",
+    "aisef2/app/review_verify.py:126-156 (verify: reads result.behavior_verdict; :150 embeds only a non-Executed result), aisef2/orchestrate/proof.py:73, aisef2/plan/story_admission.py, aisef2/probe/calibration.py, aisef2/app/adapters.py (verdict/observed only)",
+    "validation/qualification/c2_file_artifact.py:148 (copies the detail facts into the calibration record when run; the committed P1 record has no python_imports row), p5_falsifiability.py:222-227 (diagnose persists detail[:1200] for non-QUALIFIED rows; no imports_outside spec in its corpus), q2.py:224 (verdict_of only)",
+    "git grep stdlib_of at the snapshot: file_artifact.py:283, tests/v2/test_v21_kills3_T27a.py:167,176, closure-evidence mutation records (mutant descriptors), and ONE NEW prose mention: docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md:268 (see below)",
+    "docs/v2.1/decisions/B-04-LEDGERLOCK-S-10-a.md:26, ADR-V2.1.md ADR-5, drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json:57: none gives a format for stdlib_of"
+   ],
+   "exceptions_checked": [
+    "a reader that splits or regex-parses the label (split()[1], 'python (\\d+)\\.(\\d+)'): none (whole-tree grep for the key, for 'python <digit>' and for the 'python ' literal in aisef2/, validation/, tests/, docs/)",
+    "NEW: a document that states the value's format. docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md:268 (a round-3 findings document, absent at b5c2457) says 'the facts carry `stdlib_of: python 3.x`' as the documented place where the observing interpreter shows. It is prose in a finding, not a parser or a contract (the module docstring and B-04 give no format), and the version stays; under the mutant that sentence would be inexact ('3.x'). This is why the entry is REVISED, not why it falls",
+    "a stored record compared field for field with a fresh run: the committed P1 record predates the class; the release calibrations carry keys only; a re-run of c2_file_artifact would write '3.14' and nothing parses it",
+    "a reader telling interpreter implementations apart by the prefix: sys.version_info has no implementation field",
+    "the detail reaching an operator/journal/finding as a refusal or recovery instruction: stdlib_of is only in OBSERVED/SUBJECT_ABSENT/SUBJECT_DEADLINE details, which classify_failure drops; HARNESS_FAILED/UNSUPPORTED details never include facts",
+    "a value-length bound on the detail: none; the mutant shortens it by 7 characters",
+    "NEW in round 3: the statement builder / artifacts (review_verify.detail, preserve) carry `verification.{status, why, probe, observed}` where `observed` is the verdict value (review_verify.py:152-156), never facts"
+   ],
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "remapped_from": {
+    "index": 28,
+    "mutant": "L283 string 'python ' emptied",
+    "source_sha256": "21ac55fd79ae6a5f814044394ea0033445d73378e2c8f17ef16c4d32edf0583b",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  }
+ ],
+ "owed_tests": [
+  "tests/v2/test_v21_fa_grep_worker.py (or test_c2_file_artifact.py): add a _worker_facts good case with skipped_binary=[7,8] over 9 rels asserting it is accepted and named, and a bad case skipped_binary=[8,7] asserting BAD_RESULT 'skipped_binary is not an ascending list of file indexes' \u2014 kills _worker_facts[56] (sorted()->list()), which currently both wrongly rejects the valid ascending [7,8] and wrongly accepts the non-ascending [8,7]"
+ ],
+ "notes": "11/11 new survivors confirmed by running the registered kill file tests.v2.test_v21_fa_grep_worker (plus tests.v2.test_v21_fa_grep_runpath for observe[137]) one mutant at a time against a COPY tree built from snapshot 4ec961e; every run PASS (survives), baseline unmutated PASS (42 tests). 10 AUDITED, 1 REFUTED (_worker_facts[56]). The 1 carried entry (import_facts[38]) is passed through unchanged."
+}

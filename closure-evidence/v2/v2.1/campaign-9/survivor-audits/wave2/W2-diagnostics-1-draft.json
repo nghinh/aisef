@@ -1,0 +1,159 @@
+{
+  "batch": "W2-diagnostics-1",
+  "file": "aisef2/app/diagnostics.py",
+  "role": "author",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "source_sha256": "db7e2d467ab643a5d47be16623642a518900a9404a171db9ea7f839fe1808cd5",
+  "registered_kill_files": ["tests/v2/test_v21_pm8_diagnostics.py", "tests/v2/test_v21_pm8_diagnostics_run.py"],
+  "baseline": "unmutated: both kill files PASS (84 tests OK)",
+  "kill_run_summary": "every one of the 12 new mutants was run once against the two registered kill files; all 12 PASS (SURVIVE) — consistent with their being campaign-9 survivors",
+  "groups": {
+    "G-container-normalized": "A collection built in Sink.__init__ flows only into a consumer that re-normalizes it (a set comprehension / a list comprehension) and is never serialized, never type-inspected, never compared to a tuple literal at the snapshot, so tuple-vs-list produces identical behaviour and output (precedent: SURVIVOR-AUDITS continue_from[89], seal[106], context_pack[40/110]).",
+    "G-scan-order": "sorted()->list() over a directory scan changes only the order in which (problems, notes) entries are appended; the set of entries, every message, and the verify verdict are identical (precedent: unfinished[2], verify[46], lint[4/5], main[60]).",
+    "G-except-OSError-undominated": "An except-tuple with OSError dropped: OSError is NOT a subclass of the survivors (ValueError/AttributeError), so unlike SURVIVOR-AUDITS http_transport[17]/reproducer_contract[28] it is no longer caught and DOES propagate. But the sole consumer, verify.verify, wraps the whole re-derivation (review_verify.artifact_problems, diagnostics.artifact_problems, and the budget/delivery/usage re-derivation) in one `except Exception` that appends a 'the record cannot be re-derived' problem, so the top-level verdict is REFUTED whether the inner catch fires or the exception escapes. The OSError branch is also unreachable through anything Sink writes (it only writes regular files, never a directory; the probe-observations dir holds only its own *.json / *.json.tmp).",
+    "G-human-read-message-text": "A string literal in a (problems|notes) entry is emptied or blanked. The entry is appended regardless of its text, so the verify verdict is unchanged; the text is read only by the operator and parsed by no program and pinned by no test (precedent: main[55/58/62..75] help text, explain[5/31], Reviewer._ocr[139/152/159/166], _closed[9/10], continue_from[153/154] — all AUDITED). 'not harmless' (section 16) is honoured by naming the reader and checking it, not by auto-refuting."
+  },
+  "entries": [
+    {
+      "target": "aisef2/app/diagnostics.py::Sink.__init__",
+      "index": 6,
+      "mutant": "L144 tuple() -> list()",
+      "class": "EQUIVALENT",
+      "group": "G-container-normalized",
+      "grounds": "self._forms (L144) is read at exactly two sites, both `review_verify.redacted(..., self._forms)` (diagnostics.py:162, 194). redacted (review_verify.py) begins `wanted = sorted({str(s) for s in secrets if s}, key=len, reverse=True)` — it builds a set from the argument, so container type and order are fully erased before use. _forms is never serialized (it is not in report()'s dict nor in the artifact body `doc`), never type-inspected, never compared. list vs tuple is therefore unobservable in behaviour and output. Kill-file run: PASS (survives).",
+      "consumers_checked": ["review_verify.redacted via diagnostics.py:162 (the failure `why`) and :194 (the artifact body) — both set-ify the argument", "report() (diagnostics.py:229-234) — does not include _forms", "no test reads sink._forms (grep of the two kill files)"],
+      "exceptions_checked": ["serialization into RUN.json / artifact body: none", "isinstance/tuple-equality on _forms: none in aisef2/ or the kill files", "order dependence: none (redacted sorts by len after set())"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::Sink.__init__",
+      "index": 7,
+      "mutant": "L140 tuple() -> list()",
+      "class": "EQUIVALENT",
+      "group": "G-container-normalized",
+      "grounds": "self.secrets (L140) is read at exactly one site at the snapshot: `texts = [str(x) for x in self.secrets if x]` (diagnostics.py:143), a comprehension that preserves elements and order for both list and tuple. self.secrets is NOT serialized — report() (L229-234) returns dir/audience/access/permissions/authority/written/not_written/failures/dropped/limits only, and _document (L166-202) never references self.secrets. grep across aisef2/ finds no other reader; the two kill files never read sink.secrets. list vs tuple is unobservable. Kill-file run: PASS (survives).",
+      "consumers_checked": ["diagnostics.py:143 `[str(x) for x in self.secrets if x]` — comprehension, type/order-insensitive", "report() (diagnostics.py:229-234) — excludes secrets", "grep '\\.secrets' across aisef2/ — only diagnostics.py:140,143; no external reader", "kill files — no sink.secrets read, no isinstance/tuple compare"],
+      "exceptions_checked": ["serialization of self.secrets: none (report excludes it; it never reaches an artifact)", "tuple-equality assertion (e.g. sink.secrets == (...)): none — would have killed the mutant", "isinstance(self.secrets, tuple): none"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::Sink.__init__",
+      "index": 8,
+      "mutant": "L144 element 0 dropped",
+      "class": "REFUTED",
+      "group": "G-redaction-contract",
+      "grounds": "L144 builds the redaction forms from `(t, json.dumps(t)[1:-1])` for each secret text t: the RAW secret and its JSON-escaped form. Element 0 dropped keeps ONLY the escaped form, so a secret containing a character json.dumps escapes (a quote, a backslash, a non-ASCII letter, a control char) that appears in a probe's detail in its RAW form is no longer redacted and is written verbatim to the artifact file. This violates the module's redaction contract (docstring L34-36: 'Every string in it has the run's secrets replaced ... searched for in the secret's JSON-escaped forms TOO') and leaks a secret. The existing test test_a_secret_is_replaced_in_the_json_part_of_a_text_detail_where_json_wrote_it_escaped (test_v21_pm8_diagnostics.py:340) only exercises the ESCAPED-form path (its detail is `... + json.dumps(facts)`), and the other secrets tests use SECRET='zq9-KEY-7f3a91c2b8' where raw==escaped, so none distinguishes the mutant. Kill-file run: PASS (survives). Reproduced: with secret 'k\"ey\\\\\\u00e9-91827364', original _forms holds both forms and redacted() of a raw-form detail returns count=1 (secret absent); the escaped-only forms return count=0 (secret PRESENT).",
+      "consumers_checked": ["review_verify.redacted(doc, self._forms) at diagnostics.py:194 — writes the redaction into the artifact body that `aisef run --verify` binds and the operator reads", "the redaction contract in the module docstring L34-36", "diagnostics.py:162 (failure `why` redaction) — same forms"],
+      "exceptions_checked": ["could raw==escaped for every reachable secret? no — any secret with a quote/backslash/non-ASCII/control char diverges (the module docstring exists precisely because probe details carry such text)", "is the raw secret unreachable in detail? no — _parsed keeps observation.detail; a detail carrying the raw secret is the primary case", "does a later stage re-redact? no — this Sink is the only redactor of the artifact"],
+      "refutation": {
+        "input": "Sink(out, secrets=('k\"ey-9182',)) then note/observe a REFUTED probe whose Observation.detail contains the RAW secret, e.g. detail=f'env held k\"ey-9182 at step 1' (NOT json.dumps'd).",
+        "reader": "the written artifact <out>/probe-observations/<story>.<attempt>.p1.json, which `aisef run --verify` (verify.artifact_problems) binds by bytes and the operator reads; the redaction security boundary.",
+        "sketch": "In WhatIsKept/the redaction class: sink = D.Sink(self.out, secrets=(secret,)) with secret containing a quote; self.see(Observation(K.OBSERVED, BV.REFUTED, f'saw {secret}'), sink=sink); raw = (self.folder/'S1.1.p1.json').read_text(); self.assertNotIn(secret, raw) and assertGreater(d['redacted'],0). Passes unmutated (both forms in _forms); fails on the mutant (raw form gone, secret written verbatim)."
+      }
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 19,
+      "mutant": "L273 sorted() -> list()",
+      "class": "AUDITED",
+      "group": "G-scan-order",
+      "grounds": "L273 `for path in sorted(folder.glob('*'))` -> `list(folder.glob('*'))`. Each directory entry is processed independently; the loop appends each file's own problem/note. Dropping sorted() changes only the ORDER of entries in (problems, notes); the SET is identical, every message is identical, and no entry is skipped. verify.verify (verify.py:172-176) does `problems += found; notes += said` and returns them unsorted; the verdict is REFUTED iff problems is non-empty, which is order-independent. No test asserts the order (the kill files use `any(needle in p ...)` and set/`len` checks). Precedent: SURVIVOR-AUDITS unfinished[2], verify[46], lint[4/5], main[60] all AUDITED on the same operator. Kill-file run: PASS (survives).",
+      "consumers_checked": ["verify.verify (verify.py:175) `found, said = diagnostics.artifact_problems(...); problems += found; notes += said` — order not read; verdict = bool(problems)", "the kill files' assertions on problems/notes — all order-independent (any()/set/len)"],
+      "exceptions_checked": ["a consumer that sorts or diffs the problems list and would see a reordering: none found", "determinism-as-contract: nothing persists or compares artifact_problems output across runs in an order-sensitive way"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 31,
+      "mutant": "L286 element 0 dropped",
+      "class": "AUDITED",
+      "group": "G-except-OSError-undominated",
+      "grounds": "L286 `except (OSError, ValueError)` -> `except (ValueError,)` around `json.loads(path.read_bytes().decode('utf-8'))`. OSError is not a subclass of ValueError, so it is no longer caught and propagates out of artifact_problems. The sole consumer is verify.verify (verify.py:175), inside a `try` whose `except Exception` (verify.py:220) appends 'the record cannot be re-derived from the evidence: <type>: <e>'. So: original path -> doc=None -> problems.append('... is not a probe observation ...'); mutant path -> OSError -> verify appends its own problem. Either way problems is non-empty and the verdict is REFUTED. The OSError branch is unreachable through anything Sink writes (regular files only; a directory entry matching _NAME, which would raise IsADirectoryError, is never created), so no measured input reaches it. Not EQUIVALENT (OSError genuinely escapes, with a different message and skipping the later re-derivation), but no consumer depends on the inner catch. Kill-file run: PASS (survives).",
+      "consumers_checked": ["verify.verify (verify.py:170-221): the diagnostics.artifact_problems call is inside the big try; `except Exception` at :220 yields the same REFUTED verdict", "diagnostics.artifact_problems callers: only verify.py:175 (grep aisef2/)"],
+      "exceptions_checked": ["dominance: OSError NOT a subclass of ValueError, so it is not caught by the survivor (so NOT equivalent-by-hierarchy, unlike http_transport[17]/reproducer_contract[28])", "reachability: Sink writes only files; the dir never holds a sub-directory, so read_bytes() does not raise IsADirectoryError in practice; a transient I/O fault is the only trigger", "verdict masking: on the (unreachable) OSError, the later budget/delivery/usage re-derivation is skipped; the top-level verdict is still REFUTED and no test/consumer pins the completeness of a REFUTED result's problems list or its delivery_verdict for this path — noted for the owner"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 47,
+      "mutant": "L275 string '.tmp' emptied",
+      "class": "REFUTED",
+      "group": "G-file-classification-verdict",
+      "grounds": "L275 `if path.name.endswith('.tmp') and _NAME.fullmatch(path.name[:-4])` -> `endswith('')` (always True). For a real .tmp sibling and for a normal .json artifact the behaviour is unchanged (shown below), which is why every kill-file case survives. But a file whose name does NOT end in '.tmp' yet whose name[:-4] matches _NAME — e.g. S1.1.p1.json.bak — is misclassified: original takes the else path and flags it a PROBLEM ('... is not a file this release writes'); mutant matches `endswith('') and _NAME.fullmatch('S1.1.p1.json')` and emits the failed-write NOTE then `continue`. That moves the file from problems to notes, so for a run whose only artifact issue is such a file the verify verdict flips REFUTED -> VERIFIED: verification would silently accept an unexpected file in probe-observations. Not cosmetic (unlike the human-read-text group): it changes WHETHER the file is a problem, which verify.verify's verdict depends on. Kill-file run: PASS (survives). Reproduced: original problems for {S1.1.p1.json, S1.1.p1.json.bak} = ['... S1.1.p1.json.bak is not a file this release writes'], notes = [].",
+      "consumers_checked": ["verify.verify (verify.py:175): problems += found -> verdict REFUTED iff problems non-empty; moving an entry problems->notes can flip the verdict", "the operator reading RUN.json/verify problems"],
+      "exceptions_checked": ["are the kill-file inputs distinguishing? no: 'S1.1.p1.json.tmp' (note both), 'stray.json.tmp'/'S1.1.p2.json.tmp.tmp'/'S1.1.p3.tmp' (problem both: name[:-4] does not match _NAME), normal 'S1.1.p1.json' (name[:-4]='S1.1.p1.' no match -> processed normally both)", "the existing test_a_sibling_a_failed_write_left_is_a_note test has no non-.tmp file whose name[:-4] matches _NAME"],
+      "refutation": {
+        "input": "A directory holding a valid artifact S1.1.p1.json plus a file S1.1.p1.json.bak (any non-.tmp name whose name[:-4] matches _NAME), journal binding the valid one.",
+        "reader": "artifact_problems -> verify.verify: an unexpected file must be a PROBLEM ('is not a file this release writes'), never a harmless failed-write note.",
+        "sketch": "In WhatVerifyChecks: self.put('S1.1.p1.json', self.doc()); self.put('S1.1.p1.json.bak', 'x'); problems, notes = self.check(); self.assertTrue(any('S1.1.p1.json.bak is not a file this release writes' in p for p in problems)); self.assertFalse(any('S1.1.p1.json.bak' in n and 'failed write' in n for n in notes)). Passes unmutated (problem); fails on the mutant (note + continue)."
+      }
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 64,
+      "mutant": "L320 string ' is incomplete; no verdict depends on it): see RUN.json diagnostics.failures' emptied",
+      "class": "AUDITED",
+      "group": "G-human-read-message-text",
+      "grounds": "L320 appends to `notes` (the `if ... kept.get('not_written')` branch) — never to problems. The entry is appended regardless of its text, so the verify verdict is unchanged. The mutant leaves the note as 'N probe observation(s) could not be written (probe-observations' (losing the explanation and the 'see RUN.json diagnostics.failures' pointer). The note is read only by the operator, parsed by no program; the facts it states are asserted by the module's own behaviour (notes never affect a verdict; diagnostics.not_written/failures live in RUN.json regardless of this pointer). Precedent: operator-facing report prose is AUDITED (main help text, explain, Reviewer._ocr labels). The registered test (test_what_was_not_written_or_dropped_is_a_note_never_a_problem) pins only the prefix 'N probe observation(s) could not be written', which the mutant preserves. Kill-file run: PASS (survives).",
+      "consumers_checked": ["verify.verify (verify.py:176): notes += said — notes do not affect the verdict", "the operator reading RUN.json/verify notes — no program parses them", "test_what_was_not_written_or_dropped_is_a_note_never_a_problem — asserts the prefix only"],
+      "exceptions_checked": ["verdict impact: none — always a note, never a problem", "a program that parses the note tail (e.g. extracts the RUN.json path): none", "the pointed-to fact itself (diagnostics.failures in RUN.json) is unaffected by the string"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 78,
+      "mutant": "L303 element 0 dropped",
+      "class": "AUDITED",
+      "group": "G-except-OSError-undominated",
+      "grounds": "L303 `except (OSError, ValueError, AttributeError)` -> `except (ValueError, AttributeError)` around reading the review-finding file `finding.read_bytes()`. OSError is not a subclass of ValueError/AttributeError, so it propagates out of artifact_problems and is caught by verify.verify's outer `except Exception` (verify.py:220), appending 'the record cannot be re-derived' — same REFUTED verdict as the original (held=None -> problems.append('the finding it observes is not at ...')). The ValueError and AttributeError branches ARE exercised by test_the_finding_is_compared_as_the_text_the_gate_row_carries ('{ not json' -> ValueError; '{\"finding\": \"F\"}' -> str.get -> AttributeError), and the mutant keeps both, so the test survives. The OSError branch is unreachable through anything review_verify.preserve writes (regular files only). Same reasoning and consumer as index 31. Kill-file run: PASS (survives).",
+      "consumers_checked": ["verify.verify (verify.py:170-221): outer `except Exception` at :220 yields the same REFUTED verdict", "test_the_finding_is_compared_as_the_text_the_gate_row_carries — covers the ValueError/AttributeError branches the mutant keeps"],
+      "exceptions_checked": ["dominance: OSError not a subclass of ValueError/AttributeError -> it escapes (not equivalent-by-hierarchy)", "reachability: the review-findings file is a regular file preserve wrote; no IsADirectoryError in practice", "verdict masking on the (unreachable) OSError: later re-derivation skipped but verdict stays REFUTED; nothing pins the completeness — noted for the owner"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 84,
+      "mutant": "L315 And swapped",
+      "class": "REFUTED",
+      "group": "G-count-verdict",
+      "grounds": "L315 `present = sum(1 for p in folder.glob('*.json') if p.is_file() and _NAME.fullmatch(p.name))` -> `... if p.is_file() or _NAME.fullmatch(p.name)`. `present` is the count of files this release writes, compared at L316 against RUN.json's `diagnostics.written`; a mismatch is a PROBLEM (or a note under failure). With `or`, present counts any real *.json file even when its name does not match _NAME (and any _NAME-matching directory). Consequences, both verdict-level: (a) a stray real .json file inflates present and FORGES a spurious 'RUN.json states X written, the directory holds X+1' problem; (b) worse, it can MASK a real mismatch — if RUN.json claims 2 written but only 1 real artifact exists alongside one stray .json, original present=1 flags 'holds 1' (correct, REFUTED) while the mutant present=2 equals written and emits NO problem (false VERIFIED). Not cosmetic: `present` exists only for this count check, whose verdict depends on it. Kill-file run: PASS (survives) — no kill-file case puts a stray real .json beside a valid artifact. Reproduced: {S1.1.p1.json, stray.json}: original written=1 -> no count problem; original written=2 -> 'RUN.json states 2 written, the directory holds 1'.",
+      "consumers_checked": ["artifact_problems L316 count-mismatch check -> verify.verify problems -> verdict", "the operator reading the count-mismatch problem"],
+      "exceptions_checked": ["do the kill-file inputs distinguish? no — test_the_count_the_record_states uses only one valid .json (present=1 both ways); test_a_sibling... uses .tmp files (glob('*.json') matches none, present=0 both ways)", "is a stray non-_NAME .json reachable? yes — the main loop already flags such a file as a problem, so it can coexist with the count check; and the masking case needs only the stray plus an over-stated `written`"],
+      "refutation": {
+        "input": "Directory with a valid artifact S1.1.p1.json and a stray real file stray.json (name not matching _NAME); rec={'diagnostics': {'written': 1}} for the spurious-fire case, and rec={'diagnostics': {'written': 2}} for the masking case.",
+        "reader": "the count-mismatch check (L315-318) surfaced by verify.verify: `present` must count only artifact-named files, matching the semantics of RUN.json `written`.",
+        "sketch": "In WhatVerifyChecks: self.put('S1.1.p1.json', self.doc()); self.put('stray.json', 'x'); then assert that with written=1 there is NO 'RUN.json states ... holds' problem (only the stray's 'not a file this release writes'), i.e. present counted 1 not 2. Passes unmutated (present=1); fails on the mutant (present=2 -> forged 'holds 2'). A second assert with written=2 pins the masking direction (original flags 'holds 1', mutant silent)."
+      }
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 115,
+      "mutant": "L311 string ', revision ' emptied",
+      "class": "AUDITED",
+      "group": "G-human-read-message-text",
+      "grounds": "L311 the mismatch message `f'... (spec {spec16}, revision {rev12}) ...'` loses the ', revision ' separator, becoming '... (spec {spec16}{rev12}) ...'. The entry is still appended (to problems, or to notes under failure) regardless of its text, so the verify verdict is unchanged; both the spec_id and the revision VALUES are still present, merely concatenated. The message is operator-read and parsed by no program; the registered test (test_a_record_the_journal_does_not_hold...) pins only 'names a probe record', which the mutant preserves. Precedent: separator/paren emptied in human-read messages is AUDITED (_closed[9/10], continue_from[153/154]). Kill-file run: PASS (survives).",
+      "consumers_checked": ["verify.verify (verify.py:175): problems/notes += ... — entry appended irrespective of text; verdict = bool(problems)", "the operator reading the message — no program parses it", "test_a_record_the_journal_does_not_hold_for_that_story_spec_and_revision_is_a_problem — asserts 'names a probe record' only"],
+      "exceptions_checked": ["verdict impact: none — the (notes if failure else problems).append happens regardless of the string", "a program parsing spec/revision out of the message: none (the record identity is recomputed by _identity from the journal, not parsed from this text)"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 121,
+      "mutant": "L311 string 'spec_id' emptied",
+      "class": "AUDITED",
+      "group": "G-human-read-message-text",
+      "grounds": "L311 `str(doc.get('spec_id'))` -> `str(doc.get(''))`; doc has no '' key so this renders 'None' — the message shows 'spec None' instead of the real spec id. The entry is still appended (problems, or notes under failure) regardless of text, so the verify verdict is unchanged and the mismatch itself is still reported; only the operator's display of the spec identifier degrades to None. The message is parsed by no program; the record's true identity is recomputed by _identity from the journal (L271-272, L309), not read back from this string. The registered test pins only 'names a probe record', which the mutant preserves. Precedent: a report field blanked to the empty-string key with the value still shown/absent is AUDITED (explain[5], Reviewer._ocr[166]). Kill-file run: PASS (survives).",
+      "consumers_checked": ["verify.verify (verify.py:175): entry appended irrespective of text; verdict unchanged", "the operator reading the mismatch message — no program parses it", "_identity (L256) — recomputes record identity from the journal record, not from this message; unaffected"],
+      "exceptions_checked": ["verdict impact: none — the append is unconditional", "a program reading the spec_id back out of the message: none", "note vs problem placement: unchanged (governed by rec.get('failure'), not the string)"]
+    },
+    {
+      "target": "aisef2/app/diagnostics.py::artifact_problems",
+      "index": 122,
+      "mutant": "L312 string 'revision' emptied",
+      "class": "AUDITED",
+      "group": "G-human-read-message-text",
+      "grounds": "L312 `str(doc.get('revision'))` -> `str(doc.get(''))` -> 'None'; the message shows 'revision None' instead of the real revision. As index 121: the entry is appended regardless of text (verdict unchanged, mismatch still reported), the message is operator-read and parsed by no program, and the record identity is recomputed by _identity from the journal rather than parsed from this text. The registered test pins only 'names a probe record', preserved by the mutant. Kill-file run: PASS (survives).",
+      "consumers_checked": ["verify.verify (verify.py:175): entry appended irrespective of text; verdict unchanged", "the operator reading the message — no program parses it", "_identity (L256) — unaffected (recomputed from the journal)"],
+      "exceptions_checked": ["verdict impact: none — unconditional append", "a program reading the revision back out of the message: none", "note vs problem placement: unchanged (rec.get('failure'))"]
+    }
+  ],
+  "owed_tests": [
+    "Sink.__init__ idx 8 (REFUTED, SECURITY): a secret containing a json.dumps-escaped character (quote/backslash/non-ASCII/control) that appears RAW in a probe detail must be redacted from the written artifact. sink=D.Sink(out, secrets=('k\"ey-9182',)); see Observation(K.OBSERVED, BV.REFUTED, f'saw k\"ey-9182'); assertNotIn(raw secret, written file) and assertGreater(d['redacted'],0). Kills the raw-form drop.",
+    "artifact_problems idx 47 (REFUTED): a non-.tmp file whose name[:-4] matches _NAME (e.g. S1.1.p1.json.bak) must be a PROBLEM 'is not a file this release writes', not a failed-write note. put('S1.1.p1.json', doc()); put('S1.1.p1.json.bak','x'); assert it is in problems and not a 'failed write' note.",
+    "artifact_problems idx 84 (REFUTED): `present` must count only _NAME-matching files. put('S1.1.p1.json', doc()); put('stray.json','x'); with written=1 assert NO 'RUN.json states ... holds' problem (present=1); with written=2 assert the 'holds 1' problem still fires (masking direction)."
+  ],
+  "notes": "Baseline (unmutated) both kill files PASS, 84 tests. All 12 new mutants were run once each against both registered kill files (tests/v2/test_v21_pm8_diagnostics.py, tests/v2/test_v21_pm8_diagnostics_run.py); all 12 SURVIVE, as expected for campaign-9 survivors. carried: none. Classification: 2 EQUIVALENT (6,7), 7 AUDITED (19,31,64,78,115,121,122), 3 REFUTED (8,47,84). Dividing line used for the string/except mutants, aligned with SURVIVOR-AUDITS precedent: REFUTED only where the mutant changes WHETHER something is a problem (verify verdict can flip: 47, 84) or breaks a hard contract with a security consequence (8, redaction); AUDITED where it changes only the TEXT of an operator-read message that no program parses and the verdict is unaffected (64,115,121,122) or only the order of entries (19) or an unreachable exception branch the sole consumer tolerates identically (31,78). EQUIVALENT reserved for container swaps whose consumer re-normalizes (6,7). The idx 8/47/84 divergences were reproduced directly against the snapshot module (measurement only; no kill file or product code was changed)."
+}

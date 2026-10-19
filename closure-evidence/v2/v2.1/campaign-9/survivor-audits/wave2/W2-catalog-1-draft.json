@@ -1,0 +1,100 @@
+{
+  "batch": "W2-catalog-1",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "role": "author",
+  "date": "2026-10-19 22:10 +07",
+  "file": "aisef2/probe/catalog.py",
+  "kill_file": "tests.v2.test_v21_migrate_semantics",
+  "baseline": "unmutated kill file: Ran 51 tests OK (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json added via git show)",
+  "groups": {
+    "catalog-capability-field-flags": "All four mutants toggle a dataclass field() flag on CatalogEntry's capability metadata: capability_version (L66) and capability_changes (L67), both declared field(default=None, compare=False, hash=False). These flags affect ONLY the generated CatalogEntry.__eq__ (compare) and __hash__ (hash); they do not change the stored value or attribute access. Across aisef2/, validation/ and tests/ at this snapshot NOTHING hashes a CatalogEntry, uses one as a dict key or set member, or compares two CatalogEntry objects with == / assertEqual. catalog.problems_of() dedups on explicit (probe_id, probe_digest) tuples; active()/catalogue()/probes_by_id()/registry() build dicts keyed by subject_kind or probe_id; entry_for() uses next(...e.module==...). Every other consumer (bundle_cli.migrate, diagnostics, run, review_verify, bundle, static_admission, and all validation/qualification/* and validation/v2/* readers) iterates entries and reads attribute VALUES or constructs new entries via dataclasses.replace -- none routes through __eq__/__hash__. bundle_cli.migrate reads entry.capability_version (bundle_cli.py:235) and entry.capability_changes (bundle_cli.py:200) as VALUES into the operator-visible migrate report, so the report is byte-for-byte unaffected by compare/hash. The registered kill file tests.v2.test_v21_migrate_semantics PASSED on every one of the four mutants (Ran 51 tests OK, identical to the unmutated baseline): it exercises capability VALUES and migrate behaviour, and its FailClosed assertions compare sets of contract-id strings, never entries -- so by construction it cannot observe a compare/hash flag change. Exception named and checked: validation/qualification/v21_conformance_ruling.py:137 describes this change and states '(neither is compared: compare=False)', but that is descriptive prose; its two cited behaviour_tests (Declarations.test_every_probe_of_the_catalog_declares_every_capability_version_above_1 and .test_the_catalog_entry_is_what_the_module_declares) check the capability VALUES against the module's CAPABILITY_VERSION/CAPABILITY_CHANGES, not the compare/hash flags, and nothing machine-verifies the flag value. Therefore no consumer, contract, document or operator depends on the eq/hash participation of these two fields: AUDITED, not REFUTED, and not EQUIVALENT (each mutant is distinguishable by a constructed observation, e.g. dataclasses.replace(e, capability_version=99)==e, or hash() of the file_artifact entry)."
+  },
+  "entries": [
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_version",
+      "index": 0,
+      "mutant": "L66 False->True",
+      "diff": "capability_version: field(default=None, compare=False->True, hash=False)",
+      "class": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "compare=False->True makes CatalogEntry.__eq__ fold in capability_version: two entries equal in all identity fields but differing in capability_version would become unequal. No code anywhere compares two CatalogEntry objects with ==/assertEqual, and problems_of() (the only identity-dedup) keys on explicit (probe_id, probe_digest) tuples, not on __eq__. dataclasses.replace(e, capability_version=...) in tests/with_entry constructs entries but never ==-compares them. bundle_cli.migrate reads the VALUE (bundle_cli.py:235), unaffected. Registered kill file PASSED on this mutant (Ran 51 tests OK) == baseline: not killed. Observable in principle but no reader depends on it.",
+      "kill_run": "tests.v2.test_v21_migrate_semantics PASSED on mutant (Ran 51 OK); did not kill",
+      "consumers_checked": [
+        "aisef2/probe/catalog.py problems_of/active/catalogue/probes_by_id/registry/entry_for -- dedup on (probe_id,probe_digest) tuples; dicts keyed by subject_kind/probe_id; no entry __eq__/__hash__",
+        "aisef2/app/bundle_cli.py:235,260-261,284,293 -- reads capability_version VALUE for migrate report; compare flag does not change value",
+        "tests/v2/test_v21_migrate_semantics.py Declarations/FailClosed -- read .capability_version value; assertEqual compares sets of contract-id strings, never two entries",
+        "tests/v2/test_cycle2_wp201.py -- problems_of/active/probes_by_id; assertEqual on .probe_id and list[str], no entry ==",
+        "validation/qualification/* and validation/v2/* (q0,q2,q4,q5,p5_*,p10,c2_*,common,rebind,release_calibration,probe_static_checks) -- iterate entries, read attributes, build dicts keyed by probe_id/kind.value; no entry ==",
+        "aisef2/app/diagnostics.py:224 -- dataclasses.replace(e, factory=...); construction, not =="
+      ],
+      "exceptions_checked": [
+        "validation/qualification/v21_conformance_ruling.py:137 -- documents 'neither is compared: compare=False' as descriptive prose; its 2 cited behaviour_tests verify capability VALUES vs module declarations, not the compare flag; nothing machine-checks the flag value",
+        "no set()/dict-key/hash() of a CatalogEntry exists in aisef2/ validation/ tests/ (grepped)"
+      ]
+    },
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_version",
+      "index": 1,
+      "mutant": "L66 False->True",
+      "diff": "capability_version: field(default=None, compare=False, hash=False->True)",
+      "class": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "hash=False->True makes CatalogEntry.__hash__ fold in capability_version (int|None, hashable -> no TypeError). Observable only if an entry is hashed (set member / dict key / hash()). No such use exists anywhere in aisef2/ validation/ tests/. bundle_cli.migrate reads the VALUE, unaffected. Registered kill file PASSED on this mutant (Ran 51 tests OK) == baseline: not killed. No reader depends on it.",
+      "kill_run": "tests.v2.test_v21_migrate_semantics PASSED on mutant (Ran 51 OK); did not kill",
+      "consumers_checked": [
+        "catalog.problems_of -- set of (probe_id,probe_digest) tuples, never hash(entry)",
+        "catalog.active/catalogue/probes_by_id/registry -- dicts keyed by subject_kind/probe_id, entry is the VALUE not the key",
+        "all validation/qualification/* consumers build {probe_id:...}/{kind.value:...} dicts and (probe_id,probe_digest,cls) sets -- never a set/dict of CatalogEntry",
+        "aisef2/app/bundle_cli.py:235 reads capability_version VALUE",
+        "unrelated hash(): tests/v2/test_v21_r5_probe_model_data.py hashes model-shaped JSON in observation_class, not CatalogEntry"
+      ],
+      "exceptions_checked": [
+        "frozen=True makes CatalogEntry conventionally hashable; since capability_version is a hashable int|None, this mutant cannot even break hashability -- it only changes the hash VALUE, which no reader consumes",
+        "conformance ruling (v21_conformance_ruling.py:137) mentions compare only, not hash; no document names the hash flag"
+      ]
+    },
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+      "index": 0,
+      "mutant": "L67 False->True",
+      "diff": "capability_changes: field(default=None, compare=False->True, hash=False)",
+      "class": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "compare=False->True makes CatalogEntry.__eq__ fold in capability_changes (a dict; dict == is well-defined, no crash, no ordering generated since order=False). Same as the capability_version compare mutant: no code compares two CatalogEntry objects. The only entry carrying a non-None dict is file_artifact (CAPABILITY_CHANGES); nothing ==-compares it. bundle_cli.migrate reads the VALUE (bundle_cli.py:200), unaffected. Registered kill file PASSED on this mutant (Ran 51 tests OK) == baseline: not killed. Observable in principle but no reader depends on it.",
+      "kill_run": "tests.v2.test_v21_migrate_semantics PASSED on mutant (Ran 51 OK); did not kill",
+      "consumers_checked": [
+        "aisef2/app/bundle_cli.py:200 _declared reads entry.capability_changes VALUE; :260-261 copies version values -- compare flag does not change value",
+        "tests/v2/test_v21_migrate_semantics.py -- dataclasses.replace(e, capability_changes=...) builds entries passed to bundle_cli._declared (value); withheld_with/withheld compare sets of contract-id strings, never entries; assertIs(e.capability_changes, ...) is identity of the value",
+        "catalog.problems_of/active/catalogue/probes_by_id/registry/entry_for -- no entry ==",
+        "all validation/qualification/* and validation/v2/* catalog readers -- attribute reads only"
+      ],
+      "exceptions_checked": [
+        "validation/qualification/v21_conformance_ruling.py:137 -- 'neither is compared: compare=False' is descriptive prose; cited behaviour_tests check CAPABILITY_CHANGES value identity (assertIs) vs the module, not the compare flag",
+        "no CatalogEntry ==/assertEqual comparison exists (grepped tests/ and aisef2/)"
+      ]
+    },
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+      "index": 1,
+      "mutant": "L67 False->True",
+      "diff": "capability_changes: field(default=None, compare=False, hash=False->True)",
+      "class": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "hash=False->True makes CatalogEntry.__hash__ fold in capability_changes, which is a dict -- UNHASHABLE. hash() of the file_artifact entry (the only entry whose CAPABILITY_CHANGES is a non-None dict) would raise TypeError('unhashable type: dict'); hash() of entries whose capability_changes is None still succeeds. This is the strongest-signal mutant, yet it is never triggered: no code hashes a CatalogEntry, uses one as a set member or dict key anywhere in aisef2/ validation/ tests/. Construction and dataclasses.replace do not compute __hash__. bundle_cli.migrate reads the VALUE, unaffected. Registered kill file PASSED on this mutant (Ran 51 tests OK) == baseline: not killed. AUDITED, with a named latent risk: hash=False is exactly what preserves the frozen entry's hashability; a future consumer that put a CatalogEntry in a set/dict key would crash on file_artifact. No current reader depends on it, so no test is owed now.",
+      "kill_run": "tests.v2.test_v21_migrate_semantics PASSED on mutant (Ran 51 OK); did not kill",
+      "consumers_checked": [
+        "catalog.problems_of -- builds seen:set of (probe_id,probe_digest) tuples, never hash(entry)",
+        "catalog.active/catalogue/probes_by_id/registry -- dicts keyed by subject_kind/probe_id; entry is the value",
+        "all validation/qualification/* consumers -- {probe_id:...}/{kind.value:...} dicts and tuple-sets, never set/dict of CatalogEntry",
+        "aisef2/app/diagnostics.py:224 dataclasses.replace(e,...) -- no hash",
+        "unrelated hash(): tests/v2/test_v21_r5_probe_model_data.py hashes JSON model data, not CatalogEntry"
+      ],
+      "exceptions_checked": [
+        "frozen=True dataclass is conventionally hashable; hash=False on the dict field is the mechanism that keeps the file_artifact entry hashable -- but hashability is unexercised, so the mutant's TypeError path is never reached",
+        "validation/qualification/v21_conformance_ruling.py:137 names compare=False only, not the hash flag -- no document pins hash"
+      ]
+    }
+  ],
+  "owed_tests": [],
+  "notes": "4/4 new survivors AUDITED; 0 EQUIVALENT, 0 REFUTED. The four flags affect only CatalogEntry.__eq__/__hash__, and no consumer/contract/document/operator at snapshot 4ec961e hashes or ==-compares a CatalogEntry (verified by repo-wide grep over aisef2/ validation/ tests/ and by reading every catalog consumer). The registered kill file tests.v2.test_v21_migrate_semantics PASSED unchanged on all four (51 tests OK, == unmutated baseline), confirming survival. Acceptance-scope note for the owner (not a REFUTED gap, per the positional rule -- there is no current reader): (1) index 1 of capability_changes (hash=False->True) is the only mutant with a correctness edge -- it would make the frozen file_artifact entry unhashable; hash=False is a deliberate defensive flag for a dict field, documented nowhere as a test. (2) The conformance ruling v21_conformance_ruling.py:137 asserts '(neither is compared: compare=False)' but its cited behaviour tests verify capability VALUES, not the flags, so the compare=False claim is itself unpinned. If the owner wants these pinned, the smallest owed tests would be: (a) construct two entries via dataclasses.replace differing only in capability_version/capability_changes and assert == and equal hash (pins compare=False, hash=False for the eq/hash exclusion); (b) assert hash(active()[FILE_ARTIFACT_kind]) does not raise (pins hashability despite the dict). Recommend recording as a known limit rather than adding tests to reach a number."
+}

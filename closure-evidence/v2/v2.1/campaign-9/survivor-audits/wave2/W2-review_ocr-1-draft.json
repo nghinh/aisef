@@ -1,0 +1,128 @@
+{
+  "batch": "W2-review_ocr-1",
+  "file": "aisef2/app/review_ocr.py",
+  "role": "author",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "source_sha256": "5365a608449ad6ae76792fb5dafce294904308b2a645fb92e57ec22264d76012",
+  "registered_kill_files": ["tests/v2/test_v21_ocr_declared.py", "tests/v2/test_v21_ocr_gate.py"],
+  "measured": "Baseline (unmutated) ocr_declared+ocr_gate: 22 tests OK (66.6s). Each of the 6 new mutants, built into a copy tree and run against the two registered kill files one at a time (PATH stripped of every dir with an executable opencode; HOME/TMPDIR/PYTHONPATH under the tree; nice -n 19 python3 -P -B): all PASS (22 OK) -> NOT killed by the registered set. 37:71.7s 40:77.7s 41:69.4s 42:65.4s 43:65.6s 44:56.3s.",
+  "group": "declared() returns (seen, why); `why` is an operator diagnostic. Readers at 4ec961e: (1) adapters._declared (adapters.py:329-341) -> Reviewer._ocr raises CapabilityUnrunnable(why) (adapters.py:200-202), journaled 'reviewer cannot run: ...' (orchestrate/review.py:35-40), asserted by the registered kill file tests/v2/test_v21_ocr_gate.py:176-191 on the REFUSED VALUE words only. (2) run.ocr_identity (run.py:177-216) stores out['reason']=why, embedded verbatim by ocr_refusal (run.py:219-226) into the RunRefused operator text (run.py:517) and into RUN.json rec['ocr_identity']['reason']; asserted by tests/v2/test_v21_ocr_identity.py:112-133 on VALUE words and, at :186-202, requiring EXACTLY ONE DECLARED_WAYS marker via `(marker,) = [m for m in DECLARED_WAYS if m in reason]` (the marker for a version/commit mismatch is 'declares itself'). (3) the registered kill file tests/v2/test_v21_ocr_declared.py calls declared() directly and asserts the REFUSED value words + '/x/ocr', never a connector. aisef2/app/verify.py reads none of it (grep: no ocr_identity/reason/identity/declared). The exact message format is documented verbatim in docs/v2.1/USAGE-2.1.md:693 but NO test compares code to that doc (validation/v21/traceability_check.py reads TRACEABILITY.json cells + git objects, not USAGE prose). No parser/splitter/regex of the declared reason exists: tests/v2/test_v21_kills3_T12b.py:182 .partition('not the pinned') parses the pinned() message (review_ocr.py:238), a DIFFERENT function. Across the six, every interpolated value (seen/pinned version and commit, the exe, the quoted first line) is untouched; only connecting prose/punctuation is removed. The per-mutant question: was the removed text a free connector (AUDITED) or a token a named reader depends on (REFUTED)?",
+  "entries": [
+    {
+      "target": "aisef2/app/review_ocr.py::declared",
+      "index": 37,
+      "mutant": "L268 string ')' emptied",
+      "class": "AUDITED",
+      "group": "declared-reason diagnostic: values pinned by readers, connectors/punctuation free",
+      "grounds": "The 'no version line' refusal (review_ocr.py:268) loses only its closing ')': `{exe}: `version` printed no version line (first line {first[:80]!r}`. For the 'a banner first' answer this renders `/x/ocr: `version` printed no version line (first line 'Welcome to ocr'`. The DECLARED_WAYS marker 'printed no version line' and the quoted first line (including 'Welcome') survive, so run.ocr_identity's `(marker,)` unpack (test_v21_ocr_identity.py:197) still finds exactly one marker, and ocr_declared's 'no version line'/'Welcome' asserts (:42-44,:99) and ocr_gate's REFUSED-value asserts (:190) pass. Only an unbalanced parenthesis is lost; no value, no marker. RAN registered kill files: ocr_declared+ocr_gate PASS (22 OK, 71.7s) -> not killed.",
+      "consumers_checked": [
+        "tests/v2/test_v21_ocr_declared.py:42-44,:87-99 (no version command / a banner first / garbage): assert 'no version line' (and 'Welcome') in why; the trailing ')' is never asserted",
+        "run.ocr_identity reason -> test_v21_ocr_identity.py:186-202 `(marker,) = [m for m in DECLARED_WAYS if m in reason]`: the marker 'printed no version line' survives, so exactly one match",
+        "adapters._declared -> CapabilityUnrunnable(why) -> ocr_gate.py:176-191 asserts REFUSED value words only; verify.py reads none of it",
+        "docs/v2.1/USAGE-2.1.md:696 documents this line's format; no test compares code to the doc"
+      ],
+      "exceptions_checked": [
+        "a reader that balances parentheses in the refusal: none (first[:80]!r already emits a repr whose own quotes are present; the message is read whole, not parsed)",
+        "a splitter/regex over this message: none in aisef2/, validation/, tests/",
+        "same class as carried coverage index 85 (L114 ')' emptied, AUDITED): a diagnostic-string paren whose loss keeps every fact"
+      ]
+    },
+    {
+      "target": "aisef2/app/review_ocr.py::declared",
+      "index": 40,
+      "mutant": "L272 string ': declares itself ' emptied",
+      "class": "REFUTED",
+      "group": "declared-reason diagnostic: values pinned by readers, connectors/punctuation free",
+      "grounds": "The version/commit-mismatch branch (review_ocr.py:271-273) loses ': declares itself ', so the reason becomes `{exe}{seen.version} ({seen.commit}), not the pinned {OCR.version} ({OCR.commit[:7]}): no review command was run` — for 'another version': `/x/ocrv1.11.0 (182898c), not the pinned v1.12.12 (182898c): no review command was run`. The exe glues onto the declared version and the self-declaration verb is gone. Decisively, the branch then contains NO DECLARED_WAYS marker ('declares itself','exited','did not answer in time','printed no version line','could not be started' are all absent), so run.ocr_identity's reader `(marker,) = [m for m in DECLARED_WAYS if m in reason]` (test_v21_ocr_identity.py:197) unpacks an empty list and raises ValueError — that test FAILS on this mutant (reasoned from code; not run, per the hard rule limiting runs to the two registered kill files). RAN registered kill files: ocr_declared+ocr_gate PASS (22 OK, 77.7s) because both assert VALUE words + '/x/ocr' only (the glued '/x/ocrv1.11.0' still contains '/x/ocr'); the positional kill files do not pin the self-declaration.",
+      "refutation": "A reader depends on 'declares itself'. Reader: run.ocr_identity's reason, consumed at test_v21_ocr_identity.py:186-202 `(marker,) = [m for m in DECLARED_WAYS if m in reason]` (ValueError when no marker is present), and the operator reading the journaled 'reviewer cannot run: ...' / run.ocr_refusal text, who relies on the verb framing the pair as the binary's self-declaration — the entire contract of this branch (docstring review_ocr.py:256 'This is a SELF-DECLARATION'). Input: `review_ocr.declared('/x/ocr', 0, 'open-code-review v1.11.0 (182898c) darwin/arm64\\n')` (any version/commit mismatch; exit 0). Owed in the positional kill file tests/v2/test_v21_ocr_declared.py — in test_every_answer_that_is_not_the_pinned_build... (:72-80) or test_a_mismatch_names_both... (:82-85): add `self.assertIn('declares itself', why)` for the mismatch answers. Note: the behaviour is already caught incidentally by test_v21_ocr_identity.py:186-202 (not a registered kill file for this target), so the gap is POSITIONAL (the self-declaration is unpinned in declared()'s own kill files), not an unprotected behaviour.",
+      "consumers_checked": [
+        "run.ocr_identity reason -> test_v21_ocr_identity.py:186-202 `(marker,) = [m for m in DECLARED_WAYS if m in reason]` (DECLARED_WAYS keys at :51-52): removing 'declares itself' leaves zero markers -> ValueError -> the test fails (DEPENDS on this string)",
+        "tests/v2/test_v21_ocr_declared.py:72-85 (the two mismatch tests): assert only the VALUE words (v1.11.0/deadbee/dev, v1.12.12, 182898c) and '/x/ocr' -> survive; 'declares itself' is not asserted (the positional gap)",
+        "adapters._declared -> CapabilityUnrunnable(why) -> ocr_gate.py:176-191: REFUSED value words only -> survive",
+        "the operator reading the refusal (run.ocr_refusal, run.py:219-226; orchestrate/review.py journal): the self-declaration verb is lost and the exe glues to the version",
+        "docs/v2.1/USAGE-2.1.md:693 documents 'declares itself ...' verbatim; unenforced"
+      ],
+      "exceptions_checked": [
+        "the exe survives, so the registered set's '/x/ocr' and REFUSED value asserts pass -> ocr_declared/ocr_gate do not kill it (confirmed: 22 OK)",
+        "a different DECLARED_WAYS marker accidentally appearing in the glued text: none ('exited','did not answer in time','printed no version line','could not be started' are absent from a version-mismatch reason)",
+        "EQUIVALENT ruled out: the output differs and a named reader (ocr_identity) breaks"
+      ]
+    },
+    {
+      "target": "aisef2/app/review_ocr.py::declared",
+      "index": 41,
+      "mutant": "L272 string ' (' emptied",
+      "class": "AUDITED",
+      "group": "declared-reason diagnostic: values pinned by readers, connectors/punctuation free",
+      "grounds": "Loses the ' (' before the SEEN commit: `{exe}: declares itself {seen.version}{seen.commit}), not the pinned {OCR.version} ({OCR.commit[:7]}): no review command was run` — for 'another version': `/x/ocr: declares itself v1.11.0182898c), not the pinned v1.12.12 (182898c): no review command was run`. The seen version and commit glue within the declared side ('v1.11.0182898c'), but both remain as substrings (every REFUSED value assert passes), 'declares itself' stays (ocr_identity's single marker holds), and the two sides stay separated by ', not the pinned '. No value and no marker lost. RAN registered kill files: ocr_declared+ocr_gate PASS (22 OK, 69.4s) -> not killed.",
+      "consumers_checked": [
+        "tests/v2/test_v21_ocr_declared.py:72-85 and ocr_gate.py:176-191: assert the seen version and commit as substrings of why (v1.11.0, 182898c) -> both present in the glued 'v1.11.0182898c'",
+        "run.ocr_identity reason -> test_v21_ocr_identity.py:197 `(marker,)`: 'declares itself' survives -> one marker",
+        "readers that need the seen version/commit as fields read the `seen` dict, never `why`: adapters session identity s['identity']['declared'] (ocr_gate.py:168,:226,:281; ocr_identity.py:101,:138-139)",
+        "docs/v2.1/USAGE-2.1.md:693 documents the '(<commit>)' form; unenforced"
+      ],
+      "exceptions_checked": [
+        "within-side gluing ('v1.11.0182898c'): both are substrings; no reader parses the version/commit out of the text (the fields come from the `seen` dict)",
+        "the stray trailing ')' now follows the glued pair: cosmetic; no splitter of the message",
+        "cf. index 43 (the same ' (' on the pinned side) — same reasoning, same class"
+      ]
+    },
+    {
+      "target": "aisef2/app/review_ocr.py::declared",
+      "index": 42,
+      "mutant": "L272 string '), not the pinned ' emptied",
+      "class": "AUDITED",
+      "group": "declared-reason diagnostic: values pinned by readers, connectors/punctuation free",
+      "grounds": "Loses the comparator '), not the pinned ' between the two pairs: `{exe}: declares itself {seen.version} ({seen.commit}{OCR.version} ({OCR.commit[:7]}): no review command was run` — for 'another version': `/x/ocr: declares itself v1.11.0 (182898c v1.12.12 (182898c): no review command was run`. All four values and 'declares itself' survive (every REFUSED value assert and the ocr_identity marker pass), but the seen and pinned pairs glue ('182898c v1.12.12') and the phrase 'not the pinned' that labels which side is the pin is gone. NO automated consumer depends on 'not the pinned' in the DECLARED reason: every 'not the pinned' assertion in the tree binds the pinned() sha256 message (review_ocr.py:238), not declared() — ocr_gate.py:216, ocr_identity.py:302, ocr_preflight.py:272/:430, kills3_T12b.py:182. The leading 'declares itself' still labels the declared side, so no value is lost. This is the batch's most operator-degrading mutant (a comparator loss, not merely a delimiter), documented in USAGE-2.1.md:693 (unenforced) — flagged for the owner. RAN registered kill files: ocr_declared+ocr_gate PASS (22 OK, 65.4s) -> not killed.",
+      "consumers_checked": [
+        "tests/v2/test_v21_ocr_declared.py:72-85 and ocr_gate.py:176-191: VALUE words only (all four survive as substrings) -> survive",
+        "run.ocr_identity reason -> test_v21_ocr_identity.py:112-133 (value words) and :197 `(marker,)`: 'declares itself' survives -> one marker -> survive",
+        "every 'not the pinned' assertion binds the pinned() message, never declared(): ocr_gate.py:216 (sha256='0'*64), ocr_identity.py:302 (sha256='f'*64), ocr_preflight.py:272/:430 (sha256 mismatch / swapped binary), kills3_T12b.py:182 `.partition('not the pinned')` over review_ocr.pinned() at :238",
+        "aisef2/app/verify.py: reads no ocr_identity / reason / sessions identity",
+        "docs/v2.1/USAGE-2.1.md:693 documents '), not the pinned ...' verbatim; traceability_check.py does not compare code to USAGE prose"
+      ],
+      "exceptions_checked": [
+        "the comparator 'not the pinned' is removed and the seen/pinned pairs glue: no NAMED consumer/verifier/contract depends on this phrase in the declared reason (all depend on it in the pinned() message); every value + 'declares itself' survive; by the carried precedent (coverage index 85) a delimiter whose loss keeps every fact is AUDITED — but FLAGGED because USAGE-2.1.md:693 documents it and an operator's reading degrades most here",
+        "ocr_identity `(marker,)`: exactly one DECLARED_WAYS marker ('declares itself') remains in the glued text",
+        "EQUIVALENT ruled out: the output differs (an operator reads a materially poorer message)"
+      ]
+    },
+    {
+      "target": "aisef2/app/review_ocr.py::declared",
+      "index": 43,
+      "mutant": "L273 string ' (' emptied",
+      "class": "AUDITED",
+      "group": "declared-reason diagnostic: values pinned by readers, connectors/punctuation free",
+      "grounds": "Loses the ' (' before the PINNED commit: `... not the pinned {OCR.version}{OCR.commit[:7]}): no review command was run` — `/x/ocr: declares itself v1.11.0 (182898c), not the pinned v1.12.12182898c): no review command was run`. The pinned version and commit glue ('v1.12.12182898c'), both remain as substrings (REFUSED value asserts pass: 'v1.12.12' and '182898c' are both present), and 'declares itself' + 'not the pinned' stay. No value, no marker lost. RAN registered kill files: ocr_declared+ocr_gate PASS (22 OK, 65.6s) -> not killed.",
+      "consumers_checked": [
+        "tests/v2/test_v21_ocr_declared.py:72-85 and ocr_gate.py:176-191: assert 'v1.12.12' and '182898c' as substrings of why -> both present in 'v1.12.12182898c'",
+        "run.ocr_identity reason -> test_v21_ocr_identity.py:197 `(marker,)`: 'declares itself' survives -> one marker; the pinned version/commit the operator needs are also carried structurally by out['expected'] (run.py:210-212) and asserted from the OCR constant (ocr_identity.py:99,:125-126), not parsed from `why`",
+        "docs/v2.1/USAGE-2.1.md:693 documents the pinned '(<commit>)' form; unenforced"
+      ],
+      "exceptions_checked": [
+        "within-side gluing of the pinned pair ('v1.12.12182898c'): both are substrings; readers of the expected version/commit use the OCR constant / out['expected'], never the reason text",
+        "a splitter over the reason: none",
+        "cf. index 41 (same ' (' delimiter on the seen side) — same class"
+      ]
+    },
+    {
+      "target": "aisef2/app/review_ocr.py::declared",
+      "index": 44,
+      "mutant": "L273 string '): no review command was run' emptied",
+      "class": "AUDITED",
+      "group": "declared-reason diagnostic: values pinned by readers, connectors/punctuation free",
+      "grounds": "Loses the trailing '): no review command was run': `{exe}: declares itself {seen.version} ({seen.commit}), not the pinned {OCR.version} ({OCR.commit[:7]}` — `/x/ocr: declares itself v1.11.0 (182898c), not the pinned v1.12.12 (182898c`. A closing ')' and the reassurance that no review ran are lost; the comparator 'not the pinned', 'declares itself' and all four values survive (every assert + ocr_identity marker pass). The 'no review command was run' fact is carried by the control itself, not this phrase: CapabilityUnrunnable is raised before any review command (adapters.py:200-202), ocr_gate.py:192-195 pins that only ['version'] ran and no stream/review dir was made, and run.ocr_refusal appends its own 'No session was started and no provider request was sent' (run.py:224-226). Documented in USAGE-2.1.md:693 (unenforced). RAN registered kill files: ocr_declared+ocr_gate PASS (22 OK, 56.3s) -> not killed.",
+      "consumers_checked": [
+        "tests/v2/test_v21_ocr_declared.py:72-85 and ocr_gate.py:176-191: VALUE words only -> survive; 'no review command was run' is never asserted",
+        "run.ocr_identity reason -> test_v21_ocr_identity.py:197 `(marker,)`: 'declares itself' survives -> one marker -> survive",
+        "the no-review guarantee is pinned STRUCTURALLY, not by this string: ocr_gate.py:192-195 (only ['version'] ran; no stream; no review work dir) and run.ocr_refusal's own closing sentence (run.py:224-226)",
+        "docs/v2.1/USAGE-2.1.md:693 documents '): no review command was run' verbatim; unenforced"
+      ],
+      "exceptions_checked": [
+        "the operator loses a trailing reassurance and a ')': the comparator and every value stay, and the no-run guarantee is pinned structurally elsewhere (ocr_gate.py:192-195, ocr_refusal)",
+        "the string now ends in an unbalanced '(': cosmetic; no splitter/regex reads it",
+        "EQUIVALENT ruled out: the output differs"
+      ]
+    }
+  ]
+}

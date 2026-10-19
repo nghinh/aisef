@@ -1,0 +1,82 @@
+{
+ "batch": "W2-diagnostics-2",
+ "file": "aisef2/app/diagnostics.py",
+ "targets": [
+  "aisef2/app/diagnostics.py::NOT_INSPECTED",
+  "aisef2/app/diagnostics.py::PERMISSIONS",
+  "aisef2/app/diagnostics.py::Sink._document",
+  "aisef2/app/diagnostics.py::Sink._keep",
+  "aisef2/app/diagnostics.py::_identity",
+  "aisef2/app/diagnostics.py::_parsed",
+  "aisef2/app/diagnostics.py::access_of",
+  "aisef2/app/diagnostics.py::tapped"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._keep",
+   "index": 13,
+   "mutant": "L210 string '\\n' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._keep",
+   "index": 15,
+   "mutant": "L216 string ' exists: an artifact is never overwritten' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._keep",
+   "index": 16,
+   "mutant": "L210 True->False"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::access_of",
+   "index": 10,
+   "mutant": "L103 string 'true' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::access_of",
+   "index": 13,
+   "mutant": "L103 string 'ws' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::access_of",
+   "index": 14,
+   "mutant": "L103 string 'work' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._document",
+   "index": 96,
+   "mutant": "L196 True->False"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._document",
+   "index": 97,
+   "mutant": "L197 False->True"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::_identity",
+   "index": 3,
+   "mutant": "L257 True->False"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::tapped",
+   "index": 9,
+   "mutant": "L248 dict entry 2 dropped"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::PERMISSIONS",
+   "index": 2,
+   "mutant": "L87 string 'platform default (modes are not applied)' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::NOT_INSPECTED",
+   "index": 0,
+   "mutant": "L84 string ' (confinement is asked for; what its sessions mount could not be inspected)' emptied"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::_parsed",
+   "index": 3,
+   "mutant": "L119 element 1 dropped"
+  }
+ ],
+ "carried": []
+}

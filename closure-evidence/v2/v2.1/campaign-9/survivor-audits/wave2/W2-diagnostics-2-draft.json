@@ -1,0 +1,267 @@
+{
+ "batch": "W2-diagnostics-2",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/app/diagnostics.py",
+ "role": "author",
+ "measured_on": "2026-10-19 (date: Mon Oct 19 22:05 +0700 2026)",
+ "method": "Author tree from `git archive 4ec961e aisef2 aisef tests validation docs pyproject.toml`. For each of the 13 NEW survivors: built the mutated module from a pristine copy via validation.v2.mutation.mutants(src,'<target>',_enum_members(src,pathlib.Path('.')))[INDEX], asserted desc==the batch entry's mutant, wrote it over aisef2/app/diagnostics.py in a run-copy tree, then ran BOTH registered kill files one mutant at a time from the copy root: `nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.test_v21_pm8_diagnostics -q` and `... tests.v2.test_v21_pm8_diagnostics_run -q`, under `env -i PATH=/usr/bin:/bin` (stripped of /Users/nghinh/.opencode/bin which holds an `opencode` executable), HOME and TMPDIR under the run tree, PYTHONPATH=<copy root> (needed because -P keeps cwd off sys.path), LANG/LC_ALL=en_US.UTF-8. The run file's fake client is a local python script (never the real opencode; no network). Baseline unmutated: unit 59 OK, run 25 OK. Consumers grepped across aisef2/ validation/ tests/ docs/; confine.wrap/argv/targets and run.py:608 read at the snapshot.",
+ "kill_files": [
+  "tests/v2/test_v21_pm8_diagnostics.py",
+  "tests/v2/test_v21_pm8_diagnostics_run.py"
+ ],
+ "measurement_result": "All 13 NEW survivors re-measured SURVIVED: both registered kill files PASS on every mutant (unit 59 OK, run 25 OK) and PASS unmutated. No REFUTED-by-measurement (no kill file FAILED on any mutant). Classes: 1 EQUIVALENT (access_of 10), 10 AUDITED, 2 REFUTED/test-owed (PERMISSIONS 2 — non-posix branch dead on the posix host; NOT_INSPECTED 0 — collapses to SAME_USER). The REFUTED pair are operator-facing access/permission statements under the owner's 'a string an operator reads is not harmless' rule; owed kill tests named below.",
+ "entries": [
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._keep",
+   "index": 13,
+   "mutant": "L210 string '\\n' emptied",
+   "class": "AUDITED",
+   "group": "file-bytes-cosmetic: the mutant changes only the formatting of the bytes _keep writes (trailing newline; key sort order). The manifest hashes the produced bytes in the same run, so --verify is self-consistent; every reader is json.loads (newline/order-agnostic); no test or golden pins the produced file's exact bytes; the operator reads the parsed content. AUDITED.",
+   "grounds": "L210: data = (json.dumps(doc,indent=1,sort_keys=True) + '\\n').encode('ascii') -> + ''. The written file loses its single trailing newline. detail/content unchanged. Kill files: unit 59 OK, run 25 OK on mutant and unmutated (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:206-210 Sink._keep — the sole writer of the bytes; json.dumps(doc,indent=1,sort_keys=True)+'\\n', .encode('ascii'), os.open O_WRONLY|O_CREAT|O_EXCL then os.replace.",
+    "aisef2/app/run.py:609 evidence_manifest / aisef2/app/run.py anchor_of — the manifest hashes each produced file's bytes (sha256) IN THE SAME RUN, so whatever bytes _keep writes are the bytes the manifest binds; --verify is self-consistent (test_v21_pm8_diagnostics_run.test_the_manifest_lists_every_file_by_its_sha256, test_verification_accepts_the_run_as_it_is).",
+    "aisef2/app/diagnostics.py:284 artifact_problems / aisef2/app/verify.py — reads every file via json.loads(path.read_bytes().decode('utf-8')); trailing newline and key order are invisible to json.loads.",
+    "operator — reads the parsed JSON content of the file; a trailing newline / sorted keys are cosmetic."
+   ],
+   "exceptions_checked": [
+    "No golden-byte fixture: the kill files never assert the produced file's exact bytes. test_a_changed_file_is_refuted_by_the_manifest only shows the manifest binds bytes (it mutates '\"returned\": -1'->'-2' on a COPY); the refutation tests that write json.dumps(...,sort_keys=True)+'\\n' are operator-rewrite simulations on COPIES, not assertions on the produced file.",
+    "Measured: unit 59 OK, run 25 OK on the mutant and unmutated — SURVIVED.",
+    "json.loads ignores a trailing newline; the manifest binds whatever bytes were produced, so the newline's presence/absence is identical on the producing and verifying side of the same run."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._keep",
+   "index": 16,
+   "mutant": "L210 True->False",
+   "class": "AUDITED",
+   "group": "file-bytes-cosmetic: the mutant changes only the formatting of the bytes _keep writes (trailing newline; key sort order). The manifest hashes the produced bytes in the same run, so --verify is self-consistent; every reader is json.loads (newline/order-agnostic); no test or golden pins the produced file's exact bytes; the operator reads the parsed content. AUDITED.",
+   "grounds": "L210: json.dumps(doc,indent=1,sort_keys=True) -> sort_keys=False. The file's top-level keys follow the doc's construction order instead of being sorted. The doc is built in a fixed key order every run, so output stays deterministic; only the on-disk key order changes. Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:206-210 Sink._keep — the sole writer of the bytes; json.dumps(doc,indent=1,sort_keys=True)+'\\n', .encode('ascii'), os.open O_WRONLY|O_CREAT|O_EXCL then os.replace.",
+    "aisef2/app/run.py:609 evidence_manifest / aisef2/app/run.py anchor_of — the manifest hashes each produced file's bytes (sha256) IN THE SAME RUN, so whatever bytes _keep writes are the bytes the manifest binds; --verify is self-consistent (test_v21_pm8_diagnostics_run.test_the_manifest_lists_every_file_by_its_sha256, test_verification_accepts_the_run_as_it_is).",
+    "aisef2/app/diagnostics.py:284 artifact_problems / aisef2/app/verify.py — reads every file via json.loads(path.read_bytes().decode('utf-8')); trailing newline and key order are invisible to json.loads.",
+    "operator — reads the parsed JSON content of the file; a trailing newline / sorted keys are cosmetic."
+   ],
+   "exceptions_checked": [
+    "No golden-byte fixture: the kill files never assert the produced file's exact bytes. test_a_changed_file_is_refuted_by_the_manifest only shows the manifest binds bytes (it mutates '\"returned\": -1'->'-2' on a COPY); the refutation tests that write json.dumps(...,sort_keys=True)+'\\n' are operator-rewrite simulations on COPIES, not assertions on the produced file.",
+    "Measured: unit 59 OK, run 25 OK on the mutant and unmutated — SURVIVED.",
+    "json.loads is key-order-agnostic; no cross-run golden compares bytes; the manifest is computed over the produced (unsorted) bytes, so --verify accepts the run (test_verification_accepts_the_run_as_it_is)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._keep",
+   "index": 15,
+   "mutant": "L216 string ' exists: an artifact is never overwritten' emptied",
+   "class": "AUDITED",
+   "group": "label-emptied-cause-survives: the friendly explanatory clause is deleted but the exception TYPE name survives in `why` and uniquely names the cause; AUDITED by direct analogy to the W2-lineage precedent (index 35: a label emptied, the branch's distinguishing diagnostic remains => AUDITED). (A skeptic may read it as an operator report field under the round-3 rule; noted as a possible label-dispute.)",
+   "grounds": "L216: raise FileExistsError(f'{name} exists: an artifact is never overwritten') -> raise FileExistsError(f'{name}'). This fires only in the create-collision branch (final.exists()). Sink.note catches it: why = review_verify.redacted(f'{type(e).__name__}: {e}', forms)[0][:200]. Baseline why='FileExistsError: S1.1.p1.json exists: an artifact is never overwritten'; mutant why='FileExistsError: S1.1.p1.json'. The type name 'FileExistsError' + the filename still tell the operator a file of that name already existed (the create-only behaviour). Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:164-171 Sink.note — catches the exception, builds why=f'{type(e).__name__}: {e}', records it in self.failures[].why.",
+    "aisef2/app/diagnostics.py:303 report() -> RUN.json diagnostics.failures[].why — operator-facing.",
+    "operator triaging a not_written diagnostic reads why; the 'FileExistsError' type + filename name the cause."
+   ],
+   "exceptions_checked": [
+    "test_a_file_is_never_overwritten (unit 408-415) asserts only self.assertIn('FileExistsError', sink.failures[0]['why']) — the type name, which the f-string prefix preserves; it does NOT assert the explanatory clause, so the mutant is not killed.",
+    "No consumer parses the `why` text; it is a human-readable mark, decides nothing (the module 'decides nothing').",
+    "The dropped clause is redundant with the surviving exception type 'FileExistsError' (= a file exists), the same pattern the lineage wave classified AUDITED when a distinguishing token survived.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::access_of",
+   "index": 10,
+   "mutant": "L103 string 'true' emptied",
+   "class": "EQUIVALENT",
+   "group": "command-discarded-by-targets: the mutated token is the sandbox COMMAND, which confine.targets slices off; access_of's return is provably identical for all inputs.",
+   "grounds": "L103: confine.wrap(confinement, ['true'], ...) -> confine.wrap(confinement, [''], ...). Proof from the code: (1) wrap (confine.py:177-200) references `command` only in its final argv(...) call — no control flow depends on it, and it does not validate non-emptiness, so [''] is accepted without raising. (2) argv (confine.py:160-174) places the command after the single '--' separator. (3) access_of uses only wrap's first return `full`, then confine.targets(full, host=True), which does a = full[:full.index('--')] and reads only --bind/--ro-bind dest paths from a — everything after '--' (the command) is excluded. Therefore targets(full) is byte-identical for ['true'] vs [''], and access_of's return (a pure function of targets(full) and folder/system) is identical. Kill files: unit 59 OK, run 25 OK (SURVIVED), consistent with no observable difference.",
+   "consumers_checked": [
+    "aisef2/app/run.py:608-609 — the sole caller: diagnostics.Sink(out, secrets, diagnostics.access_of(out / diagnostics.ARTIFACT_DIR, settings.confinement, kw['env'], exe)); folder is ALWAYS out/'probe-observations'.",
+    "aisef2/app/confine.py:177-200 wrap — uses `command` only by splicing it into argv()'s tail after '--'; all control flow (Unavailable raises, the HOME/workspace `held` check, config_dir, git_dir, ro, inside) is independent of `command`.",
+    "aisef2/app/confine.py:160-174 argv — command goes after the single '--' separator: [...,'--bind'|'--ro-bind',workspace,workspace,'--chdir',workspace,'--',*command].",
+    "aisef2/app/confine.py:285-292 targets(full,host=True) — slices a = full[:full.index('--')], i.e. everything BEFORE the first '--', then returns only --bind/--ro-bind dest paths; the command (after '--') is discarded entirely.",
+    "access_of's return is a pure function of confine.targets(full,host=True) and folder/system (diagnostics.py:98-106); it is stored as Sink.access -> RUN.json diagnostics.access and each artifact's diagnostics_access (operator-facing)."
+   ],
+   "exceptions_checked": [
+    "No input can distinguish: the command never appears as a --bind/--ro-bind value and targets() drops the whole post-'--' tail; '--' is the only exact-'--' token (flags like '--unshare-user' are distinct strings), so full.index('--') is the separator.",
+    "wrap raises Unavailable only on system/bwrap/read_only-path checks — none reads `command`.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::access_of",
+   "index": 13,
+   "mutant": "L103 string 'ws' emptied",
+   "class": "AUDITED",
+   "group": "workspace-path-never-matches-folder: the mutated token is a component of the session WORKSPACE (folder.parent/'work'/'ws'), which appears before '--' and so is a confine.targets mount. But the sole caller always passes folder = out/'probe-observations'; the workspace is the sibling branch out/work/ws, which can never equal folder nor be a parent of it, so access_of's folder-in-mounts test is unaffected. Observable in the command line, not in the return => AUDITED (not EQUIVALENT, because a pathological folder literally named 'work' or 'ws' could match — that folder never arises).",
+   "grounds": "L103: workspace = str(pathlib.Path(folder).parent / 'work' / 'ws') -> parent/'work'/'' = parent/'work' (joining '' is a no-op in pathlib). access_of builds `full` for the mounts, then returns SAME_USER iff realpath(folder) equals or is under some mount, else SESSIONS_CONFINED (NOT_INSPECTED on exception). folder=out/probe-observations; the workspace mount is out/work/ws (baseline) or out/work (mutant) — neither equals nor is a parent of out/probe-observations, so the match result is unchanged; git_dir(workspace) returns None (no workspace/.git) and does not raise. Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/run.py:608-609 — the sole caller: diagnostics.Sink(out, secrets, diagnostics.access_of(out / diagnostics.ARTIFACT_DIR, settings.confinement, kw['env'], exe)); folder is ALWAYS out/'probe-observations'.",
+    "aisef2/app/confine.py:177-200 wrap — uses `command` only by splicing it into argv()'s tail after '--'; all control flow (Unavailable raises, the HOME/workspace `held` check, config_dir, git_dir, ro, inside) is independent of `command`.",
+    "aisef2/app/confine.py:160-174 argv — command goes after the single '--' separator: [...,'--bind'|'--ro-bind',workspace,workspace,'--chdir',workspace,'--',*command].",
+    "aisef2/app/confine.py:285-292 targets(full,host=True) — slices a = full[:full.index('--')], i.e. everything BEFORE the first '--', then returns only --bind/--ro-bind dest paths; the command (after '--') is discarded entirely.",
+    "access_of's return is a pure function of confine.targets(full,host=True) and folder/system (diagnostics.py:98-106); it is stored as Sink.access -> RUN.json diagnostics.access and each artifact's diagnostics_access (operator-facing)."
+   ],
+   "exceptions_checked": [
+    "The three tests in TheStatementOfWhoCanRead that drive access_of (test_confined... SESSIONS_CONFINED with read_only=operator-input; test_a_directory_the_sandbox_mounts... SAME_USER via a read_only above folder; test_what_cannot_be_shown... NOT_INSPECTED) all key on read_only mounts / exceptions, never on the workspace path — so the workspace component is unpinned.",
+    "Proof the workspace can never match folder: workspace = folder.parent/work/ws and folder = folder.parent/<name>; folder is exactly one level below folder.parent while the workspace is deeper on a different branch, and folder.name is ARTIFACT_DIR='probe-observations' at the only call site, so folder != out/work and folder is not under out/work/ws nor out/work.",
+    "git_dir(out/work) returns None (confine.py:142-143: .git is not a file) — no extra mount, no raise, so no NOT_INSPECTED flip.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::access_of",
+   "index": 14,
+   "mutant": "L103 string 'work' emptied",
+   "class": "AUDITED",
+   "group": "workspace-path-never-matches-folder: the mutated token is a component of the session WORKSPACE (folder.parent/'work'/'ws'), which appears before '--' and so is a confine.targets mount. But the sole caller always passes folder = out/'probe-observations'; the workspace is the sibling branch out/work/ws, which can never equal folder nor be a parent of it, so access_of's folder-in-mounts test is unaffected. Observable in the command line, not in the return => AUDITED (not EQUIVALENT, because a pathological folder literally named 'work' or 'ws' could match — that folder never arises).",
+   "grounds": "L103: workspace -> parent/''/'ws' = parent/'ws' (the empty component drops). The workspace mount is out/ws; as for index 13, out/ws neither equals nor is a parent of out/probe-observations, so the folder-in-mounts decision is unchanged and git_dir(out/ws) is None (no raise). Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/run.py:608-609 — the sole caller: diagnostics.Sink(out, secrets, diagnostics.access_of(out / diagnostics.ARTIFACT_DIR, settings.confinement, kw['env'], exe)); folder is ALWAYS out/'probe-observations'.",
+    "aisef2/app/confine.py:177-200 wrap — uses `command` only by splicing it into argv()'s tail after '--'; all control flow (Unavailable raises, the HOME/workspace `held` check, config_dir, git_dir, ro, inside) is independent of `command`.",
+    "aisef2/app/confine.py:160-174 argv — command goes after the single '--' separator: [...,'--bind'|'--ro-bind',workspace,workspace,'--chdir',workspace,'--',*command].",
+    "aisef2/app/confine.py:285-292 targets(full,host=True) — slices a = full[:full.index('--')], i.e. everything BEFORE the first '--', then returns only --bind/--ro-bind dest paths; the command (after '--') is discarded entirely.",
+    "access_of's return is a pure function of confine.targets(full,host=True) and folder/system (diagnostics.py:98-106); it is stored as Sink.access -> RUN.json diagnostics.access and each artifact's diagnostics_access (operator-facing)."
+   ],
+   "exceptions_checked": [
+    "Same as index 13: no test pins the workspace path; access_of is driven only by read_only mounts / exceptions.",
+    "out/ws is a sibling of out/probe-observations (different basename), so it never matches folder at the only call site.",
+    "git_dir(out/ws)=None, no exception, so no NOT_INSPECTED flip.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._document",
+   "index": 96,
+   "mutant": "L196 True->False",
+   "class": "AUDITED",
+   "group": "detail-text-length-and-truncation-only: the mutated kwarg feeds json.dumps of shown['detail'] into `text`, which is used only for detail_chars=len(text), elided, and the elided truncation text[:DETAIL_MAX]. It bites only for a NON-STRING (dict/list) detail; the file itself always stores the detail sorted+ASCII-escaped via _keep. No consumer/contract/test keys on the key ORDER (96) or on natural-vs-escaped length (97); no test uses a multi-key or non-ASCII dict detail. AUDITED.",
+   "grounds": "L196: text = ... else json.dumps(shown['detail'], sort_keys=True, ensure_ascii=False) -> sort_keys=False. len(text) is invariant under key reordering, so detail_chars and elided are unchanged; the only observable change is the truncated text[:DETAIL_MAX] when a MULTI-KEY dict/list detail exceeds DETAIL_MAX (different key order => different truncation prefix). Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:194-200 Sink._document — `text` is used ONLY for shown['detail_chars']=len(text), shown['elided']=max(0,len(text)-DETAIL_MAX), and, when elided, shown['detail']=text[:DETAIL_MAX].",
+    "aisef2/app/diagnostics.py:206-210 Sink._keep — serializes the whole doc with json.dumps(...,sort_keys=True).encode('ascii') (ensure_ascii defaults True), so the FILE always stores detail ASCII-escaped and with sorted keys regardless of this line.",
+    "operator / aisef2/app/verify.py artifact_problems — read the parsed detail and the numeric detail_chars/elided; no decision keys on them (the module 'decides nothing')."
+   ],
+   "exceptions_checked": [
+    "No multi-key non-string detail is elided in any test: the e2e detail is {'returned':-1} (one key); test_the_detail_is_data... uses short ASCII dicts; the long-detail tests (test_a_detail_longer_than_the_bound, test_a_deeply_nested_detail) use a single-key dict {'rows':...} and a bare nested list — sort_keys is a no-op for 0/1-key objects and for lists.",
+    "Readers are order-agnostic: artifact_problems/verify json.loads the detail; the operator reads content, not key order; detail_chars/elided are unchanged (len invariant).",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._document",
+   "index": 97,
+   "mutant": "L197 False->True",
+   "class": "AUDITED",
+   "group": "detail-text-length-and-truncation-only: the mutated kwarg feeds json.dumps of shown['detail'] into `text`, which is used only for detail_chars=len(text), elided, and the elided truncation text[:DETAIL_MAX]. It bites only for a NON-STRING (dict/list) detail; the file itself always stores the detail sorted+ASCII-escaped via _keep. No consumer/contract/test keys on the key ORDER (96) or on natural-vs-escaped length (97); no test uses a multi-key or non-ASCII dict detail. AUDITED.",
+   "grounds": "L197: json.dumps(shown['detail'], sort_keys=True, ensure_ascii=False) -> ensure_ascii=True. For a NON-STRING detail containing non-ASCII characters, escaping lengthens `text`, so detail_chars (and possibly elided and the truncation) differ. For string details the isinstance(str) branch is taken and this line is dead. Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:194-200 Sink._document — `text` is used ONLY for shown['detail_chars']=len(text), shown['elided']=max(0,len(text)-DETAIL_MAX), and, when elided, shown['detail']=text[:DETAIL_MAX].",
+    "aisef2/app/diagnostics.py:206-210 Sink._keep — serializes the whole doc with json.dumps(...,sort_keys=True).encode('ascii') (ensure_ascii defaults True), so the FILE always stores detail ASCII-escaped and with sorted keys regardless of this line.",
+    "operator / aisef2/app/verify.py artifact_problems — read the parsed detail and the numeric detail_chars/elided; no decision keys on them (the module 'decides nothing')."
+   ],
+   "exceptions_checked": [
+    "No test uses a non-ASCII dict/list detail: the non-ASCII secret test (test_a_secret_is_replaced_in_the_json_part_of_a_text_detail) passes a TEXT detail (the isinstance str branch), so this line is not reached with non-ASCII; all dict-detail tests are ASCII, where ensure_ascii is a no-op.",
+    "detail_chars is an informational operator field ('its length'); no decision/verify step consumes it, and the file stores the detail ASCII-escaped anyway (via _keep's encode('ascii')), so the escaped count is not even clearly 'wrong'.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::_identity",
+   "index": 3,
+   "mutant": "L257 True->False",
+   "class": "AUDITED",
+   "group": "canonical-key-order-self-consistent: sort_keys only reorders dict keys, and the json.dumps argument is a LIST whose only dict element is `result`={'behavior_verdict','reason'}; _identity is applied with the same (mutated) function to both sides of the artifact<->journal-row comparison, and for the actual result dict sorted order already equals the construction order, so the canonical text is unchanged. AUDITED (not EQUIVALENT: a result dict whose keys were in non-sorted order on one side only would differ — no such record arises).",
+   "grounds": "L257: json.dumps([story, *record.get(k) for k in (...,'result')], sort_keys=True, default=str) -> sort_keys=False. Only `result` (=plain(Executed)) is a dict; its keys 'behavior_verdict'<'reason' are already in sorted order and plain() builds them in that order, so json.dumps gives identical bytes with sort_keys True or False (verified: json.dumps({'behavior_verdict':'REFUTED','reason':None}, sort_keys=True) == with False). Because artifact_problems computes _identity on both the journal record and the doc with the same function, the membership test is consistent regardless. Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:274-279 artifact_problems — rows = {_identity(d.get('story_id'), d['record']) for probe/evaluated events}; then `_identity(doc.get('story_id'), doc) not in rows` flags an unbound file. _identity is applied to BOTH the journal record and the artifact doc with the SAME (mutated) function, so the membership test stays self-consistent.",
+    "aisef2/app/verify.py verify -> artifact_problems is the only consumer; _identity's string is never stored, never operator-visible.",
+    "the only nested dict in the json.dumps([...]) list is `result` = plain(Executed) = {'behavior_verdict':..,'reason':..}; sort_keys reorders dict keys only."
+   ],
+   "exceptions_checked": [
+    "No test constructs a record whose `result` has keys in a non-sorted insertion order differing between the journal row and the file (the file stores result sorted via _keep; plain() emits behavior_verdict then reason = sorted); WhatVerifyChecks and the e2e binding tests all use {'behavior_verdict':..,'reason':..}.",
+    "_identity's output is never stored or shown; its sole consumer, artifact_problems, uses it only for set membership and compares like-against-like.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::tapped",
+   "index": 9,
+   "mutant": "L248 dict entry 2 dropped",
+   "class": "AUDITED",
+   "group": "dunder-doc-unused: the subclass namespace loses '__doc__': factory.__doc__, so the tapped probe's __doc__ becomes None instead of the probe's docstring. __doc__ is read by nothing in aisef2 (grep: the only occurrence is this very line), and no calibration/digest/verify/operator path consumes a probe's docstring. AUDITED.",
+   "grounds": "L248: type(factory.__name__, (factory,), {'observe':observe, '__module__':factory.__module__, '__doc__':factory.__doc__}) -> drops '__doc__'. A class created by type() without __doc__ in its namespace has __doc__=None (not inherited). So the tapped subclass's __doc__ is None vs the untapped probe's docstring — observable via introspection only. Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/probe/calibration.py:68 executing(probe) — returns execution_digest or digest (class attrs, inherited), NOT __doc__; test_identity_digest_execution_digest_and_the_sealed_record asserts executing(T)==executing(Fake) and still passes.",
+    "aisef2/app/run.py probe_factories / diagnostics.Sink.entries — build the subclass, call observe, read id/digest/enforcement; none reads __doc__.",
+    "aisef2/probe/catalog, aisef2/app/verify — no reader of a probe's __doc__."
+   ],
+   "exceptions_checked": [
+    "test_it_returns_the_probes_own_observation_and_only_overrides_observe (unit 126-133) asserts {k for k in vars(T) if not k.startswith('__')}=={'observe'} (dunders EXCLUDED) and (T.__name__,T.__module__)==(Fake...); it never asserts T.__doc__, so the mutant survives.",
+    "grep -rn '__doc__' aisef2/ (excluding tests): the only hit is diagnostics.py:249 — nothing reads it back.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::PERMISSIONS",
+   "index": 2,
+   "mutant": "L87 string 'platform default (modes are not applied)' emptied",
+   "class": "REFUTED",
+   "group": "operator-access/permission-statement-under-pinned: an operator-facing RUN.json field whose non-posix value is unpinned because the campaign host is posix (owner rule: a string an operator reads is not harmless; owed test named).",
+   "grounds": "L87: PERMISSIONS = 'directory 0700, files 0600' if os.name=='posix' else 'platform default (modes are not applied)' -> else ''. On the posix measurement host the ternary always takes the first branch, so the mutated else-branch is dead code here (that is WHY it survives: unit 59 OK, run 25 OK). But on Windows (os.name=='nt'; Windows is a real supported constraint for AISEF) RUN.json diagnostics.permissions would become '' instead of a statement that modes are not applied — a security-relevant omission about who the directory protects. A reader (the Windows operator) depends on it.",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:301 report() -> RUN.json diagnostics.permissions = PERMISSIONS — operator-facing.",
+    "docs/the module docstring: the directory is 0700/0600 'where the platform has modes'; the else string is the explicit statement for platforms without modes (Windows)."
+   ],
+   "exceptions_checked": [
+    "test_the_report_states_where_for_whom_and_how_it_is_limited (unit 464-471) asserts assertIn(('directory 0700, files 0600' if os.name=='posix' else 'platform default'), r['permissions']) — on posix it checks only the first branch; the non-posix literal is never evaluated on this host.",
+    "test_v21_pm8_diagnostics_run.test_RUN_json_says_what_is_and_is_not_enforced asserts permissions=='directory 0700, files 0600' (posix) — also only the first branch.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED) — a platform-coverage gap, not a flaky pass."
+   ],
+   "refutation": "Input: import diagnostics with os.name != 'posix' (Windows). Reader: the Windows operator reading RUN.json diagnostics.permissions (Sink.report), which must state that filesystem modes are not applied. Sketch: a test that re-evaluates the constant under a simulated non-posix platform, e.g. with mock.patch.object(os, 'name', 'nt'): importlib.reload(D); self.assertEqual(D.PERMISSIONS, 'platform default (modes are not applied)'); importlib.reload(D) to restore. Baseline passes; mutant (else '') gives D.PERMISSIONS=='' and the test FAILS — killing index 2."
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::NOT_INSPECTED",
+   "index": 0,
+   "mutant": "L84 string ' (confinement is asked for; what its sessions mount could not be inspected)' emptied",
+   "class": "REFUTED",
+   "group": "operator-access/permission-statement-under-pinned: the mutant collapses NOT_INSPECTED to exactly SAME_USER, erasing the distinction between 'no confinement requested' and 'confinement requested but uninspectable'. An operator reads this (RUN.json diagnostics.access / each artifact's diagnostics_access) and depends on the distinction (owner rule).",
+   "grounds": "L84: NOT_INSPECTED = SAME_USER + ' (confinement is asked for; what its sessions mount could not be inspected)' -> SAME_USER + '' , i.e. NOT_INSPECTED == SAME_USER == 'same-user, not enforced'. access_of returns NOT_INSPECTED when confinement IS requested but its command line cannot be built/read (non-Linux host, missing bwrap, absent read_only path, malformed spec). With the mutant, such a run reports access identical to a run with NO confinement, so the operator cannot tell confinement was requested but could not be verified. Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:98-106 access_of — returns NOT_INSPECTED on the except branch (confinement requested, uninspectable).",
+    "aisef2/app/run.py:608-609 -> Sink.access -> aisef2/app/diagnostics.py:300 report() RUN.json diagnostics.access AND diagnostics.py:188 doc['diagnostics_access'] in every artifact — operator-facing.",
+    "the module docstring frames SAME_USER / NOT_INSPECTED / SESSIONS_CONFINED as a closed vocabulary of distinct statements."
+   ],
+   "exceptions_checked": [
+    "test_what_cannot_be_shown_is_not_claimed (unit 519-524) asserts access(...)==D.NOT_INSPECTED (mutated both sides => still equal) and D.NOT_INSPECTED.startswith(D.SAME_USER) (True when they are equal) — so it never requires NOT_INSPECTED to DIFFER from SAME_USER.",
+    "test_the_statements_make_no_claim_that_nobody_can_read_it (526-530) only checks the 'cannot read' regex is absent — '' passes.",
+    "No test asserts NOT_INSPECTED != SAME_USER nor that it carries the 'confinement is asked for' clause.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED)."
+   ],
+   "refutation": "Input: access_of(out/probe-observations, confinement_spec, env, exe, system='darwin') — confinement requested on a host that cannot inspect it. Reader: the operator reading RUN.json diagnostics.access / artifact diagnostics_access, who must distinguish 'confinement requested but uninspectable' from 'no confinement'. Sketch: in TheStatementOfWhoCanRead add self.assertNotEqual(D.NOT_INSPECTED, D.SAME_USER) and self.assertIn('could not be inspected', D.NOT_INSPECTED); equivalently assertNotEqual(self.access(self.spec(str(self.other)), system='darwin'), D.SAME_USER). Baseline passes; mutant (NOT_INSPECTED==SAME_USER) FAILS — killing index 0."
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::_parsed",
+   "index": 3,
+   "mutant": "L119 element 1 dropped",
+   "class": "AUDITED",
+   "group": "recursionerror-branch-unreached: dropping RecursionError from the except tuple matters only when json.loads(detail) raises RecursionError; CPython's C json scanner does not raise it for any input the kill files use (even '['*3000+']'*3000 parses), and when it does raise, Sink.note's fail-open `except Exception` still catches it (RecursionError is a RuntimeError/Exception) so nothing escapes. The only difference is a non-deciding diagnostic kept-with-raw-text vs counted as not_written. AUDITED.",
+   "grounds": "L119: except (ValueError, RecursionError): return detail -> except (ValueError,): . Original: a RecursionError from json.loads is swallowed and _parsed returns the raw text; mutant: it propagates out of _parsed, is caught by Sink.note (diagnostics.py:164 `except Exception`), so the artifact is not kept and is counted (not_written += 1, a failures[] entry). Verified: json.loads('['*3000+']'*3000) returns a list (no RecursionError) on this interpreter, so the deep-detail test (test_a_deeply_nested_detail_is_cut...) does not exercise this branch. Kill files: unit 59 OK, run 25 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:185-188 Sink._document -> _parsed(observation.detail); result feeds shown['detail'].",
+    "aisef2/app/diagnostics.py:159-171 Sink.note — wraps _document in `except Exception` (fail-open): a RecursionError becomes not_written + a failures[] mark, never a raised exception or a changed run outcome.",
+    "operator — would see a kept artifact (raw text) vs a not_written mark in RUN.json; the module decides nothing either way."
+   ],
+   "exceptions_checked": [
+    "No test triggers a json.loads RecursionError: the C scanner parses the test inputs (deep-nested lists included) without recursing in Python; the string-detail / broken-JSON tests go through the ValueError arm, which the mutant keeps.",
+    "The module's own contract is fail-open and non-deciding ('What it decides: nothing'); Sink.note's `except Exception` is the safety net the mutant falls through to — no exception escapes the module, no run outcome or --verify result changes.",
+    "Measured: unit 59 OK, run 25 OK (SURVIVED). (A skeptic could deem a test owed by mocking json.loads to raise RecursionError and asserting the artifact is still kept with raw text; noted.)"
+   ]
+  }
+ ],
+ "owed_tests": [
+  "aisef2/app/diagnostics.py::PERMISSIONS index 2 — a test that evaluates PERMISSIONS under os.name != 'posix' (reload under mock.patch.object(os,'name','nt')) and asserts it == 'platform default (modes are not applied)'. Reader: Windows operator via RUN.json diagnostics.permissions.",
+  "aisef2/app/diagnostics.py::NOT_INSPECTED index 0 — a test asserting NOT_INSPECTED != SAME_USER and that it carries the 'confinement is asked for ... could not be inspected' clause (equivalently that access_of(..., system='darwin') with a confinement spec differs from SAME_USER). Reader: operator via RUN.json diagnostics.access / artifact diagnostics_access."
+ ],
+ "notes": "diagnostics.py is a window-rewritten file whose kill set is the two PM-8 files only (the fix report's proposal). The under-pinning is concentrated in operator-facing statement strings: PERMISSIONS's non-posix arm and NOT_INSPECTED's distinction from SAME_USER are both unpinned on the posix measurement host. The label-dispute cases (Sink._keep 15 FileExistsError clause) I classed AUDITED by the W2-lineage precedent (a distinguishing token — the exception type — survives); a blind skeptic may relabel it REFUTED. Sink._document 96/97 and Sink._keep 13/16 are genuine formatting/length cosmetics with no byte-golden and a self-consistent manifest. _parsed 3's RecursionError arm is unreachable via the C json scanner and is caught by fail-open anyway."
+}

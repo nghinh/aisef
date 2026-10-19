@@ -1,0 +1,273 @@
+{
+ "batch": "W2-cli_invocation-1",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/probe/cli_invocation.py",
+ "role": "skeptic",
+ "verified_on": "2026-10-19 23:18 +0700; macOS, CPython 3.14.7, nice -n 19 python3 -P -B, PATH stripped of opencode, HOME/TMPDIR/XDG under the audit tree",
+ "method": "Confirmed every mutant via mutant_view.py / mutation.mutants()[index] at the snapshot (desc == the entry). Read the consumer chain across aisef2/ validation/ tests/ docs/ at the snapshot (StreamSearchFailed/_said/_SEARCH_STOPPED/_compiles/observation_class/_observe/_concluded/_watch/_after_dispatch/classify_failure/Observation.__post_init__/proof.on_range/q5._subprocesses/_public/the HARNESS program). Ran registered kill files AND unregistered test modules reaching each function on the built mutant in a clean copy tree; a test that FAILS on the mutant and PASSES unmutated kills it.",
+ "result_summary": {
+  "CONFIRMED": 21,
+  "REFUTED": 2,
+  "REVISED": 0,
+  "NOT_DECIDED": 0,
+  "refuted": [
+   "HARNESS/finish[6] (carried AUDITED -> SURVIVED test owed)",
+   "HARNESS/answer_to[10] (carried AUDITED -> SURVIVED test owed; killed by unregistered T21b)"
+  ]
+ },
+ "entries": [
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 53,
+   "mutant": "L360 string 'the search did not finish within the harness watchdog (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Confirmed mutant: str(e)='regex search DEADLINE: 1s: timeouts_s.probe) over N bytes of the stderr stream...never a verdict...changes nothing...'. reason='DEADLINE' (StreamSearchFailed.__init__ cli_invocation.py:313-315, 1st arg untouched). The DEADLINE kill test test_v21_r5_regex_worker.py:203-218 asserts reason=='DEADLINE', str(e).startswith('regex search DEADLINE: ') (prefix from __init__, not the emptied lead-in), and assertIn of '1s: timeouts_s.probe','the stderr stream','{len} bytes',repr(EVIL),'never a verdict','changes nothing' -- every one of those survives the emptied lead-in. grep 'did not finish within the harness watchdog' over aisef2/tests/validation/docs = only cli_invocation.py:360 itself and the file_artifact SIBLING's different string ('the regex loop did not finish...' test_v21_fa_grep_worker.py:744). MEASURED on mutant: test_v21_r5_regex_worker PASS (34 tests, 66.9s), baseline PASS.",
+   "refutation": "none",
+   "note": "registered kill files = r5_regex_worker + r5_regex_isolation; ran r5_regex_worker on the mutant -> OK."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 72,
+   "mutant": "L337 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "INPUT message closing ')' dropped: 'the request cannot be written ({type(e).__name__}'. reason='INPUT' survives. Kill test test_v21_r5_regex_worker.py:386-390 asserts reason=='INPUT' and assertIn('the request cannot be written', str(e)); both hold on the mutant, the lone ')' is punctuation no reader parses. MEASURED on mutant: test_v21_r5_regex_worker PASS (34, 77.7s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 73,
+   "mutant": "L343 string 'the worker did not start (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "LAUNCH lead-in dropped: str(e)='regex search LAUNCH: {type(e).__name__})'. reason='LAUNCH' + the type-name token survive. The LAUNCH kill test test_v21_r5_regex_worker.py:364-377 asserts reason=='LAUNCH' ONLY (no assertIn on the message). grep 'the worker did not start' hits only cli_invocation.py:343 (this line) and file_artifact.py:484 (SIBLING), and tests test_v21_fa_grep_worker.py:570/595 which pin file_artifact's grep worker, not cli. MEASURED on mutant: test_v21_r5_regex_worker PASS (34, 74.7s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 74,
+   "mutant": "L343 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "LAUNCH closing ')' dropped: 'the worker did not start ({type(e).__name__}'. reason='LAUNCH', lead-in + type-name survive. The LAUNCH kill test (test_v21_r5_regex_worker.py:364-377) asserts reason only, never the message text; no cli test pins the LAUNCH message (grep as [73]). Same assertion surface as [73] (verified in code: reason-only), which I ran on its mutant -> PASS; [74] removes strictly less (a single ')').",
+   "refutation": "none",
+   "note": "not separately run; identical reason-only kill-test surface as [73] which ran PASS."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 75,
+   "mutant": "L369 string 'the worker ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "CRASHED subject prose dropped: '{how} before it gave its result'+_said(log). reason='CRASHED' and the discriminating {how} ('exited with status 7'/'ended by signal 15') survive. FailureModes test_each_failure... (test_v21_r5_regex_worker.py:354-361) asserts reason, str(e).startswith('regex search {reason}: ') (prefix from __init__) and assertIn(phrase) where phrase is {how}/the traceback tail -- all present; the emptied 'the worker ' is not among the pinned phrases. MEASURED on mutant: test_v21_r5_regex_worker PASS (34, 75.1s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 76,
+   "mutant": "L369 string ' before it gave its result' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "CRASHED trailing clause dropped: 'the worker {how}'+_said(log). reason='CRASHED', {how} and the _said tail survive and are the pinned phrases (FailureModes :354-361; signal case :362-368 'ended by signal 15'). The emptied clause is narrative no reader parses. MEASURED on mutant: test_v21_r5_regex_worker PASS (34, 77.2s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 3,
+   "mutant": "L388 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "_said returns f': {tail!r}' -> f'{tail!r}' (the ': ' separator before the worker-output tail dropped; empty-tail path still ''). _said's callers are cli_invocation.py:356/369/374 ('<message>'+_said(log)). FailureModes asserts the tail phrase (e.g. 'ZeroDivisionError') which is inside repr(tail) and survives; the ': ' before 'regex search {reason}: ' is from StreamSearchFailed.__init__, not _said, so startswith still holds. MEASURED on mutant: test_v21_r5_regex_worker PASS (34, 79.5s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 2,
+   "mutant": "L387 returns None",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The OSError branch of _said returns ''->None. _said is consumed only as '<message>'+_said(log) (356/369/374), so None would raise TypeError and break search_in_worker -- but the branch fires only if pathlib.Path(log).read_bytes() raises OSError, i.e. the just-created local worker.log (open 'wb' at 335) is unreadable when read right after the worker ends. REGEX_WORKER is fixed kernel code (launched 339) that never removes/chmods the log; every FailureModes stand-in leaves a readable log. The branch is dead on every real/tested path, so ''/None is unobservable. Not EQUIVALENT (a real FS fault WOULD make None observable), but no named consumer/test reaches it -> AUDITED. MEASURED on mutant: test_v21_r5_regex_worker PASS (34, 71.7s), baseline PASS.",
+   "refutation": "none",
+   "note": "defensive-guard survivor; a genuine EIO on worker.log read is latent but unreachable by any consumer/test."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 5,
+   "mutant": "L385 string 'replace' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "read_bytes()[-300:].decode('utf-8','replace')->decode('utf-8',''). VERIFIED on 3.14.7: b'hello\\ntrace'.decode('utf-8','') == 'hello\\ntrace' (the '' handler is looked up only on a decode error), while b'a\\xffb'.decode('utf-8','') raises LookupError. The only writer of worker.log is the fixed REGEX_WORKER / FailureModes stand-ins, all ASCII/UTF-8 tracebacks -- never invalid UTF-8 -- so the handler is never invoked and 'replace' vs '' are byte-identical on every real/tested path. (A latent LookupError would escape _said's OSError-only except, but no consumer/test produces invalid-UTF-8 on the log.) MEASURED on mutant: test_v21_r5_regex_worker PASS (34, 74.0s), baseline PASS.",
+   "refutation": "none",
+   "note": "defensive-guard survivor; invalid-UTF-8 on the log is unreachable."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 0,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->UNSUPPORTED",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Code proof: _SEARCH_STOPPED is used in exactly one place, cli_invocation.py:351 `_after_dispatch(run, _SEARCH_STOPPED)` with the return DISCARDED (grep over aisef2/validation/tests/docs = 306 def, 351 use only). python_callable.py:379-389 _after_dispatch: stages=[s['stage'] for s in run.ledger]; if not stages: return observation (discarded here) ELSE raise ProbeInterrupted(from stages) -- neither branch reads the observation's kind/verdict/detail. Import still succeeds: Observation.__post_init__ (protocol.py:104-119) accepts UNSUPPORTED with verdict=None (default) and non-empty detail ('the regex search was interrupted'). No observable difference anywhere. MEASURED on mutant: test_v21_r5_regex_isolation PASS (19, 31.3s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 1,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->SUBJECT_ABSENT",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "As [0]: the only reader _after_dispatch never inspects the argument. __post_init__ accepts SUBJECT_ABSENT with verdict in (None,SATISFIED,REFUTED); verdict is the default None. MEASURED on mutant: test_v21_r5_regex_isolation PASS (19, 33.1s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 4,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->NON_CONTROLLER_SIGNAL",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "As [0]: the only reader _after_dispatch never inspects the argument. __post_init__ accepts NON_CONTROLLER_SIGNAL with verdict=None + non-empty detail. MEASURED on mutant: test_v21_r5_regex_isolation PASS (19, 33.2s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_compiles",
+   "index": 5,
+   "mutant": "L448 returns None",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "except branch `return False`->`return None`. Only caller cli_invocation.py:467 `return isinstance(v, str) and _compiles(v)` (grep _compiles -> 440 def, 467 use); _stream_shape_ok's only caller is `all(_stream_shape_ok(obs[k]) for k in extra)` at 528; observation_class returns None at 533 when all(...) is falsy. all() coerces both False and None to the same falsy result, so observation_class is identical. No `is False`/`==False`/`is None` test on the result anywhere (grep). Kill file test_v21_r5_probe_model_data.py:299/304 assertIsNone(observation_class(...bad regex...)) passes for both. MEASURED on mutant: test_v21_r5_probe_model_data PASS (26, 10.8s), baseline PASS.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+   "index": 15,
+   "mutant": "L1164 string 'probe ' emptied",
+   "class_before": "SURVIVED (test owed)",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Confirmed mutant: the regex-worker ProcessRange name f'probe {spec_id} regex {stream}' (cli_invocation.py:1164) -> f'{spec_id} regex {stream}'. The 'probe ' prefix is a CLASSIFICATION token: proof.py:68-69 on_range acquires the story resource f'{process_range.name} [{under} {label}]', and q5.py:803-811 _subprocesses keys it `'probe' if r.startswith('probe ') else ... else 'worktree'`. Mutated, the regex range's resource loses the prefix and is counted 'worktree' not 'probe', changing q5.compare's subprocess accounting. The sibling SUBJECT range 'probe {spec_id}' (1213) is pinned exactly by test_c2_cli_protocol.py:226 and test_v21_r5_regex_isolation.py:189; the regex range's prefix is pinned by NO registered kill file (test_v21_r5_regex_worker.py:461-476 records names but asserts only `'regex' in n` and the stream suffix `n.rsplit(' ',1)[1]`). I CONFIRM the author's REFUTED: survived ALL behavioral registered kill files on the mutant -- test_v21_r5_regex_worker PASS(34,61.5s), test_v21_r5_regex_isolation PASS(19,21.5s), test_c2_cli_invocation PASS(32,74.1s); baselines PASS. (c2_cli_protocol/v21_identity have a baseline-only CLI_Q0 failure from the un-archived closure-evidence manifest, not a kill.)",
+   "refutation": "Test owed. INPUT: the regex-stdout spec test_v21_r5_regex_worker.py ThroughTheProbe.test_a_search_is_made...:461-476 already records every ProcessRange name in `made` under counting(). READER: q5._subprocesses (q5.py:808) and the operator-visible STORY_RESOURCE_ACQUIRED journal, which classify the regex subprocess by the 'probe ' prefix. SKETCH: add `self.assertTrue(all(n.startswith('probe ') for n in made if 'regex' in n), made)`. Demonstrated by construction: pristine name starts with 'probe ', mutant ('{spec_id} regex {stream}') does not, so q5 reclassifies it 'worktree'.",
+   "note": "author entry already REFUTED; I confirm the reader chain and the registered-set survival."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 96,
+   "mutant": "HARNESS L134 string 'subject_signal' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Confirmed mutant at the snapshot: HARNESS L134 (cli_invocation.py:1009) `if \"subject_signal\" in r:` -> `if \"\" in r:`. ended() (987-989) returns {'subject_signal':-code} or {'subject':'present','exit_code':code,'hard_exit':True} -- never an '' key -- so `'' in r` is always False and a signalled pre-step takes the tail r['pre_failed']=i;return r, yielding {subject_signal:N, pre_failed:i} instead of {subject_signal:N}. The module tail (1040) tests the UNMUTATED literal 'subject_signal' in facts, still True, so finish() is still skipped. _watch(1312-1316)->_concluded(1356-1360): the signal branch reads facts['subject_signal'] ALONE to build NON_CONTROLLER_SIGNAL detail and returns facts None; classify_failure (protocol.py:181) maps NON_CONTROLLER_SIGNAL->Executed(INDETERMINATE), dropping detail. pre_failed is read only by verdict_of(657) and _half_ok(636), never reached for a signal. The Observation, ProbeResult and detail are byte-identical; only the disposed protocol.log RESULT body gains a key no reader parses (test_c2_cli_protocol.py:246-251 feeds a faked main-path subject_signal and asserts the Observation, not the pre-step body).",
+   "refutation": "none",
+   "note": "hard-exit pre-step (code>=0): `'subject_signal' in r` and `'' in r` are both False, unchanged."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 115,
+   "mutant": "HARNESS L130 string '.stdout.bin' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Confirmed: pre-step i stdout capture work/pre<i> instead of work/pre<i>.stdout.bin; stderr stays work/pre<i>.stderr.bin (two distinct files). The capture path is an internal handle: _public (cli_invocation.py, verified) strips 'path' from every stdout/stderr dict incl. inside the 'pre' list, so it never reaches detail; the parent streams only the MAIN invocation (verdict_of reads facts['pre_failed'] at 657, never a pre-step capture name). Distinctness holds (pre<i> vs pre<i>.stderr.bin, vs other steps, vs stdout.bin/stderr.bin/stdin.bin/request.json/protocol.log/harness.log/agent.log and the ws/pycache/tmp dirs). grep stdout.bin/stderr.bin in tests = only the MAIN-invocation faked facts (test_c2_cli_protocol.py:453-454 '/w/stdout.bin'); no test pins a pre-step capture name.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 116,
+   "mutant": "HARNESS L131 string '.stderr.bin' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "As [115] for stderr: pre<i> instead of pre<i>.stderr.bin; stdout stays pre<i>.stdout.bin, distinct pair. Internal handle stripped by _public, parent never opens a pre-step stream, no test pins the name. Confirmed mutant label at the snapshot.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 123,
+   "mutant": "HARNESS L130 string 'pre' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "As [115]: stdout capture work/<i>.stdout.bin (digit-led) instead of work/pre<i>.stdout.bin; stderr stays pre<i>.stderr.bin. Distinct from every other name (1.stdout.bin vs 11.stdout.bin, vs the fixed names; no numeric directory exists). Internal handle stripped by _public, not opened by the parent, not pinned by any test. Confirmed mutant label at the snapshot.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "index": 124,
+   "mutant": "HARNESS L131 string 'pre' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "As [116]/[123]: stderr capture work/<i>.stderr.bin instead of pre<i>.stderr.bin; stdout stays pre<i>.stdout.bin. Distinct, internal, stripped by _public, parent never opens it. test_c2_cli_invocation.py::test_CLI_5 captures a pre-step (size/hash facts) but asserts no name. Confirmed mutant label at the snapshot.",
+   "refutation": "none",
+   "note": ""
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/finish",
+   "index": 6,
+   "mutant": "HARNESS L70 string \"an answer on the subject's channel is not the agent's\" emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Confirmed mutant: finish() (cli_invocation.py:945) returns ''->the tamper sentence emptied; the module tail (1041-1043) `if wrong is not None: facts={'subject':'present','tampered': wrong}` still fires ('' is not None), so OBSERVED/REFUTED stands via the KEY. BUT the author's harmlessness argument ('classify_failure drops the detail for OBSERVED') covers only the OPERATOR (ProbeResult) path: a VERIFIER reads Observation.detail directly. DEMONSTRATED by driving the real CliInvocationProbe on T21a's 'straybye' closing-exchange checkout: pristine facts(o)['tampered']=\"an answer on the subject's channel is not the agent's\"; finish[6] mutant facts(o)['tampered']='' (both OBSERVED/REFUTED). T21a ClosingExchange.test_a_stray_line_that_pre_answers_the_closing_request... (test_v21_kills3_T21a.py:188-192) reaches finish() and reads facts(o)['tampered'] via _Tampering.assert_tampered (:117-123) but only assertIsInstance(...,str) -- so '' passes and the mutant survives (confirmed: T21a PASS, T21b PASS on the mutant). The same sentence on the PARALLEL answer_to path IS pinned non-empty (T21b:108 kills answer_to[10], see idx 10) and on process_effect (test_v21_kills3_T19b.py:215 assertIn 'not the agent's'); the cli finish closing-exchange reason is under-pinned.",
+   "refutation": "Test owed. INPUT: base.spec('app.strayer:main', EXITS_0, {'argv':['straybye']}, window=WINDOW) -- T21a's existing ClosingExchange fixture reaching finish(). READER: the verifier facts(o)['tampered'] (Observation.detail=json.dumps(facts) built by _concluded:1366-1368), and the operator's REFUTED tamper reason. SKETCH: strengthen T21a _Tampering.assert_tampered (:123) to add `self.assertTrue(f['tampered'], why)` (mirroring T21b:108 and T19b:215). Demonstrated: pristine reason non-empty, mutant ''.",
+   "note": "carried AUDITED. The author's classify_failure-drop justification is incomplete (verifiers read Observation.detail directly); the closing-exchange reason parallels answer_to[10]/process_effect which ARE pinned non-empty."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/answer_to",
+   "index": 10,
+   "mutant": "HARNESS L56 string \"an answer on the subject's channel is not the agent's\" emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Confirmed mutant: answer_to() (cli_invocation.py:931) returns {'tampered': ''} instead of the sentence when the subject's line is not the agent's answer. An EXISTING, UNREGISTERED test kills it: test_v21_kills3_T21b.py StrayAnswerInAPreStep.assert_tampered (:108) does `self.assertTrue(f['tampered'], 'the reason is not empty')`, reached through a pre-step stray answer ('wrongn'/'junkexit') which answer_to flags. MEASURED: T21b FAILS on the mutant (4 failures, \"'' is not true : the reason is not empty\") and PASSES unmutated. T21b is NOT a registered kill file for HARNESS/answer_to (registered = c2_cli_protocol, v21_identity, c2_cli_invocation, kills3_T21a); the registered set only type-checks the value (T21a assert_tampered:123 assertIsInstance str), so the campaign measured SURVIVED -- VERIFIED: on the mutant test_c2_cli_invocation PASS(32), test_v21_kills3_T21a PASS(14), test_c2_cli_protocol FAILED(1) but the sole failure is the baseline-only CLI_Q0 closure-manifest artifact (identical on the unmutated baseline), not a kill. Per the owner rule 'a test that kills it and is not registered refutes the audit' -> REFUTED.",
+   "refutation": "Test owed (the test already exists). INPUT: a pre-step whose argv writes a stray numbered object on the agent's channel, e.g. T21b's base.spec('app.strayer:main', observable, {'argv':['ok'],'pre':[{'argv':['wrongn']}]}). READER: the verifier facts(o)['tampered'] (Observation.detail built by _concluded:1366-1368), asserted non-empty by T21b:108. SKETCH: register test_v21_kills3_T21b.py for aisef2/probe/cli_invocation.py::HARNESS/answer_to (it already kills the mutant), or equivalently strengthen the registered T21a assert_tampered to assertTrue(f['tampered']).",
+   "note": "carried AUDITED, but an existing unregistered test (T21b) kills it; the registered per-target set under-pins the tamper reason."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/inside",
+   "index": 2,
+   "mutant": "HARNESS L73 And swapped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Confirmed: inside() (cli_invocation.py:948) `[spec.origin] if spec.origin and spec.has_location else ...` with the `and` operands swapped to `spec.has_location and spec.origin`. The expression's value is used ONLY as the truth condition of a conditional-expression, and bool(A and B) == bool(B and A) for all A,B (AND truth value is commutative), so the SAME branch is taken in every case regardless of spec type. spec.origin (plain attr) and spec.has_location (ModuleSpec property returning self._set_fileattr, a bool) are side-effect-free, so swapping evaluation order cannot raise or differ. EQUIVALENT by code (simpler and more general than the author's PathFinder enumeration, which is sound corroboration). Not separately measured (pure boolean-commutativity proof); the campaign measured SURVIVED.",
+   "refutation": "none",
+   "note": "the author's PathFinder (T,F)/(F,T) analysis is correct but unnecessary: commutativity of the AND truth value settles it for any spec."
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::HARNESS/conclude",
+   "index": 1,
+   "mutant": "HARNESS L29 False->True",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Confirmed: conclude() (cli_invocation.py:904) `said.acquire(blocking=False)`->`blocking=True`. said = threading.Lock() (883), acquired non-blocking in settle(901) and conclude(904) and NEVER released (no said.release in the HARNESS, grep). conclude is reached ONLY from the daemon Timer built in deadline()(908, timer.daemon=True, never joined/cancelled). When the lock is FREE (deadline wins the race) both acquire at once and write RESULT(deadline)/END identically; when HELD (the subject already settled) the non-blocking call returns False and writes nothing, the blocking call parks forever and also writes nothing -- the acquire is atomic either way, so the RESULT winner, protocol file and exit status are identical. The only difference is a parked daemon thread, which is not a range member and is not read by the parent (_watch reads the protocol file and the range's wait status); interpreter shutdown abandons daemon threads. EQUIVALENT by code (author's park.py measurement corroborates equal exit time). Campaign measured SURVIVED.",
+   "refutation": "none",
+   "note": "threading.Lock is non-reentrant and never released; conclude's sole caller is the daemon timer."
+  }
+ ]
+}

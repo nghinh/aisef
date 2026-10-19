@@ -1,0 +1,69 @@
+{
+ "batch": "W2-verify-1",
+ "file": "aisef2/app/verify.py",
+ "targets": [
+  "aisef2/app/verify.py::_runspec_problems",
+  "aisef2/app/verify.py::_spend"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/verify.py::_spend",
+   "index": 18,
+   "mutant": "L93 string ' \u2014 and verify again): ' emptied"
+  },
+  {
+   "target": "aisef2/app/verify.py::_spend",
+   "index": 22,
+   "mutant": "L93 string '; ' emptied"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/app/verify.py::_runspec_problems",
+   "index": 33,
+   "mutant": "L72 string ')' emptied",
+   "class": "AUDITED",
+   "group": "closing ')' of a parenthesised tail of a problem, shared with [155] and [158], but each looked at on its own text and consumers",
+   "grounds": "The mutant prints '(re-derived H1, journaled H2' without the closing ')' (verify.py L71-L72, the one return of the `derived != spec['runspec_hash']` branch, L70). Both 12-hex prefixes and both role labels are intact and still separate tokens: test_v21_kills3_A22.py::TheHashPrefixesOfARefutedRunSpecAreTwoTokens (L122-L137, pins [32]) reads them with HEX12 = \\b[0-9a-f]{12}\\b and passes on the mutant, because the second prefix is the last datum of the string and the end of the text is a word boundary. What is lost is the closing delimiter of an aside in a human-readable refusal whose decision (REFUTED, by `len(problems)` at L204), subject ('settings', 'runspec hash') and identifying elements are all in the part the mutant keeps. The problem is one list element and nothing is appended to it.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L70-L72 is the only producer; L173-L174 the only caller (`bound, s = _runspec_problems(...)`; `problems += bound`), by name over aisef2, validation, tests, scripts (git grep '_runspec_problems': verify.py, and tests that import it: A22, R01)",
+    "aisef2/app/cli.py L52-L53 `_print` (json.dumps of the document), L74-L76 exit status from v['verdict'] only",
+    "validation/qualification/release_acceptance.py L128 verify(), L144 reads v['verdict'] == 'VERIFIED', L152 stores v whole under 'verification'; release_rehearsal.py L124 verify(), L133 keeps {'verdict','problems'}, L153-L154 formats the list into a message for a human: a list repr, no parsing",
+    "validation/v21/cli_integration/e2e_guest.py (new in round 3) S1 L467-L473 reads vj['problems'] == [] and records it; S4 L702-L760 reads problems by the substrings 'evidence anchor', 'journal re-derives', 'RUN.json' and a stream path: none occurs in this problem (it says 'settings' and 'runspec hash'), and S4 never forges a settings document",
+    "tests: test_v21_verify.py::test_raising_the_ceiling_in_the_record_is_refuted (L57-L62) asserts 'runspec' in a problem; test_v21_kills3_T14b.py L232 and L242 assert 'runspec hash' in a problem; A22 L122-L137 the two tokens (all pass on the mutant)",
+    "git grep of 'are not the ones', 'journaled ' and 're-derived {' over aisef2, validation, tests, docs, scripts: verify.py only (the other hits are unrelated uses of 'journaled' in prose); no document quotes the text"
+   ],
+   "exceptions_checked": [
+    "a regex or split that extracts the second prefix by its closing ')': none exists (grep above); HEX12 in A22 is the only token reader and the end of text delimits it",
+    "the problem concatenated with following text so that the open '(' swallows it: it is one list element; the only embedding (release_rehearsal.py L154) prints the list repr, which quotes each element; cli.py prints JSON",
+    "round 3 path: a journal a control projection refuses leaves `events == []` (verify.py L149-L155), `_runspec_problems` then returns ([], None) at L58-L59 (no run/spec-resolved event) and the mutant's line is not reached at all; nothing new reaches it",
+    "the e2e S4 substring readers (new): 'evidence anchor' / 'journal re-derives' / 'RUN.json' do not occur in this problem, and the other problems of such a run are separate elements"
+   ],
+   "source_sha256": "2555fdca1107d19f16cd0165da3dacfd2bcb112efec228a3045b4a573807b72b",
+   "remapped_from": {
+    "index": 33,
+    "mutant": "L72 string ')' emptied",
+    "source_sha256": "47ee144110dfe861325c6fc2a3067b8297ea9116bcaabb65054ca089b6cbcd15",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 33,
+     "mutant": "L50 string ')' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 33,
+      "mutant": "L50 string ')' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 33,
+      "mutant": "L72 string ')' emptied",
+      "source_sha256": "47ee144110dfe861325c6fc2a3067b8297ea9116bcaabb65054ca089b6cbcd15",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

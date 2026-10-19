@@ -1,0 +1,44 @@
+{
+  "batch": "W2-client-1",
+  "file": "aisef2/app/client.py",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "role": "author",
+  "date": "Mon Oct 19 22:19:40 +07 2026",
+  "entries": [
+    {
+      "target": "aisef2/app/client.py::Budget.spend",
+      "index": 24,
+      "mutant": "L101 string \"the lineage's evidence cannot be read, or is gone: \" emptied",
+      "class": "REFUTED",
+      "group": "inherited-unread-prefix-is-operator-facing",
+      "grounds": "client.py:101 prefixes each inherited-unread entry with \"the lineage's evidence cannot be read, or is gone: {u}\"; the mutant drops the prefix, leaving bare {u}. The prefix is the ONLY text that frames the entry as the LINEAGE's (predecessor/inherited) unread evidence rather than this run's own unaccounted line, and the {u} suffix never repeats it (verified: suffix is e.g. 'the-sessions-directory-is-moved-away: RUN.json records ...'). The string is operator/record-facing: Budget.reached()/exceeded() (client.py:117-119,128-130) join unaccounted into the run-stop reason, and Budget.account() (client.py:137) embeds spend() into the account; run.execute() surfaces reached() as the NOT_RUN story reason (run.py:623) and writes account() + budget_stop to RUN.json (run.py:663). An un-registered test, tests/v2/test_v21_x_lineage_gone.py:297 (class Gone, test_the_budget_never_computes_a_remaining_from_the_known_part), asserts assertIn('cannot be read, or is gone', stop) on both reached() and exceeded(); it FAILS on the mutant and PASSES unmutated (confirmed). That test is NOT in this target's registered kill set, so the registered set has a real gap. Owner rule: a string read by an operator or a verifier is not harmless.",
+      "refutation": "input: client.Budget(limits_well_above_known, base={k:0}, logs=<empty dir>, requests=lambda:0, inherited=lineage.lineage_account(d, next)) where d is a run whose sessions directory was moved away (inherited['unread'] non-empty). reader: Budget.reached() and Budget.exceeded() return 'unaccounted: ' + '; '.join(spent['unaccounted']); Budget.account()['spent']['unaccounted']; operator reads these via run.py budget_stop/NOT_RUN and RUN.json rec['budget']. sketch: assert \"the lineage's evidence cannot be read, or is gone:\" is in b.reached(), in b.exceeded(), and prefixes each inherited-unread entry of b.spend()['unaccounted']. Simplest fix: register tests/v2/test_v21_x_lineage_gone.py in V21_TARGETS['aisef2/app/client.py::Budget.spend'] (its line 297 already proves the kill), or add that assertion to an already-registered kill file (e.g. tests/v2/test_v21_x_lineage_proof.py).",
+      "consumers_checked": [
+        "aisef2/app/client.py:117-119 Budget.reached -> 'unaccounted: '+'; '.join(spent['unaccounted'])",
+        "aisef2/app/client.py:128-130 Budget.exceeded -> same join",
+        "aisef2/app/client.py:137 Budget.account -> {'spent': self.spend(), ...} (unaccounted embedded)",
+        "aisef2/app/run.py:623 why=budget.reached() -> results[story]=['NOT_RUN: '+why], not_run",
+        "aisef2/app/run.py:663 rec['budget']=budget.account(); budget_stop=stop (budget.exceeded via budget_stops) -> RUN.json",
+        "tests/v2/test_v21_x_lineage_gone.py:297 assertIn('cannot be read, or is gone', stop) -- reader; NOT in this target's registered kill set"
+      ],
+      "exceptions_checked": [
+        "reached()/exceeded() control flow only tests 'if spent[\"unaccounted\"]:' (non-empty); mutant keeps one list entry per inherited_unread item, so the stop DECISION is unchanged -- only the message text differs (behaviour equivalent, message not)",
+        "the {u} suffix is built in aisef2/app/lineage.py:503/510/523/529/534-537 (account_of) and is NOT touched by this mutant; it carries its own self-describing text and is pinned via 'RUN.json records' (test line 296 still passes)",
+        "all 6 registered kill files PASS on the mutant (do not assert the prefix): test_s2_kills_deterministic, test_v21_transport, test_app_units, test_app_run, test_s2_kills, test_v21_x_lineage_proof"
+      ]
+    }
+  ],
+  "registered_kill_files": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_x_lineage_proof.py"
+  ],
+  "kill_file_run": "against mutant 24, all 6 registered kill files OK (none kill): test_s2_kills_deterministic 4 OK; test_v21_transport 3 OK; test_app_units 41 OK; test_app_run 17 OK; test_s2_kills 43 OK (after adding closure-evidence/v2/release/LEDGERLOCK-PROJECT.json from the snapshot -- the sole earlier error was that missing evidence file, unrelated to Budget.spend); test_v21_x_lineage_proof 55 OK. Survivor confirmed.",
+  "owed_tests": [
+    "aisef2/app/client.py::Budget.spend index 24 (L101 inherited-unread prefix emptied): register tests/v2/test_v21_x_lineage_gone.py (Gone.test_the_budget_never_computes_a_remaining_from_the_known_part, line 297) in V21_TARGETS for this target -- it already fails on the mutant, passes unmutated -- or add that assertion to an already-registered kill file (test_v21_x_lineage_proof.py). Owed because the prefix is operator/record-facing (reached/exceeded/account -> RUN.json + NOT_RUN) and no REGISTERED kill file asserts it."
+  ],
+  "notes": "1 new survivor, 0 carried. Classified REFUTED (not AUDITED): the prefix is read by an operator (run-stop reason, RUN.json account) and by an existing-but-unregistered verifier test, and the {u} suffix does not reproduce it. Measurement left pinned; no code or test changed."
+}

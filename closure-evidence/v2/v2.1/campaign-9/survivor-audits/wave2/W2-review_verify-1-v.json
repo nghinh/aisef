@@ -1,0 +1,438 @@
+{
+ "batch": "W2-review_verify-1",
+ "file": "aisef2/app/review_verify.py",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "role": "skeptic",
+ "source_sha256": "1ce50180ce42c9390e89ee6983a0fb7f6d1b92cb6e54e6ceb1fba5ecf600d337",
+ "registered_kill_files": {
+  "reproducer_contract": "test_v21_review, review_ocr, review_chain, defects_reproducer, kills3_A15, kills3_T15a, r5_review_deep_input",
+  "verify": "test_v21_review, review_ocr, review_chain, kills3_A16, kills3_T16a, r4_uncalibrated_qualifier, r5_review_indeterminate, r5_probe_model_data, pm8_diagnostics, pm8_diagnostics_run, r5_review_status, kills3_T15a",
+  "_deeper_than": "test_v21_r5_review_deep_input",
+  "bounded": "test_v21_r5_review_deep_input",
+  "anchor": "test_v21_review, review_ocr, review_chain, kills3_A15, kills3_T15a",
+  "_canon": "test_v21_review, review_ocr, review_chain, kills3_T16a, r4_anchor_nonascii",
+  "_states": "test_v21_review, review_ocr, review_chain, kills3_T16a",
+  "_scalars": "test_v21_review, review_ocr, review_chain, kills3_T16a"
+ },
+ "entries": [
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 35,
+   "mutant": "L160 string 'the reproducer nests containers deeper than ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view at 4ec961e shows the L159-161 refusal string reduced to \"63 levels: state it with a flatter stimulus and observable (no probe grammar needs more)\": str(DEPTH_MAX-1)='63' and 'flatter' both survive. KILL-RUN (copy tree, PATH stripped of both opencode dirs, HOME/TMPDIR/XDG under the copy): all 7 registered kill files PASS on the mutant, baseline PASS -> SURVIVED. The decisive tokens are pinned by tests/v2/test_v21_r5_review_deep_input.py:111 assertIn(str(DEPTH_MAX-1),c), :112 assertIn('flatter',c), :118 assertLessEqual(len(c),WHY_MAX) (mutant 44 chars shorter, still <=160), :204 assertIn(str(DEPTH_MAX-1),stated['why']) -- all survive. grep over tests/ for 'nests containers deeper than'/'flatter stimulus': 0 hits; only consumer of the full phrase is docs/v2.1/USAGE-2.1.md:559 and no test enforces doc==code (the 6 tests touching USAGE-2.1 are A23/T01a/T03b/A11/r3_usage_no_progress/A20, none a review_verify kill file). The str becomes Verification(UNVERIFIABLE,c) (:194-195) and Anchor(UNANCHORED,c) (:295-296); neither blocks (blocks :332-335 needs CONFIRMED+ANCHORED) so it is operator/journal/artifact text, never the developer retry prompt. Author grounds verified accurate.",
+   "refutation": "",
+   "note": "Author's AUDITED class is correct: operator-visible refusal text (so not EQUIVALENT per the owner's string rule), but no test/runtime reader pins the lead-in and the decisive tokens survive.",
+   "consumers_checked": [
+    "review_verify.py:154-181/194-195/295-296 (str -> UNVERIFIABLE/UNANCHORED)",
+    "adapters.py Reviewer.review: preserve() artifact, detail() why@WHY_MAX, redacted()->RUN.json; feedback.py:75-80 prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_r5_review_deep_input.py:111-112,118,204 pin str(DEPTH_MAX-1) and 'flatter' only"
+   ],
+   "exceptions_checked": [
+    "docs/v2.1/USAGE-2.1.md:559 quotes the full message (operator prose); no test enforces doc==code -> doc drift, not a broken dependency",
+    "no operator DECISION branches on the lead-in; no block rests on UNVERIFIABLE/UNANCHORED text"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "index": 23,
+   "mutant": "L204 element 1 dropped (except (OverflowError, RecursionError) -> except (OverflowError,))",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms the except around :203 catalog.registry().observation_class loses RecursionError. KILL-RUN: all 12 registered kill files PASS on the mutant, baseline PASS -> SURVIVED. Verified the backstop is unreachable at the snapshot: (1) cli_invocation._compiles (:440-447) and file_artifact._compiles (:263-275) both `except (re.error, OverflowError, RecursionError): return False`, so the 2000-nested-group regex yields observation_class None, not an exception -- test_v21_r5_probe_model_data.py:331-336 (AGrepPatternOfTheFileArtifactProbe) reaches verify's cls-None path, PASS on the mutant; (2) the only exception still propagating from a classifier is window_of's OverflowError on a 400-digit within_s (python_callable.py:104-110 math.isfinite), which the mutant KEEPS -- test_v21_r5_probe_model_data.py:AWindowNoFloatHolds (within_s 10**400 for all 4 probe kinds) PASS on the mutant; (3) reproducer_contract's depth gate (:159) bounds the spec handed to observation_class to <=63 levels, so no recursive walk reaches the recursion limit. Author grounds (incl. probe_model_data docstring :316-322 stating this except now only backstops) verified accurate.",
+   "refutation": "",
+   "note": "Honest residual (stated by author): if a future classifier regressed to let RecursionError escape observation_class, the mutant would turn a graceful UNVERIFIABLE into a story-REFUSING crash (RV-1). No reachable input triggers it now and no test/consumer depends on verify's own RecursionError arm -> AUDITED (defensive element for a type no producer can currently raise), same category as carried reproducer_contract[32].",
+   "consumers_checked": [
+    "probe/protocol.py:259-261 observation_class -> per-probe classifier (cli_invocation/file_artifact catch internally)",
+    "review_verify.py:211-212 cls-None path; :193-195 reproducer_contract gate -> <=63-deep spec",
+    "adapters.py:_verify -> verify (a RecursionError out of verify would REFUSE the story)"
+   ],
+   "exceptions_checked": [
+    "OverflowError arm kept -> 400-digit within_s still no_meaning (probe_model_data PASS)",
+    "no classifier propagates RecursionError at 4ec961e; test_v21_r5_regex_worker pins the classifier itself, not verify's except"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "index": 32,
+   "mutant": "L234 string '): neither confirmed nor ruled out' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms the INDETERMINATE reason (:232-234) loses its trailing clause, leaving f\"{probe} could not decide the stated behaviour (INDETERMINATE, {cause}\". KILL-RUN of the CORRECT L234 mutant: all 12 registered kill files PASS, baseline PASS -> SURVIVED. (Note: an index-tooling slip first built L215 by mistake; L215 is genuinely killed by r4_uncalibrated_qualifier, so I rebuilt the asserted L234 mutant and re-ran -- r4 then PASS, confirming the failure was the wrong mutant, not L234.) The decisive tokens survive and are pinned: test_v21_r5_review_indeterminate.py decided_nothing (:44-53) asserts the probe id, 'INDETERMINATE' and the typed cause are IN the reason and the SATISFIED claims are NOT, and its docstring (:15-17) states the surrounding wording is deliberately NOT pinned; test_the_reason_fits_the_statement (:102-110) checks <=WHY_MAX and the mutant is 34 chars shorter. The only other occurrence of 'neither confirmed nor ruled out' in tests is test_v21_r5_review_status.py:265-266, a hand-written V.Verification FIXTURE (EARLIER tuple), not an assertion on verify()'s output. INDETERMINATE never CONFIRMED -> never blocks. Author grounds verified accurate.",
+   "refutation": "",
+   "note": "Developer never sees it (INDETERMINATE row passes); operator/RUN.json/artifact text with decisive tokens pinned, trailing clause not -> AUDITED.",
+   "consumers_checked": [
+    "review_verify.py:232-234 INDETERMINATE reason; adapters preserve/detail/redacted chain; feedback never prints a passing row",
+    "test_v21_r5_review_indeterminate.py:44-53,102-110 (tokens + length, not wording)"
+   ],
+   "exceptions_checked": [
+    "USAGE-2.1.md:570-571 documents the full message: doc drift, no test enforces doc==code",
+    "unbalanced '(' left by the cut: no consumer matches balanced parens over a reason (grep); stored as a JSON string value"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::_deeper_than",
+   "index": 0,
+   "mutant": "L129 returns None (final `return False` -> `return None`)",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Proof from code, verified at the snapshot. _deeper_than (:113-129) returns True at :127 (unmutated) and False at :129 (mutated to None). Its only two callers use the result purely for truth: reproducer_contract:159 `if _deeper_than(...)` and bounded:138 `[k for ... if ... and _deeper_than(...)]`. None and False are both falsy -> identical control flow and identical results in both. git grep -w _deeper_than over aisef2/ validation/ tests/ docs/: only review_verify.py:113/138/159 and the registration validation/v2/mutation.py:1030; no direct test of the return value, no `is`/`==` comparison, no serialisation of it, no type checker in pyproject.toml/CI. KILL-RUN: baseline PASS and mutant PASS on the sole registered kill file test_v21_r5_review_deep_input.py -> SURVIVED. Author's EQUIVALENT (with code proof) is correct; no kill owed.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "review_verify.py:138 (bounded), :159 (reproducer_contract) -- both truth contexts; True path :127 untouched",
+    "grep: no getattr/import of _deeper_than, no test asserts its value directly"
+   ],
+   "exceptions_checked": [
+    "no caller compares is/==False or serialises the value; bounded/reproducer_contract convert to control flow before any serialiser"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::bounded",
+   "index": 2,
+   "mutant": "L139 dict entry 0 dropped ({**finding, **dict.fromkeys(deep, _NESTED_TOO_DEEP)} -> {**dict.fromkeys(deep, _NESTED_TOO_DEEP)})",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "CONFIRMED a real gap. mutant_view confirms the `**finding` spread is dropped, so when `deep` is non-empty bounded returns ONLY the marked deep fields. DEMONSTRATED divergence at the snapshot by importing the real (mutant) module and calling V.bounded on a finding with a valid shallow reproducer plus one deep field: PRISTINE -> keys {blocking,id,reproducer,severity,summary}, reproducer intact; MUTANT -> keys {summary} only (reproducer, id, severity, blocking all dropped). Reviewer.review consumes bounded's output (adapters.py `found=[review_verify.bounded(f) for f in found]`), then _verify reads f.get('reproducer') (returns UNVERIFIABLE when absent), anchor() is guarded by isinstance(f.get('reproducer'),dict) (returns None), fid=redacted(str(f.get('id')))='None', Finding(..., confirmed or bool(f.get('blocking'))). So a finding the probe would REFUTE and the bundle ANCHOR (CONFIRMED+ANCHORED, blocking) becomes a non-blocking UNVERIFIABLE row with fid 'None', and the reproducer never reaches the artifact/RUN.json. The deep branch is reachable (bounded exists precisely for a model's deeply-nested field). KILL-RUN: baseline PASS and mutant PASS on the sole registered kill file -> SURVIVED. The existing kill file misses it (test_v21_r5_review_deep_input.py:231-234 reads only bounded(...)['summary'] (present in both worlds) and :214-227 uses a reproducer-less, blocking=False finding so the drop is invisible). Author's REFUTED is correct.",
+   "refutation": "INPUT: f = {'id':'F-1','severity':'high','summary':'s','reproducer': <a valid shallow R-9/3 reproducer the probe REFUTES and the bundle anchors>, 'blocking':True}; deep_f = {**f, 'summary': nested('list', V.DEPTH_MAX+1)}; policy fix-loop, min_severity low. READER: review_verify.bounded directly, and through it Reviewer.review (adapters.py bounded->_verify->anchor->blocks->Finding), redacted()->RUN.json, preserve()->artifact. SKETCH (add to test_v21_r5_review_deep_input.py, no existing test changed): b = V.bounded(deep_f); self.assertEqual(set(b), set(f)); self.assertEqual(b['reproducer'], f['reproducer']); self.assertEqual(b['id'], f['id']) -- the mutant returns {'summary': marker} only, so set(b)!=set(f) and b['reproducer']/b['id'] raise KeyError (VERIFIED: on pristine these pass, on the mutant they fail). STRONGER e2e: review a single finding with a CONFIRMED+ANCHORED shallow reproducer and a deep summary; assert the row blocks (stated verification CONFIRMED, anchor ANCHORED); the mutant yields a non-blocking UNVERIFIABLE row with fid 'None'.",
+   "note": "Observable, reachable, consumer-depended, not caught by the registered kill file -> a kill is owed. class_after = SURVIVED (test owed).",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: `found=[bounded(f) for f in found]`, then _verify (reads f['reproducer']), anchor (guarded by dict reproducer), blocks, Finding(fid, confirmed or bool(f.get('blocking'))), redacted->RUN.json, preserve->artifact",
+    "review_verify.py:132-139 docstring/body contract (every non-reproducer field kept, deep ones marked, reproducer left as stated)",
+    "grep bounded( : adapters.py (prod) + test_v21_r5_review_deep_input.py:231-234 (only direct test, reads ['summary'] only)"
+   ],
+   "exceptions_checked": [
+    "`deep` empty -> else-branch returns the identical finding object in both worlds (assertIs passes on the mutant): observable ONLY when a non-reproducer field nests past 63",
+    "existing :214 test uses a reproducer-less, blocking=False finding so the drop is invisible -- why the suite misses it"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 11,
+   "mutant": "L300 sorted() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Remapped mutant matches 4ec961e (mutant_view L300: keys=sorted(...)->list(...)). Proof from code: `keys` iterates c.observable, and c is a BehaviorContract whose observable is freeze()d -- contract.py:32-44 freeze rebuilds every mapping as MappingProxyType({k: freeze(v) for k in sorted(value)}) after requiring str keys, and contract.py __post_init__ applies freeze to observable (and stimulus). So c.observable already iterates in ascending key order; the `k!='within_s'` filter preserves relative order -> list(gen)==sorted(gen). KILL-RUN: all registered kill files (minus the e2e review_chain) PASS on the mutant, baseline PASS -> SURVIVED. EQUIVALENT with code proof is correct.",
+   "refutation": "",
+   "note": "Carried grounds cite pre-remap line numbers (base 289885e: freeze :32-44/:144) but the structural facts hold at 4ec961e (verified freeze sorts deeply and is applied to observable). review_chain excluded (its only anchor_why assertion is a substring id BC-USAGE-0, order-independent and preserved)."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 47,
+   "mutant": "L329 string 'clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Remapped mutant matches 4ec961e (mutant_view L329, ANCHORED reason). KILL-RUN: registered kill files (minus review_chain) PASS, baseline PASS -> SURVIVED. The ANCHORED reason becomes \"{clause}'s approved outcome {json} ({ids})\"; A15 AnchoredReason pins the clause via has_token (clause followed by \"'s\", a non-identifier char -> still matched), the outcome via outcome_in (raw_decode from the first '{'), 'approved outcome', and each id -- all survive the lead-in empty. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in label deliberately not pinned (A15:12-15); carried grounds cite pre-remap lines, structural facts hold.",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: anchor()->f['anchor'], blocks reads status only, preserve() keeps whole finding (anchor.why), detail() why@WHY_MAX, redacted->RUN.json; feedback prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_kills3_A15.py docstring:12-15 pins identifying elements (clause, locator, keys, contract ids, outcome) via has_token/outcome_in and explicitly NOT the lead-in labels, punctuation or list order; review.py:222 pins the substring 'does not show its outcome is the clause's constant' (preserved)"
+   ],
+   "exceptions_checked": [
+    "has_token uses identifier-char boundaries [\\w.-], so every id/clause/key token survives a lead-in or punctuation empty (e.g. R-X/1.2's, ['stdout'], 'BC-b ')",
+    "UNANCHORED/CONTRADICTS reasons never corroborate -> never the developer prompt"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 50,
+   "mutant": "L329 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L329 (ANCHORED reason closing paren of the id list). KILL-RUN: PASS (minus review_chain), baseline PASS -> SURVIVED. outcome_in reads the JSON via raw_decode (indifferent to a trailing ')'), has_token finds each id (last id now ends the string, bounded by end-of-string). Anchor.contracts carries the full id list to RUN.json/artifact independently. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Punctuation deliberately not pinned (A15:15).",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: anchor()->f['anchor'], blocks reads status only, preserve() keeps whole finding (anchor.why), detail() why@WHY_MAX, redacted->RUN.json; feedback prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_kills3_A15.py docstring:12-15 pins identifying elements (clause, locator, keys, contract ids, outcome) via has_token/outcome_in and explicitly NOT the lead-in labels, punctuation or list order; review.py:222 pins the substring 'does not show its outcome is the clause's constant' (preserved)"
+   ],
+   "exceptions_checked": [
+    "has_token uses identifier-char boundaries [\\w.-], so every id/clause/key token survives a lead-in or punctuation empty (e.g. R-X/1.2's, ['stdout'], 'BC-b ')",
+    "UNANCHORED/CONTRADICTS reasons never corroborate -> never the developer prompt"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 60,
+   "mutant": "L315 string 'the approved contracts of clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L315 (UNANCHORED 'do not observe' reason). KILL-RUN: PASS, baseline PASS -> SURVIVED. Mutant reason \"{clause} do not observe {keys}\"; A15 test_the_clause_s_contracts_do_not_observe_the_expected_keys asserts the phrase 'do not observe' and has_token(clause) and the key -- all survive. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in noun phrase not pinned.",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: anchor()->f['anchor'], blocks reads status only, preserve() keeps whole finding (anchor.why), detail() why@WHY_MAX, redacted->RUN.json; feedback prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_kills3_A15.py docstring:12-15 pins identifying elements (clause, locator, keys, contract ids, outcome) via has_token/outcome_in and explicitly NOT the lead-in labels, punctuation or list order; review.py:222 pins the substring 'does not show its outcome is the clause's constant' (preserved)"
+   ],
+   "exceptions_checked": [
+    "has_token uses identifier-char boundaries [\\w.-], so every id/clause/key token survives a lead-in or punctuation empty (e.g. R-X/1.2's, ['stdout'], 'BC-b ')",
+    "UNANCHORED/CONTRADICTS reasons never corroborate -> never the developer prompt"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 62,
+   "mutant": "L319 string 'the approved contracts of clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L319 (UNANCHORED 'different values' reason). KILL-RUN: PASS, baseline PASS -> SURVIVED. Mutant reason \"{clause} expect different values for different stimuli: its outcome depends on the input\"; A15 test_..._expect_different_values pins the phrase 'different values' and contracts (via Anchor.contracts, not the text). Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in noun phrase not pinned.",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: anchor()->f['anchor'], blocks reads status only, preserve() keeps whole finding (anchor.why), detail() why@WHY_MAX, redacted->RUN.json; feedback prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_kills3_A15.py docstring:12-15 pins identifying elements (clause, locator, keys, contract ids, outcome) via has_token/outcome_in and explicitly NOT the lead-in labels, punctuation or list order; review.py:222 pins the substring 'does not show its outcome is the clause's constant' (preserved)"
+   ],
+   "exceptions_checked": [
+    "has_token uses identifier-char boundaries [\\w.-], so every id/clause/key token survives a lead-in or punctuation empty (e.g. R-X/1.2's, ['stdout'], 'BC-b ')",
+    "UNANCHORED/CONTRADICTS reasons never corroborate -> never the developer prompt"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 64,
+   "mutant": "L325 string 'one approved contract of clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L325 (UNANCHORED 'does not show its outcome is the clause's constant' reason). KILL-RUN: PASS, baseline PASS -> SURVIVED. The substring review.py:222 pins -- 'does not show its outcome is the clause's constant' -- is downstream of the emptied lead-in and survives whole; the clause token survives via has_token. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in not pinned; the pinned substring is after it.",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: anchor()->f['anchor'], blocks reads status only, preserve() keeps whole finding (anchor.why), detail() why@WHY_MAX, redacted->RUN.json; feedback prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_kills3_A15.py docstring:12-15 pins identifying elements (clause, locator, keys, contract ids, outcome) via has_token/outcome_in and explicitly NOT the lead-in labels, punctuation or list order; review.py:222 pins the substring 'does not show its outcome is the clause's constant' (preserved)"
+   ],
+   "exceptions_checked": [
+    "has_token uses identifier-char boundaries [\\w.-], so every id/clause/key token survives a lead-in or punctuation empty (e.g. R-X/1.2's, ['stdout'], 'BC-b ')",
+    "UNANCHORED/CONTRADICTS reasons never corroborate -> never the developer prompt"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 66,
+   "mutant": "L328 string 'clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L328 (CONTRADICTS_APPROVED 'approved outcome is' reason). KILL-RUN: PASS, baseline PASS -> SURVIVED. A15 test_the_clause_s_approved_outcome_is_another pins has_token(clause) (followed by \"'s\"), 'approved outcome', outcome_in -- all survive the lead-in empty. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in label not pinned.",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: anchor()->f['anchor'], blocks reads status only, preserve() keeps whole finding (anchor.why), detail() why@WHY_MAX, redacted->RUN.json; feedback prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_kills3_A15.py docstring:12-15 pins identifying elements (clause, locator, keys, contract ids, outcome) via has_token/outcome_in and explicitly NOT the lead-in labels, punctuation or list order; review.py:222 pins the substring 'does not show its outcome is the clause's constant' (preserved)"
+   ],
+   "exceptions_checked": [
+    "has_token uses identifier-char boundaries [\\w.-], so every id/clause/key token survives a lead-in or punctuation empty (e.g. R-X/1.2's, ['stdout'], 'BC-b ')",
+    "UNANCHORED/CONTRADICTS reasons never corroborate -> never the developer prompt"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 69,
+   "mutant": "L306 string 'approved contract ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L306 (CONTRADICTS_APPROVED 'decides this stimulus otherwise' reason). KILL-RUN: PASS, baseline PASS -> SURVIVED. A15 test_an_approved_contract_decides_the_stimulus_otherwise pins has_token(id 'BC-b') (followed by ' '), 'decides this stimulus', outcome_in -- all survive. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in label not pinned.",
+   "consumers_checked": [
+    "adapters.py Reviewer.review: anchor()->f['anchor'], blocks reads status only, preserve() keeps whole finding (anchor.why), detail() why@WHY_MAX, redacted->RUN.json; feedback prints only passed-False (CONFIRMED+ANCHORED) rows",
+    "test_v21_kills3_A15.py docstring:12-15 pins identifying elements (clause, locator, keys, contract ids, outcome) via has_token/outcome_in and explicitly NOT the lead-in labels, punctuation or list order; review.py:222 pins the substring 'does not show its outcome is the clause's constant' (preserved)"
+   ],
+   "exceptions_checked": [
+    "has_token uses identifier-char boundaries [\\w.-], so every id/clause/key token survives a lead-in or punctuation empty (e.g. R-X/1.2's, ['stdout'], 'BC-b ')",
+    "UNANCHORED/CONTRADICTS reasons never corroborate -> never the developer prompt"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 30,
+   "mutant": "L180 element 0 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Remapped mutant matches 4ec961e (mutant_view L180: except (ContractError, ValueError, TypeError) -> (ValueError, TypeError)). Proof by hierarchy, verified: aisef2/product/contract.py:26 `class ContractError(ValueError)`, so every ContractError is a ValueError and is caught by the kept element into the same handler returning the same f-string. ContractError is imported once (:76 area) and never rebound. KILL-RUN: all registered kill files (minus review_chain) PASS, baseline PASS -> SURVIVED. EQUIVALENT with code proof correct.",
+   "refutation": "",
+   "note": "A dropped except type whose instances are still caught by a surviving superclass -> truly indistinguishable.",
+   "consumers_checked": [
+    "review_verify.py:194/295 (str -> UNVERIFIABLE/UNANCHORED), identical either form",
+    "ContractError subclasses (PlanError, CompileError, UnapprovedContract) are all ValueErrors by inheritance"
+   ],
+   "exceptions_checked": [
+    "a ContractError that is not a ValueError: impossible by class definition",
+    "lint F401 on a fully-unused import would be a lint gate, not a behaviour; here ValueError remains used"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 32,
+   "mutant": "L180 element 2 dropped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L180: loses TypeError from the except. KILL-RUN: all registered kill files (minus review_chain) PASS incl. test_v21_defects_reproducer (the lone-surrogate defect raises ValueError, caught by the kept element), baseline PASS -> SURVIVED. Verified the try block (:173-179) raises only ValueError/ContractError on the JSON-shaped findings it sees (json.loads output; SubjectKind(bad) -> ValueError, freeze -> ContractError, contract_hash encode -> ValueError/UnicodeEncodeError); no reachable producer in aisef2/validation/tests builds a non-JSON Mapping that would raise TypeError there. Carried AUDITED correct (same 'defensive type no producer can raise' category as verify[23]).",
+   "refutation": "",
+   "note": "Honest residual: a hostile non-JSON Mapping would raise TypeError and the mutant would propagate it instead of returning a reason; no producer builds one at 4ec961e.",
+   "consumers_checked": [
+    "callers review_verify.py:193 (verify), :294 (anchor); producers adapters.py json.loads (dict-filtered), review_ocr.findings",
+    "test_v21_defects_reproducer.py (lone surrogate -> ValueError, caught by kept element)"
+   ],
+   "exceptions_checked": [
+    "int-to-str 4300-digit limit -> ValueError, and json.loads cannot yield such an int by default",
+    "RecursionError (deep reproducer) is gated out by :159 before the try; TypeError from sorted() of a mixed-key Mapping is outside the try"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 37,
+   "mutant": "L165 string 'the clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L165: 'the clause ' lead-in of the 'names no requirement' refusal emptied -> \"{clause!r} names no requirement of the project\". KILL-RUN: PASS (minus review_chain), baseline PASS -> SURVIVED. The clause repr survives; the refusal is UNVERIFIABLE/UNANCHORED text, never a block. No test pins the lead-in. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in label not pinned.",
+   "consumers_checked": [
+    "review_verify.py:164-165 refusal -> UNVERIFIABLE/UNANCHORED; same adapters chain; never developer prompt"
+   ],
+   "exceptions_checked": [
+    "no consumer parses the refusal; clause repr carries the identity"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 44,
+   "mutant": "L172 string 'the subject ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L172: 'the subject ' lead-in of the 'not in the product' refusal emptied -> \"{locator!r} is not in the product ({sorted(product_roots)})\". KILL-RUN: PASS (minus review_chain), baseline PASS -> SURVIVED. locator repr and the roots list survive; UNVERIFIABLE/UNANCHORED text. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Lead-in label not pinned.",
+   "consumers_checked": [
+    "review_verify.py:171-172 refusal; same adapters chain"
+   ],
+   "exceptions_checked": [
+    "locator repr carries the identity; no consumer parses the lead-in"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 46,
+   "mutant": "L172 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L172: closing ')' of the bracketed roots list in the 'not in the product' refusal emptied. KILL-RUN: PASS (minus review_chain), baseline PASS -> SURVIVED. The list content and locator survive; only the closing punctuation is lost. UNVERIFIABLE/UNANCHORED text. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "Punctuation not pinned.",
+   "consumers_checked": [
+    "review_verify.py:172 refusal; same adapters chain"
+   ],
+   "exceptions_checked": [
+    "no consumer matches balanced parens over the refusal"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 50,
+   "mutant": "L172 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L172: sorted(product_roots) -> list(product_roots) in the 'not in the product' refusal. KILL-RUN: PASS (minus review_chain), baseline PASS -> SURVIVED. Only the display order of the roots list (for a person reading the refusal) may change; no test pins the order. UNVERIFIABLE/UNANCHORED text. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "List order for a person, not pinned.",
+   "consumers_checked": [
+    "review_verify.py:172 refusal; same adapters chain"
+   ],
+   "exceptions_checked": [
+    "no test asserts the roots order in the refusal; product_roots membership (not order) decides the branch"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "index": 40,
+   "mutant": "L225 string ' is said to demand' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view L225: the CONFIRMED reason loses ' is said to demand' -> \"{probe} refutes the behaviour {rid}\". KILL-RUN: all registered kill files (minus review_chain) PASS, baseline PASS -> SURVIVED. grep for 'refutes'/'is said to demand' over the verify kill files: T16a:43 is a hand-written CONFIRMED FIXTURE ('the probe refutes it') and T16a:468 is a negative `names()` check on a constructed literal -- neither asserts verify()'s actual reason; no test pins the tail. The probe id and requirement id (the operational content) survive. Carried AUDITED correct.",
+   "refutation": "",
+   "note": "This reason IS developer-facing when CONFIRMED+ANCHORED blocks, so operator/developer-visible (not EQUIVALENT), but decisive tokens survive and the tail is unpinned -> AUDITED.",
+   "consumers_checked": [
+    "review_verify.py:224-226 CONFIRMED reason; blocks :332-335; feedback.py:76-80 prints it on a blocking row",
+    "T16a:43 fixture, :468 names() negative check -- not assertions on verify output"
+   ],
+   "exceptions_checked": [
+    "the probe and requirement id are preserved; no DECISION branches on the explanatory tail"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::_canon",
+   "index": 1,
+   "mutant": "L245 True->False",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Remapped mutant matches 4ec961e (mutant_view L245: json.dumps(..., sort_keys=True,...) -> sort_keys=False). Proof from code, verified: every dict reaching _canon is either {k:... for k in keys} with keys=sorted(...) (anchor :301,:307,:316,:328,:329) or plain() of freeze()d contract data; contract.py freeze rebuilds every mapping in sorted-key order deeply and __post_init__ applies it to stimulus and observable, and plain() preserves that (sorted) insertion order while converting tuple->list. So insertion order == sorted order at every level -> sort_keys is a no-op. _stimulus (:250) runs over plain(frozen stimulus).items(), also sorted. KILL-RUN: registered kill files (minus review_chain) PASS incl. test_v21_r4_anchor_nonascii (non-ASCII keys -- the strongest canonicalisation stress), baseline PASS -> SURVIVED. EQUIVALENT with code proof correct.",
+   "refutation": "",
+   "note": "Carried grounds cite pre-remap lines; the freeze/plain premises verified at 4ec961e. review_chain excluded (canonical output identical, so its BC-USAGE-0 substring assertion is unaffected).",
+   "consumers_checked": [
+    "review_verify.py _canon call sites all derive from freeze()d c.observable/c.stimulus or sorted `keys`",
+    "contract.py freeze (sorts deeply)/plain (order-preserving, tuple->list); Project.contracts via from_json re-runs __post_init__"
+   ],
+   "exceptions_checked": [
+    "a contract bypassing __post_init__: object.__setattr__ only in contract.py; replace/from_json re-run it; no round-3 file builds a raw contract",
+    "non-str keys where sort_keys could disagree: freeze refuses them first"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::_states",
+   "index": 3,
+   "mutant": "L269 returns None",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Remapped mutant matches 4ec961e (mutant_view L269: the early `return False` -> `return None`). Proof from code: _states' single caller is anchor :322-323 `all(_states(...) for _,f in same)` -- all() tests truthiness, None and False alike, and the result feeds only `if not shown`. No caller compares is/==, serialises, or returns the value; no type checker in CI. KILL-RUN: registered kill files (minus review_chain) PASS, baseline PASS -> SURVIVED. EQUIVALENT with code proof correct.",
+   "refutation": "",
+   "note": "Single caller, pure truth context. Carried grounds cite pre-remap lines; facts hold.",
+   "consumers_checked": [
+    "review_verify.py:322-323 (anchor `shown` via all(_states...)); grep: _states only in review_verify + mutation.py registration"
+   ],
+   "exceptions_checked": [
+    "no is/==False comparison, no serialisation; the final boolean return (unmutated) also feeds all()"
+   ]
+  },
+  {
+   "target": "aisef2/app/review_verify.py::_scalars",
+   "index": 6,
+   "mutant": "L256 element 1 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Remapped mutant matches 4ec961e (mutant_view L256: isinstance(value,(list,tuple)) -> (list,)). Proof from code: _scalars' only entry is _states, called with constant={k: plain(observable[k]) for k in keys}; plain() (contract.py:47-57) converts every tuple to a list at every depth, and the observable is freeze()d (sequences already tuples, then plain->list). So no tuple ever reaches _scalars -> dropping `tuple` from the isinstance is unobservable; (list,) selects the same values. KILL-RUN: registered kill files (minus review_chain) PASS, baseline PASS -> SURVIVED. EQUIVALENT with code proof correct.",
+   "refutation": "",
+   "note": "plain() converts tuple->list before _scalars runs (verified); single caller. Carried grounds cite pre-remap lines; facts hold.",
+   "consumers_checked": [
+    "review_verify.py:253-258/_states sole caller; grep: _scalars only in review_verify + mutation.py registration",
+    "contract.py plain (tuple->list at every depth), freeze (sequences->tuples)"
+   ],
+   "exceptions_checked": [
+    "a raw list-with-tuple that plain leaves alone: freeze never leaves a raw list, and no round-3 path builds an observable"
+   ]
+  }
+ ]
+}

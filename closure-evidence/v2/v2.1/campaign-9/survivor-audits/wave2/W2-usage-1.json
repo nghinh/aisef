@@ -1,0 +1,39 @@
+{
+ "batch": "W2-usage-1",
+ "file": "aisef2/app/usage.py",
+ "targets": [
+  "aisef2/app/usage.py::usage"
+ ],
+ "new": [],
+ "carried": [
+  {
+   "target": "aisef2/app/usage.py::usage",
+   "index": 61,
+   "mutant": "L101 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "A20",
+   "grounds": "usage.py:101 sorted(set(retried)) -> list(set(retried)) changes only the insertion order of the `retries` dict (same items and counts; for str keys the set order is per-process) and removes one exception: sorted() raises TypeError on non-comparable keys. The retried story_id of a story/retry is a non-empty str by schema (journal/event.py:209 + _str :95-96, not overridden in format2/format3), so the TypeError path is unreachable from run.events (run.py:501), verify (format3.reconstruct, verify.py:148-151, which since round 3 also refuses journals the projections refuse) and lineage.events_of (format3.reconstruct, lineage.py:95-102). Round 3 changed session_tokens (client.events) and no_progress in this module, not these lines.",
+   "consumers_checked": [
+    "aisef2/app/run.py:501-506 (rec['usage'] written by json.dumps(..., sort_keys=True): recursive, so RUN.json's bytes do not depend on insertion order); run.py:282-291 + :502 (_content_sha canonicalises RUN.json with sort_keys before the manifest hash)",
+    "aisef2/app/verify.py:191-198: rec['usage'] != json.loads(json.dumps(usage.usage(...))): dict equality, order-blind",
+    "aisef2/app/lineage.py:365-387 usage_lineage: calls usage.usage on each run of a lineage (:373) and reads u['tokens'] and u['cost'] only (:380)",
+    "aisef2/app/cli.py:104-106 prints a fixed subset that omits usage (and _print uses sort_keys, :52-53)",
+    "tests: tests/v2/test_v21_kills3_T20b.py:65-73 (assertEqual with dict literals), test_v21_r3_usage_boundary.py:76 (json round-trip of usage into RUN.json, then verify's re-derivation), test_v21_review_chain.py:286, :358 (rec['usage']['tokens'], ['cost'] only); docs/v2.1/USAGE-2.1.md:86 names the field without an order; grep of aisef2, validation, tests, docs for 'retries': no code iterates usage['retries']",
+    "line coverage: L100-101 is executed by 26 test modules outside this target's kill set (app_units, s2_kills, app_run, release_acceptance, confine, context_pack, defects_bundlecli, experiment, A13, T00a, T01a, T01b, T09a, T13a, T14a, T14b, T22a, T22b, TO1, r3_client_stream, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_detail_product, test_v21_review, review_chain [by reading: tokens and cost only]): the mutant run against all but review_chain: SURVIVED (s2_kills and confine showed a same-process re-run artifact; re-run in fresh processes: SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "a reader that iterates retries in insertion order and promises an order: none (grep)",
+    "a serialiser of usage without sort_keys that is then hashed or compared as text: none (verify compares parsed values; run.py:506 and :288 sort)",
+    "mixed / None story_id making sorted() raise in the original only (RUN.json would then hold usage={'error': ...}, run.py:505): excluded by the schema and by validated callers; a hand-built events list could, no caller passes one",
+    "a different PYTHONHASHSEED between the writing and the verifying process: only the insertion order moves; dict equality and sort_keys are unaffected",
+    "created by round 3: client.events as the stream reader for session_tokens (usage.py:51) and the rewritten no_progress (usage.py:118-142) are other code; the new tests read tokens/cost or call no_progress"
+   ],
+   "source_sha256": "14e8008eb6f54ad77a4206c9e216901c5cbefd81c324084134383934d58e84b3",
+   "remapped_from": {
+    "index": 61,
+    "mutant": "L104 sorted() -> list()",
+    "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+   }
+  }
+ ]
+}

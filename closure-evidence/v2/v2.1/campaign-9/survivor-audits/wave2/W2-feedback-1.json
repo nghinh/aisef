@@ -1,0 +1,57 @@
+{
+ "batch": "W2-feedback-1",
+ "file": "aisef2/app/feedback.py",
+ "targets": [
+  "aisef2/app/feedback.py::context_pack"
+ ],
+ "new": [],
+ "carried": [
+  {
+   "target": "aisef2/app/feedback.py::context_pack",
+   "index": 40,
+   "mutant": "L171 sorted() -> list()",
+   "class": "EQUIVALENT",
+   "group": "A17",
+   "grounds": "L171 `unproved = sorted(set(a['criteria']) - set(a['proofs']))` -> list(...). `unproved` is read only at L172 (`if unproved:`, truthiness) and L173 (`named((k, 0) for k in unproved)`); named() starts with `sorted(rows)` (L148) over (criterion, 0) pairs whose criteria are distinct str elements of a set difference (a['criteria'] is sorted(map(str, ...)), L131; a['proofs'] keys are str(...), L138), so the pairs order by criterion whatever order `unproved` had; `shown`, `more`, the PACK_LIST cut (L149-150) and both joins derive from that sorted list; `unproved` is local, never returned or stored. aisef2/app/feedback.py is byte-identical at the snapshot (not among the 12 files of the round-3 diff).",
+   "consumers_checked": [
+    "aisef2/app/feedback.py:171-174 (the only readers of `unproved`) and named() :147-150",
+    "aisef2/app/adapters.py:77 (Developer.implement, the only product caller; line was :71): uses the text only",
+    "validation/v21/cli_integration/readback.py:35, validation/v21/context_gap.py:193 (text only)",
+    "validation/v21/context_pack_mutants.py (its L171 hand mutant changes the content of the set difference, not its order)",
+    "tests/v2/test_v21_context_pack.py assert the line's text; both forms produce it identically; RUN.json's prompt_sha256 binds the same text"
+   ],
+   "exceptions_checked": [
+    "ties in sorted(rows): impossible, set elements are distinct and `(k, 0)` has a constant second member",
+    "non-str criteria: a['criteria'] is map(str, ...) (L131) and a['proofs'] keys are str(...) (L138)",
+    "the PACK_LIST cut: the slice is taken after named()'s own sort (L148-150)",
+    "set iteration order varying between processes (hash randomisation): re-sorted in named()",
+    "coupling to the sort in named() itself (a separate mutant): measured one at a time; the proof rests on named()'s sort being present, which it is on the measured module"
+   ],
+   "source_sha256": "1b02a7bcc4351211075699033e8ad56f6541fb0374657051bbcdde82a50fabae",
+   "remapped_from": null
+  },
+  {
+   "target": "aisef2/app/feedback.py::context_pack",
+   "index": 110,
+   "mutant": "L131 sorted() -> list()",
+   "class": "EQUIVALENT",
+   "group": "A17",
+   "grounds": "L131 `cur['criteria'] = sorted(map(str, d.get('dispositions') or {}))` -> list(...). grep 'criteria' in feedback.py finds only L127 (init), L131 (the store) and L171 `set(a['criteria'])` (a = {**cur, 'end': seq}, L142). set() discards the list order and the enclosing sorted() (L171) imposes name order, then named() sorts again; so sorted() vs list() on L131 cannot reach any output. Both forms iterate d.get('dispositions') or {} through map(str, ...): same elements, same TypeError for a non-iterable at the same point. `cur`/`ended` are locals; only `text` leaves context_pack. feedback.py is byte-identical at the snapshot.",
+   "consumers_checked": [
+    "aisef2/app/feedback.py: every occurrence of 'criteria' (L12 docstring, L127, L131, L171)",
+    "aisef2/app/adapters.py:77 and validation/v21/cli_integration/readback.py:35, validation/v21/context_gap.py:193 consume the returned text only",
+    "validation/v21/context_pack_mutants.py:37 hand mutant removes `- set(a['proofs'])`: content, not order",
+    "tests/v2/test_v21_context_pack.py: asserts on the rendered lines only"
+   ],
+   "exceptions_checked": [
+    "a second story/admitted in one attempt: overwrites cur['criteria'] identically in both forms",
+    "str() collisions (1 and '1'): duplicates in the list, merged by set() in both",
+    "another reader of the list order (a line printing criteria in journal order): none, L154-174 print parent, seq, result, candidate, proofs and the unproved set",
+    "sorted() raising on mixed types: every element is str after map(str, ...)",
+    "aliasing of the list through {**cur, 'end': seq}: never mutated in place after the store"
+   ],
+   "source_sha256": "1b02a7bcc4351211075699033e8ad56f6541fb0374657051bbcdde82a50fabae",
+   "remapped_from": null
+  }
+ ]
+}

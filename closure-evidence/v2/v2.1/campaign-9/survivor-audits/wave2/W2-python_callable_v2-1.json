@@ -1,0 +1,258 @@
+{
+ "batch": "W2-python_callable_v2-1",
+ "file": "aisef2/probe/python_callable_v2.py",
+ "targets": [
+  "aisef2/probe/python_callable_v2.py::HARNESS/conclude",
+  "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+  "aisef2/probe/python_callable_v2.py::HARNESS/main"
+ ],
+ "new": [],
+ "carried": [
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/main",
+   "index": 109,
+   "mutant": "HARNESS L121 dict entry 0 dropped",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "Dropped 'subject' entry of the equals-over-a-callable facts: UNSUPPORTED with detail facts['unsupported'] is unchanged (pinned exactly by test_PCV2_3_equality_over_a_callable_is_UNSUPPORTED_hence_INVALID_SPEC, :342); only the RESULT body differs.",
+   "consumers_checked": [
+    "_concluded :530/:534/:536 (no), :539 .get('subject') == 'absent' False with the entry present, absent or emptied, :541 (no), :543-544 returns UNSUPPORTED from facts['unsupported']",
+    "HARNESS gate :392 does not read it; finish() runs on these facts but never reads the dict",
+    "test_PCV2_3_... and the FakeRange case of test_PCV2_8_the_stream_and_the_exit_stay_two_facts pin the entry that IS read ('unsupported')"
+   ],
+   "exceptions_checked": [
+    "dropped entry read as an absent subject: :539 compares with 'absent'; a missing key is None",
+    "another class reaching this dict: it is inside `if req['cls'] == 'equals'` (:363) and `got['callable']` (:364); exists builds its own dict at :361-362"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 109,
+    "mutant": "HARNESS L121 dict entry 0 dropped",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/main",
+   "index": 110,
+   "mutant": "HARNESS L121 dict entry 1 dropped",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "Dropped 'resolved' entry of the same facts: 'resolved' is read only by verdict_of :192 for class exists, which _concluded reaches at :545, after the :543-544 return.",
+   "consumers_checked": [
+    "verdict_of :187-203 reads 'resolved' only for exists (:192); not reached from :543",
+    "python_callable.py:146 reads 'resolved' of the Cycle-1 controller's own facts (another probe, another marker file)",
+    "test_PCV2_3_...: passes on this mutant"
+   ],
+   "exceptions_checked": [
+    "verdict_of called with this dict: only caller in this module is :545; the Cycle-1/cli/process_effect verdict_of read their own facts",
+    "a future class deciding on 'resolved' of an unsupported fact: the dict is emitted only for cls == 'equals' and returns UNSUPPORTED regardless"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 110,
+    "mutant": "HARNESS L121 dict entry 1 dropped",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/main",
+   "index": 134,
+   "mutant": "HARNESS L121 string 'subject' emptied",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "'subject' key emptied in the same facts: wire key '' only; dict keys are not rewritten by _unsubstituted, JSON and the MAC accept it (ran end to end).",
+   "consumers_checked": [
+    ":539 .get('subject') is None for the emptied key, != 'absent'; :543-544 returns first",
+    "_unsubstituted :218-227 rewrites values only; ci._protocol authenticates the bytes as written",
+    "HARNESS gate :392 does not read it"
+   ],
+   "exceptions_checked": [
+    "'' colliding with 'resolved'/'unsupported': three distinct keys",
+    "'' breaking the wire: ran end to end by exp/wire_exp.py, authenticated and parsed",
+    "the lookup landing on a missing key: None != 'absent'"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 134,
+    "mutant": "HARNESS L121 string 'subject' emptied",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/main",
+   "index": 135,
+   "mutant": "HARNESS L121 string 'resolved' emptied",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "'resolved' key emptied in the same facts: as [110] for the reader, as [134] for the wire.",
+   "consumers_checked": [
+    "verdict_of :192 (class exists only) not reached from the :543 return; no other read of 'resolved' in the module (grep)",
+    "_watch :518-521 parses the body whole and hands it to _concluded; keys other than the tested ones are inert",
+    "test_PCV2_3_...: passes on this mutant"
+   ],
+   "exceptions_checked": [
+    "'' colliding with 'subject'/'unsupported': no",
+    "facts.get('resolved') returning None where it IS read: only for class exists, whose dict is built at :361-362"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 135,
+    "mutant": "HARNESS L121 string 'resolved' emptied",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/main",
+   "index": 137,
+   "mutant": "HARNESS L121 string 'present' emptied",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "'present' value emptied in the same facts: '' == 'absent' is False exactly as 'present' == 'absent' is, on a path that returns UNSUPPORTED before anything else is read.",
+   "consumers_checked": [
+    ":539 == 'absent' evaluated and False for both",
+    "_unsubstituted: ''.replace(ws, '<ws>') is a no-op (ws non-empty realpath)",
+    "test_PCV2_3_...: passes on this mutant"
+   ],
+   "exceptions_checked": [
+    "'' as a third state mapped differently by a reader: the only read of the value is == 'absent' (grep); no truthiness test",
+    "'' tripping Observation's invariants: the UNSUPPORTED detail is facts['unsupported'], untouched and non-empty"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 137,
+    "mutant": "HARNESS L121 string 'present' emptied",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/main",
+   "index": 138,
+   "mutant": "HARNESS L121 True->False",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "'resolved' True -> False in the same facts: same as [110] for the reader; nothing reads the value on this branch (verdict_of reads it only for exists, :192).",
+   "consumers_checked": [
+    "verdict_of :192 `facts.get('resolved') is True` (class exists), not reached from :543-544; for equals verdict_of reads 'returned' (:193-194), which this dict never carries",
+    "grep 'resolved' in aisef2/: python_callable.py :146 (Cycle-1 facts) and python_callable_v2.py :192 and the producers only"
+   ],
+   "exceptions_checked": [
+    "'resolved' False read as 'did not resolve' and sent down REFUTED: that read exists only in verdict_of, never called here; the UNSUPPORTED sentence is unchanged",
+    "UNSUPPORTED re-decided from the facts later: Observation(UNSUPPORTED) carries only the detail; classify_failure -> InvalidSpec(detail), no facts"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 138,
+    "mutant": "HARNESS L121 True->False",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+   "index": 11,
+   "mutant": "HARNESS L82 dict entry 0 dropped",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "Dropped 'subject' entry of the hard-exit facts {'subject','hard_exit','exit_code'}: required=no, decision=no (hard_exit and exit_code are the decision-bearing entries: gate :392 and _concluded :536-538, killed by the existing exit-3 case), integrity=no (not hashed/counted). Reproduced: Observation(OBSERVED, REFUTED, '... (exit 3)') identical, RESULT body differs.",
+   "consumers_checked": [
+    "python_callable_v2.py _concluded :536-538 returns on hard_exit before :539",
+    "HARNESS gate :392 reads facts.get('hard_exit'), never 'subject'",
+    "test_PCV2_8_absence_exit_and_forgery_are_what_they_were and test_PCV2_8_the_stream_and_the_exit_stay_two_facts feed hard-exit facts WITH the entry and pin the Observation; both are indifferent to it",
+    "docs/, validation/: no mention of this probe's hard-exit facts (grep hard_exit: only cli_invocation/process_effect own facts)"
+   ],
+   "exceptions_checked": [
+    "a reader indexing facts['subject']: none (only .get at :539)",
+    "_concluded reordered so 'subject' is tested before 'hard_exit': it compares to 'absent' only, a missing key is None",
+    "facts reaching Observation.detail as cli_invocation does (its test_FM2_CLI_SUBJECT_5 asserts f['subject']): here the detail is the fixed sentence of exit_code"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 11,
+    "mutant": "HARNESS L82 dict entry 0 dropped",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+   "index": 19,
+   "mutant": "HARNESS L82 string 'subject' emptied",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "'subject' key emptied in the hard-exit facts: same path as [11]; the wire key '' is authenticated and parsed like any key (exp/wire_exp.py ran it end to end).",
+   "consumers_checked": [
+    "_watch :518 json.loads accepts any object; _unsubstituted :218-227 rewrites values only",
+    "ci._protocol :879-896 authenticates the body bytes as written",
+    "_concluded :536 returns on hard_exit first"
+   ],
+   "exceptions_checked": [
+    "'' colliding with 'hard_exit'/'exit_code': no",
+    "'' breaking the line parser (split(' ', 4)): ran end to end, body authenticated and parsed",
+    "facts.get('subject') landing on another key: None != 'absent' and unreachable here"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 19,
+    "mutant": "HARNESS L82 string 'subject' emptied",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+   "index": 22,
+   "mutant": "HARNESS L82 string 'present' emptied",
+   "class": "AUDITED",
+   "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
+   "grounds": "'present' value emptied in the hard-exit facts: same path as [11]. '' vs 'present' differ at :539 only (== 'absent', False for both), unreachable for a hard exit.",
+   "consumers_checked": [
+    ":539 facts.get('subject') == 'absent' is False for '' as for 'present' and is after the :536 return",
+    "_unsubstituted :218-227: ''.replace(ws, '<ws>') is a no-op while ws is a non-empty realpath (observe() :463)",
+    "HARNESS gate :392 does not read 'subject'"
+   ],
+   "exceptions_checked": [
+    "'' tested for truthiness somewhere: the only read of the value is == 'absent' (grep)",
+    "empty ws making ''.replace('', '<ws>') non-empty: ws is os.path.realpath(<work>/ws), never empty",
+    "a consumer outside the module reading this body: none (ci._protocol callers listed above)"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 22,
+    "mutant": "HARNESS L82 string 'present' emptied",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/probe/python_callable_v2.py::HARNESS/conclude",
+   "index": 1,
+   "mutant": "HARNESS L27 False->True",
+   "class": "EQUIVALENT",
+   "group": "A18",
+   "grounds": "see notes",
+   "consumers_checked": [
+    "python_callable_v2.py _watch :500-521 and ci._await/_protocol (cli_invocation.py :879-:911): read only authentic protocol lines and the exit; no thread, no wait on the controller's threads",
+    "tests/v2/test_python_callable_v2.py test_PCV2_B1_BLOCKS_STOP_001_...: lost-race path (app.stall:f) passes on both versions (re-run by me through conclude_exp.py)",
+    "test_PCV2_8_the_protocol_reader_never_holds_the_interpreter_open: counts threading.Thread( only; a Timer is not counted"
+   ],
+   "exceptions_checked": [
+    "lock released or re-created so a parked acquire could later succeed and write a second RESULT: grep of HARNESS finds no release/second Lock",
+    "non-daemon / joined / cancelled Timer: daemon at :276 before start; no reference kept; the only way to lose this is mutant deadline[0], a different single mutant",
+    "conclude called from the main thread (self-deadlock on a non-reentrant Lock): only Timer calls it",
+    "interpreter shutdown waiting on the parked thread: observed exit 0 on 4 CPython versions; Windows not measured, argument is CPython's threading semantics (daemon threads are not joined)"
+   ],
+   "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
+   "remapped_from": {
+    "index": 1,
+    "mutant": "HARNESS L27 False->True",
+    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  }
+ ]
+}

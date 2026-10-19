@@ -1,0 +1,15 @@
+{
+ "batch": "W2-cli_invocation-2",
+ "file": "aisef2/probe/cli_invocation.py",
+ "targets": [
+  "aisef2/probe/cli_invocation.py::_stream_matches"
+ ],
+ "new": [
+  {
+   "target": "aisef2/probe/cli_invocation.py::_stream_matches",
+   "index": 29,
+   "mutant": "L596 string \"a regex shape is searched by the harness's bounded search: none was given\" emptied"
+  }
+ ],
+ "carried": []
+}

@@ -1,0 +1,68 @@
+{
+ "batch": "W2-story_runner-1",
+ "file": "aisef2/orchestrate/story_runner.py",
+ "targets": [
+  "aisef2/orchestrate/story_runner.py::_attempt"
+ ],
+ "new": [],
+ "carried": [
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 144,
+   "mutant": "L247 ObligationRole.PRESERVE->INTRODUCE",
+   "class": "EQUIVALENT",
+   "group": "T28-EQ-ROLE-AT-CANDIDATE: the label reaches route() only and every CANDIDATE row is role-independent (own trace per mutant, own label)",
+   "grounds": "Re-derived at the snapshot (story_runner.py, proof.py, routing.py, outcome.py, format3.py, merge.py are byte-identical to c4c1720, i.e. to the proof's own base). Value flow: story_runner.py:247-248 builds `preserved` (ObligationRole is read at no other line of the module but :139 `o.role.value` from plan.obligations); :250 `spec_id, role = obligations.get(cid) or preserved[cid]` (the plan's own role wins whenever the cid is one of the story's obligations); :251-253 hands `role` to prove() with the literal point MeasurementPoint.CANDIDATE. In prove() (proof.py:80-111) `role` is read once, at :107 `route(bound, spec, point, role)`; prove() refuses PARENT first (:86-87); the Proof (:28-37), the probe/evaluated payloads (plain(record)), the proof/verified payload (format3.verified_payload :233-246) and the gate row (`proof:{cid}`, :255-256) carry no role, and the Party range name is built from `under = criterion/point` (:88, :69). In route/row_for (routing.py:96-130) role has three readers: the isinstance guard (:114-115; all three labels are ObligationRole members), the table lookup (:125-126) and the fail-closed text (:102-103). Every role-keyed row of _EXECUTED is at PARENT (:70, :73, :76); the CANDIDATE rows (:81-86) are keyed role None, so .get((C, sat, reason, label)) misses and the `or` falls to (C, sat, reason, None): the same Route for any label. The fail-closed text is reachable only when row_for returns None; at CANDIDATE it cannot, by totality: Executed.__post_init__ (outcome.py:43-50) allows a reason only on INDETERMINATE and only an IndeterminateReason, which has exactly PRECONDITION_ABSENT and NON_CONTROLLER_SIGNAL (:28-33); contract_satisfaction (:71-79) yields SATISFIED/UNSATISFIED (no reason) or INDETERMINATE; the table has (C,S,None), (C,U,None), (C,I,PA), (C,I,NCS); UNRUNNABLE/INVALID_SPEC return at routing.py:120-123 before the lookup. The only place INTRODUCE differs from PRESERVE in the table is the PARENT PRECONDITION_ABSENT row (:70 READY vs :73 PRECONDITION_BROKEN); PARENT is refused by prove() before any role is read, so that row is unreachable from this call site (story_admission.py:80, the PARENT caller, passes the plan's obligation.role).",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:247-253 (only reader of `preserved`)",
+    "aisef2/orchestrate/proof.py:80-111 (single read of role at :107), :28-37 Proof",
+    "aisef2/control/routing.py:67-130 (table, route, row_for); callers: proof.py:107 and plan/story_admission.py:80 (PARENT)",
+    "aisef2/product/outcome.py:28-79 (reason enum, Executed invariant, contract_satisfaction)",
+    "aisef2/journal/format3.py:233-246 verified_payload; story_runner.py:137-139 plan/frozen 'roles' (from plan.obligations, not `preserved`)",
+    "aisef2/app/feedback.py:63, :88 (retry prompt prints [role] from project.plan.obligations, not from the label), :30 (_line)",
+    "aisef2/orchestrate/merge.py:38-60 affected_preserve / reprove (the post-merge re-proof passes the plan's o.role)",
+    "aisef2/app/verify.py _projection_refusal (new in round 3: folds the six control projections over the journal; the journal has no role field outside plan/frozen)",
+    "tests/v2/test_p6_orchestration.py ProofObserver spy on story_runner.prove passes role through and records none"
+   ],
+   "exceptions_checked": [
+    "a role-keyed CANDIDATE or POST_MERGE row in _EXECUTED: none (routing.py:81-92); _EXECUTED is changed at runtime only by mock.patch.dict in tests",
+    "a legal executed result with no CANDIDATE row, which would put role!r into UnroutableOutcome: none, by the totality argument",
+    "a cid of `preserved` that is also one of the story's own obligations: then the plan role is used and the label is not read",
+    "the retry prompt showing [INTRODUCE] for the preserved criterion: it reads the plan's obligation (feedback.py:63, :88)",
+    "the INTRODUCE PARENT row turning a PLAN failure into READY: needs point PARENT, refused by prove() at proof.py:86-87",
+    "a round-3 reader of a proof's role: none (verify.py:_projection_refusal, review_verify.artifact_problems, usage.no_progress read other rows)"
+   ],
+   "source_sha256": "db394816ee96297205094282647c5896bf3a417c9ebd1ba04f15dd32fe70a4d0",
+   "remapped_from": null
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 145,
+   "mutant": "L247 ObligationRole.PRESERVE->VERIFY",
+   "class": "EQUIVALENT",
+   "group": "T28-EQ-ROLE-AT-CANDIDATE: the label reaches route() only and every CANDIDATE row is role-independent (own trace per mutant, own label)",
+   "grounds": "Re-derived from BASE c4c1720, not taken from the hand-over. Value flow: story_runner.py:247-248 builds `preserved` (`ObligationRole` is read at no other line of that module); :250 `spec_id, role = obligations.get(cid) or preserved[cid]` (the plan's own role wins whenever the cid is one of the story's obligations); :251-253 hands `role` to prove() with the literal point MeasurementPoint.CANDIDATE. In prove() (proof.py:80-111) `role` is read once, at :107 `route(bound, spec, point, role)`; prove() refuses PARENT first (:86-87), and the Proof (:28-37), the probe/evaluated payloads (plain(record), protocol.py:189-200), the proof/verified payload (format3.verified_payload :233-246) and the gate row (`proof:{cid}`) carry no role. In route/row_for (routing.py:96-127) role has three readers: the isinstance guard (:114-115; all three labels are ObligationRole members), the table lookup (:125-126) and the fail-closed text (:102-103). Lookup: every role-keyed row of _EXECUTED is at PARENT (:70, :73, :76); the CANDIDATE rows (:81-85) are keyed role None, so .get((C, sat, reason, label)) misses and the `or` falls to the (C, sat, reason, None) row: the same Route for any label. The text is reachable only when row_for returns None; at CANDIDATE it cannot, by totality: Executed.__post_init__ (outcome.py:43-49) allows a reason only on INDETERMINATE and only an IndeterminateReason, which has exactly PRECONDITION_ABSENT and NON_CONTROLLER_SIGNAL (:28-33); contract_satisfaction (:71-79) yields SATISFIED/UNSATISFIED (reason None) or INDETERMINATE; the table has (C,S,None), (C,U,None), (C,I,PA), (C,I,NCS); UNRUNNABLE/INVALID_SPEC return at routing.py:120-123 before the lookup. Experiment (review/probe_attempt_label_identity.py, corroboration not proof): the real run_story/_attempt/GitWorkspace/two-party proof over three results of the affected PRESERVE criterion at the candidate (UNSATISFIED, SATISFIED, subject ABSENT -> SUBJECT_ABSENT_AT_CANDIDATE), label PRESERVE vs the mutant's label (ObligationRole is substituted in story_runner, which is the mutant exactly): the spy sees the label differ, the whole journal (types and payloads, SHAs/digests normalised by first appearance; BASE-vs-BASE control identical) and the attempt outcomes are identical in all 6 comparisons. Also re-ran the hand-over's routing probe: 56 cells, one Route across the 3 roles. [145] label VERIFY: VERIFY and PRESERVE have identical rows at every point (routing.py:73 and :76 differ only in the `rule` prose), and VERIFY is a role this call site already hands to prove() at the candidate: continuation.verify_at_candidate is every admission obligation of the story, any role (drift.py:89-90), each proved with the plan role from obligations_of. It survives because Scenario L (test_p6_stages.py:463, test_p6_orchestration.py ORCH_11) pins prove()'s and the real path's role-independence for the story's own obligations, not the label _attempt builds for an affected preserved one.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:247-253",
+    "aisef2/orchestrate/proof.py:80-111, :114-116",
+    "aisef2/control/routing.py:67-127 (VERIFY rows :76 at PARENT only)",
+    "aisef2/plan/drift.py:71-90 (verify_at_candidate: every admission obligation of the story)",
+    "aisef2/product/outcome.py:28-79",
+    "aisef2/journal/format3.py:233-246; story_runner.py:137-139",
+    "aisef2/app/feedback.py:30,88: prints the plan obligation's role (feedback.py:63 by_criterion over project.plan.obligations), the label is not journaled",
+    "aisef2/orchestrate/merge.py:38-50",
+    "tests/v2/test_p6_stages.py:444-466 (prove with PRESERVE and VERIFY at CANDIDATE, equal proof/verified payloads), tests/v2/test_p6_orchestration.py ORCH_11 (:559)",
+    "docs/implementation/v2/P6-ORCHESTRATION.md:53; docs/v2.1/ADR-V2.1.md ADR-4 (owner DEVELOPER, criterion in the retry prompt: neither names a label)"
+   ],
+   "exceptions_checked": [
+    "a role-keyed CANDIDATE row for VERIFY: none at BASE",
+    "the VERIFY-vs-PRESERVE PARENT difference: `rule` prose only, and PARENT is refused by prove()",
+    "the refusal text with role!r: unreachable at CANDIDATE by totality",
+    "the retry prompt: it does print a role, [role] from the plan's obligation (feedback.py:30,88), not the label; the hand-over's wording 'never from a role' was imprecise",
+    "a story whose obligations include the same cid: the plan role wins at story_runner.py:250"
+   ],
+   "source_sha256": "db394816ee96297205094282647c5896bf3a417c9ebd1ba04f15dd32fe70a4d0",
+   "remapped_from": null
+  }
+ ]
+}

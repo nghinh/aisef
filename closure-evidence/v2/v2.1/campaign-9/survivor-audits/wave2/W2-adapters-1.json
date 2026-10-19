@@ -1,0 +1,40 @@
+{
+ "batch": "W2-adapters-1",
+ "file": "aisef2/app/adapters.py",
+ "targets": [
+  "aisef2/app/adapters.py::_declared"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 3,
+   "mutant": "L338 element 0 dropped"
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 7,
+   "mutant": "L340 string 'replace' emptied"
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 8,
+   "mutant": "L331 string 'aisef-ocr-version-' emptied"
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 9,
+   "mutant": "L337 string 'ocr version' emptied"
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 13,
+   "mutant": "L339 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 14,
+   "mutant": "L339 string ')' emptied"
+  }
+ ],
+ "carried": []
+}

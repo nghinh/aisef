@@ -1,0 +1,312 @@
+{
+ "batch": "W2-cli_invocation-1",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/probe/cli_invocation.py",
+ "role": "author",
+ "measured_on": "2026-10-19 (date -u at run); macOS, CPython 3.14.7, nice -n 19 python3 -P -B, PATH stripped of opencode, HOME/TMPDIR/XDG under the audit tree",
+ "method": "built each mutant from the pristine module via validation.v2.mutation.mutants(src, func, enums)[index] with desc asserted equal to the batch entry; wrote it over aisef2/probe/cli_invocation.py in a COPY of the archive tree; ran each target's registered kill files via `python3 -P -B -m unittest tests.v2.<name> -q`; restored pristine between mutants. A kill file that FAILS on the mutant and PASSES unmutated would kill it.",
+ "kill_files": {
+  "search_in_worker / _said / _SEARCH_STOPPED": [
+   "tests/v2/test_v21_r5_regex_worker.py",
+   "tests/v2/test_v21_r5_regex_isolation.py"
+  ],
+  "_compiles": [
+   "tests/v2/test_v21_r5_probe_model_data.py"
+  ],
+  "CliInvocationProbe._observe": [
+   "tests/v2/test_c2_cli_protocol.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_c2_cli_invocation.py",
+   "tests/v2/test_v21_r5_regex_worker.py",
+   "tests/v2/test_v21_r5_regex_isolation.py"
+  ]
+ },
+ "measurement_caveat": "For _observe[15], 2 of its 5 registered kill files cannot run in the audit tree because closure-evidence/ was not archived: test_c2_cli_protocol.py::test_CLI_Q0 FAILS on the UNMUTATED baseline (PROBE_CATALOG_CLOSURE reads closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json, absent) and test_v21_identity.py errors (7) likewise. These are module-digest/catalog-closure identity tests that do not inspect ProcessRange names, so they neither pin nor catch the 'probe ' prefix regardless; their baseline failure is a missing-evidence artifact, not a kill. The behaviour-relevant kill files (regex_worker/isolation and c2_cli_invocation) run clean and PASS on the mutant. The campaign already measured [15] SURVIVED at this snapshot with closure-evidence present.",
+ "baselines_unmutated": {
+  "test_v21_r5_regex_worker.py": "PASS 34 tests ~61s",
+  "test_v21_r5_regex_isolation.py": "PASS 19 tests ~20s",
+  "test_v21_r5_probe_model_data.py": "PASS 26 tests ~7s"
+ },
+ "entries": [
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 53,
+   "mutant": "L360 string 'the search did not finish within the harness watchdog (' emptied",
+   "class": "AUDITED",
+   "group": "G-SEARCH-MSG-PROSE: prose/punctuation inside the StreamSearchFailed MESSAGE (2nd arg); the structured reason code (1st arg, DEADLINE/LAUNCH/CRASHED) is untouched and pinned by the kill file, and every discriminating runtime token in the message survives. StreamSearchFailed(reason, message) builds str(e)=f'regex search {reason}: {message}' and stores self.reason (cli_invocation.py:313-315); search_in_worker's exception is caught only in _Later.settle (cli_invocation.py:1346-1347 -> Observation(HARNESS_FAILED, detail=str(e))), classify_failure maps HARNESS_FAILED -> Unrunnable(detail) (protocol.py:176-177) so the operator sees it as the UNRUNNABLE record's detail, and review_verify.verify surfaces it in v.reason=f'the probe did not execute the reproducer: {result}'[:300] (review_verify.py:222). Nothing parses the message: the structured reason is the untouched self.reason (1st arg), the message (2nd arg) is free prose. The detail reaches an operator (Unrunnable) and a verifier (v.reason) but no reader depends on the emptied prose: the kill file pins the reason code and specific tokens, never the emptied words; no consumer parses the message. (Precedent: W2-bundle_cli _journal/_authentic message-prose nulls were AUDITED; the structured codes there were REFUTED. Here only prose is emptied, the reason code is intact.)",
+   "grounds": "The DEADLINE lead-in prose is emptied; the message becomes 'regex search DEADLINE: {timeout:g}s: timeouts_s.probe) over {len} bytes of the {stream} stream, against the pattern {head!r} ({n} characters); its process range was emptied ... never a verdict about the product. ... changes nothing. Simplify ...'. Reason='DEADLINE' (self.reason) and every token the kill file pins survive. test_v21_r5_regex_worker.py:214-216 asserts '1s: timeouts_s.probe', 'the stderr stream', f'{len(EVIL_LINE)} bytes', repr(EVIL), 'never a verdict', 'changes nothing' -- all present on the mutant; :221-226 pins the pattern-head only. The emptied prose is a human restatement of DEADLINE that no reader depends on. MEASURED: SURVIVED reconfirmed (all registered kill files PASS on the mutant, baseline PASS unmutated): test_v21_r5_regex_worker.py=PASS(58.9s); test_v21_r5_regex_isolation.py=PASS(19.4s)",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:313-315 StreamSearchFailed.__init__ -> str(e)=f'regex search {reason}: {message}'; reason is the untouched 1st arg",
+    "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle catches StreamSearchFailed -> Observation(HARNESS_FAILED, detail=str(e)) (detail non-empty, passes __post_init__)",
+    "aisef2/probe/protocol.py:176-177 classify_failure HARNESS_FAILED -> Unrunnable(detail): the UNRUNNABLE record's detail an operator reads",
+    "aisef2/app/review_verify.py:222 v.reason=f'the probe did not execute the reproducer: {result}'[:300]: the verifier surfaces the detail; test_v21_r5_regex_worker.py:521-522 pins only 'did not execute the reproducer' and 'regex search DEADLINE', not the emptied prose",
+    "grep over aisef2/ validation/ tests/ docs/: nothing parses a StreamSearchFailed message or an Unrunnable detail into fields; the structured channel is StreamSearchFailed.reason (SEARCH_REASONS), which no mutant here touches",
+    "aisef2/probe/cli_invocation.py:358-366 the DEADLINE message; test_v21_r5_regex_worker.py:203-238 AStuckSearchStopsAtItsDeadline and :516-527 ThroughReviewVerify"
+   ],
+   "exceptions_checked": [
+    "a test/verifier that greps the message for the emptied phrase: none (the DEADLINE test pins '1s: timeouts_s.probe', 'the stderr stream', 'N bytes', repr(EVIL), 'never a verdict', 'changes nothing'; FailureModes pins the per-reason {how}/_said phrases; review_verify pins 'regex search DEADLINE')",
+    "the sibling probes' copies (file_artifact grep worker, process_effect) are other targets with their own strings",
+    "docs/v2.1/*: grep of 'did not finish within the harness watchdog' over docs/ finds only file_artifact's own analogous DEADLINE prose (file_artifact.py:547), not a contract on this string"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 72,
+   "mutant": "L337 string ')' emptied",
+   "class": "AUDITED",
+   "group": "G-SEARCH-MSG-PROSE: prose/punctuation inside the StreamSearchFailed MESSAGE (2nd arg); the structured reason code (1st arg, DEADLINE/LAUNCH/CRASHED) is untouched and pinned by the kill file, and every discriminating runtime token in the message survives. StreamSearchFailed(reason, message) builds str(e)=f'regex search {reason}: {message}' and stores self.reason (cli_invocation.py:313-315); search_in_worker's exception is caught only in _Later.settle (cli_invocation.py:1346-1347 -> Observation(HARNESS_FAILED, detail=str(e))), classify_failure maps HARNESS_FAILED -> Unrunnable(detail) (protocol.py:176-177) so the operator sees it as the UNRUNNABLE record's detail, and review_verify.verify surfaces it in v.reason=f'the probe did not execute the reproducer: {result}'[:300] (review_verify.py:222). Nothing parses the message: the structured reason is the untouched self.reason (1st arg), the message (2nd arg) is free prose. The detail reaches an operator (Unrunnable) and a verifier (v.reason) but no reader depends on the emptied prose: the kill file pins the reason code and specific tokens, never the emptied words; no consumer parses the message. (Precedent: W2-bundle_cli _journal/_authentic message-prose nulls were AUDITED; the structured codes there were REFUTED. Here only prose is emptied, the reason code is intact.)",
+   "grounds": "INPUT message closing ')' emptied: 'the request cannot be written ({type(e).__name__}' (unbalanced paren). Reason='INPUT' and the discriminating token {type(e).__name__} survive. test_v21_r5_regex_worker.py:386-390 asserts reason=='INPUT' and 'the request cannot be written' in str(e) -- both hold; the lone ')' is punctuation no reader parses. MEASURED: SURVIVED reconfirmed (all registered kill files PASS on the mutant, baseline PASS unmutated): test_v21_r5_regex_worker.py=PASS(58.7s); test_v21_r5_regex_isolation.py=PASS(19.4s)",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:313-315 StreamSearchFailed.__init__ -> str(e)=f'regex search {reason}: {message}'; reason is the untouched 1st arg",
+    "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle catches StreamSearchFailed -> Observation(HARNESS_FAILED, detail=str(e)) (detail non-empty, passes __post_init__)",
+    "aisef2/probe/protocol.py:176-177 classify_failure HARNESS_FAILED -> Unrunnable(detail): the UNRUNNABLE record's detail an operator reads",
+    "aisef2/app/review_verify.py:222 v.reason=f'the probe did not execute the reproducer: {result}'[:300]: the verifier surfaces the detail; test_v21_r5_regex_worker.py:521-522 pins only 'did not execute the reproducer' and 'regex search DEADLINE', not the emptied prose",
+    "grep over aisef2/ validation/ tests/ docs/: nothing parses a StreamSearchFailed message or an Unrunnable detail into fields; the structured channel is StreamSearchFailed.reason (SEARCH_REASONS), which no mutant here touches",
+    "aisef2/probe/cli_invocation.py:336-337 the INPUT branch; test_v21_r5_regex_worker.py:386-390 test_a_request_that_cannot_be_written_is_INPUT"
+   ],
+   "exceptions_checked": [
+    "a test/verifier that greps the message for the emptied phrase: none (the DEADLINE test pins '1s: timeouts_s.probe', 'the stderr stream', 'N bytes', repr(EVIL), 'never a verdict', 'changes nothing'; FailureModes pins the per-reason {how}/_said phrases; review_verify pins 'regex search DEADLINE')",
+    "the sibling probes' copies (file_artifact grep worker, process_effect) are other targets with their own strings",
+    "a consumer that balances/parses parens in the message: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 73,
+   "mutant": "L343 string 'the worker did not start (' emptied",
+   "class": "AUDITED",
+   "group": "G-SEARCH-MSG-PROSE: prose/punctuation inside the StreamSearchFailed MESSAGE (2nd arg); the structured reason code (1st arg, DEADLINE/LAUNCH/CRASHED) is untouched and pinned by the kill file, and every discriminating runtime token in the message survives. StreamSearchFailed(reason, message) builds str(e)=f'regex search {reason}: {message}' and stores self.reason (cli_invocation.py:313-315); search_in_worker's exception is caught only in _Later.settle (cli_invocation.py:1346-1347 -> Observation(HARNESS_FAILED, detail=str(e))), classify_failure maps HARNESS_FAILED -> Unrunnable(detail) (protocol.py:176-177) so the operator sees it as the UNRUNNABLE record's detail, and review_verify.verify surfaces it in v.reason=f'the probe did not execute the reproducer: {result}'[:300] (review_verify.py:222). Nothing parses the message: the structured reason is the untouched self.reason (1st arg), the message (2nd arg) is free prose. The detail reaches an operator (Unrunnable) and a verifier (v.reason) but no reader depends on the emptied prose: the kill file pins the reason code and specific tokens, never the emptied words; no consumer parses the message. (Precedent: W2-bundle_cli _journal/_authentic message-prose nulls were AUDITED; the structured codes there were REFUTED. Here only prose is emptied, the reason code is intact.)",
+   "grounds": "LAUNCH lead-in prose emptied: str(e) becomes 'regex search LAUNCH: {type(e).__name__})'. Reason='LAUNCH' and the discriminating token {type(e).__name__} (RangeError/OSError class) survive. The LAUNCH message prose is pinned by NO test -- test_v21_r5_regex_worker.py:370-377 asserts reason=='LAUNCH' only, no assertIn on the text. Parallel to the W2-bundle_cli _journal/_authentic prose nulls (AUDITED) where the code and the error-class token survived. MEASURED: SURVIVED reconfirmed (all registered kill files PASS on the mutant, baseline PASS unmutated): test_v21_r5_regex_worker.py=PASS(60.3s); test_v21_r5_regex_isolation.py=PASS(20.6s)",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:313-315 StreamSearchFailed.__init__ -> str(e)=f'regex search {reason}: {message}'; reason is the untouched 1st arg",
+    "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle catches StreamSearchFailed -> Observation(HARNESS_FAILED, detail=str(e)) (detail non-empty, passes __post_init__)",
+    "aisef2/probe/protocol.py:176-177 classify_failure HARNESS_FAILED -> Unrunnable(detail): the UNRUNNABLE record's detail an operator reads",
+    "aisef2/app/review_verify.py:222 v.reason=f'the probe did not execute the reproducer: {result}'[:300]: the verifier surfaces the detail; test_v21_r5_regex_worker.py:521-522 pins only 'did not execute the reproducer' and 'regex search DEADLINE', not the emptied prose",
+    "grep over aisef2/ validation/ tests/ docs/: nothing parses a StreamSearchFailed message or an Unrunnable detail into fields; the structured channel is StreamSearchFailed.reason (SEARCH_REASONS), which no mutant here touches",
+    "aisef2/probe/cli_invocation.py:342-343 the LAUNCH branch; test_v21_r5_regex_worker.py:370-377 (reason only, no message assertIn)"
+   ],
+   "exceptions_checked": [
+    "a test/verifier that greps the message for the emptied phrase: none (the DEADLINE test pins '1s: timeouts_s.probe', 'the stderr stream', 'N bytes', repr(EVIL), 'never a verdict', 'changes nothing'; FailureModes pins the per-reason {how}/_said phrases; review_verify pins 'regex search DEADLINE')",
+    "the sibling probes' copies (file_artifact grep worker, process_effect) are other targets with their own strings",
+    "a reader that depends on the LAUNCH message words: none -- the reason code carries the class and the type-name token survives"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 74,
+   "mutant": "L343 string ')' emptied",
+   "class": "AUDITED",
+   "group": "G-SEARCH-MSG-PROSE: prose/punctuation inside the StreamSearchFailed MESSAGE (2nd arg); the structured reason code (1st arg, DEADLINE/LAUNCH/CRASHED) is untouched and pinned by the kill file, and every discriminating runtime token in the message survives. StreamSearchFailed(reason, message) builds str(e)=f'regex search {reason}: {message}' and stores self.reason (cli_invocation.py:313-315); search_in_worker's exception is caught only in _Later.settle (cli_invocation.py:1346-1347 -> Observation(HARNESS_FAILED, detail=str(e))), classify_failure maps HARNESS_FAILED -> Unrunnable(detail) (protocol.py:176-177) so the operator sees it as the UNRUNNABLE record's detail, and review_verify.verify surfaces it in v.reason=f'the probe did not execute the reproducer: {result}'[:300] (review_verify.py:222). Nothing parses the message: the structured reason is the untouched self.reason (1st arg), the message (2nd arg) is free prose. The detail reaches an operator (Unrunnable) and a verifier (v.reason) but no reader depends on the emptied prose: the kill file pins the reason code and specific tokens, never the emptied words; no consumer parses the message. (Precedent: W2-bundle_cli _journal/_authentic message-prose nulls were AUDITED; the structured codes there were REFUTED. Here only prose is emptied, the reason code is intact.)",
+   "grounds": "LAUNCH closing ')' emptied: 'the worker did not start ({type(e).__name__}'. Reason='LAUNCH' and the lead-in + type-name survive; only the closing paren (punctuation) is lost. No test asserts the LAUNCH message text (reason only). MEASURED: SURVIVED reconfirmed (all registered kill files PASS on the mutant, baseline PASS unmutated): test_v21_r5_regex_worker.py=PASS(60.6s); test_v21_r5_regex_isolation.py=PASS(20.0s)",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:313-315 StreamSearchFailed.__init__ -> str(e)=f'regex search {reason}: {message}'; reason is the untouched 1st arg",
+    "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle catches StreamSearchFailed -> Observation(HARNESS_FAILED, detail=str(e)) (detail non-empty, passes __post_init__)",
+    "aisef2/probe/protocol.py:176-177 classify_failure HARNESS_FAILED -> Unrunnable(detail): the UNRUNNABLE record's detail an operator reads",
+    "aisef2/app/review_verify.py:222 v.reason=f'the probe did not execute the reproducer: {result}'[:300]: the verifier surfaces the detail; test_v21_r5_regex_worker.py:521-522 pins only 'did not execute the reproducer' and 'regex search DEADLINE', not the emptied prose",
+    "grep over aisef2/ validation/ tests/ docs/: nothing parses a StreamSearchFailed message or an Unrunnable detail into fields; the structured channel is StreamSearchFailed.reason (SEARCH_REASONS), which no mutant here touches",
+    "aisef2/probe/cli_invocation.py:342-343 the LAUNCH branch; test_v21_r5_regex_worker.py:370-377"
+   ],
+   "exceptions_checked": [
+    "a test/verifier that greps the message for the emptied phrase: none (the DEADLINE test pins '1s: timeouts_s.probe', 'the stderr stream', 'N bytes', repr(EVIL), 'never a verdict', 'changes nothing'; FailureModes pins the per-reason {how}/_said phrases; review_verify pins 'regex search DEADLINE')",
+    "the sibling probes' copies (file_artifact grep worker, process_effect) are other targets with their own strings",
+    "a consumer parsing the parenthetical: none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 75,
+   "mutant": "L369 string 'the worker ' emptied",
+   "class": "AUDITED",
+   "group": "G-SEARCH-MSG-PROSE: prose/punctuation inside the StreamSearchFailed MESSAGE (2nd arg); the structured reason code (1st arg, DEADLINE/LAUNCH/CRASHED) is untouched and pinned by the kill file, and every discriminating runtime token in the message survives. StreamSearchFailed(reason, message) builds str(e)=f'regex search {reason}: {message}' and stores self.reason (cli_invocation.py:313-315); search_in_worker's exception is caught only in _Later.settle (cli_invocation.py:1346-1347 -> Observation(HARNESS_FAILED, detail=str(e))), classify_failure maps HARNESS_FAILED -> Unrunnable(detail) (protocol.py:176-177) so the operator sees it as the UNRUNNABLE record's detail, and review_verify.verify surfaces it in v.reason=f'the probe did not execute the reproducer: {result}'[:300] (review_verify.py:222). Nothing parses the message: the structured reason is the untouched self.reason (1st arg), the message (2nd arg) is free prose. The detail reaches an operator (Unrunnable) and a verifier (v.reason) but no reader depends on the emptied prose: the kill file pins the reason code and specific tokens, never the emptied words; no consumer parses the message. (Precedent: W2-bundle_cli _journal/_authentic message-prose nulls were AUDITED; the structured codes there were REFUTED. Here only prose is emptied, the reason code is intact.)",
+   "grounds": "CRASHED subject prose emptied: '{how} before it gave its result' + _said(log) (e.g. 'exited with status 7 before it gave its result'). Reason='CRASHED' and the discriminating token {how} ('exited with status 7' / 'ended by signal 15') survive and ARE pinned. test_v21_r5_regex_worker.py:353-360 asserts reason + the {how}/_said phrase per case (e.g. 'exited with status 7', 'ZeroDivisionError'); :362-368 pins 'ended by signal 15'. The emptied 'the worker ' is a redundant subject already carried by the 'regex search CRASHED:' prefix. MEASURED: SURVIVED reconfirmed (all registered kill files PASS on the mutant, baseline PASS unmutated): test_v21_r5_regex_worker.py=PASS(58.7s); test_v21_r5_regex_isolation.py=PASS(19.4s)",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:313-315 StreamSearchFailed.__init__ -> str(e)=f'regex search {reason}: {message}'; reason is the untouched 1st arg",
+    "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle catches StreamSearchFailed -> Observation(HARNESS_FAILED, detail=str(e)) (detail non-empty, passes __post_init__)",
+    "aisef2/probe/protocol.py:176-177 classify_failure HARNESS_FAILED -> Unrunnable(detail): the UNRUNNABLE record's detail an operator reads",
+    "aisef2/app/review_verify.py:222 v.reason=f'the probe did not execute the reproducer: {result}'[:300]: the verifier surfaces the detail; test_v21_r5_regex_worker.py:521-522 pins only 'did not execute the reproducer' and 'regex search DEADLINE', not the emptied prose",
+    "grep over aisef2/ validation/ tests/ docs/: nothing parses a StreamSearchFailed message or an Unrunnable detail into fields; the structured channel is StreamSearchFailed.reason (SEARCH_REASONS), which no mutant here touches",
+    "aisef2/probe/cli_invocation.py:367-369 the CRASHED-status branch; test_v21_r5_regex_worker.py:338-368 FailureModes"
+   ],
+   "exceptions_checked": [
+    "a test/verifier that greps the message for the emptied phrase: none (the DEADLINE test pins '1s: timeouts_s.probe', 'the stderr stream', 'N bytes', repr(EVIL), 'never a verdict', 'changes nothing'; FailureModes pins the per-reason {how}/_said phrases; review_verify pins 'regex search DEADLINE')",
+    "the sibling probes' copies (file_artifact grep worker, process_effect) are other targets with their own strings",
+    "a reader keying on the subject word 'worker': none; {how} and the reason code carry the fact"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::search_in_worker",
+   "index": 76,
+   "mutant": "L369 string ' before it gave its result' emptied",
+   "class": "AUDITED",
+   "group": "G-SEARCH-MSG-PROSE: prose/punctuation inside the StreamSearchFailed MESSAGE (2nd arg); the structured reason code (1st arg, DEADLINE/LAUNCH/CRASHED) is untouched and pinned by the kill file, and every discriminating runtime token in the message survives. StreamSearchFailed(reason, message) builds str(e)=f'regex search {reason}: {message}' and stores self.reason (cli_invocation.py:313-315); search_in_worker's exception is caught only in _Later.settle (cli_invocation.py:1346-1347 -> Observation(HARNESS_FAILED, detail=str(e))), classify_failure maps HARNESS_FAILED -> Unrunnable(detail) (protocol.py:176-177) so the operator sees it as the UNRUNNABLE record's detail, and review_verify.verify surfaces it in v.reason=f'the probe did not execute the reproducer: {result}'[:300] (review_verify.py:222). Nothing parses the message: the structured reason is the untouched self.reason (1st arg), the message (2nd arg) is free prose. The detail reaches an operator (Unrunnable) and a verifier (v.reason) but no reader depends on the emptied prose: the kill file pins the reason code and specific tokens, never the emptied words; no consumer parses the message. (Precedent: W2-bundle_cli _journal/_authentic message-prose nulls were AUDITED; the structured codes there were REFUTED. Here only prose is emptied, the reason code is intact.)",
+   "grounds": "CRASHED trailing prose emptied: 'the worker {how}' + _said(log). Reason='CRASHED' and {how} survive and are pinned (test_v21_r5_regex_worker.py:353-368). The emptied clause ' before it gave its result' is narrative no reader depends on. MEASURED: SURVIVED reconfirmed (all registered kill files PASS on the mutant, baseline PASS unmutated): test_v21_r5_regex_worker.py=PASS(71.4s); test_v21_r5_regex_isolation.py=PASS(19.3s)",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:313-315 StreamSearchFailed.__init__ -> str(e)=f'regex search {reason}: {message}'; reason is the untouched 1st arg",
+    "aisef2/probe/cli_invocation.py:1343-1348 _Later.settle catches StreamSearchFailed -> Observation(HARNESS_FAILED, detail=str(e)) (detail non-empty, passes __post_init__)",
+    "aisef2/probe/protocol.py:176-177 classify_failure HARNESS_FAILED -> Unrunnable(detail): the UNRUNNABLE record's detail an operator reads",
+    "aisef2/app/review_verify.py:222 v.reason=f'the probe did not execute the reproducer: {result}'[:300]: the verifier surfaces the detail; test_v21_r5_regex_worker.py:521-522 pins only 'did not execute the reproducer' and 'regex search DEADLINE', not the emptied prose",
+    "grep over aisef2/ validation/ tests/ docs/: nothing parses a StreamSearchFailed message or an Unrunnable detail into fields; the structured channel is StreamSearchFailed.reason (SEARCH_REASONS), which no mutant here touches",
+    "aisef2/probe/cli_invocation.py:367-369 the CRASHED-status branch; test_v21_r5_regex_worker.py:338-368 FailureModes"
+   ],
+   "exceptions_checked": [
+    "a test/verifier that greps the message for the emptied phrase: none (the DEADLINE test pins '1s: timeouts_s.probe', 'the stderr stream', 'N bytes', repr(EVIL), 'never a verdict', 'changes nothing'; FailureModes pins the per-reason {how}/_said phrases; review_verify pins 'regex search DEADLINE')",
+    "the sibling probes' copies (file_artifact grep worker, process_effect) are other targets with their own strings",
+    "a reader keying on 'before it gave its result': none"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 3,
+   "mutant": "L388 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "G-SEARCH-MSG-PROSE: prose/punctuation inside the StreamSearchFailed MESSAGE (2nd arg); the structured reason code (1st arg, DEADLINE/LAUNCH/CRASHED) is untouched and pinned by the kill file, and every discriminating runtime token in the message survives. StreamSearchFailed(reason, message) builds str(e)=f'regex search {reason}: {message}' and stores self.reason (cli_invocation.py:313-315); search_in_worker's exception is caught only in _Later.settle (cli_invocation.py:1346-1347 -> Observation(HARNESS_FAILED, detail=str(e))), classify_failure maps HARNESS_FAILED -> Unrunnable(detail) (protocol.py:176-177) so the operator sees it as the UNRUNNABLE record's detail, and review_verify.verify surfaces it in v.reason=f'the probe did not execute the reproducer: {result}'[:300] (review_verify.py:222). Nothing parses the message: the structured reason is the untouched self.reason (1st arg), the message (2nd arg) is free prose. The detail reaches an operator (Unrunnable) and a verifier (v.reason) but no reader depends on the emptied prose: the kill file pins the reason code and specific tokens, never the emptied words; no consumer parses the message. (Precedent: W2-bundle_cli _journal/_authentic message-prose nulls were AUDITED; the structured codes there were REFUTED. Here only prose is emptied, the reason code is intact.)",
+   "grounds": "_said returns f': {tail!r}' -> f'{tail!r}' (the ': ' separator before the worker's output tail is dropped) when tail is non-empty; the empty-tail branch still returns ''. This is the suffix appended to the CRASHED/NO_RESULT messages (356/369/374). The tail repr (e.g. containing 'ZeroDivisionError') survives; test_v21_r5_regex_worker.py:353-360 asserts the tail phrase is in str(e), never the ': ' separator. Punctuation-only prose. (Precedent: W2-bundle_cli _journal L860 ': ' emptied -> AUDITED.) MEASURED: re-run in progress at report time; campaign-confirmed SURVIVED at this snapshot (4ec961e, f9a8122a: 534 SURVIVED). Classification is from the code, not the re-run; the 5 completed search_in_worker re-runs all reconfirmed SURVIVED with baselines PASS",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:382-388 _said; its only callers aisef2/probe/cli_invocation.py:356,369,374 ('<message>' + _said(log))",
+    "aisef2/app/review_verify.py:222 / protocol.py:176-177 as in the message group (operator + verifier read the whole detail, never the ': ' separator)",
+    "test_v21_r5_regex_worker.py:338-368 FailureModes asserts the tail phrase ('ZeroDivisionError', etc.), not the separator"
+   ],
+   "exceptions_checked": [
+    "a consumer that splits the suffix on ': ': none",
+    "the empty-tail path: still returns '' (unchanged)"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 2,
+   "mutant": "L387 returns None",
+   "class": "AUDITED",
+   "group": "G-SAID-DEFENSIVE-GUARD: _said (cli_invocation.py:382-388) is a defensive reader of the worker's output file, called only at 356/369/374 inside search_in_worker as '<message>' + _said(log); log is always the regex worker's own worker.log, created locally at 335 and read right after the worker ends. The sole writer of that file is the process launched at 339 running the FIXED REGEX_WORKER, whose imports are pinned to {json,re,sys} (test_v21_r5_regex_worker.py:419-420): it writes b'0'/b'1' to the RESULT file, and on a crash only a UTF-8 (ASCII) traceback to its stderr->log; it never removes the log and never writes invalid UTF-8. So the mutated guard is unreachable on every real and tested path.",
+   "grounds": "The OSError branch of _said returns '' -> None. _said's value is consumed only as '<message>' + _said(log) (356/369/374), so None would raise TypeError and break search_in_worker's documented contract (326-328: 'Raises StreamSearchFailed for every way the worker gave no answer'). But the branch is taken only when pathlib.Path(log).read_bytes() raises OSError, i.e. the just-created local worker.log is unreadable when read right after the worker ends. In every real and tested path the file exists and is readable (the fixed REGEX_WORKER never removes/chmods it; it is read by this same process before the eval dir is disposed), so the branch is dead and '' vs None is never observed. No consumer, test or operator the entry names reaches it. (Contrast W2-bundle_cli with_commands L349 returns None = REFUTED: there the None path is reached by an ordinary input; here it needs an FS fault on a local file.) MEASURED: re-run in progress at report time; campaign-confirmed SURVIVED at this snapshot (4ec961e, f9a8122a: 534 SURVIVED). Classification is from the code, not the re-run; the 5 completed search_in_worker re-runs all reconfirmed SURVIVED with baselines PASS",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:356,369,374 the three '<message>' + _said(log) sites (the only consumers; both operands must be str)",
+    "aisef2/probe/cli_invocation.py:331-335 worker.log is created locally with open(log,'wb'); aisef2/probe/cli_invocation.py:339 the launched process runs the fixed REGEX_WORKER",
+    "test_v21_r5_regex_worker.py:338-368 FailureModes: every stand-in worker leaves a readable log; none triggers the OSError branch"
+   ],
+   "exceptions_checked": [
+    "an adversarial worker that removes/chmods worker.log: the worker is fixed kernel code (REGEX_WORKER), not a model's; the pattern and data are passed as files (test :417-420 pins the worker's argv and imports)",
+    "a genuine filesystem fault (EIO) on read_bytes: possible but not reachable by any named consumer/test/input"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_said",
+   "index": 5,
+   "mutant": "L385 string 'replace' emptied",
+   "class": "AUDITED",
+   "group": "G-SAID-DEFENSIVE-GUARD: _said (cli_invocation.py:382-388) is a defensive reader of the worker's output file, called only at 356/369/374 inside search_in_worker as '<message>' + _said(log); log is always the regex worker's own worker.log, created locally at 335 and read right after the worker ends. The sole writer of that file is the process launched at 339 running the FIXED REGEX_WORKER, whose imports are pinned to {json,re,sys} (test_v21_r5_regex_worker.py:419-420): it writes b'0'/b'1' to the RESULT file, and on a crash only a UTF-8 (ASCII) traceback to its stderr->log; it never removes the log and never writes invalid UTF-8. So the mutated guard is unreachable on every real and tested path.",
+   "grounds": "read_bytes()[-300:].decode('utf-8','replace') -> decode('utf-8',''). The '' errors-handler is looked up only when a decode error occurs; on valid UTF-8 it is never invoked and the result is byte-identical to 'replace' (verified: b'hello'.decode('utf-8','') OK; b'a\\xffb'.decode('utf-8','') raises LookupError). The only writer of worker.log is the fixed REGEX_WORKER, which writes b'0'/b'1' to the RESULT file and, on a crash, a UTF-8/ASCII traceback to its log -- never invalid UTF-8 -- so the handler is never invoked on any real or tested path and 'replace' vs '' are indistinguishable. Were invalid UTF-8 ever present, '' would raise LookupError (not caught by _said's OSError-only except) and escape search_in_worker as a non-StreamSearchFailed -- but no named consumer/test produces that. MEASURED: re-run in progress at report time; campaign-confirmed SURVIVED at this snapshot (4ec961e, f9a8122a: 534 SURVIVED). Classification is from the code, not the re-run; the 5 completed search_in_worker re-runs all reconfirmed SURVIVED with baselines PASS",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:382-388 _said; callers 356/369/374",
+    "aisef2/probe/cli_invocation.py:339 the launched process is the fixed REGEX_WORKER (its source writes b'0'/b'1' to the result file; no raw-byte stderr)",
+    "test_v21_r5_regex_worker.py:338-368 FailureModes: stand-in workers emit ASCII tracebacks ('ZeroDivisionError'); none writes invalid UTF-8 to stderr"
+   ],
+   "exceptions_checked": [
+    "a stand-in/adversarial worker writing raw non-UTF-8 bytes to its stderr: none of the FailureModes stand-ins do; the production worker is fixed",
+    "ROWS in SameAnswerAsInProcess feed non-UTF-8 to the search DATA, not to the worker's log; _said reads the log only"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 0,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->UNSUPPORTED",
+   "class": "EQUIVALENT",
+   "group": "G-SEARCH-STOPPED-UNREAD: _SEARCH_STOPPED's ObservationKind is never read. It is passed once, at cli_invocation.py:351 `_after_dispatch(run, _SEARCH_STOPPED)` with the return value DISCARDED. _after_dispatch (python_callable.py:379-389) returns its `observation` argument unchanged when run.ledger has no stages (discarded at the unassigned call site) and otherwise raises ProbeInterrupted built only from the ledger stages, never referencing the argument. So neither branch reads _SEARCH_STOPPED.kind. The constant is built at import (306); Observation.__post_init__ (protocol.py:104-119) accepts all three mutated kinds because verdict is None (HARNESS_FAILED/UNSUPPORTED/NON_CONTROLLER_SIGNAL need detail non-empty + verdict None; SUBJECT_ABSENT accepts verdict None), and detail is the untouched non-empty string. No observable difference anywhere. EQUIVALENT.",
+   "grounds": "_SEARCH_STOPPED's kind HARNESS_FAILED->UNSUPPORTED. The constant is read in exactly one place, aisef2/probe/cli_invocation.py:351 `_after_dispatch(run, _SEARCH_STOPPED)`, whose return value is discarded. _after_dispatch (python_callable.py:385-389) returns the argument unchanged when run.ledger has no stages (discarded here) and otherwise raises ProbeInterrupted built only from the stages, never reading the argument. So _SEARCH_STOPPED.kind is never observed. Construction at import succeeds for UNSUPPORTED: __post_init__ (protocol.py:104-119) requires verdict None for HARNESS_FAILED/UNSUPPORTED/NON_CONTROLLER_SIGNAL (and detail non-empty) and accepts verdict None for SUBJECT_ABSENT; verdict is the default None and detail is the untouched 'the regex search was interrupted'. No observable difference. MEASURED: SURVIVED reconfirmed (all registered kill files PASS on the mutant, baseline PASS unmutated): test_v21_r5_regex_isolation.py=PASS(19.3s); test_v21_r5_regex_worker.py=PASS(59.8s)",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:306 the only definition; aisef2/probe/cli_invocation.py:351 the only use (return discarded)",
+    "aisef2/probe/python_callable.py:379-389 _after_dispatch: returns the arg (empty ledger) or raises ProbeInterrupted from stages (non-empty); the arg is never inspected",
+    "aisef2/probe/protocol.py:104-119 Observation.__post_init__: all three mutated kinds are constructible with verdict=None + non-empty detail",
+    "grep '_SEARCH_STOPPED' over aisef2/ validation/ tests/ docs/: 306 and 351 only"
+   ],
+   "exceptions_checked": [
+    "a kind whose __post_init__ would reject verdict=None: none of the three (SUBJECT_ABSENT also accepts a decided verdict, but here verdict is None)",
+    "_after_dispatch returning the observation to a caller that uses it: the cli_invocation call site at 351 discards the return; the other callers (python_callable, process_effect) pass their own observations, not this constant",
+    "the ProbeInterrupted branch reading the observation: it builds its detail from run.ledger stages, not the argument"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 1,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->SUBJECT_ABSENT",
+   "class": "EQUIVALENT",
+   "group": "G-SEARCH-STOPPED-UNREAD: _SEARCH_STOPPED's ObservationKind is never read. It is passed once, at cli_invocation.py:351 `_after_dispatch(run, _SEARCH_STOPPED)` with the return value DISCARDED. _after_dispatch (python_callable.py:379-389) returns its `observation` argument unchanged when run.ledger has no stages (discarded at the unassigned call site) and otherwise raises ProbeInterrupted built only from the ledger stages, never referencing the argument. So neither branch reads _SEARCH_STOPPED.kind. The constant is built at import (306); Observation.__post_init__ (protocol.py:104-119) accepts all three mutated kinds because verdict is None (HARNESS_FAILED/UNSUPPORTED/NON_CONTROLLER_SIGNAL need detail non-empty + verdict None; SUBJECT_ABSENT accepts verdict None), and detail is the untouched non-empty string. No observable difference anywhere. EQUIVALENT.",
+   "grounds": "_SEARCH_STOPPED's kind HARNESS_FAILED->SUBJECT_ABSENT. The constant is read in exactly one place, aisef2/probe/cli_invocation.py:351 `_after_dispatch(run, _SEARCH_STOPPED)`, whose return value is discarded. _after_dispatch (python_callable.py:385-389) returns the argument unchanged when run.ledger has no stages (discarded here) and otherwise raises ProbeInterrupted built only from the stages, never reading the argument. So _SEARCH_STOPPED.kind is never observed. Construction at import succeeds for SUBJECT_ABSENT: __post_init__ (protocol.py:104-119) requires verdict None for HARNESS_FAILED/UNSUPPORTED/NON_CONTROLLER_SIGNAL (and detail non-empty) and accepts verdict None for SUBJECT_ABSENT; verdict is the default None and detail is the untouched 'the regex search was interrupted'. No observable difference. MEASURED: re-run in progress at report time; campaign-confirmed SURVIVED at this snapshot (4ec961e, f9a8122a: 534 SURVIVED). Classification is from the code, not the re-run; the 5 completed search_in_worker re-runs all reconfirmed SURVIVED with baselines PASS",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:306 the only definition; aisef2/probe/cli_invocation.py:351 the only use (return discarded)",
+    "aisef2/probe/python_callable.py:379-389 _after_dispatch: returns the arg (empty ledger) or raises ProbeInterrupted from stages (non-empty); the arg is never inspected",
+    "aisef2/probe/protocol.py:104-119 Observation.__post_init__: all three mutated kinds are constructible with verdict=None + non-empty detail",
+    "grep '_SEARCH_STOPPED' over aisef2/ validation/ tests/ docs/: 306 and 351 only"
+   ],
+   "exceptions_checked": [
+    "a kind whose __post_init__ would reject verdict=None: none of the three (SUBJECT_ABSENT also accepts a decided verdict, but here verdict is None)",
+    "_after_dispatch returning the observation to a caller that uses it: the cli_invocation call site at 351 discards the return; the other callers (python_callable, process_effect) pass their own observations, not this constant",
+    "the ProbeInterrupted branch reading the observation: it builds its detail from run.ledger stages, not the argument"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED",
+   "index": 4,
+   "mutant": "L306 ObservationKind.HARNESS_FAILED->NON_CONTROLLER_SIGNAL",
+   "class": "EQUIVALENT",
+   "group": "G-SEARCH-STOPPED-UNREAD: _SEARCH_STOPPED's ObservationKind is never read. It is passed once, at cli_invocation.py:351 `_after_dispatch(run, _SEARCH_STOPPED)` with the return value DISCARDED. _after_dispatch (python_callable.py:379-389) returns its `observation` argument unchanged when run.ledger has no stages (discarded at the unassigned call site) and otherwise raises ProbeInterrupted built only from the ledger stages, never referencing the argument. So neither branch reads _SEARCH_STOPPED.kind. The constant is built at import (306); Observation.__post_init__ (protocol.py:104-119) accepts all three mutated kinds because verdict is None (HARNESS_FAILED/UNSUPPORTED/NON_CONTROLLER_SIGNAL need detail non-empty + verdict None; SUBJECT_ABSENT accepts verdict None), and detail is the untouched non-empty string. No observable difference anywhere. EQUIVALENT.",
+   "grounds": "_SEARCH_STOPPED's kind HARNESS_FAILED->NON_CONTROLLER_SIGNAL. The constant is read in exactly one place, aisef2/probe/cli_invocation.py:351 `_after_dispatch(run, _SEARCH_STOPPED)`, whose return value is discarded. _after_dispatch (python_callable.py:385-389) returns the argument unchanged when run.ledger has no stages (discarded here) and otherwise raises ProbeInterrupted built only from the stages, never reading the argument. So _SEARCH_STOPPED.kind is never observed. Construction at import succeeds for NON_CONTROLLER_SIGNAL: __post_init__ (protocol.py:104-119) requires verdict None for HARNESS_FAILED/UNSUPPORTED/NON_CONTROLLER_SIGNAL (and detail non-empty) and accepts verdict None for SUBJECT_ABSENT; verdict is the default None and detail is the untouched 'the regex search was interrupted'. No observable difference. MEASURED: re-run in progress at report time; campaign-confirmed SURVIVED at this snapshot (4ec961e, f9a8122a: 534 SURVIVED). Classification is from the code, not the re-run; the 5 completed search_in_worker re-runs all reconfirmed SURVIVED with baselines PASS",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:306 the only definition; aisef2/probe/cli_invocation.py:351 the only use (return discarded)",
+    "aisef2/probe/python_callable.py:379-389 _after_dispatch: returns the arg (empty ledger) or raises ProbeInterrupted from stages (non-empty); the arg is never inspected",
+    "aisef2/probe/protocol.py:104-119 Observation.__post_init__: all three mutated kinds are constructible with verdict=None + non-empty detail",
+    "grep '_SEARCH_STOPPED' over aisef2/ validation/ tests/ docs/: 306 and 351 only"
+   ],
+   "exceptions_checked": [
+    "a kind whose __post_init__ would reject verdict=None: none of the three (SUBJECT_ABSENT also accepts a decided verdict, but here verdict is None)",
+    "_after_dispatch returning the observation to a caller that uses it: the cli_invocation call site at 351 discards the return; the other callers (python_callable, process_effect) pass their own observations, not this constant",
+    "the ProbeInterrupted branch reading the observation: it builds its detail from run.ledger stages, not the argument"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_compiles",
+   "index": 5,
+   "mutant": "L448 returns None",
+   "class": "EQUIVALENT",
+   "group": "A-COMPILES-ALL-COERCE",
+   "grounds": "_compiles' except branch `return False` -> `return None` (a pattern re.compile rejects). _compiles' only caller is aisef2/probe/cli_invocation.py:467 `return isinstance(v, str) and _compiles(v)` inside _stream_shape_ok (regex case); _stream_shape_ok's only caller is aisef2/probe/cli_invocation.py:528 `all(_stream_shape_ok(obs[k]) for k in extra)` in observation_class. For a bad regex, pristine yields isinstance and False -> False; the mutant yields isinstance and None -> None; all() coerces both to the same falsy, so observation_class falls through to return None (533) identically. A good regex returns True unchanged. The None/False never escapes as itself: _stream_shape_ok's result is consumed only by all(); no identity/equality test (is False/==False/is None) exists on it. The '-> bool' annotation is not runtime-enforced. No observable difference. MEASURED: re-run in progress at report time; campaign-confirmed SURVIVED at this snapshot (4ec961e, f9a8122a: 534 SURVIVED). Classification is from the code, not the re-run; the 5 completed search_in_worker re-runs all reconfirmed SURVIVED with baselines PASS",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:440-449 _compiles; its only caller aisef2/probe/cli_invocation.py:467 (_stream_shape_ok regex case)",
+    "aisef2/probe/cli_invocation.py:452,528 _stream_shape_ok and its only caller all(...) in observation_class (grep '_stream_shape_ok' -> 452 def, 528 use only)",
+    "aisef2/probe/cli_invocation.py:511-533 observation_class returns None (533) when all(...) is falsy -- same for False and None",
+    "tests/v2/test_v21_r5_probe_model_data.py:299,304 assertIsNone(observation_class(... bad regex ...)); :293 assertEqual(..., 'exits_streams') for good -- both pass on the mutant (no assertIs on _compiles)"
+   ],
+   "exceptions_checked": [
+    "a caller doing `is False`/`== False`/`is None` on _compiles or _stream_shape_ok: none (grep)",
+    "test_v21_r5_regex_worker.py EveryPatternClassifierTakesNoPatternReCannotCompile (not registered for this target) also only asserts observation_class is None / 'exits_streams', absorbed by all()"
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+   "index": 15,
+   "mutant": "L1164 string 'probe ' emptied",
+   "class": "REFUTED",
+   "group": "",
+   "grounds": "The regex worker's ProcessRange name f'probe {spec_id} regex {stream}' -> f'{spec_id} regex {stream}'. The 'probe ' prefix is a CLASSIFICATION token, not prose: q5._subprocesses (q5.py:803-811) buckets every story/resource-acquired event by `r.startswith('probe ')` into 'probe' vs tests/tool/scratch/worktree, and in production proof.py:68-69 acquires this range (via self._on_range) as the story resource f'{process_range.name} [{under} {self.label}]' -- so a regex range becomes 'probe {spec_id} regex {stream} [..]' and is counted as a probe subprocess. Mutated, it loses the prefix and q5 counts it as 'worktree', changing the reproduction-verdict subprocess accounting (q5.compare). The convention is load-bearing and intended: the SIBLING subject range at {C}:1213 ('probe {spec_id}') is pinned EXACTLY by test_c2_cli_protocol.py:226 (fake.name==f'probe {s.id}') and :494, and by test_v21_r5_regex_isolation.py:189 (event[1]==[(f'probe {s.id}',0)]). The regex range's prefix is pinned by NO registered kill file: test_v21_r5_regex_worker.py:461-476 checks only 'regex' in the name and the stream suffix (n.rsplit(' ',1)[1]); the 5 registered kill files drive the regex path via direct .observe()/run_probe() with a test on_range, never through proof.py, so none exercises the resource classification. A reader (q5._subprocesses, the operator-visible story resource journal) depends on the prefix and no registered kill file covers it -> a test is owed. MEASURED: re-run in progress at report time; campaign-confirmed SURVIVED at this snapshot (4ec961e, f9a8122a: 534 SURVIVED). Classification is from the code, not the re-run; the 5 completed search_in_worker re-runs all reconfirmed SURVIVED with baselines PASS",
+   "consumers_checked": [
+    "aisef2/probe/cli_invocation.py:1149-1165 _observe builds the regex range name at 1164 and passes on_range=self._on_range",
+    "aisef2/orchestrate/proof.py:65-77 Party.run defines on_range -> self.scope.acquire(Ranged(range, f'{range.name} [{under} {label}]')): the regex range becomes a story resource named after range.name",
+    "aisef2/runtime/story_scope.py:88-99 StoryScope.acquire emits STORY_RESOURCE_ACQUIRED with resource=resource.name (journal format2.py:118 schema, the operator-visible attempt journal)",
+    "validation/qualification/q5.py:803-811 _subprocesses: `key = 'probe' if r.startswith('probe ') else ... else 'worktree'`; used by q5.compare for the reproduction verdict",
+    "the sibling subject range aisef2/probe/cli_invocation.py:1213 'probe {spec_id}' is pinned exactly by test_c2_cli_protocol.py:226,494 and test_v21_r5_regex_isolation.py:189 -- the same 'probe ' convention",
+    "tests/v2/test_v21_r5_regex_worker.py:461-476 ThroughTheProbe records range names but asserts only 'regex' in n and the stream suffix, never the 'probe ' prefix",
+    "tests/v2/test_c2_orchestration_conformance.py:463 filters story resources by startswith('probe ') -- it runs no regex spec, so it never observes a regex range (an exception, not a cover)"
+   ],
+   "exceptions_checked": [
+    "distinctness: '{spec_id} regex {stream}' is still unique (vs the subject 'probe {spec_id}', vs the other stream's regex range) -- distinctness is NOT the broken property; classification is",
+    "the on_range hook in the 5 registered kill files (list.append / a recording ProcessRange): records the name but does not classify by prefix, so the mutant survives them",
+    "operator range error messages (ProcessRange RangeError/RangeNotEmpty at process_range.py:347/505) still contain the name -- prose, not the broken property",
+    "conformance:463 depends on the prefix but exercises no regex spec; q5 is the reachable verifier that reads it"
+   ],
+   "refutation": "T-REGEX-RANGE-PROBE-PREFIX (tests/v2/test_v21_r5_regex_worker.py, extend ThroughTheProbe.test_a_search_is_made_for_a_conjunct_that_is_reached_and_in_a_range_of_its_own at :461-476, which already records every ProcessRange name in `made`): add `self.assertTrue(all(n.startswith('probe ') for n in made if 'regex' in n), made)`. Input: the existing regex-stdout say([...],{'stdout':{'regex':'hello'}}). Reader: the uniform 'probe ' range-name convention that q5._subprocesses (validation/qualification/q5.py:808 `r.startswith('probe ')`) uses to classify a story resource as a probe subprocess, and that the sibling subject range is already held to exactly (test_c2_cli_protocol.py:226, test_v21_r5_regex_isolation.py:189). Kills [15]: the mutant name '{spec_id} regex {stream}' does not start with 'probe ', so under proof.py:68-69 its acquired resource '{spec_id} regex {stream} [under label]' is classified 'worktree' not 'probe'. Demonstrated: pristine name starts with 'probe ', mutant does not."
+  }
+ ],
+ "owed_tests": [
+  "T-REGEX-RANGE-PROBE-PREFIX (tests/v2/test_v21_r5_regex_worker.py, extend ThroughTheProbe.test_a_search_is_made_for_a_conjunct_that_is_reached_and_in_a_range_of_its_own at :461-476, which already records every ProcessRange name in `made`): add `self.assertTrue(all(n.startswith('probe ') for n in made if 'regex' in n), made)`. Input: the existing regex-stdout say([...],{'stdout':{'regex':'hello'}}). Reader: the uniform 'probe ' range-name convention that q5._subprocesses (validation/qualification/q5.py:808 `r.startswith('probe ')`) uses to classify a story resource as a probe subprocess, and that the sibling subject range is already held to exactly (test_c2_cli_protocol.py:226, test_v21_r5_regex_isolation.py:189). Kills [15]: the mutant name '{spec_id} regex {stream}' does not start with 'probe ', so under proof.py:68-69 its acquired resource '{spec_id} regex {stream} [under label]' is classified 'worktree' not 'probe'. Demonstrated: pristine name starts with 'probe ', mutant does not."
+ ],
+ "notes": "14 new survivors. 9 AUDITED (6 search_in_worker message prose + _said ': ' separator + _said returns-None and decode-'' defensive guards), 4 EQUIVALENT (_SEARCH_STOPPED x3 kind-never-read, _compiles returns-None coerced by all()), 1 REFUTED (_observe regex-range 'probe ' classification prefix). Classification bar taken from the campaign's own precedent (W2-bundle_cli drafts): structured tokens a consumer keys on (codes, dict keys, filenames, classification prefixes) -> REFUTED; message prose/punctuation with the code and discriminating tokens intact -> AUDITED. The StreamSearchFailed reason code (SEARCH_REASONS) is the structured channel and is untouched by all six message-prose mutants."
+}

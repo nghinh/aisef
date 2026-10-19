@@ -1,0 +1,129 @@
+{
+ "batch": "W2-preflight-1",
+ "file": "aisef2/app/preflight.py",
+ "targets": [
+  "aisef2/app/preflight.py::http_transport"
+ ],
+ "new": [],
+ "carried": [
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 13,
+   "mutant": "L47 element 0 dropped",
+   "class": "AUDITED",
+   "group": "T25-AUD-ANNOTATION: the return annotation of the nested def `call` (preflight.py:47), two elements of one unevaluated string",
+   "grounds": "The mutant changes only call.__annotations__['return'] (`tuple[dict,]` for `tuple[int, dict]`, preflight.py:47); under `from __future__ import annotations` (preflight.py:7) it is one string nothing evaluates; call's result, exceptions and requests are identical (the runtime shape (status, document) is asserted by value in tests/v2/test_s2_kills_rc2.py and T25a). Separated only by introspection (typing.get_type_hints(call)['return'] == tuple[int, dict]); not a requirement anyone relies on. The runner's own policy (mutation.py:1096-1107) calls every annotation inert and only fails to descend into nested defs. preflight.py and pyproject.toml are unchanged at the snapshot.",
+   "consumers_checked": [
+    "aisef2/app/run.py:415 builds the transport (`transport or preflight.http_transport(...)`; was :409) and hands it to preflight.run; aisef2/app/preflight.py:101 and :110 `code, body = transport(...)` unpack the 2-tuple (unchanged file); preflight.run's `transport` parameter is unannotated, so no typed consumer of the closure's return type exists",
+    "git grep over aisef2/ validation/ tests/ scripts/ for __annotations__|get_type_hints|get_annotations|annotationlib|inspect.signature|eval_str|autospec|typeguard|beartype|pydantic|validate_call at the snapshot: no reader reaches `call` (a closure, never a module member; the signature readers are over module-level callables); the only mock.patch of http_transport (tests/v2/test_app_run.py:355) uses side_effect",
+    "pyproject.toml:68 select = [F, B, E9] (unchanged since b5c2457); no mypy/pyright/pytype/pyre in pyproject.toml or .github/workflows",
+    "validation/v2/mutation.py:1096-1107 `_inert`: the runner's own policy is that every annotation is inert (postponed, never evaluated); it exempts the target's own args/returns/AnnAssign but does not descend into nested defs (round 3 left it unchanged), which is why `call`'s annotation was generated at all",
+    "tests/v2/test_v21_kills3_T25a.py (its docstring numbers [13, 14] are from an older enumeration: kill_check of the target's T25a at the snapshot leaves these two mutants SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "a reader that unpacks the annotation to decide arity (autospec, dispatcher, serializer): none found (above)",
+    "a static type checker reading `code, body = transport(...)` against a 1-tuple: none runs in this repository; this is the ceiling of the audit - if one is added, [13] and [14] become real findings and a declared-shape test is warranted",
+    "evaluation of the annotation at import (PEP 649, Python 3.14): `from __future__ import annotations` (preflight.py:7) keeps it a string",
+    "a round-3 introspecting reader (statement builder, artifact reader, host-table readers, typed errors): none inspects annotations (git grep above)"
+   ],
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "remapped_from": null
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 14,
+   "mutant": "L47 element 1 dropped",
+   "class": "AUDITED",
+   "group": "T25-AUD-ANNOTATION: the return annotation of the nested def `call` (preflight.py:47), two elements of one unevaluated string",
+   "grounds": "Same mechanism as [13]: only call.__annotations__['return'] (`tuple[int,]`) and inspect.signature(call).return_annotation differ; result, exception and request of `call` are identical.",
+   "consumers_checked": [
+    "aisef2/app/run.py:415 builds the transport (`transport or preflight.http_transport(...)`; was :409) and hands it to preflight.run; aisef2/app/preflight.py:101 and :110 `code, body = transport(...)` unpack the 2-tuple (unchanged file); preflight.run's `transport` parameter is unannotated, so no typed consumer of the closure's return type exists",
+    "git grep over aisef2/ validation/ tests/ scripts/ for __annotations__|get_type_hints|get_annotations|annotationlib|inspect.signature|eval_str|autospec|typeguard|beartype|pydantic|validate_call at the snapshot: no reader reaches `call` (a closure, never a module member; the signature readers are over module-level callables); the only mock.patch of http_transport (tests/v2/test_app_run.py:355) uses side_effect",
+    "pyproject.toml:68 select = [F, B, E9] (unchanged since b5c2457); no mypy/pyright/pytype/pyre in pyproject.toml or .github/workflows",
+    "validation/v2/mutation.py:1096-1107 `_inert`: the runner's own policy is that every annotation is inert (postponed, never evaluated); it exempts the target's own args/returns/AnnAssign but does not descend into nested defs (round 3 left it unchanged), which is why `call`'s annotation was generated at all",
+    "tests/v2/test_v21_kills3_T25a.py (its docstring numbers [13, 14] are from an older enumeration: kill_check of the target's T25a at the snapshot leaves these two mutants SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "a reader that unpacks the annotation to decide arity (autospec, dispatcher, serializer): none found (above)",
+    "a static type checker reading `code, body = transport(...)` against a 1-tuple: none runs in this repository; this is the ceiling of the audit - if one is added, [13] and [14] become real findings and a declared-shape test is warranted",
+    "evaluation of the annotation at import (PEP 649, Python 3.14): `from __future__ import annotations` (preflight.py:7) keeps it a string",
+    "a round-3 introspecting reader (statement builder, artifact reader, host-table readers, typed errors): none inspects annotations (git grep above)"
+   ],
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "remapped_from": null
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 17,
+   "mutant": "L61 element 0 dropped",
+   "class": "EQUIVALENT",
+   "group": "T25-EQ-URLERROR-IS-OSERROR: a subclass listed next to its base class in one except tuple",
+   "grounds": "preflight.py:61 is ONE clause `except (urllib.error.URLError, OSError, ValueError, http.client.HTTPException, RecursionError) as e:`; except-tuple matching is isinstance matching and urllib/error.py:19 `class URLError(OSError)` (CPython 3.14.7; HTTPError :35 and ContentTooShortError :70 derive from URLError): every URLError the try block can raise is matched by element 1 (OSError) into the same handler with the same `e`, and the body reads type(e).__name__ (the instance's class, not the listed one). HTTPError is taken by the clause before (preflight.py:56) in both. Verified by me against the installed stdlib (class MROs printed: URLError, HTTPError, ContentTooShortError all have OSError in their MRO; HTTPException, IncompleteRead, RecursionError do not and are listed separately). kill_check of the behavioural scratch test (URLError and ContentTooShortError answered with their class name): [17] SURVIVED, as a proof by hierarchy requires.",
+   "consumers_checked": [
+    "aisef2/app/preflight.py:92 failure() and :124 identity_problems(): read transport_error/content_type of the returned body; the same strings for every URLError",
+    "tests/v2/test_s2_kills_rc2.py Transport/Run and tests/v2/test_v21_kills3_T25a.py FailureIsData: assert the class name answered for URLError-family failures; all pass on the mutant (campaign 3: every kill file PASSED)",
+    "grep over aisef2/ validation/ tests/ for assignments to or patches of urllib.error.URLError: none (tests patch only preflight._OPENER.open)"
+   ],
+   "exceptions_checked": [
+    "an exception that is a URLError but not an OSError: impossible by class definition (urllib/error.py:19); separable only by rebinding urllib.error.URLError, i.e. patching the stdlib, not an input of http_transport",
+    "the tuple's other elements (HTTPException, RecursionError, added by the product fixes) relate URLError to nothing; `except` matching is by PyType_IsSubtype for exception classes, so ABC registration is not a path",
+    "the attribute lookup urllib.error.URLError at match time in the original: urllib.error is imported at preflight.py:13; no AttributeError path",
+    "lint: ruff F/B/E9 on the mutated source passes (urllib.error is still used by the HTTPError clause)"
+   ],
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "remapped_from": null
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 42,
+   "mutant": "L49 string 'GET' emptied",
+   "class": "EQUIVALENT",
+   "group": "T25-EQ-METHOD-DEFAULT: the explicit method= restates urllib.request.Request's own default for the same predicate",
+   "grounds": "CPython urllib/request.py Request.__init__/get_method (3.12.14 :330-331, :378-381; 3.14.7 :302-303, :350-353); preflight.py:46-47.",
+   "consumers_checked": [
+    "urllib.request 3.14.7 and 3.12.14: grep for `.method` / get_method: the only attribute read is inside get_method(); redirect_request (the one place a method is chosen for a new Request) is overridden by _NoRedirect (preflight.py:28-29, returns None)",
+    "aisef2/app/preflight.py:51: `req` is local to call(); only _OPENER.open(req, ...) receives it",
+    "tests/v2/test_s2_kills_rc2.py:82,88 and tests/v2/test_v21_transport.py (loopback servers answer only do_GET): read req.get_method() / the wire request line; both pass on the mutant",
+    "grep -rE '\\.method\\b' aisef2 tests validation closure-evidence --include=*.py: no reader of Request.method; loopback providers (tests/v2/fixtures/provider/fixture_provider.py, validation/v21/cli_integration/fakeprov.py, release_smoke.py) dispatch on the request line, which is identical"
+   ],
+   "exceptions_checked": [
+    "a test double substituted for _OPENER that reads req.method: the only way to see the difference (hasattr(req,'method') False vs True); none exists in the repository and asserting it would pin a stdlib private attribute, not the method contract",
+    "a stdlib that stores method='': 3.12.14 and 3.14.7 have the `if method:` guard (3.11 since 3.3); a change would break every Request(method='') caller, not this line",
+    "body falsy but not None ({}): POST in both because 'stream': False is always added (wire cross-check 'POST {} 200')",
+    "a proxy/tunnel path: do_open still calls h.request(req.get_method(), ...); https-through-http-proxy run identical"
+   ],
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "remapped_from": {
+    "index": 33,
+    "mutant": "L47 string 'GET' emptied",
+    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+   }
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 43,
+   "mutant": "L49 string 'POST' emptied",
+   "class": "EQUIVALENT",
+   "group": "T25-EQ-METHOD-DEFAULT (see [33]): the other arm of the same conditional",
+   "grounds": "CPython urllib/request.py Request.__init__/get_method and AbstractHTTPHandler.do_request_/_get_content_length; preflight.py:46-47.",
+   "consumers_checked": [
+    "aisef2/app/preflight.py:103 inside run(): the chat probe is the only caller that passes a body; it reads (code, body) only",
+    "http.client.HTTPConnection._get_content_length(body, method): called with request.get_method(); same value so the same Content-length (wire cross-check compares the full bytes)",
+    "closure-evidence/v2/release/smoke/OBS-S6-1/transport_mechanism.py and diagnostic/same_bytes.py: replay the chat probe against loopback servers with do_POST; dispatch on the request line, identical",
+    "tests/v2/test_s2_kills_rc2.py:82 asserts req.get_method() == 'POST' and req.data bytes; passes on the mutant because get_method() derives the same value"
+   ],
+   "exceptions_checked": [
+    "a double reading req.method directly: same as [33]; none exists",
+    "an empty caller body {}: still POST in both ('stream': False always added; wire 'POST {} 200' identical)",
+    "a non-dict body (list): TypeError at `{**body, ...}` is raised while evaluating Request(...) arguments, before `method` matters, in both ('POST non-dict body' identical)",
+    "the explicit string as a guard against a data/body mismatch: data is derived from body in the same expression, so none can arise"
+   ],
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "remapped_from": {
+    "index": 34,
+    "mutant": "L47 string 'POST' emptied",
+    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+   }
+  }
+ ]
+}

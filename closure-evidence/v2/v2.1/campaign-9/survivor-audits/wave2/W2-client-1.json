@@ -1,0 +1,15 @@
+{
+ "batch": "W2-client-1",
+ "file": "aisef2/app/client.py",
+ "targets": [
+  "aisef2/app/client.py::Budget.spend"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/client.py::Budget.spend",
+   "index": 24,
+   "mutant": "L101 string \"the lineage's evidence cannot be read, or is gone: \" emptied"
+  }
+ ],
+ "carried": []
+}

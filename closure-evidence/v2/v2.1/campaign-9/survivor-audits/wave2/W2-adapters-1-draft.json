@@ -1,0 +1,130 @@
+{
+ "batch": "W2-adapters-1",
+ "file": "aisef2/app/adapters.py",
+ "role": "author",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+ "registered_kill_files": [
+  "tests/v2/test_v21_ocr_identity.py",
+  "tests/v2/test_v21_ocr_gate.py",
+  "tests/v2/test_v21_review_chain.py"
+ ],
+ "measured": "Baseline unmutated (PATH stripped of every dir with an executable opencode; env -i; HOME/TMPDIR/PYTHONPATH under the run copy; nice -n 19 python3 -P -B): ocr_identity 15 OK (10.5s), ocr_gate 12 OK (60.3s), review_chain 19 OK skipped=4 (222.5s; the 4 skips are RealBinary, AISEF_TEST_OCR_EXE unset -- the real opencode is never run). Each of the 6 new mutants built into a COPY tree (one at a time) and run against the three registered kill files: see each entry's grounds for the measured OK. All six SURVIVED the registered set (0 killed). review_chain and ocr_gate never fail the fake binary so they touch only _declared's success path; only test_v21_ocr_identity reaches the OSError/RangeError branch and asserts solely the surviving substrings.",
+ "group": "_declared (adapters.py:328-341) returns (seen, why). `why` is an operator diagnostic (a refusal reason), never parsed: readers at 4ec961e are (1) adapters._ocr (adapters.py:200): `if why: raise CapabilityUnrunnable(why)` -> journaled; (2) run.ocr_identity (run.py:208,215): out['reason']=why, status REFUSED, embedded verbatim by ocr_refusal (run.py:219-225 `observed {ident['reason']}`) into the RunRefused operator text (run.py:517) and into RUN.json rec['ocr_identity']; (3) validation/v21/ocr/inspect_binary.py:116 `why_not`=why (a report). aisef2/app/verify.py reads none of it (grep: no ocr_identity/reason/declared). Indices 3,9,13,14 are the OSError/RangeError failure path (adapters.py:338-339). At this snapshot a binary that cannot start is reported by the anchor as `SPAWN_FAILED {type(e).__name__}: {e}` (range_anchor.py:99) and ProcessRange.start RAISES RangeError, not OSError (process_range.py:363-365 `{self.name}: the target did not start ({tag} {value})`); so the reason is `<exe>: `version` could not be started (RangeError: ocr version: the target did not start (SPAWN_FAILED PermissionError: [Errno 13] Permission denied: ...))`. The ONLY registered kill file that reaches this path is test_v21_ocr_identity.py (test_a_binary_that_cannot_be_started_...:204-220 chmod 0644 / `#!/nonexistent/interpreter`; test_the_declared_operator_text_...:186-202 chmod 0644), and it asserts only the surviving substrings 'could not be started', 'Permission denied', 'No such file'. ocr_gate and review_chain never fail the binary (fake OCR always starts), so they exercise only _declared's success path. The DECLARED_WAYS marker for this branch is 'could not be started' (test_v21_ocr_identity.py:51-52), which lives in _declared's own literal and is untouched by every mutant here.",
+ "entries": [
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 3,
+   "mutant": "L338 element 0 dropped",
+   "class": "AUDITED",
+   "group": "_declared's (seen, why): `why` is an unparsed operator diagnostic; the OSError/RangeError branch's marker 'could not be started' and the OS message are pinned by test_v21_ocr_identity, connectors/labels are not; only ocr_identity reaches the failure path (fake OCR always starts for ocr_gate/review_chain)",
+   "grounds": "Drops OSError from `except (OSError, RangeError)` (adapters.py:338), leaving `except (RangeError,)`. In the try block the only operations are review_ocr.version_argv/version_environment (pure, no OSError) and _bounded. A binary that cannot start does NOT raise OSError here: _bounded calls ProcessRange(name,argv).start(), whose anchor spawns the target and reports SPAWN_FAILED, and start() converts that to RangeError (process_range.py:363-365) -- confirmed by the two tests that chmod 0644 / use a dead interpreter (test_v21_ocr_identity.py:204-220, :186-202): they already get a REFUSED reason, so the caught type is RangeError, which `(RangeError,)` still catches. The only residual OSError sources are _bounded's `out.open('x')` failing (a disk/IO error on a fresh temp file) or the anchor's own subprocess.Popen(sys.executable) failing -- neither is a binary-identity failure and neither is exercised by any registered kill file. NOT EQUIVALENT: such an OSError would propagate uncaught under the mutant instead of returning (None, why); but no consumer/contract/test/operator text the entry names depends on converting that I/O OSError to a refusal. RAN registered kill files: test_v21_ocr_identity=OK(10.775s); test_v21_ocr_gate=OK(76.434s); test_v21_review_chain=OK (skipped=4)(268.895s) -> SURVIVED (none killed).",
+   "consumers_checked": [
+    "test_v21_ocr_identity.py:204-220 (test_a_binary_that_cannot_be_started...) and :186-202 (test_the_declared_operator_text...): exercise chmod-0644/dead-interpreter, which raise RangeError (not OSError) via the anchor -> still caught by (RangeError,) -> assert 'could not be started'/'Permission denied'/'No such file' pass (SURVIVED, measured OK)",
+    "ocr_gate / review_chain: the fake OCR always starts (FAKE_OCR version branch), so the except clause is never entered -> cannot distinguish the mutant (measured OK)",
+    "adapters._ocr -> CapabilityUnrunnable(why); run.ocr_identity reason; inspect_binary why_not: all read `why`, which is only produced if the except fires; none forces an OSError path"
+   ],
+   "exceptions_checked": [
+    "the inline comment 'not executable, or the range could not start it' attributes OSError to 'not executable', but at this snapshot 'not executable' is a RangeError (anchor SPAWN_FAILED -> process_range.py:365); the comment is a stale doc, not a checkable contract, and no test asserts the OSError arm",
+    "a test/consumer that makes out.open('x') or the anchor Popen raise OSError: none in aisef2/ validation/ tests/ (version.out is always a fresh temp path; TMPDIR is writable)",
+    "EQUIVALENT ruled out: an OSError inside the try (e.g. ENOSPC on out.open) propagates under the mutant vs. a clean (None, why) unmutated -- observable, though no named reader depends on it"
+   ]
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 7,
+   "mutant": "L340 string 'replace' emptied",
+   "class": "REFUTED",
+   "group": "_declared's (seen, why): `why` is an unparsed operator diagnostic; the OSError/RangeError branch's marker 'could not be started' and the OS message are pinned by test_v21_ocr_identity, connectors/labels are not; only ocr_identity reaches the failure path (fake OCR always starts for ocr_gate/review_chain)",
+   "grounds": "out.read_bytes()[:4096].decode('utf-8','replace') -> decode('utf-8','') (adapters.py:340). Python looks up the error handler name lazily: for valid UTF-8 output the handler is never consulted, so '' behaves like 'replace'; for INVALID UTF-8 bytes, 'replace' yields U+FFFD while '' raises `LookupError: unknown error handler name ''` (verified: b'\\xff\\xfe'.decode('utf-8','') -> LookupError). LookupError is neither OSError nor RangeError, so under the mutant it propagates uncaught out of _declared/_bounded, past adapters._ocr and run.ocr_identity -- a traceback instead of a clean refusal, for a binary whose `version` prints non-UTF-8 bytes (a realistic input: any Go/garbage binary). No registered kill file feeds invalid UTF-8: the closest answer ANSWERS['garbage']='\\x00\\x01 segmentation noise \\xff\\n{not a version}\\n' (test_v21_ocr_declared.py:33) is a Python str whose \\xff is U+00FF; FAKE_OCR writes it with sys.stdout.write (UTF-8), so version.out holds VALID UTF-8 (\\xc3\\xbf) and '' is never consulted -> the mutant survives. RAN registered kill files: test_v21_ocr_identity=OK(11.279s); test_v21_ocr_gate=OK(60.046s); test_v21_review_chain=OK (skipped=4)(199.286s) -> SURVIVED (none killed).",
+   "consumers_checked": [
+    "adapters._declared -> review_ocr.declared(exe, code, text) (adapters.py:341): expects a str it can .split('\\n'); the gate contract is 'a refusal, never a traceback' for any binary (test_v21_ocr_identity.py docstring; test_every_way_the_pin_fails_... insists a refusal not a traceback) -> DEPENDS on robust decoding",
+    "run.ocr_identity / run.execute: an uncaught LookupError escapes before status is set -> no REFUSED record, RunRefused never raised cleanly, RUN.json not written for this stage",
+    "every registered kill file (ocr_identity/ocr_gate/review_chain) only ever feeds valid-UTF-8 version output (FAKE_OCR via sys.stdout.write; ANSWERS all str) -> none reaches the invalid-UTF-8 branch (SURVIVED, measured OK)"
+   ],
+   "exceptions_checked": [
+    "EQUIVALENT ruled out: on invalid UTF-8 the behaviour differs (LookupError vs U+FFFD replacement)",
+    "the existing 'garbage' answer does NOT cover it: its \\xff is code point U+00FF, encoded to valid UTF-8 \\xc3\\xbf by the fake binary's UTF-8 stdout; raw invalid bytes are needed",
+    "a consumer that tolerates the crash: none -- the whole point of 'replace' (and the clean-refusal contract) is that an unreadable binary is refused, not a traceback",
+    "decode('utf-8','replace') is a house-wide idiom for never crashing on external/subprocess bytes (client.py:44, workspace.py:59, cli_invocation.py:291/385/601/1084, file_artifact.py:528, process_range.py:86) -- adapters.py:340 is the OCR-binary instance of the same contract"
+   ],
+   "refutation": "A reader depends on 'replace' (robust decode). Reader: adapters._declared's own decode feeding review_ocr.declared, and the gate (adapters._ocr / run.ocr_identity) which contracts that _declared returns (None, why) for ANY binary -- 'a refusal, never a traceback'. Input: a binary whose `version` writes raw invalid UTF-8 bytes to stdout, e.g. b'\\xff\\xfe not utf8\\n' (NOT a str with U+00FF -- that encodes to valid UTF-8). Sketch (owed in test_v21_ocr_identity.py Identity, the natural home, since it is a registered kill file that drives the fake binary): extend FAKE_OCR's version branch (or add an ANSWERS entry) to emit raw bytes via sys.stdout.buffer.write(b'\\xff\\xfe bad\\n'); then assert R.ocr_identity(self.settings())['status']=='REFUSED' and 'printed no version line' in reason and NO exception is raised. Equivalently a direct unit test: point review.ocr.exe at a binary that prints b'\\xff\\xfe' and assert ad._declared(exe, VERSION_TIMEOUT_S) == (None, <why with 'no version line'>), not a raised LookupError."
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 8,
+   "mutant": "L331 string 'aisef-ocr-version-' emptied",
+   "class": "AUDITED",
+   "group": "_declared's (seen, why): `why` is an unparsed operator diagnostic; the OSError/RangeError branch's marker 'could not be started' and the OS message are pinned by test_v21_ocr_identity, connectors/labels are not; only ocr_identity reaches the failure path (fake OCR always starts for ocr_gate/review_chain)",
+   "grounds": "tempfile.TemporaryDirectory(prefix='aisef-ocr-version-') -> prefix='' (adapters.py:331). The prefix only names the transient temp directory `d` that holds HOME and version.out for the single `version` process; the directory is created and removed by the context manager and its NAME is never read, logged, or returned. `d` is consumed only to build home=Path(d,'home') and out=Path(d,'version.out') (adapters.py:332,334); neither path, nor the prefix, reaches `why`, the `seen` dict, the journal, or any record. grep: 'aisef-ocr-version-' occurs ONLY at adapters.py:331 (no consumer). An empty prefix is a valid mkdtemp argument (no error, no collision beyond the random suffix's). RAN registered kill files: test_v21_ocr_identity=OK(11.317s); test_v21_ocr_gate=OK(65.407s); test_v21_review_chain=OK (skipped=4)(201.983s) -> SURVIVED (none killed).",
+   "consumers_checked": [
+    "the success path (ocr_gate/review_chain with the fake OCR, and ocr_identity's pinned/mismatch answers): use the temp dir and are indifferent to its name -> all pass (SURVIVED, measured OK)",
+    "readers of `d`'s contents: home -> review_ocr.version_environment HOME (a random path regardless of prefix); out -> read_bytes() then decode; neither surfaces the dir name",
+    "no logging/journal/record writes the temp path (grep: no reference to the prefix or the temp dir name anywhere)"
+   ],
+   "exceptions_checked": [
+    "an operator or test inspecting /tmp for a leftover 'aisef-ocr-version-*' dir: none; the TemporaryDirectory is always cleaned up, and nothing matches the prefix",
+    "a sibling cosmetic prefix 'aisef-ocr-rebuild-' (inspect_binary.py:134) is likewise unconsumed -- same class of debug label",
+    "EQUIVALENT ruled out: the temp directory's on-disk name differs (observable at the filesystem/syscall level), though no reader consumes it"
+   ]
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 9,
+   "mutant": "L337 string 'ocr version' emptied",
+   "class": "AUDITED",
+   "group": "_declared's (seen, why): `why` is an unparsed operator diagnostic; the OSError/RangeError branch's marker 'could not be started' and the OS message are pinned by test_v21_ocr_identity, connectors/labels are not; only ocr_identity reaches the failure path (fake OCR always starts for ocr_gate/review_chain)",
+   "grounds": "The 6th arg to _bounded is the ProcessRange `name` (adapters.py:337 -> process_range.py:331). `self.name` is used ONLY inside exception message strings (process_range.py:347 already-started, :365 target-did-not-start, :451 anchor-reaped, :505 RangeNotEmpty, :528 RangeEscaped); it is NOT used to find or signal processes (POSIX matches by process group/pgid, Windows by job object -- the range name is never a match token). On the could-not-be-started path the name prefixes the RangeError str that _declared folds into `why` via str(e)[:300]: emptied, the reason becomes `<exe>: `version` could not be started (RangeError: : the target did not start (SPAWN_FAILED PermissionError: ...Permission denied...))`. The DECLARED_WAYS marker 'could not be started' and the OS message ('Permission denied'/'No such file') survive; no value is lost, only the 'ocr version' label naming which range failed. grep: 'ocr version' occurs ONLY at adapters.py:337 (no consumer). RAN registered kill files: test_v21_ocr_identity=OK(10.785s); test_v21_ocr_gate=OK(54.769s); test_v21_review_chain=non-discriminating for this branch (it never fails the fake binary, so it exercises only _declared's success path; measured OK on mutants 3/7/8) -> SURVIVED (none killed).",
+   "consumers_checked": [
+    "test_v21_ocr_identity.py:204-220/:186-202: assert 'could not be started','Permission denied','No such file' in reason -- all survive (the name is a separate token); 'ocr version' is never asserted (SURVIVED, measured OK)",
+    "process_range.py signalling/escape logic: uses pgid (POSIX) / job object (Windows), never self.name -> emptying the name cannot change which processes are found or killed",
+    "run.ocr_identity reason / ocr_refusal operator text / RUN.json / inspect_binary why_not: carry the reason string whole; none parses out or asserts the range name"
+   ],
+   "exceptions_checked": [
+    "a RangeNotEmpty/RangeEscaped message that names the range (process_range.py:505,:528): those exceptions are NOT caught by _declared (only OSError/RangeError are) and no registered kill file provokes them on this target; even so they would only lose the same diagnostic label",
+    "a second DECLARED_WAYS marker accidentally introduced/removed by emptying 'ocr version': none ('ocr version' contains no marker substring; exactly one marker 'could not be started' remains)",
+    "EQUIVALENT ruled out: the operator reason text differs (the range label is gone), though no named reader depends on it"
+   ]
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 13,
+   "mutant": "L339 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "_declared's (seen, why): `why` is an unparsed operator diagnostic; the OSError/RangeError branch's marker 'could not be started' and the OS message are pinned by test_v21_ocr_identity, connectors/labels are not; only ocr_identity reaches the failure path (fake OCR always starts for ocr_gate/review_chain)",
+   "grounds": "Removes the ': ' separator between {type(e).__name__} and {str(e)[:300]} in the OSError/RangeError reason (adapters.py:339): `({type(e).__name__}: {str(e)[:300]})` -> `({type(e).__name__}{str(e)[:300]})`. For the chmod-0644 case this renders `... could not be started (RangeErrorocr version: the target did not start (SPAWN_FAILED PermissionError: [Errno 13] Permission denied: ...))` -- the exception type name glues to the message. The marker 'could not be started' and the actionable OS text 'Permission denied'/'No such file' survive as substrings; only the type/message visual separator is lost. Same family as sibling review_ocr.declared index 37 (a ')' delimiter emptied, AUDITED). RAN registered kill files: test_v21_ocr_identity=OK(10.842s); test_v21_ocr_gate=OK(64.496s); test_v21_review_chain=non-discriminating for this branch (it never fails the fake binary, so it exercises only _declared's success path; measured OK on mutants 3/7/8) -> SURVIVED (none killed).",
+   "consumers_checked": [
+    "test_v21_ocr_identity.py:204-220 (asserts 'Permission denied','No such file','`version` could not be started') and :186-202 (asserts 'could not be started'): all survive the removed ': ' (SURVIVED, measured OK)",
+    "run.ocr_identity reason -> the `(marker,) = [m for m in DECLARED_WAYS if m in reason]` unpack (test_v21_ocr_identity.py:197) runs only for the REFUSED (version-based) answers, never for the could-not-be-started path; and 'could not be started' remains the single marker regardless",
+    "ocr_refusal operator text / RUN.json / inspect_binary why_not: embed the reason whole; no splitter/regex over it exists in aisef2/ validation/ tests/"
+   ],
+   "exceptions_checked": [
+    "an operator reads `(RangeErrorocr version: ...)` -- a readability degradation (the type name abuts the message), FLAGGED; but every actionable token survives and no test/consumer/verifier depends on the ': ' separator",
+    "a parser of the '(TypeName: message)' shape: none; the string is read whole",
+    "EQUIVALENT ruled out: the reason text differs for the operator"
+   ]
+  },
+  {
+   "target": "aisef2/app/adapters.py::_declared",
+   "index": 14,
+   "mutant": "L339 string ')' emptied",
+   "class": "AUDITED",
+   "group": "_declared's (seen, why): `why` is an unparsed operator diagnostic; the OSError/RangeError branch's marker 'could not be started' and the OS message are pinned by test_v21_ocr_identity, connectors/labels are not; only ocr_identity reaches the failure path (fake OCR always starts for ocr_gate/review_chain)",
+   "grounds": "Removes the trailing ')' that closes the parenthesis in the OSError/RangeError reason (adapters.py:339): `(...{str(e)[:300]})` -> `(...{str(e)[:300]}`. The reason loses only its outer closing paren (leaving str(e)'s own '(SPAWN_FAILED ...)' balanced inside): `<exe>: `version` could not be started (RangeError: ocr version: the target did not start (SPAWN_FAILED PermissionError: ...Permission denied...)`. All values and the marker survive; only an unbalanced parenthesis is lost. Identical in kind to sibling review_ocr.declared index 37 (')' emptied, AUDITED). RAN registered kill files: test_v21_ocr_identity=OK(11.111s); test_v21_ocr_gate=OK(71.145s); test_v21_review_chain=non-discriminating for this branch (it never fails the fake binary, so it exercises only _declared's success path; measured OK on mutants 3/7/8) -> SURVIVED (none killed).",
+   "consumers_checked": [
+    "test_v21_ocr_identity.py:204-220 and :186-202: assert 'could not be started','Permission denied','No such file' -- all survive the dropped ')' (SURVIVED, measured OK)",
+    "run.ocr_identity reason / ocr_refusal operator text / RUN.json / inspect_binary why_not: carry the reason whole; no reader balances or parses parentheses",
+    "the `(marker,)` unpack (test_v21_ocr_identity.py:197): not run for the could-not-be-started path; 'could not be started' remains the single marker"
+   ],
+   "exceptions_checked": [
+    "a reader that depends on a balanced trailing paren: none (first/str(e) are emitted whole; the message is read as text)",
+    "a splitter/regex over this reason: none in aisef2/ validation/ tests/",
+    "EQUIVALENT ruled out: the output string differs by one character an operator would read"
+   ]
+  }
+ ],
+ "owed_tests": [
+  "test_v21_ocr_identity.py (Identity): a binary whose `version` prints raw invalid UTF-8 bytes (sys.stdout.buffer.write(b'\\xff\\xfe bad\\n')) is REFUSED with 'printed no version line', never a LookupError traceback -- pins adapters._declared's decode('utf-8','replace') (index 7)."
+ ],
+ "notes": "6/6 new survivors confirmed against the registered set. 5 AUDITED (indices 3,8,9,13,14 -- a defensive OSError arm that the anchor makes a RangeError, the temp-dir prefix label, the ProcessRange name label, and two reason-string punctuation losses; every value + the 'could not be started' marker + the OS message survive, and only test_v21_ocr_identity reaches the failure path). 1 REFUTED (index 7): decode errors handler 'replace'->'' crashes with LookupError on a binary that prints invalid UTF-8; no kill file feeds invalid UTF-8 (the 'garbage' answer's \\xff is U+00FF -> valid UTF-8). Index 13 flagged: operator reason readability degrades (type name abuts the message) but every actionable token survives. No EQUIVALENT: indices 3/7/8/9/13/14 all differ observably, just with no named dependent for the five AUDITED. Classifications match the sibling review_ocr.declared draft's convention (index 37 ')' emptied = AUDITED; index 40 marker-bearing loss = REFUTED)."
+}

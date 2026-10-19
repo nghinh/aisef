@@ -1,0 +1,109 @@
+{
+  "batch": "W2-catalog-1",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "role": "skeptic",
+  "date": "2026-10-19 22:52 +07",
+  "file": "aisef2/probe/catalog.py",
+  "kill_file": "tests.v2.test_v21_migrate_semantics",
+  "baseline": "unmutated kill file: Ran 51 tests OK (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json added via git show; PATH stripped of both opencode dirs; HOME/TMPDIR/XDG under the run tree)",
+  "verification_method": "Re-derived each mutant with buildmut.py (validation.v2.mutation.mutants) and confirmed the diff via mutant_view.py; ran the registered kill file against each mutant one at a time in an env-isolated COPY tree; demonstrated the observable eq/hash difference by importing the original and each mutant module directly; grepped aisef2/ validation/ tests/ for any CatalogEntry ==/assertEqual, hash(), set member or dict key; ran the catalog's own test module (test_cycle2_wp201) on baseline and the two strongest mutants (delta zero).",
+  "entries": [
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_version",
+      "index": 0,
+      "mutant": "L66 False->True (compare=False->True)",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "Mutant re-derived: field(default=None, compare=False->True, hash=False) on capability_version; mutant_view + buildmut both show compare=True, hash=False. Effect is confined to the generated CatalogEntry.__eq__ (folds in capability_version); __hash__ unchanged (hash still False). Direct execution on the original: dataclasses.replace(pc2, capability_version=99) == pc2 -> True; on the mutant -> False (observable, so not EQUIVALENT). Registered kill file tests.v2.test_v21_migrate_semantics re-run on this mutant: Ran 51 tests OK == unmutated baseline -> NOT killed. Exhaustive grep over aisef2/ validation/ tests/ finds no code that compares two CatalogEntry objects with ==/assertEqual: problems_of() dedups on explicit (probe_id,probe_digest) tuples; active()/catalogue()/probes_by_id()/registry() build dicts keyed by subject_kind/probe_id with the entry as the VALUE; entry_for() compares e.module (str); every app/validation/test consumer reads attribute VALUES or builds new entries via dataclasses.replace (which calls __init__, never __eq__). No semantic reader depends on the eq participation of this field -> AUDITED confirmed.",
+      "refutation": "",
+      "consumers_checked": [
+        "aisef2/probe/catalog.py problems_of/active/catalogue/probes_by_id/registry/entry_for -- seen set of (probe_id,probe_digest) tuples; dicts keyed by subject_kind/probe_id (entry is the value); entry_for compares e.module==module; no entry ==",
+        "aisef2/app/bundle_cli.py:235 top=entry.capability_version (VALUE into operator migrate report), :260-261 copies the version values; compare flag does not change the value",
+        "aisef2/app/diagnostics.py:226 dataclasses.replace(e, factory=tapped(...)) -- construction, not == (author cited :224; the replace is on :226, :224 is the def)",
+        "tests/v2/test_v21_migrate_semantics.py Declarations/FailClosed -- assertEqual(e.capability_version, module.CAPABILITY_VERSION) reads the value; assertEqual on sets of contract-id strings, never two entries",
+        "tests/v2/test_cycle2_wp201.py Catalog tests -- read .probe_id/.probe_digest/.cycle/.active; assertEqual on tuples of those values and on list[str]; no entry ==. Ran on baseline and this mutant: identical outcome (the 4 failures are missing-closure-evidence env errors, orthogonal to the mutation; the entry-exercising tests pass on both)",
+        "tests/v2/test_v21_identity.py -- reads e.probe_id/e.classes/e.factory, digests the probe's OWN module bytes (executing(e.factory)), never catalog.py and never hashes/==-compares an entry",
+        "validation/qualification/* and validation/v2/* catalog readers (q0,q2,q4,q5,p5_*,p10,c2_*,rebind,release_*,probe_static_checks,common,authority_limits) -- iterate CATALOG/active().items(), read attributes, build {probe_id:...}/{kind.value:...} dicts and (probe_id,probe_digest,cls) tuple-sets; no entry ==/hash"
+      ],
+      "exceptions_checked": [
+        "validation/qualification/v21_conformance_ruling.py:135-137 -- 'neither is compared: compare=False' is descriptive prose in a data dict; its two cited behaviour_tests check capability VALUES (assertEqual/assertIs vs the module), not the flag; grep finds NO test that asserts the literal 'compare=False' from source",
+        "committed conformance ruling closure-evidence/v2/v2.1/CONFORMANCE-RULING.json has 12 rows and aisef2/probe/catalog.py is NOT among them -> R.check()/the sha256 drift guard does not pin catalog.py's bytes at this snapshot, so no file-digest guard would kill any catalog.py mutant (consistent with the campaign reporting these as survivors)",
+        "repo-wide grep: no set()/dict-key/hash()/sorted()/count()/index() of a CatalogEntry anywhere in aisef2/ validation/ tests/"
+      ],
+      "note": "Kill file survival independently reproduced (51 OK). Observable-but-unobserved confirmed by execution. Minor author slip: diagnostics replace is at :226 not :224 (immaterial)."
+    },
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_version",
+      "index": 1,
+      "mutant": "L66 False->True (hash=False->True)",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "Mutant re-derived: field(default=None, compare=False, hash=False->True) on capability_version; buildmut shows compare=False, hash=True. Effect is confined to the generated CatalogEntry.__hash__ (folds in capability_version, an int|None -> hashable, no TypeError, only a different hash value); __eq__ unchanged. Direct execution: original hash(pc2)==hash(replace(pc2,capability_version=99)) -> True; mutant -> False (observable, not EQUIVALENT). Registered kill file re-run on this mutant: Ran 51 tests OK == baseline -> NOT killed. Grep confirms nothing hashes a CatalogEntry or uses one as a set member / dict key (all dicts are keyed by subject_kind or probe_id, with the entry as the value; active().items() iteration never hashes the value). No reader consumes the hash value -> AUDITED confirmed.",
+      "refutation": "",
+      "consumers_checked": [
+        "catalog.problems_of -- seen:set of (probe_id,probe_digest) tuples, never hash(entry)",
+        "catalog.active/catalogue/probes_by_id/registry -- dicts keyed by subject_kind/probe_id; the entry is the VALUE; {kind: e ...} and {probe_id: ...} hash the KEY only",
+        "aisef2/app/*, validation/qualification/*, validation/v2/* -- every 'for kind, e in catalog.active().items()' / 'for e in catalog.CATALOG' iterates and reads e.attr; none puts an entry in a set or dict key",
+        "aisef2/app/bundle_cli.py:235 reads capability_version VALUE",
+        "unrelated hash(): tests/v2/test_v21_r5_probe_model_data.py hashes nested model-shaped JSON in the contract freeze, not a CatalogEntry (comment at :23)"
+      ],
+      "exceptions_checked": [
+        "frozen=True + capability_version:int|None means this mutant cannot break hashability -- it only changes the hash VALUE, which no reader consumes; verified hash(fa) still succeeds on the mutant",
+        "conformance ruling names compare only, not hash; committed ruling does not pin catalog.py bytes (12 rows, catalog absent); no freeze manifest pins catalog.py",
+        "repo-wide grep: the only hash( near the catalog is runspec_hash (unrelated)"
+      ],
+      "note": "Hash-value change reproduced by execution; no set/dict-key use of entries exists."
+    },
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+      "index": 0,
+      "mutant": "L67 False->True (compare=False->True)",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "Mutant re-derived: field(default=None, compare=False->True, hash=False) on capability_changes; buildmut shows compare=True, hash=False. Effect confined to CatalogEntry.__eq__, folding in capability_changes (a dict; dict == is well-defined, no crash, order=False so no __lt__). Same shape as the capability_version compare mutant: no code ==-compares two CatalogEntry objects; only the file_artifact entry carries a non-None dict and nothing compares it. bundle_cli._declared reads entry.capability_changes (bundle_cli.py:200) as a VALUE, unaffected. Registered kill file re-run: Ran 51 tests OK == baseline -> NOT killed. Observable in principle (replace(fa, capability_changes={...}) == fa -> False) but no semantic reader depends on it -> AUDITED confirmed.",
+      "refutation": "",
+      "consumers_checked": [
+        "aisef2/app/bundle_cli.py:200 changes=entry.capability_changes (VALUE); rec=changes.get(version) if Mapping -- compare flag does not change the value",
+        "tests/v2/test_v21_migrate_semantics.py -- dataclasses.replace(e, capability_changes=...) builds entries passed to bundle_cli._declared (value read); assertIs(e.capability_changes, module.CAPABILITY_CHANGES) is identity of the VALUE (dict), not of an entry; withheld_with/withheld compare sets of contract-id strings",
+        "catalog.problems_of/active/catalogue/probes_by_id/registry/entry_for -- no entry ==",
+        "all validation/qualification/* and validation/v2/* catalog readers -- attribute reads and dicts keyed by probe_id/kind only"
+      ],
+      "exceptions_checked": [
+        "v21_conformance_ruling.py:135-137 -- 'neither is compared: compare=False' is prose; cited behaviour_tests verify CAPABILITY_CHANGES value identity (assertIs) vs the module, not the compare flag; no test asserts the literal flag from source",
+        "no CatalogEntry ==/assertEqual comparison exists anywhere (grepped aisef2/ validation/ tests/)"
+      ],
+      "note": "dict == under the compare mutant is total (no crash); survival and non-observation reproduced."
+    },
+    {
+      "target": "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+      "index": 1,
+      "mutant": "L67 False->True (hash=False->True)",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "group": "catalog-capability-field-flags",
+      "grounds": "Mutant re-derived: field(default=None, compare=False, hash=False->True) on capability_changes; buildmut shows compare=False, hash=True. Effect confined to CatalogEntry.__hash__, folding in capability_changes which is a dict -> UNHASHABLE. Direct execution on the mutant: hash(active()[FILE_ARTIFACT]) raises TypeError('unhashable type: dict'); on the original it succeeds (verified). Entries whose capability_changes is None still hash. This is the strongest-signal mutant, yet never triggered: grep confirms nothing hashes a CatalogEntry or uses one as a set member / dict key anywhere in aisef2/ validation/ tests/; construction and dataclasses.replace do not compute __hash__. Registered kill file re-run: Ran 51 tests OK == baseline -> NOT killed. AUDITED confirmed, with the author's named latent risk accurate (hash=False is exactly what keeps the frozen file_artifact entry hashable).",
+      "refutation": "",
+      "consumers_checked": [
+        "catalog.problems_of -- seen:set of (probe_id,probe_digest) tuples, never hash(entry)",
+        "catalog.active/catalogue/probes_by_id/registry -- dicts keyed by subject_kind/probe_id; entry is the value, so the dict hashes the key, never the entry",
+        "aisef2/app/diagnostics.py:226 dataclasses.replace(e, ...) -- no hash computed",
+        "all validation/qualification/* consumers -- {probe_id:...}/{kind.value:...} dicts and (probe_id,probe_digest,cls) tuple-sets, never a set/dict of CatalogEntry",
+        "tests/v2/test_v21_identity.py / test_v21_identity_bytes.py -- read e.probe_id/e.classes/e.factory and digest the probe's own module bytes; never hash an entry"
+      ],
+      "exceptions_checked": [
+        "frozen=True dataclass is conventionally hashable; hash=False on the dict field is the mechanism that keeps file_artifact hashable -- but hashability is unexercised, so the TypeError path is never reached by any current reader",
+        "no document pins the hash flag (conformance ruling names compare=False only); committed conformance ruling does not pin catalog.py bytes (12 rows, catalog absent)",
+        "repo-wide grep: no hash()/set()/dict-key of a CatalogEntry"
+      ],
+      "note": "Latent-risk (unhashable file_artifact entry) reproduced by execution. Per the owner positional rule this is a known limit, not a REFUTED gap: no current reader hashes entries, so no test is owed; recording as a known limit (not adding a test to reach a number) is the correct call."
+    }
+  ],
+  "notes": "SKEPTIC verdict: all 4 entries CONFIRMED, class_after = AUDITED (0 EQUIVALENT, 0 REFUTED, 0 test owed). All four mutants match the draft exactly (re-derived via buildmut + mutant_view: capability_version idx0=compare F->T, idx1=hash F->T; capability_changes idx0=compare F->T, idx1=hash F->T). Each toggles only the generated CatalogEntry.__eq__ or __hash__. Independently reproduced: unmutated kill file 51 OK, and each mutant 51 OK (survives, not killed). Each is genuinely observable (not EQUIVALENT), shown by direct execution: compare mutants flip ==, the version hash mutant flips hash-equality, the changes hash mutant makes the file_artifact entry raise TypeError. No semantic reader depends on the eq/hash participation: exhaustive grep across aisef2/ validation/ tests/ finds nothing that compares two CatalogEntry objects with ==/assertEqual, hashes one, or uses one as a set member or dict key; every consumer reads attribute VALUES or keys dicts by subject_kind/probe_id (entry as value), and dataclasses.replace builds entries via __init__. Checked the two plausible non-registered guards and cleared both: (1) test_v21_identity reads values and digests the probe modules' own bytes, not catalog.py, and does not touch entry eq/hash; (2) the committed conformance ruling (closure-evidence/v2/v2.1/CONFORMANCE-RULING.json) has 12 rows and does NOT include aisef2/probe/catalog.py, so its sha256 drift guard R.check() does not pin catalog.py bytes -- there is no file-digest guard that would kill these mutants (and the campaign reporting them as survivors in a 2.1 file confirms no byte guard is run as a kill file for these targets). Ran test_cycle2_wp201 on baseline and the two strongest mutants: identical outcome (delta zero; its failures are missing-closure-evidence env errors, and its entry-exercising Catalog tests pass on both). One immaterial author slip noted: the diagnostics dataclasses.replace is at bundle/diagnostics line 226, not 224. Agree with the author's acceptance-scope recommendation to the owner: record as a known limit (esp. the capability_changes hash mutant's latent unhashable-file_artifact edge and the unpinned compare=False prose), do not add tests merely to pin the flags."
+}

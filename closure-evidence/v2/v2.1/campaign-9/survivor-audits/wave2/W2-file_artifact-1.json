@@ -1,0 +1,102 @@
+{
+ "batch": "W2-file_artifact-1",
+ "file": "aisef2/probe/file_artifact.py",
+ "targets": [
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.observe",
+  "aisef2/probe/file_artifact.py::_stopped",
+  "aisef2/probe/file_artifact.py::_worker_facts",
+  "aisef2/probe/file_artifact.py::grep_facts",
+  "aisef2/probe/file_artifact.py::import_facts"
+ ],
+ "new": [
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 26,
+   "mutant": "L517 element 0 dropped"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 28,
+   "mutant": "L517 element 2 dropped"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 71,
+   "mutant": "L502 string \"; it is not retried here: a harness that ends the same way again is the environment's to fix\" emptied"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 80,
+   "mutant": "L477 string ')' emptied"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 86,
+   "mutant": "L518 string ')' emptied"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 88,
+   "mutant": "L502 string 'the worker ' emptied"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::grep_facts",
+   "index": 89,
+   "mutant": "L502 string ' before it gave its result' emptied"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::_worker_facts",
+   "index": 56,
+   "mutant": "L432 sorted() -> list()"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::_worker_facts",
+   "index": 71,
+   "mutant": "L423 string ')' emptied"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::FileArtifactProbe.observe",
+   "index": 137,
+   "mutant": "L877 string 'grep' emptied"
+  },
+  {
+   "target": "aisef2/probe/file_artifact.py::_stopped",
+   "index": 30,
+   "mutant": "L550 string 'g' emptied"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/probe/file_artifact.py::import_facts",
+   "index": 38,
+   "mutant": "L604 string 'python ' emptied",
+   "class": "AUDITED",
+   "group": "single mutant in this batch",
+   "grounds": "With the one literal replaced (file_artifact.py:283 f'python {major}.{minor}' -> f'{major}.{minor}'), import_facts returns the same keys in the same order and the same files/matches/locations; only `stdlib_of` differs ('python 3.14' vs '3.14'); verdict_of (:215-223 reads present/sha256/matches only), observe() kind/verdict, spec id/semantic hash and evaluate() are identical. The value is written at one place and parsed at none in code. Reach: observe() puts facts into Observation.detail only for OBSERVED, SUBJECT_ABSENT and SUBJECT_DEADLINE (:540-548); classify_failure (protocol.py:164-185) turns those into Executed(verdict)/on_subject_absent and keeps detail only for HARNESS_FAILED/UNSUPPORTED, whose details (:506-538) are built from locator/path/git text and never from facts; every in-product caller goes through run_probe (review_verify.py:146-148 bound_result(run_probe(...)), orchestrate/proof.py:73, plan/story_admission.py, probe/calibration.py) and a ProbeRecord holds the typed result, not the detail; review_verify.verify's 'did not execute' message (:150) embeds only an Unrunnable/InvalidSpec detail. The prefix is a constant and sys.version_info has no implementation name, so 'python X.Y' and 'X.Y' are in bijection and nothing is lost; major.minor, the identifying element, remains and is asserted by T27a (test_v21_kills3_T27a.py:176 assertIn(f'{major}.{minor}', stdlib_of)), which the mutant survives by design. Interpreter identity itself is bound independently by the RunSpec 'python' capability. file_artifact.py is unchanged at the snapshot.",
+   "consumers_checked": [
+    "aisef2/probe/file_artifact.py: writer :283; facts_of :477 merges it; observe :540-548 serialises it into detail; verdict_of :215-223 reads only present/sha256/matches",
+    "aisef2/probe/protocol.py: Observation :94-120, classify_failure :164-185 (detail kept only for HARNESS_FAILED/UNSUPPORTED), run_probe/ProbeRecord :189-215 (the record holds the typed result)",
+    "aisef2/app/review_verify.py:126-156 (verify: reads result.behavior_verdict; :150 embeds only a non-Executed result), aisef2/orchestrate/proof.py:73, aisef2/plan/story_admission.py, aisef2/probe/calibration.py, aisef2/app/adapters.py (verdict/observed only)",
+    "validation/qualification/c2_file_artifact.py:148 (copies the detail facts into the calibration record when run; the committed P1 record has no python_imports row), p5_falsifiability.py:222-227 (diagnose persists detail[:1200] for non-QUALIFIED rows; no imports_outside spec in its corpus), q2.py:224 (verdict_of only)",
+    "git grep stdlib_of at the snapshot: file_artifact.py:283, tests/v2/test_v21_kills3_T27a.py:167,176, closure-evidence mutation records (mutant descriptors), and ONE NEW prose mention: docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md:268 (see below)",
+    "docs/v2.1/decisions/B-04-LEDGERLOCK-S-10-a.md:26, ADR-V2.1.md ADR-5, drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json:57: none gives a format for stdlib_of"
+   ],
+   "exceptions_checked": [
+    "a reader that splits or regex-parses the label (split()[1], 'python (\\d+)\\.(\\d+)'): none (whole-tree grep for the key, for 'python <digit>' and for the 'python ' literal in aisef2/, validation/, tests/, docs/)",
+    "NEW: a document that states the value's format. docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md:268 (a round-3 findings document, absent at b5c2457) says 'the facts carry `stdlib_of: python 3.x`' as the documented place where the observing interpreter shows. It is prose in a finding, not a parser or a contract (the module docstring and B-04 give no format), and the version stays; under the mutant that sentence would be inexact ('3.x'). This is why the entry is REVISED, not why it falls",
+    "a stored record compared field for field with a fresh run: the committed P1 record predates the class; the release calibrations carry keys only; a re-run of c2_file_artifact would write '3.14' and nothing parses it",
+    "a reader telling interpreter implementations apart by the prefix: sys.version_info has no implementation field",
+    "the detail reaching an operator/journal/finding as a refusal or recovery instruction: stdlib_of is only in OBSERVED/SUBJECT_ABSENT/SUBJECT_DEADLINE details, which classify_failure drops; HARNESS_FAILED/UNSUPPORTED details never include facts",
+    "a value-length bound on the detail: none; the mutant shortens it by 7 characters",
+    "NEW in round 3: the statement builder / artifacts (review_verify.detail, preserve) carry `verification.{status, why, probe, observed}` where `observed` is the verdict value (review_verify.py:152-156), never facts"
+   ],
+   "source_sha256": "626d1894450fe782a1478b4bf73233acb7c5f159eeee9eebd6c4065971497eab",
+   "remapped_from": {
+    "index": 28,
+    "mutant": "L283 string 'python ' emptied",
+    "source_sha256": "21ac55fd79ae6a5f814044394ea0033445d73378e2c8f17ef16c4d32edf0583b",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  }
+ ]
+}
