@@ -1,0 +1,1 @@
+launched 2026-10-18T01:17:16Z heavy.sh campaign9 campaign3.sh /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c9/camp 4ec961e 4 EXECUTION-ORDER-10.json; watchdog.sh; sync9.sh -> /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/closure-evidence/v2/v2.1/campaign-9/run

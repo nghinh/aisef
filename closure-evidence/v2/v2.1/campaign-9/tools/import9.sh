@@ -11,8 +11,8 @@ C=${1:?campaign dir}; W=$(git rev-parse --show-toplevel) || exit 9
 for i in 1 2 3 4; do
   wt=$C/c3-w$i; [[ -d $wt && -e $C/c3-w$i.finished ]] || { echo "refused: worker c3-w$i has no worktree or no .finished"; exit 2; }
   st=$(tr -d '\n' < $C/c3-w$i.status-after); [[ -n $st ]] && st="dirty: $st" || st="clean"
-  status="finished $(cat $C/c3-w$i.finished); git status --porcelain after: $st (campaign 9, snapshot $(cut -c1-7 $C/c3-w$i.snapshot); the worker directory is named c3-w$i by the campaign script)"
-  /opt/homebrew/bin/python3 -P -B validation/qualification/v21_mutation_record.py --import c9-w$i $wt "$status" $C/c3-w$i.log || exit 3
+  desc="finished $(cat $C/c3-w$i.finished); git status --porcelain after: $st (campaign 9, snapshot $(cut -c1-7 $C/c3-w$i.snapshot); the worker directory is named c3-w$i by the campaign script)"
+  /opt/homebrew/bin/python3 -P -B validation/qualification/v21_mutation_record.py --import c9-w$i $wt "$desc" $C/c3-w$i.log || exit 3
 done
 R=$W/closure-evidence/v2/v2.1/campaign-9/results; mkdir -p $R
 rsync -a --exclude '/c3-w[0-9]/' --exclude '/c3-w[0-9].env/' --exclude '/c3-w[0-9].record.json' --exclude '/c3-w[0-9].log' \

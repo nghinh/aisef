@@ -1,0 +1,18 @@
+2026-10-18 11:45:23 +07 REMOVED /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c9/t0-sweep/rc (clean, tip 69b0ea9 in v2.1/probe-window; T0 sweep and scope lane finished and recorded)
+2026-10-18 11:45:25 +07 REMOVED /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/w/c9-scope (clean, tip 50c7bd0 in v2.1/probe-window; T0 sweep and scope lane finished and recorded)
+2026-10-18 11:49:08 +07 OWNER removed 39 stale worktrees under .claude/worktrees (the list proposed at 08:27; all clean, tips kept by branches or in v2.1/probe-window) from their own terminal; 33 GiB free after
+2026-10-18 15:17:51 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf-approval-wording (this session's finished E2/remap lane worktree; clean; tip a57742b merged into v2.1/probe-window)
+2026-10-18 15:17:52 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_08f0165c-c30-1 (this session's finished E2/remap lane worktree; clean; tip 628c988 merged into v2.1/probe-window)
+2026-10-18 15:17:54 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_08f0165c-c30-2 (this session's finished E2/remap lane worktree; clean; tip eb96b28 merged into v2.1/probe-window)
+2026-10-18 15:17:55 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_5d5c14c5-3a3-1 (this session's finished E2/remap lane worktree; clean; tip 5f647c2 merged into v2.1/probe-window)
+2026-10-18 15:17:56 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_6efc3297-a83-1 (this session's finished E2/remap lane worktree; clean; tip 8e140e0 merged into v2.1/probe-window)
+2026-10-18 15:17:57 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_7d7d8519-94c-1 (this session's finished E2/remap lane worktree; clean; tip 14c9081 merged into v2.1/probe-window)
+2026-10-18 15:17:59 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_7d7d8519-94c-2 (this session's finished E2/remap lane worktree; clean; tip 8e343c9 merged into v2.1/probe-window)
+2026-10-18 15:18:00 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_7d7d8519-94c-3 (this session's finished E2/remap lane worktree; clean; tip e086326 merged into v2.1/probe-window)
+2026-10-18 15:18:02 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_830a4f0d-db8-1 (this session's finished E2/remap lane worktree; clean; tip e9ea09d merged into v2.1/probe-window)
+2026-10-18 15:18:03 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_830a4f0d-db8-2 (this session's finished E2/remap lane worktree; clean; tip c6ddb83 merged into v2.1/probe-window)
+2026-10-18 15:18:04 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_830a4f0d-db8-3 (this session's finished E2/remap lane worktree; clean; tip ad2382d merged into v2.1/probe-window)
+2026-10-18 15:18:05 +07 REMOVED /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_830a4f0d-db8-4 (this session's finished E2/remap lane worktree; clean; tip 3555699 merged into v2.1/probe-window)
+KEEP dirty=0 tip=033cb2a /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_830a4f0d-db8-5
+KEEP dirty=1 tip=bfd44ed /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_aec09ce7-c6f-1
+KEEP dirty=1 tip=bfd44ed /Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_aec09ce7-c6f-2

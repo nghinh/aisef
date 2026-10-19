@@ -1,0 +1,13 @@
+{
+ "worker": "c9-w2",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "status": "finished 2026-10-19T11:18:37Z; git status --porcelain after: dirty:  M closure-evidence/v2/v2.1/MUTATION.json (campaign 9, snapshot 4ec961e; the worker directory is named c3-w2 by the campaign script)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c9-w2.log",
+  "sha256": "34aeb8d398ff45be109aa28bf5d5fd50341bb0965f5dd093f1da6b83d64089ae"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c9-w2.record.json",
+  "sha256": "fa90d465810ee92361e41bc586a7fc117a1d8154b7074b9c5d34863763c41a56"
+ }
+}

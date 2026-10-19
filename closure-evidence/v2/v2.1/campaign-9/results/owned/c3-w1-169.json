@@ -1,0 +1,22 @@
+{
+ "command": [
+  "/opt/homebrew/bin/python3",
+  "-P",
+  "validation/v2/mutation.py",
+  "run",
+  "--order",
+  "closure-evidence/v2/v2.1/EXECUTION-ORDER-10.json",
+  "aisef2/probe/cli_invocation.py::AGENT/redirect"
+ ],
+ "exit": 1,
+ "mechanism": "posix-session-and-group",
+ "owned_before": 0,
+ "owned_at_exit": 0,
+ "owned_after": 0,
+ "residual": [],
+ "escaped": [],
+ "ladder": [],
+ "released_empty": true,
+ "harness_orphans_before": 0,
+ "harness_orphans_after": 0
+}
