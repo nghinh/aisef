@@ -189,7 +189,8 @@ def main(argv: list[str]) -> int:
            "client": {"given": exe, "from": which, "realpath": real, "sha256": client_sha, "version": version},
            "hermetic_path": path, "env_names": sorted(env), "store_home": str(store_home), "driver_argv": argv_driver,
            "python": PY, "aisef_head": subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True,
-                                                       text=True).stdout.strip(), "nice": os.nice(0)}
+                                                       text=True).stdout.strip(),
+           "nice": os.getpriority(os.PRIO_PROCESS, 0)}   # read (os.nice(0) raises EPERM on macOS when already niced)
     write(L / "launch.json", rec)
     print(f"e2_launch: {rec['at']} {rec['mode']} client {real} ({which}) sha256 {client_sha[:16]} version {version!r} "
           f"max_runs {max_runs} env names {rec['env_names']}")
