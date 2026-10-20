@@ -17,7 +17,7 @@ from aisef2.arch.enums import (
 from aisef2.control import budget
 from aisef2.control.owner import Classification, FailureCode, classify
 from aisef2.errors import InvariantError
-from aisef2.journal.format2 import OperationOutcome as O
+from aisef2.journal.format2 import OperationOutcome as O, ResourceKind
 from aisef2.orchestrate import gate, seam
 from aisef2.orchestrate.adapters import (
     Developer, Merger, ProviderOutage, ResourceUnavailable, Reviewer, Scanner, Workspace, confine, unconfine,
@@ -32,6 +32,25 @@ from aisef2.plan.obligation import Plan
 from aisef2.plan.story_admission import admit_story
 from aisef2.probe.protocol import ExecutionEnv, RevisionRef
 from aisef2.product.spec import ProductProofSpec
+from aisef2.runtime.process_range import RangeEscaped
+from aisef2.runtime.story_scope import Residual as ScopeResidual
+
+
+class _EscapedRange:
+    """PL-7 (P4-LIFETIME-SEMANTICS §3): a stand-in acquired into the scope when a developer session's own range left a
+    live process its release could not prove gone. client.session releases that range promptly itself; this carries
+    only its "not proved empty" status into the scope, as a PROCESS_RANGE whose release names the leak RESIDUAL. The
+    scope then holds every writable resource acquired before it — the implementer's checkout, the scratch — RESIDUAL
+    too (§17.1), so nothing the escapee could still write to is released, exactly as a probe range that did not empty
+    does. It is not a claim the sandbox contained anything (confinement is measured separately, app/confine)."""
+
+    kind = ResourceKind.PROCESS_RANGE
+
+    def __init__(self, name: str, detail: str) -> None:
+        self.name, self._detail = name, detail
+
+    def release(self) -> None:
+        raise ScopeResidual(self._detail)
 
 
 @dataclass(frozen=True, slots=True)
@@ -224,6 +243,11 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                     run.append(T.PROVIDER_RESULT, {"story_id": story_id, "outcome": O.FAILED.value, "synthetic": False,
                                                    "detail": detail}, source_seqs=(request,))
                     checks.append(gate.check(run, story_id, "developer", False, detail))
+                except RangeEscaped as e:   # PL-7 (§17.1): the developer session left a live process its release could
+                    # not prove gone. Carry that into the scope so the implementer's checkout and the scratch are held
+                    # RESIDUAL, not force-removed, while it may still write; then refuse the story as the range did.
+                    scope.acquire(_EscapedRange(f"developer {story_id} range", str(e)))
+                    raise
                 else:
                     run.append(T.PROVIDER_RESULT, {"story_id": story_id, "outcome": implemented.outcome.value,
                                                    "synthetic": False, "detail": implemented.detail},

@@ -303,6 +303,19 @@ class Declarations(unittest.TestCase):
             self.assertEqual(run_probe(probe, s, RevisionRef("0" * 40, str(d)), base.ENV).result,
                              Executed(BehaviorVerdict.REFUTED))     # 2.0.0 read zero matches and satisfied it
 
+    def test_before_and_after_must_be_non_empty_text_or_the_record_is_none(self):
+        """`before`/`after` are the lineage text `_assess` puts in the operator's carry-over report (one per selected
+        contract); an empty or non-text one is not a well formed record, so `_declared` is None and the change fails
+        closed over every contract, never narrowed by a blank selector that would carry a stale approval over."""
+        e = next(x for x in catalog.CATALOG if x.probe_id == fa.PROBE_ID)
+        good = {"summary": "s", "affects": ({"classes": ("grep_count",), "when": "w", "before": "b", "after": "a"},)}
+        self.assertIsNotNone(bundle_cli._declared(dataclasses.replace(e, capability_changes={3: good}), 3))
+        for field in ("before", "after"):
+            for label, bad in (("empty", ""), ("not text", 3)):
+                changes = {3: {"summary": "s", "affects": ({**good["affects"][0], field: bad},)}}
+                with self.subTest(field=field, value=label):
+                    self.assertIsNone(bundle_cli._declared(dataclasses.replace(e, capability_changes=changes), 3))
+
 
 # ----------------------------------------------------------------------------------------------- the migration
 
@@ -469,6 +482,54 @@ class WhatMigrateWithholds(unittest.TestCase):
             self.assertTrue(printed["needs_owner_reapproval"]["contracts"][0]["reads"].endswith("candidate.json"))
             self.assertEqual(printed["needs_owner_reapproval"]["contracts"][0]["reads"], str(out))
 
+    def test_the_kept_ground_rows_carry_the_absence_group_and_a_reason(self):
+        """approvals_kept_grounds is the owner's record of why each carried-over approval was kept: every row holds the
+        full group identity (subject_absence among it) and a non-empty ground. A bundle already of this release has one
+        row whose ground says there is no earlier release to compare against."""
+        FIELDS = {"probe", "class", "subject_absence", "from", "to", "consulted", "ground", "contracts"}
+        rows = self.report["approvals_kept_grounds"]
+        for r in rows:
+            self.assertEqual(set(r), FIELDS, r)                     # no field dropped and no key emptied
+        exists = next(r for r in rows if (r["probe"], r["class"]) == (fa.PROBE_ID, "exists"))
+        self.assertEqual(exists["subject_absence"], "REQUIRES_SUBJECT")   # the absence group the owner reads
+        [current] = bundle_cli.migrate(era_bundle(release=None))[1]["approvals_kept_grounds"]
+        self.assertEqual(set(current), FIELDS, current)
+        self.assertIn("no earlier release whose capability to compare", current["ground"])
+
+    def test_the_ground_of_each_kept_approval_names_the_contract_s_own_absence(self):
+        """key[2] of `_group` carries the contract's declared subject_absence into each grounds row, so the owner
+        reads, per group, under which absence `no change selects it` held. It is the contract's own absence, never the
+        release the approval was read from (2.0.0 here)."""
+        rows = self.report["approvals_kept_grounds"]
+        declared = {cid: contract(cid).subject_absence.value for cid in NOT_SELECTED}
+        self.assertEqual({c for r in rows for c in r["contracts"]}, set(declared))
+        for r in rows:
+            for cid in r["contracts"]:
+                self.assertEqual(r["subject_absence"], declared[cid], cid)
+        by = {(r["probe"], r["class"]): r for r in rows}
+        self.assertEqual(by[(fa.PROBE_ID, "exists")]["subject_absence"], "REQUIRES_SUBJECT")
+        self.assertEqual(by[("probe.python_callable_v2", "returns")]["subject_absence"], "REQUIRES_SUBJECT")
+
+    def test_with_commands_defaults_the_file_names_each_approval_and_passes_a_clean_report_through(self):
+        """The approve commands are shaped only here, and the CLI's own tests compare their output to `with_commands`
+        itself, so these literals are pinned nowhere else. With no --out the first command reads `candidate.json` (the
+        documented default); each file written is `<stem>.approved-N<suffix>`; `how` tells the operator to run them in
+        order and that the placeholder is refused; and a report needing no reapproval is returned (not dropped to None),
+        which `main` then subscripts for `candidate.file_sha256`."""
+        report = bundle_cli.with_commands(copy.deepcopy(self.report))        # no out: the documented default path
+        rows = report["needs_owner_reapproval"]["contracts"]
+        self.assertEqual(rows[0]["reads"], "candidate.json")
+        self.assertEqual([r["writes"] for r in rows],
+                         [f"candidate.approved-{n}.json" for n in range(1, len(rows) + 1)])
+        how = report["needs_owner_reapproval"]["how"]
+        self.assertIn("run them in order", how)
+        self.assertIn("refuses the placeholder", how)
+        clean = bundle_cli.migrate(era_bundle(release=None))[1]
+        self.assertIsNone(clean["needs_owner_reapproval"])
+        passed = bundle_cli.with_commands(clean)
+        self.assertIsInstance(passed, dict)
+        self.assertEqual(passed["candidate"], clean["candidate"])           # passed through; main reads it next
+
 
 class WhatIsNotKept(unittest.TestCase):
     """The bundle is approved at the contracts' hashes; an approval that does not bind them has no ground to be kept."""
@@ -600,6 +661,35 @@ class FailClosed(unittest.TestCase):
         self.assertEqual({r["contract"] for r in report["approvals_withheld"]}, self.FILE_ARTIFACT)
         [change] = next(c for c in report["semantic_changes"] if c["contract"] == "BC-EXISTS-REQ")["changes"]
         self.assertIn("not comparable", change["summary"])
+
+    def test_each_fail_closed_change_row_is_the_whole_report_structure(self):
+        """A fail-closed row is what the report hands the owner to justify a withheld approval (semantic_changes, and
+        seal's approvals_withheld_semantic): the six fields, the `every`-use wording that says the difference was not
+        ruled out, and the case's reason, not a lone summary. Checked for every withheld contract of each case."""
+        KEYS = {"version", "ref", "when", "before", "after", "summary"}
+        WHEN = "every use of the probe"
+        BEFORE = "as the earlier release evaluated it"
+        AFTER = "as this release evaluates it: the difference is not declared, so it is not ruled out"
+        with with_entry(capability_version=None):
+            _, no_version = bundle_cli.migrate(era_bundle())
+        with with_entry(capability_changes={2: fa.CAPABILITY_CHANGES[2]}):      # 3 undeclared
+            _, undeclared = bundle_cli.migrate(era_bundle())
+        past = release_with(1, probe_id="probe.file_artifact_of_the_past", digest="cd" * 32)
+        with mock.patch.dict(bundle_cli.RELEASES, {"r": past}):
+            _, not_comparable = bundle_cli.migrate(era_bundle("r"))
+        cases = {"no capability version": (no_version, "declares no capability version"),
+                 "no well formed record": (undeclared, "no well formed record"),
+                 "not comparable": (not_comparable, "not comparable")}
+        for label, (report, phrase) in cases.items():
+            self.assertEqual({c["contract"] for c in report["semantic_changes"]}, self.FILE_ARTIFACT, label)
+            rows = [h for c in report["semantic_changes"] for h in c["changes"]]
+            self.assertTrue(rows, label)
+            for h in rows:
+                with self.subTest(label, ref=h.get("ref")):
+                    self.assertEqual(set(h), KEYS)      # the whole row: no field dropped, renamed or extra
+                    self.assertEqual((h["when"], h["before"], h["after"]), (WHEN, BEFORE, AFTER))
+                    self.assertIsNone(h["ref"])
+                    self.assertIn(phrase, h["summary"])
 
 
 class NoContractIsNamed(unittest.TestCase):
@@ -792,6 +882,21 @@ class SealKeepsTheSameRule(unittest.TestCase):
     def test_the_report_without_an_old_bundle_names_nothing(self):
         _, report = bundle_cli.seal(self.authoring())
         self.assertEqual((report["approvals_withheld_semantic"], report["approvals_kept"]), ([], 0))
+
+    def test_each_withheld_row_names_the_binding_and_its_provenance(self):
+        """An operator re-approves and audits from this row, not the contract alone: every withheld row names which
+        requirement the approval bound and when it was approved. Full key set, and each field against the input
+        approval it reports."""
+        old = era_bundle()
+        _, report = self.seal(old)
+        by_contract = {a["contract_id"]: a for a in old["approvals"]}
+        rows = report["approvals_withheld_semantic"]
+        self.assertEqual({r["contract"] for r in rows}, SELECTED)       # rows exist to check
+        for r in rows:
+            self.assertEqual(set(r), {"contract", "requirement", "approver", "approved_at", "changes"})
+            a = by_contract[r["contract"]]
+            self.assertEqual((r["requirement"], r["approver"], r["approved_at"]),
+                             (a["requirement_id"], a["approver"], a["approved_at"]))
 
 
 class TheOldBundleMustBeOne(unittest.TestCase):

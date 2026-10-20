@@ -233,6 +233,17 @@ class DeepFindingsAreRows(unittest.TestCase):
         self.assertEqual(V.bounded({**f, "summary": nested("list", V.DEPTH_MAX + 1)})["summary"],
                          f"<nested deeper than {V.DEPTH_MAX} levels>")
 
+    def test_bounded_keeps_the_whole_finding_and_redacts_only_the_too_deep_field(self):
+        """A finding with one field nested past the bound is returned whole, with only that field written as the
+        marker. adapters.Reviewer reads id (the gate row's lineage), severity and reproducer (the verdict) and
+        blocking off this object, and preserve keeps it whole, so every un-deep field must survive; dropping
+        `**finding` would strip the finding to the lone marker."""
+        marker = f"<nested deeper than {V.DEPTH_MAX} levels>"
+        f = {"id": "F-1", "severity": "high", "summary": "a finding", "blocking": True,
+             "reproducer": {"clause": "R-9/3", "subject": dict(MAIN)},
+             "extra": nested("list", V.DEPTH_MAX + 1)}
+        self.assertEqual(V.bounded(f), {**f, "extra": marker})
+
 
 class ARepliesTheParserCannotReadIsUnparseableText(unittest.TestCase):
     """json.loads raises `RecursionError`, not `ValueError`, for text nested past its depth (the parser is bounded by

@@ -159,5 +159,48 @@ class ARetryInAJournalIsAccounted(Hermetic):
         self.assertEqual(r["runs"][0]["cost"]["value"], 1.0)
 
 
+class AnUnreadableRunStaysAFullRowAndOwnBlindnessIsSeen(Hermetic):
+    """Two unpinned decisions of usage_lineage, both in the record the operator reads (rec['lineage_usage']):
+
+    * A run whose evidence the reader refuses (events_of / usage.usage raises) is still a full row: its path, whether
+      it had a record, and whether it is a superseded sibling — cost null, 'its evidence cannot be read', no tokens.
+      A reader iterating the rows needs the same keys on the unreadable row as on a readable one, and the operator
+      reads `recorded` and `superseded` to see which runs' last step may be missing and which attempts were replaced.
+      The only test that drove this path (test_v21_x_lineage_proof) is @POSIX_USER (skipped as root) and reads only
+      the row's run and cost.
+    * This run's own tokens are a lower bound exactly when a session reports no tokens or has no steps; an otherwise
+      fully-known lineage stays `known` only when every own session reports tokens. No earlier test drove a good own
+      session next to a known lineage, so the `not` and the 'steps' key of line 819 went unpinned.
+
+    Pins aisef2/app/lineage.py::usage_lineage (the except-path row, and own_blind)."""
+
+    def unreadable(self, accounts, own=OWN):
+        with mock.patch.object(lineage, "lineage_account", return_value={"runs": accounts}), \
+                mock.patch.object(lineage, "events_of", side_effect=OSError("boom")):
+            return lineage.usage_lineage(self.root / "pred", self.root / "child", own, PRICES)
+
+    def test_an_unreadable_run_keeps_its_run_recorded_superseded_and_the_row_keys(self):
+        a, b = self.run_dir("a"), self.run_dir("b")
+        rows = self.unreadable([self.account(a, recorded=True),
+                                self.account(b, recorded=False, superseded=True)])["runs"]
+        self.assertEqual([r["run"] for r in rows], [str(a), str(b), "this run"])
+        self.assertEqual([(r["recorded"], r["superseded"]) for r in rows[:-1]], [(True, False), (False, True)])
+        for row in rows:
+            self.assertEqual(set(row), ROW_KEYS, row)        # the unreadable row has the same keys as a readable one
+        for row in rows[:-1]:
+            self.assertIsNone(row["cost"]["value"])
+            self.assertIn("cannot be read", row["cost"]["status"])
+            self.assertEqual(row["tokens"], {})
+
+    def test_an_own_session_that_reports_tokens_keeps_a_known_lineage_known(self):
+        a = self.run_dir("a")
+        good = {**OWN, "sessions": [{"session": "S1.developer.1.jsonl", "steps": 3, "steps_without_tokens": 0}]}
+        self.assertEqual(self.usage_lineage([self.account(a, recorded=True)], own=good)["tokens_status"], "known")
+        # the discriminating cases of own_blind: a session reporting no tokens, and a session with no steps
+        for bad in ({"steps": 1, "steps_without_tokens": 1}, {"steps": 0, "steps_without_tokens": 0}):
+            got = self.usage_lineage([self.account(a, recorded=True)], own={**OWN, "sessions": [bad]})
+            self.assertTrue(got["tokens_status"].startswith("lower bound"), (bad, got["tokens_status"]))
+
+
 if __name__ == "__main__":
     unittest.main()

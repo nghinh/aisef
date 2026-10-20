@@ -18,7 +18,7 @@ import shutil
 import time
 
 from aisef2.app import confine as confinement
-from aisef2.runtime.process_range import ProcessRange, RangeEscaped, process_table
+from aisef2.runtime.process_range import ProcessRange, ProcessTableError, RangeEscaped, process_table
 
 POLL_S = 5.0
 #: PL-7: a process that left a session's range (setsid) can be caught mid-exit at release(); a session is not refused for
@@ -27,13 +27,38 @@ POLL_S = 5.0
 ESCAPEE_GRACE_S = 60.0
 
 
+def _is_gone(pid: int, proc) -> bool:
+    """Whether an escapee that left the range is PROVABLY gone — in the parent's PID namespace, at this moment. A
+    pid merely absent from a table read that could itself have failed proves nothing (an unreadable `/proc` row is
+    not an exit); a success or an EPERM from `os.kill(pid, 0)` does not prove it gone; a pid back under a different
+    start time was reused, so the escapee is gone. When nothing proves it gone it is treated as still alive, and the
+    caller refuses the session. Never signals the process: signal 0 only asks whether the pid exists for us. This
+    serves the range's teardown contract (P4-LIFETIME-SEMANTICS §3); it is not a proof that a sandbox contained it."""
+    try:
+        present = process_table().get(pid)
+    except (ProcessTableError, OSError, UnicodeDecodeError):
+        present = None   # a table read that failed (or a torn row) proves nothing: fall through to a per-pid probe
+    if present is not None:
+        # same start time (or none to compare on) -> still the escapee; a different one -> the pid was reused -> gone
+        return not (proc.created is None or present.created is None or present.created == proc.created)
+    try:
+        os.kill(pid, 0)   # existence probe only; no signal is ever sent to a process whose ownership is unproven
+    except ProcessLookupError:
+        return True        # ESRCH here and now: gone
+    except OSError:
+        return False       # EPERM or anything else: cannot prove gone -> treat as alive (refuse side)
+    return False           # it answered: alive (a reused pid lands here too -> conservatively not gone)
+
+
 def _release_session(r: ProcessRange) -> list[int]:
     """release() the session's range. RangeNotEmpty (the range would not empty) propagates — a genuine residual. For
-    RangeEscaped (something left the range and was seen alive at release), re-check the named processes against the
-    table over ESCAPEE_GRACE_S, matched by (pid, created) so a reused pid does not count and a zombie — absent from the
-    table — reads as gone: when all are gone the session keeps its outcome and the gone pids are returned (named on the
-    result, never silent); when one stays alive RangeEscaped is re-raised and the session is refused (it could write).
-    This mirrors the mutation runner's PL-7 settle; it does not widen a timeout or suppress a leak."""
+    RangeEscaped (something left the range and was seen alive at release), re-check each named process over
+    ESCAPEE_GRACE_S with `_is_gone` (positive confirmation, matched by start time so a reused pid does not count and an
+    unreliable read is never taken for an exit): when all are proved gone the session keeps its outcome and the gone
+    pids are returned (named on the result, never silent); when one is not proved gone within the grace RangeEscaped is
+    re-raised — a structured refusal — and the session is refused (a live developer process could still write). This is
+    the range's teardown contract (P4-LIFETIME-SEMANTICS §3), not a wider timeout, not a suppressed leak, and not a
+    claim about the sandbox boundary (the confinement is measured separately, app/confine and the S3t/S3c probe)."""
     try:
         r.release()
         return []
@@ -43,14 +68,12 @@ def _release_session(r: ProcessRange) -> list[int]:
             raise
         deadline = time.monotonic() + ESCAPEE_GRACE_S
         while True:
-            live = process_table()
-            still = [p for pid, p in left.items() if pid in live
-                     and (p.created is None or live[pid].created is None or live[pid].created == p.created)]
+            still = [p for pid, p in left.items() if not _is_gone(pid, p)]
             if not still:
                 return sorted(left)
             if time.monotonic() >= deadline:
-                raise RangeEscaped(f"{r.name}: processes left the range and stayed alive {ESCAPEE_GRACE_S:g}s after "
-                                   f"release: {[(p.pid, live[p.pid].command) for p in still]}") from None
+                raise RangeEscaped(f"{r.name}: processes left the range and were not proved gone {ESCAPEE_GRACE_S:g}s "
+                                   f"after release: {sorted(p.pid for p in still)}") from None
             time.sleep(POLL_S)
 #: what the client's telemetry cannot show (recorded with every account of the budget)
 LIMITATION = ("spend is what the client reports per finished step: an HTTP request that finishes no step (a client "

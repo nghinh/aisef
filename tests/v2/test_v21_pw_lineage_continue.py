@@ -273,6 +273,30 @@ class TheRecordItself(Continuation):
         _, report = bundle_cli.continue_from(self.doc, run)
         self.assertEqual((report["carried"], report["recorded"]), (["S1"], False))
 
+    def test_the_refusal_text_says_what_the_record_is_and_that_nothing_was_written(self):
+        """JournalRefused's contract: each way RUN.json is refused, the operator-facing text names what the record is,
+        says what to do, and promises the continuation wrote nothing — not only the typed code."""
+        # valid JSON that is no record: EVIDENCE_MALFORMED, told it is not a record and to restore it (no root needed)
+        run = self.run_dir(self.delivered())
+        (run / "RUN.json").write_text("[1, 2]", encoding="utf-8")
+        err = self.refused(run)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MALFORMED", str(err))
+        self.assertIn("RUN.json", str(err))
+        self.assertIn("is not a run record", str(err))
+        self.assertRegex(str(err), r"restore|faithful copy")        # what the operator does
+        self.assertIn("nothing was written", str(err))              # the refusal changed nothing
+        # a record that is there but cannot be read (an OSError that is not "not there"): EVIDENCE_UNREADABLE.
+        # A directory in its place raises IsADirectoryError — reachable without a permission mode, so as root too.
+        run = self.run_dir(self.delivered())
+        (run / "RUN.json").unlink()
+        (run / "RUN.json").mkdir()
+        err = self.refused(run)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_UNREADABLE", str(err))
+        self.assertIn("RUN.json", str(err))
+        self.assertIn("IsADirectoryError", str(err))               # why it could not be read
+        self.assertRegex(str(err), r"restore read access|restore|copy")
+        self.assertIn("nothing was written", str(err))
+
 
 class TheJournalIsNotAJournal(Continuation):
     """Read, and refused by the reader for what it is — bytes, a line, a form. Each journal is bound by a record that
@@ -419,6 +443,51 @@ class TheOperatorAsksForAnAnchor(Continuation):
         with self.assertRaises(SystemExit):        # argparse's own refusal of an argument that is not a sha256
             with contextlib.redirect_stderr(io.StringIO()):
                 self.cli(run, "--expect-anchor", "not-hex")
+
+    def test_a_manifest_that_is_not_an_evidence_manifest_is_a_mismatch(self):
+        """`--expect-anchor` on a run whose EVIDENCE.json reads but is not a manifest -- a JSON value that is not an
+        object, or an object whose `files` is not one: the anchor cannot be reproduced from it, so EVIDENCE_MISMATCH
+        (told so, not by a crash and not by falling through to the anchor compare)."""
+        for name, body in (("a JSON value that is not an object", "[1, 2, 3]"),
+                           ("an object whose files is not one", json.dumps({"files": [1, 2, 3]}))):
+            with self.subTest(name):
+                run = self.run_dir(self.delivered(), manifest=True)
+                (run / R.MANIFEST).write_text(body, encoding="utf-8")
+                err = self.refused(run, expect_anchor="a" * 64)
+                self.assertEqual(getattr(err, "code", None), "EVIDENCE_MISMATCH", str(err))
+                self.assertIn("not an evidence manifest", str(err))
+
+    @POSIX_USER
+    def test_a_manifest_that_cannot_be_read_is_unreadable_evidence_not_missing(self):
+        """EVIDENCE.json is there but cannot be read (a permission, an I/O error): EVIDENCE_UNREADABLE with its path --
+        told apart from \"no manifest\" (EVIDENCE_MISSING) and from a refusal with no code."""
+        run = self.run_dir(self.delivered(), manifest=True)
+        (run / R.MANIFEST).chmod(0o000)
+        self.addCleanup((run / R.MANIFEST).chmod, 0o644)
+        err = self.refused(run, expect_anchor="a" * 64)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_UNREADABLE", str(err))
+        self.assertIn(R.MANIFEST, str(err))
+
+    @POSIX_USER
+    def test_an_evidence_file_that_cannot_be_reread_is_unreadable_evidence(self):
+        """The manifest reads and its anchor matches, but re-deriving the manifest hits an evidence file that cannot be
+        read: EVIDENCE_UNREADABLE, not a refusal with no code."""
+        run = self.run_dir(self.delivered(), manifest=True)
+        anchor = R.anchor_in(run)
+        (run / JOURNAL).chmod(0o000)
+        self.addCleanup((run / JOURNAL).chmod, 0o644)
+        err = self.refused(run, expect_anchor=anchor)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_UNREADABLE", str(err))
+
+    def test_the_mismatch_names_the_evidence_file_that_no_longer_matches(self):
+        """stored != fresh: the operator is told WHICH evidence file no longer matches, so they know what to restore --
+        the file that changed is named (not the ones that still match, and not by crashing)."""
+        run = self.run_dir(self.delivered(), manifest=True)
+        anchor = R.anchor_in(run)
+        (run / R.STARTED).unlink()          # an evidence file the manifest bound, now gone
+        err = self.refused(run, expect_anchor=anchor)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MISMATCH", str(err))
+        self.assertIn(R.STARTED, str(err))
 
 
 class WhatTheLineageHolds(Continuation):

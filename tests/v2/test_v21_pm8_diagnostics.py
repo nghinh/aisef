@@ -202,6 +202,18 @@ class WhatIsKept(Scratch):
                          (["C-1"], False, "operator", D.SAME_USER, 0))
         self.assertEqual((sink.written, sink.not_written, sink.dropped), (1, 0, 0))
 
+    def test_a_tampers_reason_reaches_the_operator_artifact_non_empty(self):
+        # PM-8 keeps the probe's facts in the operator's probe-observation artifact — what the sealed record omits
+        # ({behavior_verdict: REFUTED}, no more). A tamper REFUTED carries its reason here, so the operator can see WHY
+        # it was refuted. This is the operator consumer the carried HARNESS audits missed: the reason must reach the
+        # artifact and be non-empty (pinned by behaviour, not by its exact wording).
+        facts = {"subject": "present", "tampered": "an answer on the subject's channel is not the agent's"}
+        self.see(Observation(K.OBSERVED, BV.REFUTED, json.dumps(facts)), spec=spec_of(BV.SATISFIED))
+        (d,) = self.docs()
+        self.assertEqual(d["observation"]["detail"]["subject"], "present")
+        self.assertTrue(d["observation"]["detail"]["tampered"], d)   # the reason reached the artifact, non-empty
+        self.assertEqual(d["audience"], "operator")
+
     def test_what_is_not_a_finding_is_not_kept(self):
         for answer in (Observation(K.OBSERVED, BV.SATISFIED), Observation(K.HARNESS_FAILED, None, "no python"),
                        Observation(K.UNSUPPORTED, None, "not a scenario"),
@@ -354,6 +366,19 @@ class SecretsAndBounds(Scratch):
         self.assertGreater(d["redacted"], 0)
         self.assertIn(SHA, shown)      # and nothing else of the detail is touched
 
+    def test_a_secret_in_its_raw_form_in_a_text_detail_is_replaced(self):
+        # a secret as the user's env holds it, un-escaped, in a plain-text detail (not JSON): the raw form of it must be
+        # searched too, not only json.dumps's escape of it, else a quote/backslash/non-ASCII secret leaks into RUN.json
+        secret = 'k"ey\\é-91827364'
+        self.assertNotEqual(secret, json.dumps(secret)[1:-1])      # raw and escaped forms differ for this secret
+        sink = D.Sink(self.out, secrets=(secret,))
+        self.see(refuted(f"grep_count found the line: {secret}"), sink=sink)
+        (d,) = self.docs()
+        shown = d["observation"]["detail"]
+        self.assertNotIn(secret, shown)
+        self.assertIn(V.REDACTED, shown)
+        self.assertGreater(d["redacted"], 0)
+
     def test_the_why_of_a_failure_in_RUN_json_names_no_secret(self):
         sink = self.sink()
         with mock.patch.object(D.Sink, "_document", side_effect=RuntimeError(f"cannot render {SECRET}")):
@@ -470,6 +495,20 @@ class PrivateAndFailOpen(Scratch):
         self.assertIn("--verify", r["authority"])      # it says who does read them: the verification, by the journal
         self.assertIn(("directory 0700, files 0600" if os.name == "posix" else "platform default"), r["permissions"])
 
+    def test_on_a_non_posix_host_the_permissions_statement_still_names_that_modes_are_not_applied(self):
+        # RUN.json's diagnostics.permissions is a disclosure: on a host without file modes it must SAY so,
+        # never go blank, or the operator cannot tell that 0700/0600 are unenforced there. PERMISSIONS is
+        # fixed at import from os.name, so re-evaluate the non-POSIX branch here on this POSIX host.
+        import importlib
+        with mock.patch.object(os, "name", "nt"):
+            importlib.reload(D)
+        try:
+            self.assertEqual(D.PERMISSIONS, "platform default (modes are not applied)")
+            self.assertEqual(self.sink().report()["permissions"], "platform default (modes are not applied)")
+        finally:
+            importlib.reload(D)      # restore to the real os.name for the rest of the suite
+        self.assertEqual(D.PERMISSIONS, "directory 0700, files 0600")
+
 
 class TheStatementOfWhoCanRead(Scratch):
     """`access_of`: from the command line `confine.wrap` builds for a session (the same function a session's wrapper
@@ -522,6 +561,15 @@ class TheStatementOfWhoCanRead(Scratch):
         self.assertEqual(self.access(self.spec(str(self.tmp / "absent"))), D.NOT_INSPECTED)             # a path not there
         self.assertEqual(self.access("not a settings document"), D.NOT_INSPECTED)
         self.assertTrue(D.NOT_INSPECTED.startswith(D.SAME_USER))      # as little as the plain statement says
+
+    def test_not_inspected_is_told_apart_from_no_confinement(self):
+        # The operator reads diagnostics.access (RUN.json) and each artifact's diagnostics_access:
+        # 'confinement asked for but its sandbox could not be inspected' must not read as the
+        # 'no confinement requested' statement, and it must say why it is only the weaker claim.
+        not_inspected = self.access(self.spec(str(self.other)), system="darwin")  # no bwrap backend here
+        self.assertNotEqual(not_inspected, self.access(None))        # distinct from plain same-user
+        self.assertTrue(not_inspected.startswith(D.SAME_USER))       # claims no more than SAME_USER
+        self.assertIn("inspect", not_inspected)                       # and states it could not be inspected
 
     def test_the_statements_make_no_claim_that_nobody_can_read_it(self):
         for text in (D.SAME_USER, D.NOT_INSPECTED, D.SESSIONS_CONFINED, D.AUTHORITY, D.PERMISSIONS):
@@ -662,6 +710,15 @@ class WhatVerifyChecks(Scratch):
             self.assertTrue(any(f"{stray} is not a file this release writes" in p for p in problems), (stray, problems))
         self.assertEqual(len([n for n in notes if "S1.1.p1.json.tmp" in n]), 1, notes)
         self.assertIn("a failed write", [n for n in notes if "S1.1.p1.json.tmp" in n][0])
+
+    def test_a_valid_name_with_a_non_tmp_tail_is_a_foreign_file_not_a_leftover(self):
+        # the `.tmp` leftover note is only for a real failed-write sibling (`<name>.json.tmp`); a valid
+        # stem with any OTHER 4-char tail is a file this release never writes -> a problem (verify REFUTES),
+        # never swallowed as a benign leftover
+        self.put("S1.1.p1.json.bak", "x")
+        problems, notes = self.check()
+        self.assertTrue(any("S1.1.p1.json.bak is not a file this release writes" in p for p in problems), problems)
+        self.assertFalse(any("S1.1.p1.json.bak" in n for n in notes), notes)
 
 
 class TheContextTheRunGives(unittest.TestCase):

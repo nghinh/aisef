@@ -253,6 +253,32 @@ class Identity(unittest.TestCase):
         self.assertTrue(ident["levels"]["sha256_matches_pin"])
         self.assertFalse(ident["levels"]["declared_matches_release"])
 
+    def test_a_version_output_that_is_not_utf8_is_read_as_no_version_line_not_raised(self):
+        # the binary's `version` output is its own word: a build that prints bytes that are not UTF-8 (a crash dump,
+        # a non-UTF-8 locale) must be decoded best-effort and refused as "no version line", never raise and crash the
+        # identity gate (adapters._declared decodes with errors="replace", outside its OSError/RangeError guard).
+        exe = self.bin / "bytes-ocr"
+        exe.write_text(f"#!{sys.executable}\n"
+                       "import sys\n"
+                       "sys.stdout.buffer.write(b'\\xff\\xfe\\x80 not a version line\\n')\n", encoding="utf-8")
+        exe.chmod(0o755)
+        seen, why = ad._declared(str(exe), review_ocr.VERSION_TIMEOUT_S)
+        self.assertIsNone(seen)
+        self.assertIsNotNone(why)
+        self.assertIn("no version line", why)
+        self.assertIn(str(exe), why)
+
+    def test_the_declared_text_opens_by_saying_the_bytes_matched_the_pin_but_the_version_line_did_not(self):
+        # the declared refusal must distinguish itself from the pinned one: the sha256 DID match the pin, and it was
+        # the `<exe> version` self-declaration that failed -- the operator needs this to choose the right remedy
+        # (re-pin a correct build vs. fix a wrong path). Without the opening sentence the remedy reads as a dangling
+        # fragment ("line of Open Code Review v1.12.12 ...").
+        do = R.OCR_CHECKS["declared"][1]
+        self.assertIn(
+            "The file's bytes are the ones review.ocr.sha256 pins, but `<exe> version` did not print the version",
+            do,
+        )
+
 
 @POSIX
 class Command(unittest.TestCase):

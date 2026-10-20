@@ -215,6 +215,23 @@ class TheSearchStartsOnlyWhenNothingOfTheSubjectIsAlive(base._Product):
         self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
         self.assertEqual(events[:3], ["decide", "release", "verdict"], events)
 
+    def test_the_workers_range_carries_the_probe_and_spec_name(self):
+        """L1164: the regex worker's process range is named `probe <spec> regex <stream>` — the name the story scope
+        journals as the acquired/released resource (proof.Ranged) and the name a leaked-range diagnostic prints. It
+        names the probe and the spec it ran for, as the subject's own range does; a bare id is not that name."""
+        ranges = []
+
+        def hook(name, argv, **kw):
+            made = PR.ProcessRange(name, argv, **kw)
+            ranges.append(made)
+            return made
+        s = base.spec("app:__main__", {"exit_code": 0, "stdout": {"regex": "^x$"}}, {"argv": ["linger"]}, window=base.W)
+        with mock.patch.object(ci, "ProcessRange", hook):
+            o = ci.CliInvocationProbe().observe(s, self.at, base.env(20))
+        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
+        worker_names = [r.name for r in ranges if "regex" in r.name]
+        self.assertEqual(worker_names, [f"probe {s.id} regex stdout"], worker_names)
+
 
 class ALater(unittest.TestCase):
     """`_Later`, the verdict `decide` leaves to after the release: what it makes of a search that gave no answer."""

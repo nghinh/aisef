@@ -113,6 +113,18 @@ class BudgetSpend(unittest.TestCase):
                          {"provider_requests": 1, "turns": 20, "input_tokens": 300, "output_tokens": 4000,
                           "sessions_started": 0, "requests_recorded": 0, "unaccounted": []})
 
+    def test_unread_lineage_evidence_is_named_unaccounted_with_a_nonempty_reason(self):
+        # Budget.spend L132: an entry the inherited lineage account lists as `unread` is reported unaccounted framed
+        # as evidence that cannot be read or is gone, so the operator sees WHY the ceilings stopped enforcing and can
+        # restore it — distinct from a bare lineage line. The framing must be a NON-EMPTY reason prepended to the raw
+        # entry; emptied (the mutant), the operator reads the bare line and loses that this is an evidence-read
+        # failure. Asserted by behaviour (a non-empty prefix precedes the raw text), not by the exact wording.
+        raw = "run1: RUN.json records 5 turns, and the file is gone"
+        b = client.Budget(self.LIMITS, self.BASE, Listing(()), lambda: 0, {"unread": [raw]})
+        entry = next(u for u in b.spend()["unaccounted"] if raw in u)
+        self.assertNotEqual(entry, raw)                     # a reason was prepended; the mutant leaves the bare entry
+        self.assertTrue(entry[:entry.index(raw)].strip())   # that prepended reason is non-empty text, not just spacing
+
 
 if __name__ == "__main__":
     unittest.main()

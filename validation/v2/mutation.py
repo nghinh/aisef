@@ -1190,7 +1190,7 @@ _V21_R5B_NEW: dict[str, list[str]] = {
     "aisef2/app/lineage.py::_is_a_directory": [_T + "x_lineage_proof.py", _T + "kills3_A09.py",
                                                _T + "defects_lineage2.py"],
     "aisef2/app/lineage.py::_journal_mismatch": [_T + "x_lineage_proof.py"],
-    "aisef2/app/lineage.py::unread_runs": [_T + "x_lineage_proof.py"],
+    "aisef2/app/lineage.py::unread_runs": [_T + "x_lineage_proof.py", _T + "x_lineage_gone.py"],
     # lineage-r2: evidence that is gone beside a readable journal (the run's own record or its journal says it was there)
     "aisef2/app/lineage.py::_recorded_spend": [_T + "x_lineage_gone.py"],
     "aisef2/app/lineage.py::_evidence_gone": [_T + "x_lineage_gone.py", _T + "x_lineage_proof.py"],

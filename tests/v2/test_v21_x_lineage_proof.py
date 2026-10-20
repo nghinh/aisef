@@ -525,6 +525,30 @@ class LinksInPlaceOfRecordsAndClaims(UnreadAsserts):
                 self.assertEqual(lineage.continued_by(r1), (lineage.UNREADABLE_CLAIM, None))
                 self.assertIn("cannot be read", lineage.claim_unread(r1) or "")
 
+    def test_claim_unread_names_the_claim_and_the_reason_not_the_raw_oserror(self):
+        # P1 operator report: continue_from stores claim_unread(run_dir) as the UNREAD held run's "why"
+        # (app/bundle_cli.continue_from, line 893). It must name the claim and the OS reason the operator acts
+        # on ("its permissions, or a faithful copy"), not dump the raw OSError repr -- the errno and the
+        # claim's ABSOLUTE PATH -- into the report. The cause reads `getattr(e, "strerror", None) or e`:
+        # strerror for an OSError; swapping the operands always yields str(e) (an exception is always truthy),
+        # which embeds the full path.
+        for kind in LINKS:
+            with self.subTest(kind):
+                self.fresh(kind)
+                r1 = self.run_dir("run1", 3)
+                claim = r1 / lineage.CLAIM
+                self.nowhere(claim, kind)   # the newest claim is a link that does not read: OSError
+                why = lineage.claim_unread(r1) or ""
+                self.assertIn(f"{lineage.CLAIM} cannot be read", why)
+                self.assertIn("make it readable again", why)
+                self.assertIn("no claim is ever rewritten", why)
+                self.assertNotIn(str(claim), why)   # the report names the claim, not its absolute path
+        # a claim that reads is not "unread": no why at all
+        self.fresh("reads")
+        r1 = self.run_dir("run1", 3)
+        self.claim(r1, 1, self.run_dir("run2", 2))
+        self.assertIsNone(lineage.claim_unread(r1), "a claim that reads is not unread")
+
 
 class RunsTheLineageNamesAndThatAreNotThere(UnreadAsserts):
     """R-3 / F-2: a run that a record of the chain NAMES as the one it continues existed (`aisef run --parent` refuses a
@@ -620,6 +644,21 @@ class JournalThatIsNotTheOneTheRecordNames(UnreadAsserts):
                         (r / "RUN.json").write_text(json.dumps({"journal": {"lines": 7}}), encoding="utf-8")
                     (r / lineage.JOURNAL).write_bytes(cut((r / lineage.JOURNAL).read_bytes()))
                     self.assertEqual(lineage.account_of(r)["unread"], [])
+
+    def test_a_journal_edited_within_a_line_is_caught_by_its_digest_though_the_line_count_holds(self):
+        """R-9: a journal replaced, or edited inside a line, so it has the SAME number of lines but different content is
+        not the run's journal. The three CUTS above all shorten the journal (the line count alone catches them); this one
+        keeps every newline, so only the digest can catch it. RUN.json names a digest as well as a length precisely for
+        this, and `--verify` and `bundle continue` compare it: the record must report a mismatch, not agreement."""
+        self.fresh("edited-in-a-line")
+        r = self.run_dir("run1", 3, seal=True, streams=False)
+        data = (r / lineage.JOURNAL).read_bytes()
+        i = next(k for k, b in enumerate(data) if b != 0x0A)      # a byte that is not a newline: flip it, keep the count
+        (r / lineage.JOURNAL).write_bytes(data[:i] + bytes([data[i] ^ 0x20]) + data[i + 1:])
+        self.assertEqual((r / lineage.JOURNAL).read_bytes().count(b"\n"), data.count(b"\n"))   # the line count did hold
+        bad = lineage._journal_mismatch(r)
+        self.assertIsNotNone(bad, "a same-length edit must be caught by the digest, not waved through on the line count")
+        self.assertIn("digest differs", bad)
 
 
 class NamesThatAreNoPath(UnreadAsserts):

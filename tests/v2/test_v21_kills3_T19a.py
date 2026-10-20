@@ -144,6 +144,10 @@ class _Product(unittest.TestCase):
         f = facts_of(o)
         self.assertEqual(sorted(f), ["subject", "tampered"], o.detail)
         self.assertEqual(f["subject"], "present")
+        # the operator is told WHY it was refuted: the tamper reason is a non-empty report (PM-8 keeps the facts in the
+        # operator's probe-observation artifact, app/diagnostics). Emptied (the mutant), the operator reads only the
+        # bare `tampered` key. Pins HARNESS/answer_to [10] — the reason string — by behaviour, not its exact wording.
+        self.assertTrue(f["tampered"], o.detail)
 
 
 class ForgedLine(_Product):

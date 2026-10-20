@@ -121,6 +121,10 @@ class _Tampering(_Checkouts):
         self.assertEqual(sorted(f), ["subject", "tampered"], f"{why} {o.detail}")   # no exit code, streams, pre, ...
         self.assertEqual(f["subject"], "present", why)
         self.assertIsInstance(f["tampered"], str, why)
+        # The operator is told WHY it was refuted: the tamper reason is a non-empty report, on the closing
+        # exchange (finish) as on the main/pre invocation (answer_to) -- pins HARNESS/finish reason string,
+        # mirroring T21b. Kills the reason-emptied mutant (finish returns "" -> falsy here).
+        self.assertTrue(f["tampered"], f"{why}: the tamper reason is not empty")
 
 
 class MainInvocationAnsweredByTheSubject(_Tampering):

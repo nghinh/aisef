@@ -28,6 +28,7 @@ including as root. Offline; no client, no provider."""
 from __future__ import annotations
 
 import contextlib
+import errno
 import hashlib
 import io
 import json
@@ -249,6 +250,16 @@ class ChildThatCannotBeRead(UnreadContract, Lineage):
         self.assertIs(doc["supersedes"]["claimant_gone"], True)
         self.assertIs(doc["supersedes"]["operator_asserted"], True)
 
+    def test_a_torn_first_line_cause_names_the_journal_and_says_it_is_incomplete(self):
+        """L200: a journal present but cut before its first complete event is UNREAD, and the cause the operator
+        reads (the refusal at `claim`, and the recorded `supersedes['unread']`) says the evidence is THERE and
+        holds no complete event -- not a bare filename, which would not tell a damaged journal from an absence."""
+        self.put_journal(a_journal()[:60])
+        state, why = lineage.child_evidence(self.child)
+        self.assertEqual(state, lineage.UNREAD)
+        self.assertIn(lineage.JOURNAL.name, why)                  # names what could not be read
+        self.assertRegex(why, r"holds bytes|no complete event")   # present but incomplete, not an absence
+
 
 class WhatStaysAsItWas(Lineage):
     """The controls: absence is not unreadable, and a child that reads is decided as before."""
@@ -358,6 +369,22 @@ class PredecessorThatCannotBeListedOrWritten(Lineage):
         got = lineage.lineage_account(self.pred)
         self.assertTrue(got["unaccounted"], got)
         self.assertTrue(any("claim" in u for u in got["unaccounted"]), got["unaccounted"])
+
+    def test_not_there_takes_the_windows_answers_for_absence_but_not_a_refusal(self):
+        """The guard forks absence from a refusal to look. pathlib's Windows answers for 'nothing there' -- an invalid
+        name (123), a drive not ready (21), a reparse point that does not resolve (1921) -- are absence even though
+        their errno is not one of _NOT_THERE; a permission refusal is not. _look / _predecessor / account_of fork
+        UNBEGUN (superseded by evidence) from UNREAD / LineageRefused on exactly this."""
+        class Win(OSError):
+            def __init__(self, winerror: int) -> None:
+                super().__init__(errno.EINVAL, "no")   # EINVAL is not one of _NOT_THERE
+                self.winerror = winerror
+        for win in lineage._NOT_THERE_WINERROR:        # (21, 123, 1921): absence via the winerror branch
+            self.assertTrue(lineage.not_there(Win(win)), win)
+        for err in lineage._NOT_THERE:                 # the errno branch still answers absence
+            self.assertTrue(lineage.not_there(OSError(err, "no")), err)
+        self.assertFalse(lineage.not_there(OSError(errno.EACCES, "denied")))   # a refusal, not absence
+        self.assertFalse(lineage.not_there(Win(999)))                          # a winerror outside the set is a refusal
 
 
 class TheOperatorSeesARefusalNotATraceback(Lineage):
@@ -607,6 +634,32 @@ class RecordThatNamesAJournalOfEvents(UnreadContract, Lineage):
         self.record(self.names(5))
         self.put_journal(a_journal())
         self.assertEqual(lineage.child_state(self.child), lineage.BEGUN)
+
+    def test_the_cause_names_what_about_the_record_cannot_be_read(self):
+        """The UNREAD cause is the operator's own diagnosis of RUN.json (the run's own account): it names what about
+        the record made the journal's absence no evidence of a run that never began, not a bare exception. Each
+        record variant's words (round 2: a record that cannot be read or is not a record says nothing)."""
+        cases = {
+            "[1, 2]": "RUN.json is there and is not a record (a JSON object)",            # JSON, no object (L243)
+            '{"journal": {"path": "run/jour': "RUN.json is there and is not a record",    # cut: not a record (L241)
+            '{"journal": "run/journals/x.jsonl"}': "RUN.json's journal is not a journal record",  # no count (L252)
+        }
+        for n, (doc, cause) in enumerate(cases.items()):
+            with self.subTest(cause):
+                self.child = self.root / f"rec{n}"
+                self.record(doc)
+                state, why = lineage.child_evidence(self.child)
+                self.assertEqual(state, lineage.UNREAD)
+                self.assertIn(cause, why)
+                self.assertIn(lineage.JOURNAL.name, why)
+        # RUN.json itself cannot be opened: a directory stands in its place (a non-ENOENT OSError; no mode needed) (L239)
+        self.child = self.root / "rec-dir"
+        self.child.mkdir()
+        (self.child / "RUN.json").mkdir()
+        state, why = lineage.child_evidence(self.child)
+        self.assertEqual(state, lineage.UNREAD)
+        self.assertIn("RUN.json cannot be read", why)
+        self.assertIn(lineage.JOURNAL.name, why)
 
 
 class TheClaimsRefusalsSayWhatToDo(Lineage):

@@ -201,6 +201,37 @@ class Continue(ProductBase):
         with self.assertRaises(R.RunRefused):
             self.execute("third", predecessor=self.tmp / "nowhere")
 
+    def test_spend_by_run_carries_each_run_s_counters_and_marks_superseded(self):
+        """P2/lineage: `spend_by_run` is the per-run cost breakdown the operator reads. Each row carries the run's four
+        counters, whether its figures are exact, its own unaccounted detail and whether it has a record; a superseded
+        attempt in the lineage (its preflight may have spent) is marked `superseded: True`, a main-lineage run is not."""
+        from unittest import mock
+        from aisef2.app import lineage
+
+        def row(run, superseded, **spend):
+            s = {k: 0 for k in lineage.SPEND}
+            s.update(spend)
+            return {"run": run, "recorded": True, "unaccounted": [], "unread": [], "exact": True,
+                    **s, **({"superseded": True} if superseded else {})}
+
+        main = row(str(self.first), False, provider_requests=3, turns=1, input_tokens=18, output_tokens=2)
+        sup = row(str(self.tmp / "superseded"), True, provider_requests=5)
+        account = {"runs": [main, sup], **{k: main[k] + sup[k] for k in lineage.SPEND},
+                   "unaccounted": [], "unread": [], "total": None}
+        with mock.patch.object(lineage, "lineage_account", return_value=account):
+            _, report = bundle_cli.continue_from(self.doc, self.first)
+        rows = report["spend_by_run"]
+        self.assertEqual(len(rows), 2)
+        # the main-lineage row: four counters + exact + its own unaccounted + recorded, and NOT marked superseded
+        self.assertEqual(set(rows[0]), {"run", *lineage.SPEND, "exact", "unaccounted", "recorded"})
+        self.assertEqual({k: rows[0][k] for k in lineage.SPEND},
+                         {"provider_requests": 3, "turns": 1, "input_tokens": 18, "output_tokens": 2})
+        self.assertEqual((rows[0]["exact"], rows[0]["unaccounted"], rows[0]["recorded"]), (True, [], True))
+        self.assertNotIn("superseded", rows[0])
+        # the superseded attempt is carried, marked truthy and by that exact key, with its own counters
+        self.assertIs(rows[1]["superseded"], True)
+        self.assertEqual(rows[1]["provider_requests"], 5)
+
 
 if __name__ == "__main__":
     unittest.main()

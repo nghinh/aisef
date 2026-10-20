@@ -45,13 +45,15 @@ import os
 import pathlib
 import shutil
 import sys
+import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from aisef2.app import bundle_cli, cli, client, lineage, preflight, settings  # noqa: E402
+from aisef2.app import bundle, bundle_cli, cli, client, lineage, preflight, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.app.verify import verify  # noqa: E402
 from aisef2.journal import format3  # noqa: E402
@@ -690,6 +692,64 @@ class BudgetStopped(ProductBase):
         self.assertEqual(len(got["unread"]), 1, got["unread"])
         self.assertIn("a session that never started", got["unread"][0])
         self.assertIsNone(lineage.lineage_account(killed)["total"])
+
+
+class UnreadRunsNamesEachUnreadRunApart(unittest.TestCase):
+    """When two runs of a lineage are both unread, the operator restore message
+    (run.py / bundle_cli.py / verify.py embed unread_runs in it) must name each run
+    directory apart, separated by ', ', or the paths run together into one that names
+    no directory and the operator cannot restore either (owner: lineage/operator report)."""
+
+    def test_two_unread_runs_are_named_apart_so_the_operator_can_restore_each(self):
+        account = {"runs": [
+            {"run": "/lin/run1", "unread": ["run1: RUN.json records spend whose evidence is gone"]},
+            {"run": "/lin/run2", "unread": ["run2: sessions/ cannot be read (PermissionError)"]},
+        ]}
+        got = lineage.unread_runs(account)
+        self.assertEqual(got, "/lin/run1, /lin/run2")              # comma-space separated, in order
+        self.assertEqual(got.split(", "), ["/lin/run1", "/lin/run2"])  # each a directory the operator can restore
+
+    def test_one_unread_run_is_named_alone(self):
+        account = {"runs": [
+            {"run": "/lin/run1", "unread": ["run1: gone"]},
+            {"run": "/lin/run2", "unread": []},
+        ]}
+        self.assertEqual(lineage.unread_runs(account), "/lin/run1")
+
+    def test_no_unread_run_sends_the_operator_to_the_list_below(self):
+        self.assertEqual(lineage.unread_runs({"runs": [{"run": "/lin/run1", "unread": []}]}),
+                         "the runs named below")
+
+
+class TheUnreadRefusalListsEachUnreadItemSeparately(unittest.TestCase):
+    """`aisef run --parent` over a lineage whose evidence cannot be read refuses and names every unread item so the
+    operator can restore each; execute joins them with '; ' (aisef2/app/run.py::execute, line 542). A lineage's `unread`
+    is the flat list of every run's unread evidence (app/lineage.py::lineage_account), so two is ordinary -- a run whose
+    preflight ledger does not read and another whose session stream does not read. Drop the separator and the two
+    descriptions fuse into one run-on the operator cannot act on; this pins that they stay separate."""
+
+    def setUp(self) -> None:
+        t = tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        self.tmp = pathlib.Path(t.name).resolve()
+        self.pred = self.tmp / "pred"
+        self.pred.mkdir()
+        (self.pred / "RUN.json").write_text("{}", encoding="utf-8")   # a run record there: the claim stage is reached
+        self.project = bundle.load(project_bundle("0" * 40))
+        self.settings = settings.load(SETTINGS)
+
+    def test_two_unread_items_are_not_fused_in_the_refusal(self):
+        a = "run-a: the preflight's ledger does not read (JSONDecodeError): what the preflight spent is unknown"
+        b = "run-b: a session's event stream does not read (ValueError): what the sessions spent is unknown"
+        account = {**{k: 0 for k in SPEND}, "unaccounted": [], "unread": [a, b], "total": None, "runs": []}
+        with mock.patch.object(lineage, "claim", return_value=b"a-claim"), \
+             mock.patch.object(lineage, "lineage_account", return_value=account), \
+             self.assertRaises(R.RunRefused) as c:
+            R.execute(self.project, self.settings, self.tmp / "source", self.tmp / "out", predecessor=self.pred)
+        text = str(c.exception)
+        self.assertIn(a, text)                   # both unread items are named
+        self.assertIn(b, text)
+        self.assertIn(f"{a}; {b}", text)         # and separated, not fused into one run-on the operator cannot read
 
 
 if __name__ == "__main__":

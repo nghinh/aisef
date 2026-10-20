@@ -124,6 +124,17 @@ class Declared(unittest.TestCase):
         self.assertEqual(review_ocr.version_environment("/iso", {"SYSTEMROOT": r"C:\Windows"}),
                          env | {"SYSTEMROOT": r"C:\Windows"})    # the one variable a Windows process cannot start without
 
+    def test_a_version_or_commit_mismatch_reads_as_the_binary_declaring_itself_not_the_pin(self):
+        # the whole mismatch sentence, not just the values: run.ocr_identity and the operator text
+        # (DECLARED_WAYS in test_v21_ocr_identity) tell this failure apart from the others by the marker
+        # "declares itself"; the exe, what it said, and the pin must each be named and not run together
+        _, why = review_ocr.declared("/x/ocr", 0, "open-code-review v1.11.0 (182898c) darwin/arm64\n")
+        self.assertEqual(
+            why,
+            "/x/ocr: declares itself v1.11.0 (182898c), not the pinned v1.12.12 (182898c): no review command was run",
+        )
+        self.assertIn("declares itself", why)   # the marker the operator report classifies on
+
 
 if __name__ == "__main__":
     unittest.main()
