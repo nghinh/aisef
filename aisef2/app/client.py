@@ -18,9 +18,40 @@ import shutil
 import time
 
 from aisef2.app import confine as confinement
-from aisef2.runtime.process_range import ProcessRange
+from aisef2.runtime.process_range import ProcessRange, RangeEscaped, process_table
 
 POLL_S = 5.0
+#: PL-7: a process that left a session's range (setsid) can be caught mid-exit at release(); a session is not refused for
+#: one that is gone within this grace. Polled (returns as soon as all are gone), so it only elapses for one that stays
+#: alive — a developer process that could still write, which must refuse the session. Nothing is ever signalled here.
+ESCAPEE_GRACE_S = 60.0
+
+
+def _release_session(r: ProcessRange) -> list[int]:
+    """release() the session's range. RangeNotEmpty (the range would not empty) propagates — a genuine residual. For
+    RangeEscaped (something left the range and was seen alive at release), re-check the named processes against the
+    table over ESCAPEE_GRACE_S, matched by (pid, created) so a reused pid does not count and a zombie — absent from the
+    table — reads as gone: when all are gone the session keeps its outcome and the gone pids are returned (named on the
+    result, never silent); when one stays alive RangeEscaped is re-raised and the session is refused (it could write).
+    This mirrors the mutation runner's PL-7 settle; it does not widen a timeout or suppress a leak."""
+    try:
+        r.release()
+        return []
+    except RangeEscaped:
+        left = {p.pid: p for p in r.left_the_range()}
+        if not left:
+            raise
+        deadline = time.monotonic() + ESCAPEE_GRACE_S
+        while True:
+            live = process_table()
+            still = [p for pid, p in left.items() if pid in live
+                     and (p.created is None or live[pid].created is None or live[pid].created == p.created)]
+            if not still:
+                return sorted(left)
+            if time.monotonic() >= deadline:
+                raise RangeEscaped(f"{r.name}: processes left the range and stayed alive {ESCAPEE_GRACE_S:g}s after "
+                                   f"release: {[(p.pid, live[p.pid].command) for p in still]}") from None
+            time.sleep(POLL_S)
 #: what the client's telemetry cannot show (recorded with every account of the budget)
 LIMITATION = ("spend is what the client reports per finished step: an HTTP request that finishes no step (a client "
               "retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is "
@@ -230,6 +261,7 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
             except confinement.Unavailable as e:
                 raise SessionRefused(str(e)) from None
         log.parent.mkdir(parents=True, exist_ok=True)
+        left_gone: list[int] = []
         try:
             with log.open("w", encoding="utf-8") as fh:
                 r = ProcessRange(name, argv, cwd=cwd, env=env, output=fh)
@@ -237,13 +269,14 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
                 try:
                     code, stopped = wait_within(r, log, timeout_s, budget, turn_cap)
                 finally:
-                    r.release()
+                    left_gone = _release_session(r)   # PL-7: gone-within-grace escapees are named, not a refusal
         finally:    # however the session ends — an interrupt, a budget read that fails — its stream is redacted (V2.1)
             redacted = redact(log, secrets)
         seen = read_session(log)
         return {"exit": code, "timed_out": code is None and not stopped, "stopped": stopped, "started": True,
                 "error": seen["error"], "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
                 "seconds": round(time.monotonic() - started, 1), "log": log.name, "redacted": redacted,
+                **({"left_range_gone": left_gone} if left_gone else {}),
                 **({"confinement": f"bwrap network={confine['network']}" + ("" if workspace_writable else " workspace=read-only")}
                    if confine is not None else {})}
     return {"exit": None, "timed_out": False, "stopped": stopped, "started": False, "error": stopped, "text": "", "turns": 0,

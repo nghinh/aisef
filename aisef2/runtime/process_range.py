@@ -436,6 +436,12 @@ class ProcessRange:
             return []
         return self._os.escaped(self._anchor.pid)
 
+    def left_the_range(self) -> list[Proc]:
+        """What the last release saw leave the range (`_Flight.escaped`), as recorded — readable after the reap, when
+        `escaped()` can no longer measure. A RangeEscaped names these; a caller re-checks them against the table to tell
+        a process caught mid-exit at release (gone within a grace) from one that stays alive (PL-7). Nothing is signalled."""
+        return list((self._flight.escaped if self._flight is not None else {}).values())
+
     def wait_empty(self, timeout: float | None) -> bool:
         """True as soon as the range is measured empty; False if it is not empty when `timeout` ends (None: wait)."""
         deadline = None if timeout is None else time.monotonic() + timeout
