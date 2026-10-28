@@ -543,6 +543,20 @@ class TheStatementOfWhoCanRead(Scratch):
         self.assertNotIn(str(self.folder), mounted)
         self.assertFalse([m for m in mounted if str(self.folder).startswith(m.rstrip("/") + "/")], mounted)
 
+    def test_a_sandbox_made_mount_over_the_run_directory_is_not_a_host_mount(self):
+        # The run directory sits under /tmp. A confined session gets a FRESH --tmpfs at /tmp
+        # (sandbox-made, empty), not the host's /tmp: it exposes nothing of the directory, so the
+        # statement must stay SESSIONS_CONFINED. access_of lists only the HOST's binds
+        # (confine.targets host=True); reading --tmpfs/--proc/--dev as host mounts would wrongly
+        # claim SAME_USER for a directory a session cannot in fact read.
+        folder = "/tmp/aisef-run-under-a-tmpfs.0.p0"           # need not exist: realpath + prefix compare only
+        full, _ = confine.wrap(self.spec(str(self.other)), ["true"], self.env_,
+                               str(pathlib.Path(folder) / "work" / "ws"), self.exe, system="linux")
+        self.assertNotIn("/tmp", confine.targets(full, host=True))     # /tmp is not a host bind
+        self.assertIn("/tmp", confine.targets(full, host=False))       # it is a sandbox-made tmpfs
+        self.assertEqual(D.access_of(folder, self.spec(str(self.other)), self.env_, self.exe, "linux"),
+                         D.SESSIONS_CONFINED)
+
     def test_a_directory_the_sandbox_mounts_or_one_that_holds_it_is_the_same_user_again(self):
         self.folder.mkdir()
         for held in (str(self.out), str(self.tmp), str(self.folder)):

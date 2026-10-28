@@ -687,6 +687,23 @@ class TheResultIsDataFromAnotherProcess(unittest.TestCase):
         self.assertEqual(fa._worker_facts({**good, "matches": 2, "locations": [[0, 1], [1, 1]]}, self.RELS)["matches"], 2)
         self.assertEqual(fa._worker_facts({**good, "matches": 2, "locations": [[0, 1], [0, 3]]}, self.RELS)["matches"], 2)
 
+    def test_skipped_binary_must_be_ascending_not_merely_distinct(self):
+        # skipped_binary is a trust boundary: a result from another process must be the canonical
+        # ascending, distinct form, not just distinct. [8, 0] is distinct but descending, so it is
+        # rejected for not being ascending. The check is `skipped != sorted(set(skipped))`; a
+        # `list(set(skipped))` check would wrongly accept it, because CPython's set-iteration order
+        # for {8, 0} is [8, 0] (the "skipped out of order" [2, 1] case above does not expose this,
+        # as list(set([2, 1])) happens to be ascending).
+        rels = [f"f{i}.py" for i in range(9)]
+        self.assertEqual(list({8, 0}), [8, 0], "witness assumes CPython set order; re-derive if it changes")
+        obj = {"files": 9, "matches": 0, "skipped_binary": [8, 0], "locations": []}
+        with self.assertRaises(fa.WorkerFailed) as caught:
+            fa._worker_facts(obj, rels)
+        self.assertEqual(caught.exception.reason, "BAD_RESULT")
+        # the ascending form of the very same indexes is accepted: this is not a blanket refusal
+        self.assertEqual(fa._worker_facts({**obj, "skipped_binary": [0, 8]}, rels)["skipped_binary"],
+                         ["f0.py", "f8.py"])
+
     def test_the_size_a_result_may_have_is_what_the_request_can_produce(self):
         cap = 65536 + 8 * (len("f.txt") + 8)
         facts = '{"files": 1, "matches": 0, "skipped_binary": [], "locations": []}'
