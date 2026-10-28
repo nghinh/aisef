@@ -1,0 +1,1146 @@
+{
+ "record": "Step 2 — reconciliation of the 62 MISSING V2.1 targets at fce3d7b7 (owner decision 2026-10-28)",
+ "final_head": "fce3d7b75dd88378a5a349510ae7dec6ee7eb113",
+ "qualifier_snapshot_frozen": "cc5359699c057f666f1693b90f1beb4762676478",
+ "method": "proof()'s own why strings (frozen criteria, each vs its result's measured_on); per target the most benign result; no proof re-run, no rule change, no measurement",
+ "accounting_at_head": {
+  "total": 614,
+  "measured_at_final_head": 180,
+  "reused_after_mechanical_proof": 372,
+  "missing": 62
+ },
+ "handling_breakdown": {
+  "REMEASURE-TESTS": 46,
+  "REMEASURE-PRODUCT": 16
+ },
+ "by_module": {
+  "aisef2/app/adapters.py": 5,
+  "aisef2/app/bundle.py": 3,
+  "aisef2/app/bundle_cli.py": 6,
+  "aisef2/app/cli.py": 2,
+  "aisef2/app/client.py": 7,
+  "aisef2/app/diagnostics.py": 2,
+  "aisef2/app/lineage.py": 7,
+  "aisef2/app/review_ocr.py": 2,
+  "aisef2/app/review_verify.py": 2,
+  "aisef2/app/run.py": 10,
+  "aisef2/app/settings.py": 1,
+  "aisef2/app/usage.py": 1,
+  "aisef2/app/verify.py": 1,
+  "aisef2/orchestrate/story_runner.py": 3,
+  "aisef2/probe/catalog.py": 2,
+  "aisef2/probe/cli_invocation.py": 2,
+  "aisef2/runtime/process_range.py": 6
+ },
+ "kill_test_files_implicated": {
+  "tests/v2/test_v21_continue_usage.py": 27,
+  "tests/v2/test_v21_pm8_diagnostics.py": 8,
+  "tests/v2/test_v21_ocr_declared.py": 5,
+  "tests/v2/test_v21_continue_integrity.py": 5,
+  "tests/v2/ledgerlock_candidate.py": 4,
+  "tests/v2/test_v21_identity.py": 4,
+  "tests/v2/test_v21_review.py": 4,
+  "tests/v2/test_v21_review_chain.py": 4,
+  "tests/v2/test_v21_migrate_semantics.py": 4,
+  "tests/v2/test_v21_x_lineage_proof.py": 4,
+  "tests/v2/test_v21_r5_review_deep_input.py": 3,
+  "tests/v2/test_v21_bundle_tools.py": 3,
+  "tests/v2/test_v21_ocr_identity.py": 3,
+  "tests/v2/test_v21_pw_lineage_unread.py": 3,
+  "tests/v2/test_s2_kills.py": 2,
+  "tests/v2/test_v21_r5_regex_isolation.py": 2,
+  "tests/v2/test_v21_pw_lineage_continue.py": 1,
+  "tests/v2/test_s2_kills_deterministic.py": 1,
+  "tests/v2/test_v21_x_lineage_gone.py": 1
+ },
+ "resume_slice_reconciliation": {
+  "mw0_mw1_measured_at_head": 199,
+  "of_those_chosen_measured_at_final_head": 180,
+  "of_those_a_cleaner_reuse_was_chosen_instead": 19,
+  "of_those_missing": 0,
+  "missing_inside_slice": 0,
+  "missing_outside_slice": 62,
+  "note": "the resume campaign measured a 199-target slice at fce3d7b7; 180 were kept as measured_at_final_head, 19 were superseded by a cleaner reused result (a fresh result with a survivor still pending audit does not win over a clean reusable one). ALL 62 MISSING are OUTSIDE the slice."
+ },
+ "why_the_total_differs_from_the_oct20_262_352_plan": [
+  "The 262 re-measure / 352 reuse split (memory aisef-trang-thai-2026-10-20) was a PLAN from the read-set/delta tool (validation/qualification/v21_snapshot_delta.py --read-set): a target whose changed module bytes are not in the kill tests' MEASURED runtime read-set at head was ruled reuse-OK.",
+  "This record is built by the FROZEN proof() of v21_mutation_record.py (criteria_sha256 9e6f9d39bee3b765), which is STATIC and FILE-level: any byte change to the module file or to a kill-test closure file disqualifies reuse. It does not consult the runtime read-set. The two gates are different frozen criteria and classify ~20 targets differently in each direction (reuse 352->372, remeasure 262->242).",
+  "Under proof() at fce3d7b7: 614 = 372 reusable + 242 must-measure-at-head (= 180 measured_at_final_head + 62 MISSING). The must-measure set is 242, not 262.",
+  "Operationally dominant: the resume campaign completed a 199-target slice of the must-measure set (disk blocker cut it from 4 workers to 2; see memory 2026-10-21). 180 of the 199 are kept at head; the 62 MISSING are the must-measure targets the slice did not cover.",
+  "The owner's premise 'product snapshot did not change' holds for 46 of the 62 (module byte-identical at head; only the kill-test closure changed — the owed kill tests in commit fd1a1658, added AFTER the campaign snapshot). It does NOT hold for 16: their product module changed between the frozen snapshot and head (fd1a1658 PL-7 teardown hardening; fce3d7b7 calibration re-derivation)."
+ ],
+ "rows": [
+  {
+   "target": "aisef2/app/adapters.py::Reviewer.__init__",
+   "module": "aisef2/app/adapters.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pm8_diagnostics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._model",
+   "module": "aisef2/app/adapters.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_r5_review_deep_input.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "module": "aisef2/app/adapters.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_ocr_declared.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._verify",
+   "module": "aisef2/app/adapters.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pm8_diagnostics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer.review",
+   "module": "aisef2/app/adapters.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_r5_review_deep_input.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/bundle.py::Project.order",
+   "module": "aisef2/app/bundle.py",
+   "best_measured_on": "f860e57fdc",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/ledgerlock_candidate.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/bundle.py::load",
+   "module": "aisef2/app/bundle.py",
+   "best_measured_on": "f860e57fdc",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/ledgerlock_candidate.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/bundle.py::shape_problems",
+   "module": "aisef2/app/bundle.py",
+   "best_measured_on": "f860e57fdc",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/ledgerlock_candidate.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::EXAMPLES",
+   "module": "aisef2/app/bundle_cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::JournalRefused.__init__",
+   "module": "aisef2/app/bundle_cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pw_lineage_continue.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_create",
+   "module": "aisef2/app/bundle_cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_exposure",
+   "module": "aisef2/app/bundle_cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_key",
+   "module": "aisef2/app/bundle_cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_write_new",
+   "module": "aisef2/app/bundle_cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "module": "aisef2/app/cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/cli.py::run",
+   "module": "aisef2/app/cli.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE",
+    "OTHER"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_ocr_declared.py",
+    "tests/v2/test_v21_ocr_identity.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/client.py::Budget.__init__",
+   "module": "aisef2/app/client.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_x_lineage_proof.py"
+   ],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/client.py::Budget.reached",
+   "module": "aisef2/app/client.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/client.py::Budget.spend",
+   "module": "aisef2/app/client.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_v21_x_lineage_proof.py"
+   ],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/client.py::environment",
+   "module": "aisef2/app/client.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/client.py::read_session",
+   "module": "aisef2/app/client.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/client.py::session",
+   "module": "aisef2/app/client.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/client.py::wait_within",
+   "module": "aisef2/app/client.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::NOT_INSPECTED",
+   "module": "aisef2/app/diagnostics.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pm8_diagnostics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::_NAME",
+   "module": "aisef2/app/diagnostics.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pm8_diagnostics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/app/lineage.py::ANCHOR_LINE",
+   "module": "aisef2/app/lineage.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/lineage.py::JOURNAL",
+   "module": "aisef2/app/lineage.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/lineage.py::_git",
+   "module": "aisef2/app/lineage.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/lineage.py::_look",
+   "module": "aisef2/app/lineage.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_pw_lineage_unread.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/lineage.py::_sha",
+   "module": "aisef2/app/lineage.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_state",
+   "module": "aisef2/app/lineage.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_pw_lineage_unread.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/lineage.py::predecessor_of",
+   "module": "aisef2/app/lineage.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_x_lineage_proof.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::VERSION_LINE",
+   "module": "aisef2/app/review_ocr.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_ocr_declared.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::pinned",
+   "module": "aisef2/app/review_ocr.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_ocr_declared.py",
+    "tests/v2/test_v21_ocr_identity.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "module": "aisef2/app/review_verify.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_r5_review_deep_input.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "module": "aisef2/app/review_verify.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pm8_diagnostics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/app/run.py::admit",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/run.py::check_git",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/run.py::check_repository",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/run.py::delivery",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_ocr_declared.py",
+    "tests/v2/test_v21_ocr_identity.py",
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pw_lineage_unread.py",
+    "tests/v2/test_v21_x_lineage_gone.py",
+    "tests/v2/test_v21_x_lineage_proof.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/run.py::layers_of",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/run.py::probe_factories",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_pm8_diagnostics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/app/run.py::productproof",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/run.py::runspec_of",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/app/run.py::unfinished",
+   "module": "aisef2/app/run.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/settings.py::endpoint_problem",
+   "module": "aisef2/app/settings.py",
+   "best_measured_on": "f860e57fdc",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/ledgerlock_candidate.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/usage.py::_DATE",
+   "module": "aisef2/app/usage.py",
+   "best_measured_on": "289885ef1b",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 4
+  },
+  {
+   "target": "aisef2/app/verify.py::_runspec_problems",
+   "module": "aisef2/app/verify.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLSET",
+    "KILLTESTS",
+    "MODULE"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_continue_usage.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 5
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "best_measured_on": "5719f1f87e",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_Held.__call__",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "best_measured_on": "5719f1f87e",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "best_measured_on": "5719f1f87e",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 3
+  },
+  {
+   "target": "aisef2/probe/catalog.py::CatalogEntry.capability_changes",
+   "module": "aisef2/probe/catalog.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/probe/catalog.py::CatalogEntry.capability_version",
+   "module": "aisef2/probe/catalog.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::REGEX_WORKER/found",
+   "module": "aisef2/probe/cli_invocation.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_r5_regex_isolation.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::StreamSearchFailed.__init__",
+   "module": "aisef2/probe/cli_invocation.py",
+   "best_measured_on": "4ec961e706",
+   "best_blockers": [
+    "KILLTESTS"
+   ],
+   "union_blockers": [
+    "KILLTESTS"
+   ],
+   "kill_tests_changed": [
+    "tests/v2/test_v21_r5_regex_isolation.py"
+   ],
+   "handling": "REMEASURE-TESTS",
+   "n_results": 1
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.__init__",
+   "module": "aisef2/runtime/process_range.py",
+   "best_measured_on": "289885ef1b",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 2
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange._abort",
+   "module": "aisef2/runtime/process_range.py",
+   "best_measured_on": "289885ef1b",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 2
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange._close_pipes",
+   "module": "aisef2/runtime/process_range.py",
+   "best_measured_on": "289885ef1b",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 2
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange._ladder",
+   "module": "aisef2/runtime/process_range.py",
+   "best_measured_on": "289885ef1b",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 2
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::_Flight.__init__",
+   "module": "aisef2/runtime/process_range.py",
+   "best_measured_on": "289885ef1b",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 2
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::targets",
+   "module": "aisef2/runtime/process_range.py",
+   "best_measured_on": "289885ef1b",
+   "best_blockers": [
+    "MODULE"
+   ],
+   "union_blockers": [
+    "MODULE"
+   ],
+   "kill_tests_changed": [],
+   "handling": "REMEASURE-PRODUCT",
+   "n_results": 2
+  }
+ ]
+}
