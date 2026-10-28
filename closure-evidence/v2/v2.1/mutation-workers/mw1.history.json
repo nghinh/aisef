@@ -1,0 +1,13 @@
+{
+ "worker": "mw1",
+ "snapshot": "fce3d7b75dd88378a5a349510ae7dec6ee7eb113",
+ "status": "resume requalification; queue DONE 2026-10-28 18:12 +07; clean 0 TIMEOUT/0 INFRA/0 NOT_RUN; per-worker runner verdict FAIL by design (out-of-slice no-result + unaudited survivors pending audit)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/mw1.log",
+  "sha256": "a060c7d99285e2239083b29316afdeda02244a2e3059a42c89ff3f7fdc5f9a46"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/mw1.record.json",
+  "sha256": "200d6b1698137908fbbe1fc552bbb0214f65d866c9188752fddc27d710e7d557"
+ }
+}

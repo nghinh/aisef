@@ -1,0 +1,81 @@
+{
+ "record": "AISEF V2.1 mutation — completed-result preservation manifest (owner decision 2026-10-28, step 1)",
+ "measured_product_snapshot": {
+  "final_head": "fce3d7b75dd88378a5a349510ae7dec6ee7eb113",
+  "head_now": "fce3d7b75dd88378a5a349510ae7dec6ee7eb113",
+  "note": "every mw0/mw1 result was measured at FINAL_HEAD=fce3d7b7; not re-sealable (verdict FAIL)."
+ },
+ "qualifier_snapshot_frozen": "cc5359699c057f666f1693b90f1beb4762676478",
+ "verdict": "FAIL",
+ "accounting": {
+  "TOTAL_TARGETS": 614,
+  "measured_at_final_head": 180,
+  "reused_after_mechanical_proof": 372,
+  "AUDITED_SURVIVORS": 382,
+  "UNAUDITED_SURVIVORS": 2
+ },
+ "missing_count": 62,
+ "unaudited_remaining": [
+  "aisef2/app/diagnostics.py::access_of: unaudited survivor 'L106 True->False'",
+  "aisef2/probe/file_artifact.py::_worker_facts: unaudited survivor 'L432 sorted() -> list()'"
+ ],
+ "qualifier": {
+  "path": "validation/qualification/v21_mutation_record.py",
+  "file_sha256": "ccdab2dd66547f3497c2ec94dbf253e9602af31712dad0d0863fa54a9ec80bc5",
+  "criteria_sha256": "9e6f9d39bee3b76549071a326bd32dd85d50d705ed18c396c8764a4c10b3dbdf",
+  "criteria_sha256_frozen": "9e6f9d39bee3b76549071a326bd32dd85d50d705ed18c396c8764a4c10b3dbdf",
+  "s2_criteria_sha256": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+  "s2_criteria_sha256_frozen": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+  "criteria_unchanged": true
+ },
+ "files": [
+  {
+   "path": "closure-evidence/v2/v2.1/MUTATION.json",
+   "sha256": "54ba8f5606a287eb1b795c3c7777ad4456d41513b4d77f3d2ea7255dfdae2d53",
+   "bytes": 77054759
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/MUTATION-SUMMARY.json",
+   "sha256": "3cc7cb3ceebccb5778177a7aa1f83d38e55ebdbe3bcf9ea16786618fd7db7754",
+   "bytes": 717237
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json",
+   "sha256": "09f37c9e3a616883b1caf6347336e55b372e0f9b14429f339616155f8f820020",
+   "bytes": 1008621
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/mutation-workers/mw0.history.json",
+   "sha256": "0ce1d1223a7497efb7669a4c503a5542fbcf08731c2531216235a6066252aa33",
+   "bytes": 609
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/mutation-workers/mw0.record.json",
+   "sha256": "8a123d86241a1c7c871ff1010df74c011f09857d95d57dbd3ae31a24e77c07a8",
+   "bytes": 17594188
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/mutation-workers/mw0.log",
+   "sha256": "33d64df71767a7378e15c93514423ceba224a97e0fe6300565c0c0cb88c54a7d",
+   "bytes": 15875623
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/mutation-workers/mw1.history.json",
+   "sha256": "eff0a80acc090067d39a5547af934fa475de9658dc073e4b81149f0bd39409df",
+   "bytes": 609
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/mutation-workers/mw1.record.json",
+   "sha256": "200d6b1698137908fbbe1fc552bbb0214f65d866c9188752fddc27d710e7d557",
+   "bytes": 17873283
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/mutation-workers/mw1.log",
+   "sha256": "a060c7d99285e2239083b29316afdeda02244a2e3059a42c89ff3f7fdc5f9a46",
+   "bytes": 16099599
+  }
+ ],
+ "excluded_from_this_commit": {
+  "closure-evidence/v2/v2.1/campaign-9/run/": "STALE scratch of campaign 9 (launched 2026-10-18, 4ec961e); its imported results already live in committed mutation-workers/c9-w*.record.json. Not part of the mw0/mw1 result."
+ }
+}

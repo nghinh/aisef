@@ -9073,6 +9073,68 @@
    ],
    "source_sha256": "ab2f33e6dd463a3da57e9cab69514411164e09785e1ac0a304ea20f868b82602",
    "provenance": "carried:remapped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_known",
+   "index": 7,
+   "mutant": "L168 And swapped",
+   "class": "EQUIVALENT",
+   "group": "resume requalification B-03b survivor audit (2026-10-28)",
+   "grounds": "mutant_view: bundle_cli.py:168 `if old is not None and old not in known:` -> operands of `and` swapped to `old not in known and old is not None`. `old` is the return of _earlier(s, release) (bundle_cli.py:150-156): a spec id (str) or None, both hashable. `x not in known` (known is a plain dict built at :163) never raises and has no side effect for a hashable key; `x is not None` never raises and has no side effect. `and` yields the same boolean for either order when both operands are total and side-effect-free. old is None: original short-circuits False at `is not None`; swapped evaluates `None not in known` (True; None is never a key) then `None is not None` (False) -> False. old is a str: both orders evaluate to the same pair of booleans. The guarded block (:169 known[old], origin[old]=...) runs on exactly the same iterations. No observable difference. Prior campaign-9 record: same mutant SURVIVED at the same module sha (not a regression).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:159-170 _known - sole use of `old`; the guard decides whether known/origin get the entry",
+    "aisef2/app/bundle_cli.py:150-156 _earlier - returns a spec id (str) or None, both hashable, no other type",
+    "known/origin are the return value, consumed by _origins/callers: byte-identical dicts for both operand orders"
+   ],
+   "exceptions_checked": [
+    "old is None: both orders yield False (no KeyError; None is never a key of known)",
+    "`not in` on a dict never raises for a hashable key; old is str|None, both hashable",
+    "no operand mutates or calls user code, so the order of evaluation is unobservable",
+    "prior record: same mutant SURVIVED at the same module sha"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "provenance": "resume-requalification:2026-10-28:claude-single-review (NOT two-blind; pending independent re-verification)"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 179,
+   "mutant": "L965 string \" (a sessions directory, a session stream or the preflight's ledger that is gone comes back from such a copy); where that cannot be done this lineage cannot be continued (a run without --parent inherits nothing): \" emptied",
+   "class": "AUDITED",
+   "group": "resume requalification B-03b survivor audit (2026-10-28)",
+   "grounds": "The mutant empties the f-string literal at bundle_cli.py:965 ` (a sessions directory, a session stream or the preflight's ledger that is ` inside the run_parent_refused report field, built only when account['unread'] is truthy (:961). The emptied clause is non-load-bearing explanatory prose: the message still interpolates lineage.unread_runs(account) (:965) and retains 'a faithful copy of the run directory at' (:964), 'gone comes back from such a copy)' (:966), 'this lineage cannot be continued (a run without --parent inherits nothing)' (:966-967), 'no flag accepts it' (:963), 'is gone' (:962), and the '; '.join(account['unread']) tail (:967). Kill tests assert exactly the actionable substrings, all preserved. run_parent_refused is operator-facing prose; no contract or machine consumer reads this clause. Prior campaign-9 record: same mutant SURVIVED at the same module sha.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:961-967 - sole construction of run_parent_refused; the emptied clause sits between the unread_runs interpolation and the 'gone comes back' clause",
+    "tests/v2/test_v21_x_lineage_gone.py:314-317 - asserts run_parent_refused contains 'no flag accepts it', 'is gone', 'faithful copy', str(d); none is the emptied clause",
+    "tests/v2/test_v21_x_lineage_proof.py:1124-1138 - asserts 'no flag accepts it', 'faithful copy', str(self.first); none is the emptied clause",
+    "run_parent_refused is a string field read by the operator; no code branches on its content"
+   ],
+   "exceptions_checked": [
+    "built only when account['unread'] is truthy (:961); else None and the clause is never produced - unobservable",
+    "no test pins the full run_parent_refused string; only substring asserts, all on preserved fragments",
+    "prior record: same mutant SURVIVED at the same module sha (not a regression)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "provenance": "resume-requalification:2026-10-28:claude-single-review (NOT two-blind; pending independent re-verification)"
+  },
+  {
+   "target": "aisef2/app/diagnostics.py::Sink._keep",
+   "index": 15,
+   "mutant": "L216 string ' exists: an artifact is never overwritten' emptied",
+   "class": "AUDITED",
+   "group": "resume requalification B-03b survivor audit (2026-10-28)",
+   "grounds": "The mutant empties the FileExistsError message at diagnostics.py:216 ` exists: an artifact is never overwritten` -> raise FileExistsError(f'{name}'). The load-bearing behavior - raising FileExistsError when final.exists() (create-only, INV-MUTATION-AUTHORITY: an artifact is never overwritten) - is unchanged; only the exception's human-readable message differs. No consumer depends on the message: callers catch by type (FileExistsError), and no test asserts the message (grep: 0 references to 'an artifact is never overwritten' in tests/v2). Mirrors the campaign-9 AUDITED entry for Sink._keep[13] (message/file-bytes-cosmetic class). Prior campaign-9 record: same mutant SURVIVED at the same module sha.",
+   "consumers_checked": [
+    "aisef2/app/diagnostics.py:204-222 Sink._keep - the raise; the refuse-to-overwrite behavior is unchanged by emptying the message",
+    "tests/v2 - no test references 'an artifact is never overwritten'; create-only behavior (if tested) asserts the FileExistsError type, not its text",
+    "the FileExistsError propagates to the operator; no code branches on its args/message"
+   ],
+   "exceptions_checked": [
+    "the raise still fires on final.exists(): the create-only invariant is intact; only the message changed",
+    "no golden/byte fixture pins this exception's message",
+    "prior record: same mutant SURVIVED at the same module sha (not a regression)"
+   ],
+   "source_sha256": "db7e2d467ab643a5d47be16623642a518900a9404a171db9ea7f839fe1808cd5",
+   "provenance": "resume-requalification:2026-10-28:claude-single-review (NOT two-blind; pending independent re-verification)"
   }
  ]
 }
