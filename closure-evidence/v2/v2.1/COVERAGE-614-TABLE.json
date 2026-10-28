@@ -1,0 +1,35 @@
+{
+ "merged_head": "d043231e",
+ "total_targets": 614,
+ "partition": {
+  "new_measure_scope": {
+   "n": 90,
+   "why": "62 MISSING ∪ closure-affected by the 2 edits"
+  },
+  "still_valid_measured": {
+   "n": 162,
+   "why": "measured_at_final_head minus closure-affected"
+  },
+  "still_valid_reused": {
+   "n": 362,
+   "why": "reused_after_mechanical_proof minus closure-affected"
+  }
+ },
+ "sum_check": 614,
+ "set_checks": {
+  "pairwise_disjoint": true,
+  "union_equals_V21_TARGETS": true
+ },
+ "affected_breakdown": {
+  "affected_total": 36,
+  "affected_in_measured": 18,
+  "affected_in_reused": 10,
+  "affected_in_missing": 8
+ },
+ "expected_by_owner": {
+  "still_valid_measured": 162,
+  "still_valid_reused": 362,
+  "new_measure": 90
+ },
+ "matches_owner_table": true
+}

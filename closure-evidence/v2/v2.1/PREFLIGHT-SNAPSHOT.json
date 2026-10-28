@@ -1,0 +1,84 @@
+{
+ "record": "V2.1 supplementary campaign — PREFLIGHT SNAPSHOT (owner decision 2026-10-28, approved 2026-10-29)",
+ "pinned_measurement_commit": "d043231e11b677b0c9a551c8d978f486315411fe",
+ "base_product_commit": "fce3d7b7",
+ "merged_survivor_kills_commit": "50812da2",
+ "product_identity": {
+  "aisef2_tree_object_sha": "5f34a3f32bb101e007db67922e694efdd9c7dcad",
+  "identical_at_fce3d7b7_and_merged": true,
+  "proof": "git rev-parse fce3d7b7:aisef2 == d043231e:aisef2"
+ },
+ "edited_kill_tests": {
+  "tests/v2/test_v21_pm8_diagnostics.py": {
+   "blob_merged": "6e92339f1c700e6c13783060556cb8bfa903040e",
+   "blob_fce3d7b7": "854c1aac71982b3cbb1ef111169d2d3023165ca9",
+   "sha256_worktree": "9dd9eb17ab9c2bdaf1afbee750b3d65a08276d7104190f6c7ce04bdce7805e21"
+  },
+  "tests/v2/test_v21_fa_grep_worker.py": {
+   "blob_merged": "df1e0efb0958961f5ba39c88f0debaac027c1927",
+   "blob_fce3d7b7": "8ce9467cf2cf1fe25ed12c8517b89b080db93848",
+   "sha256_worktree": "037c02587f53da9b47144fc5a76a14fb3bbf63cabbabd9042d5f10a3cc65f028"
+  }
+ },
+ "gates": {
+  "ruff_0_16_4": "CLEAN",
+  "test_meta": "34 OK",
+  "test_v21_pm8_diagnostics": "65 OK",
+  "test_v21_fa_grep_worker": "43 OK",
+  "v1_evidence_guard": "PASS",
+  "full_unit_suite": {
+   "ran": 7978,
+   "failures": 19,
+   "skipped": 89,
+   "seconds": 4904,
+   "provider_calls_escaped": 0,
+   "verdict": "RED — pre-existing record-currency / tree-binding meta-tests on the unsealed closure branch",
+   "merge_caused": false,
+   "test_files_unchanged_since": "4ec961e",
+   "cannot_green_without": "regenerating/sealing records (forbidden this round)",
+   "failing_modules": [
+    "v2.p0.test_checker_calibration(4)",
+    "v2.p0.test_destructive_authority(1)",
+    "v2.p0.test_freeze_manifest(1)",
+    "v2.p5.test_invariants(2)",
+    "v2.test_c2_delivery_experiment(2)",
+    "v2.test_c2_k_nowork_001(1)",
+    "v2.test_c2_orchestration_conformance(2)",
+    "v2.test_c2_p5_acceptance(2)",
+    "v2.test_p5_plan_v22_proposal(1)",
+    "v2.test_p9_reproduction(1)",
+    "v2.test_v21_conformance_ruling(1)",
+    "v2.test_v21_read_set(1)"
+   ]
+  },
+  "t0_rehearsal": {
+   "targets": [
+    "story_runner.py::run_story (measured-at-head)",
+    "story_runner.py::StoryResult.revision (scoped)"
+   ],
+   "head": "d043231e",
+   "hermetic": true,
+   "outcome": "PASS",
+   "seconds": 354,
+   "provider_calls_escaped": 0,
+   "record_currency_tests_auto_skip": {
+    "test_c2_k_nowork_001.py": "ran 17 skipped 4",
+    "test_c2_orchestration_conformance.py": "ran 24 skipped 4"
+   }
+  }
+ },
+ "measurement_soundness": {
+  "failing_modules_that_are_kill_files": [
+   "tests/v2/test_c2_k_nowork_001.py",
+   "tests/v2/test_c2_orchestration_conformance.py"
+  ],
+  "scoped_targets_using_them": [
+   "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+   "aisef2/orchestrate/story_runner.py::_Held.__call__",
+   "aisef2/orchestrate/story_runner.py::_attempt"
+  ],
+  "measured_at_head_users_with_clean_results": 8,
+  "conclusion": "the 19 red tests do not corrupt any of the 90 T0 baselines — their record-currency tests auto-skip under the mutation runner; T0 proven PASS"
+ },
+ "limits": "no push / tag / publish / release / paid provider / APPROVE.sh / self-acceptance / reseal"
+}
