@@ -1,0 +1,49 @@
+{
+ "record": "AISEF 2.1.0 — release phase checkpoints (charter §22 analogue for the 2.1 patch lane). Read by validation/v2_release_gate.py for VERSION 2.1.0 (FINAL_RELEASE_READY, OPEN_BLOCKERS).",
+ "version": "2.1.0",
+ "authority": "owner directive 2026-10-31 (chat), closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 6",
+ "candidate": {
+  "aisef2_product_tree": "5f34a3f3 (= fce3d7b7); frozen, no product-code change in this release preparation",
+  "measurement_head": "8c7bdb44fdf8e4b19dda895c08cf8a9eeee66282",
+  "rc_source_sha": "PENDING (the 2.1.0 version-bump commit on release/v2.1.0)",
+  "rc_frozen": "PENDING (release_rc.py --freeze from the staging build of the RC commit)"
+ },
+ "FINAL_RELEASE_READY": "PREPARED_PUBLISH_WITHHELD",
+ "FINAL_RELEASE_READY_MEANING": "Release preparation is complete and the candidate is validated; production publication is explicitly WITHHELD pending separate owner authorization (RELEASE-DECISIONS seq 6, PRODUCTION_PUBLISH NOT_AUTHORIZED). This is intentionally not the string 'PASS': the v2 release gate must and does refuse production publication for 2.1.0.",
+ "OPEN_BLOCKERS": [],
+ "OPEN_BLOCKERS_MEANING": "Confirmed release-blocking product defects (owner §4): a confirmed material failure of core functionality/release-critical obligations, security/secrets/authorization/access, decision/verdict correctness, data/evidence integrity within the supported envelope, or a mandatory deployment/compatibility requirement. There are none. The mutation-gate FAIL and A-03 are recorded below as ACCEPTED EXCEPTIONS / documented limitations, not open blockers.",
+ "GATE_VERDICTS": {
+  "note": "True verdicts at the frozen candidate; preserved, never reworded to PASS.",
+  "ruff": "PASS (ruff 0.16.4, ruff check . — the F541 helper lint fixed, RELEASE-DECISIONS seq 6)",
+  "mutation_record": "FAIL — 7 owner-accepted unaudited survivors (ACCEPTED EXCEPTION, seq 6); verdict preserved, not converted to PASS",
+  "v2_release_gate_2.1.0": "FAIL by design — PRODUCTION_PUBLISH NOT_AUTHORIZED (seq 6); this is the correct 'publish withheld' state, not a defect",
+  "unit_suite_macos": "PENDING_CI (re-validated on the committed tree in CI)",
+  "unit_suite_linux": "PENDING_CI",
+  "unit_suite_windows": "PENDING_CI",
+  "staging_build_install_linux_windows": "PENDING_CI"
+ },
+ "ACCEPTED_EXCEPTIONS": [
+  {
+   "id": "MUTATION-7-UNAUDITED-SURVIVORS",
+   "verdict_effect": "mutation_record FAIL (UNAUDITED_SURVIVORS = 7)",
+   "disposition": "OWNER_ACCEPTED scoped residual risk (RELEASE-DECISIONS seq 6); not KILLED, no fabricated audit evidence, historical measurement unmodified",
+   "detail": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 6 accepted_survivors; closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json"
+  },
+  {
+   "id": "A-03-CONTINUE-INTEGRITY-ENVELOPE",
+   "verdict_effect": "soundness qualifier on A-01/A-02 and the continue_integrity-gated kill sets",
+   "disposition": "DOCUMENTED SUPPORTED-ENVELOPE LIMITATION (option 2, seq 6); not claimed fixed/verified",
+   "detail": "closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json A-03-CONTINUE-INTEGRITY-ENVELOPE"
+  }
+ ],
+ "COVERAGE": {
+  "mutation_targets": "614/614 covered, 0 MISSING",
+  "supplementary_campaign": "90 targets, 3593 mutants, KILLED 3500 / SURVIVED 93, kill rate 97.41%, 0 infra/timeout",
+  "A-01_cli_parser": "31/31 killed (A-03-gated for soundness)",
+  "A-02_bundle_cli_create": "3/3 killed; all 5 T0 kill-tests PASS incl test_v21_continue_integrity 212.87s (A-03-gated)"
+ },
+ "PRODUCTION_PUBLISH": "NOT_AUTHORIZED (RELEASE-DECISIONS seq 6) — separate explicit owner authorization required for the tag, the pypi environment approval, and the upload",
+ "history": [
+  {"phase": "RELEASE_PREP", "status": "IN_PROGRESS", "what": "F541 fixed; pyproject 2.1.0; RELEASE-DECISIONS seq 6 (A-03 opt-2, 7 survivors owner-accepted, ruff, release-prep authorized); known-limitations + survivor disposition recorded; mutation record kept at FINAL_HEAD 8c7bdb44, verdict FAIL preserved"}
+ ]
+}

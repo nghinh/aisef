@@ -9,7 +9,7 @@ name = "aisef"             # gói, module và lệnh cùng một tên từ 0.2.0
 # The ONE place the version lives (aisef.__version__ reads the installed metadata). It becomes 2.0.0 only at the
 # V2.0-RC1 freeze (docs/v2/V2-STABLE-RELEASE-CHARTER.md §10/§11); a stable `vX.Y.Z` tag must equal it or
 # .github/workflows/release.yml refuses to publish.
-version = "2.1.0.dev0"
+version = "2.1.0"
 # V2.1 (360° §3.11): the 2.0.0 summary described 1.x; this is what `aisef run` is now
 description = "AISEF 2 — deterministic, evidence-bound orchestration for coding agents: runs a prepared project bundle story by story, merges only what its probes prove, and journals every decision"
 readme = "README.md"

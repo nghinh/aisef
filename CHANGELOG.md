@@ -1,5 +1,42 @@
 # Changelog
 
+## 2.1.0 — 2026-10-31 (release prepared; production publication pending separate owner authorization)
+
+**AISEF 2.1.0 — the V2.1 requalification round, on the same `aisef run` V2 runtime.** The product kernel
+(`aisef2`) advances from 2.0.0; `aisef run`, the controller/agent split, the hash-chained journal and
+`aisef run --verify` are unchanged in shape. The authoritative, traced list of 2.1's behaviour changes is
+`docs/v2.1/REPORT.md` and `docs/v2.1/TRACEABILITY.md`; user-facing usage deltas are in `docs/v2.1/USAGE-2.1.md`.
+Headline changes (see those docs for the full, traced set and the owner decisions that bound each):
+
+- Plan criteria that read Python source are made syntax-aware so a docstring line can no longer be mistaken for
+  an import (V21-37, the 2.0.0 S10-a false-rollback class), and a post-merge regression is routed back to the
+  developer when the retry policy permits (V21-38).
+- Three separated identities for a contract — its semantic identity, a probe's capability/API version, and the
+  digest of the executed bytes (ARCHITECTURE-EXCEPTION-V2-007, RELEASE-DECISIONS seq 4).
+- `bundle migrate` does not carry an approval across merely because the contract hash is unchanged: it reports
+  `semantic_changes` / `needs_owner_reapproval` and keeps an approval only when a declared capability change did
+  not select it (`CAPABILITY_CHANGES` / `CAPABILITY_VERSION`); `bundle_cli.migrate` and `review_verify.verify`
+  enter the PRODUCT_TRUTH inventory within stated limits — neither commits or merges product (RELEASE-DECISIONS
+  seq 5, B-03c). Documented limit (owner 2026-10-18): on the LedgerLock 2.0.0 bundle, 50/53 approvals carry on
+  the version rule alone because three probes changed behaviour without a `CAPABILITY_VERSION` bump; re-approval
+  is the owner's action.
+
+- Qualification: the supplementary mutation campaign closed the 614-target scope — **614/614 covered, 0 MISSING**,
+  97.41% kill in the campaign (3500/3593), A-01 (`cli.py::_parser` 31/31) and A-02 (`bundle_cli.py::_create` 3/3)
+  fully killed. See `closure-evidence/v2/v2.1/GO-NO-GO.md`.
+- Known limitation — **A-03**: integrity guarantees under an external SIGKILL during the request-sent /
+  result-not-journaled window are outside the V2.1 supported envelope (not claimed fixed or fully verified;
+  owner ruling 2026-10-31, option 2). Normal termination paths (budget stop, turn cap, timeout, interrupt)
+  redact and release in a `finally` and are covered.
+- Residual risks — **7 mutation survivors owner-accepted** as scoped residual risks (not defects of a verdict,
+  obligation, data, secret, access boundary, or evidence integrity): the machine mutation gate verdict is
+  preserved as FAIL (7 unaudited) and the acceptance is recorded above the gate, not as kills. Detail:
+  `closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json`, `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json`
+  seq 6.
+- Platforms: Linux and macOS for a live run (Windows runs the test suite). Production publication of 2.1.0 is
+  **not** authorized by the release-preparation directive; it requires a separate explicit owner authorization
+  (the tag, the pypi environment approval, the upload).
+
 ## 2.0.0 — 2026-10-05
 
 **AISEF 2.0.0 (candidate V2.0-RC2): `aisef run` is the V2 runtime.**

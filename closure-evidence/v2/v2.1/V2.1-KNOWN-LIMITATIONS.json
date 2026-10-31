@@ -1,0 +1,33 @@
+{
+ "record": "AISEF 2.1.0 — KNOWN LIMITATIONS AND RESIDUAL RISKS (owner directive 2026-10-31, RELEASE-DECISIONS seq 6)",
+ "version": "2.1.0",
+ "candidate": "aisef2/ product tree frozen at 8c7bdb44 (tree 5f34a3f3 = fce3d7b7)",
+ "authority": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 6 (human:owner, 2026-10-31)",
+ "distinction": "These are ACCEPTED EXCEPTIONS and documented limitations, not open blockers. No item here is a CONFIRMED product defect of a verdict, an obligation, data, a secret, an access boundary, or evidence integrity.",
+ "known_limitations": [
+  {
+   "id": "A-03-CONTINUE-INTEGRITY-ENVELOPE",
+   "title": "Integrity under external SIGKILL mid-call is outside the supported envelope",
+   "statement": "AISEF 2.1 does NOT guarantee journal/usage integrity when the process is killed by an external SIGKILL during the narrow window between a provider request being sent and its result/usage being journaled. This window is outside the V2.1 supported envelope.",
+   "owner_ruling": "Option 2 — documented scope limitation (no further SIGKILL fault-injection).",
+   "honesty_note": "NOT represented as fixed or fully verified. The supplementary campaign was clean (0 TIMEOUT/INFRA; the _create T0 test_v21_continue_integrity PASSED this run, 212.87s) — that is evidence of a clean measurement environment, not closure of the external-SIGKILL window.",
+   "scope_of_effect": "the soundness qualifier on A-01 (cli.py::_parser 31/31 killed) and A-02 (bundle_cli.py::_create 3/3 killed) and every target whose kill set includes test_v21_continue_integrity.py; those head kill numbers are accepted under this documented envelope limitation.",
+   "severity": "LOW — narrow external-signal window; normal termination paths (budget stop, turn cap, timeout, interrupt) journal and redact in a finally block and are covered."
+  }
+ ],
+ "residual_risks_owner_accepted": {
+  "what": "7 unaudited mutation survivors in 2 targets (client.py::session x3, story_runner.py::_attempt x4), accepted as scoped residual risks.",
+  "authoritative_detail": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 6, field accepted_survivors.survivors — each with target, position, mutant, source_sha256, engineering one-label class, and the effect re-verified against the product source at 8c7bdb44.",
+  "summary": "All 7 are verdict/obligation/evidence-neutral on the path in use: the _attempt role mutants (S-01/S-02) route identically at MeasurementPoint.CANDIDATE and the role is not journaled nor on Proof; the _attempt label mutants (S-03/S-04) change a journal label that is not an identity/release key; the client.session mutants change only the session result's REPORT fields (the 'redacted' count and the 'left_range_gone' naming) while redact() and _release_session() both run unconditionally in a finally before the dict is built, so redaction and scope-disposal enforcement are intact.",
+  "gate_effect": "The machine mutation gate verdict is PRESERVED as FAIL (UNAUDITED_SURVIVORS = 7). The owner acceptance is a risk-based decision recorded ABOVE the gate; it does NOT convert the gate FAIL to PASS, the survivors are NOT labelled KILLED, no audit evidence is fabricated, and no historical measurement is modified.",
+  "not_done": "No test added and no product code changed to eliminate these survivors (owner directive 2026-10-31 §1, §3)."
+ },
+ "coverage_context": {
+  "targets": "614/614 covered, 0 MISSING",
+  "kill_rate_supplementary_campaign": "97.41% (3500 killed / 93 survived of 3593 mutants across the 90 new-measure targets)",
+  "survivors_total": 93,
+  "survivors_confirmed_defects": 0,
+  "survivors_owner_accepted_unaudited": 7,
+  "survivors_in_frozen_audited_set": 86
+ }
+}

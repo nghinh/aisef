@@ -1,0 +1,13 @@
+{
+ "worker": "sw-w1",
+ "snapshot": "8c7bdb44fdf8e4b19dda895c08cf8a9eeee66282",
+ "status": "finished 2026-10-31T09:00:32Z; git status --porcelain after: dirty:  M closure-evidence/v2/v2.1/MUTATION.json (supplementary campaign, snapshot 8c7bdb4)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/sw-w1.log",
+  "sha256": "e3005f6255bbc58e3f845f76628a89745072a94f1cdf93feaa54b8833fde08c5"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/sw-w1.record.json",
+  "sha256": "d4d019b08719726ef22a99b1c067f7ce3ebbe48121dcf4b79628da3e6f8016f4"
+ }
+}

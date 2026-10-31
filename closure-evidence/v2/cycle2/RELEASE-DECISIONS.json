@@ -157,6 +157,108 @@
     "evidence_directory": "closure-evidence/v2/v2.1/ (2.0 evidence never overwritten)"
    },
    "not_authorized_by_this_entry": "B-02 (2.0.1 release), B-04, B-08, B-09, B-10; any push, tag, publish, deploy or paid provider call; a 2.1 release or RC freeze; any new owner acceptance of the C2-P5 boundary — each still the owner's own decision"
+  },
+  {
+   "seq": 6,
+   "id": "AISEF_V2_1_SCOPED_RELEASE_PREPARATION_AND_HANDOVER",
+   "authority": "owner directive 2026-10-31 (chat) 'OWNER DIRECTIVE — CLOSE V2.1 AND COMPLETE RELEASE HANDOVER', reviewing the consolidated GO-NO-GO at 8c7bdb44",
+   "approver": "human:owner",
+   "decision": {
+    "A_03_CONTINUE_INTEGRITY": "SCOPE_LIMITATION_DOCUMENTED",
+    "SEVEN_MUTATION_SURVIVORS": "OWNER_ACCEPTED_SCOPED_RESIDUAL_RISK",
+    "RUFF_F541_FIX": "AUTHORIZED",
+    "V2_1_RELEASE_PREPARATION": "AUTHORIZED",
+    "PRODUCTION_PUBLISH": "NOT_AUTHORIZED",
+    "VERSION": "2.1.0"
+   },
+   "a_03_limitation": {
+    "ruling": "Option 2 — documented scope limitation (no further SIGKILL fault-injection).",
+    "statement": "Integrity guarantees under an external SIGKILL during the request-sent / result-not-yet-journaled window are OUTSIDE the V2.1 supported envelope. This is a documented limitation; it is NOT represented as fixed or fully verified. The clean campaign (0 TIMEOUT/INFRA; _create T0 test_v21_continue_integrity PASS this run, 212.87s) is evidence of a clean measurement environment, not closure of the external-SIGKILL window.",
+    "affects": "the soundness qualifier on A-01 (cli.py::_parser 31/31) and A-02 (bundle_cli.py::_create 3/3) and every target whose kill set includes test_v21_continue_integrity.py; their head kill numbers are accepted under this documented envelope limitation."
+   },
+   "accepted_survivors": {
+    "basis": "the existing consequence x evidence analysis (SURVIVOR-CLASSIFICATION.md, HANDOFF-INTERIM.md §4); each identity and effect below was re-verified against the product source at 8c7bdb44 before this acceptance was recorded (owner condition: identities and effects must match the documented classification).",
+    "disposition": "OWNER_ACCEPTED, scoped residual risks. They are NOT labelled KILLED; no audit evidence is fabricated; the historical measurements are not modified; no test or product code is changed to eliminate them. The machine mutation gate verdict is therefore PRESERVED as FAIL (UNAUDITED_SURVIVORS = 7); this acceptance is recorded one layer above the gate, as the owner's risk-based release decision, and does not convert that FAIL to PASS.",
+    "survivors": [
+     {
+      "target": "aisef2/app/client.py::session",
+      "position": 44,
+      "mutant": "L299 dict entry 11 dropped",
+      "source_sha256": "83a170c4ae6aef87fa0c66208c8f969cf39f64ab4bcabb19dd5b91baccb5b87d",
+      "engineering_class": "OOR/AUDITED",
+      "verified_effect": "drops a field of the session result dict; redact(log, secrets) runs unconditionally at client.py:297 (in a finally) BEFORE the dict is built, so redaction enforcement is intact — only the result's report of it (the 'redacted' count) changes. Report-field transparency, not enforcement."
+     },
+     {
+      "target": "aisef2/app/client.py::session",
+      "position": 113,
+      "mutant": "L302 dict entry 0 dropped",
+      "source_sha256": "83a170c4ae6aef87fa0c66208c8f969cf39f64ab4bcabb19dd5b91baccb5b87d",
+      "engineering_class": "OOR/AUDITED",
+      "verified_effect": "drops the conditional 'left_range_gone' report entry; _release_session(r) runs unconditionally at client.py:295 (in a finally) so scope disposal is intact — only the naming of the gone-within-grace escapees in the result changes. Report-field transparency, not enforcement."
+     },
+     {
+      "target": "aisef2/app/client.py::session",
+      "position": 123,
+      "mutant": "L302 string 'left_range_gone' emptied",
+      "source_sha256": "83a170c4ae6aef87fa0c66208c8f969cf39f64ab4bcabb19dd5b91baccb5b87d",
+      "engineering_class": "OOR/AUDITED",
+      "verified_effect": "empties the 'left_range_gone' report key; same site as the entry-drop; _release_session disposal unchanged; report field only."
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_attempt",
+      "position": 144,
+      "mutant": "L271 ObligationRole.PRESERVE->INTRODUCE",
+      "source_sha256": "b23f2d2cb3f2e9a696eb1c1b9b60881e8d9a81e348d9822488086a350541a287",
+      "engineering_class": "EQUIV",
+      "verified_effect": "candidate-side re-proof role (V21-38); role reaches only route() and every CANDIDATE routing row is role-agnostic (keyed None, routing.py:81-86, fallback routing.py:125), point pinned CANDIDATE (story_runner.py:277); role not in verified_payload (not journaled) nor on the Proof dataclass (proof.py:29). Verdict- and evidence-neutral on the path in use; a developer regression of the PRESERVE obligation is still caught role-independently via contract_satisfaction->CONTRACT_UNSATISFIED/DEVELOPER. Residual: contingent on the current role-agnostic CANDIDATE routing (C-03 hardening note)."
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_attempt",
+      "position": 145,
+      "mutant": "L271 ObligationRole.PRESERVE->VERIFY",
+      "source_sha256": "b23f2d2cb3f2e9a696eb1c1b9b60881e8d9a81e348d9822488086a350541a287",
+      "engineering_class": "EQUIV",
+      "verified_effect": "sibling of the INTRODUCE mutant; VERIFY also routes identically at CANDIDATE (role-None fallback); same proof and same residual."
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_attempt",
+      "position": 323,
+      "mutant": "L249 string 'developer ' emptied",
+      "source_sha256": "b23f2d2cb3f2e9a696eb1c1b9b60881e8d9a81e348d9822488086a350541a287",
+      "engineering_class": "OOR/AUDITED",
+      "verified_effect": "descriptive label of _EscapedRange(f\"developer {story_id} range\") on the PL-7 RangeEscaped handler; scope.acquire/release key on resource.kind + object identity (story_scope.py:112), name is only a journal payload (story_scope.py:99), never an identity/release key; {story_id} keeps the name unique. Descriptive-only."
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_attempt",
+      "position": 324,
+      "mutant": "L249 string ' range' emptied",
+      "source_sha256": "b23f2d2cb3f2e9a696eb1c1b9b60881e8d9a81e348d9822488086a350541a287",
+      "engineering_class": "OOR/AUDITED",
+      "verified_effect": "sibling of the 'developer ' mutant; same label, other fragment; same resolution."
+     }
+    ]
+   },
+   "ruff": {
+    "ruling": "AUTHORIZED — the single-line F541 fix (remove the extraneous f prefix) in the coverage helper closure-evidence/v2/v2.1/tools/verify_coverage_614.py:90; no other refactoring."
+   },
+   "release_preparation_scope": {
+    "authorized": [
+     "create the V2.1.0 release candidate and freeze it",
+     "stable version metadata (pyproject 2.1.0)",
+     "this release-decision record and the status artifacts",
+     "final handover artifacts",
+     "the minimum necessary local changes, version bump and commits",
+     "a release-branch push SOLELY for required CI validation, destination and changes verified"
+    ]
+   },
+   "not_authorized_by_this_entry": "publishing packages (PyPI/TestPyPI upload), creating a production deployment, invoking paid providers, executing APPROVE.sh, and creating the vX.Y.Z release tag — each still requires separate explicit owner authorization. PRODUCTION_PUBLISH is recorded NOT_AUTHORIZED for 2.1.0 so the v2 release gate correctly refuses production publication.",
+   "owner_text": "OWNER DIRECTIVE — CLOSE V2.1 AND COMPLETE RELEASE HANDOVER\nDecision: APPROVED — PROCEED WITH SCOPED V2.1 RELEASE PREPARATION AND HANDOVER.\nI have reviewed the consolidated GO-NO-GO report at 8c7bdb44.\nWe are ending the repetitive fix–measure–fix cycle.\nThe objective is no longer to achieve theoretical perfection. The objective is to finish V2.1, complete the release pipeline, and hand over a usable, verified, properly documented deliverable.\nThe current evidence is sufficient to proceed:\n\n* 614/614 mutation targets covered, 0 MISSING.\n* 97.41% mutation kill rate in the supplementary campaign.\n* A-01 and A-02 fully killed.\n* No CONFIRMED product defect affecting critical behavior, decisions, data integrity, security boundaries, or evidence integrity.\n* Remaining issues have been identified and classified.\n\n1. Final owner decisions\nA-03 — APPROVE OPTION 2: DOCUMENTED SCOPE LIMITATION\nDo not perform further SIGKILL fault-injection or attempt to make this edge case perfect.\nDocument that integrity guarantees under external SIGKILL during the request-sent/result-not-journaled window are outside the V2.1 supported envelope.\nDo not misrepresent this limitation as fixed or fully verified.\n7 remaining mutation survivors — APPROVE SCOPED RISK ACCEPTANCE\nAuthorize acceptance of the seven identified survivors based on the existing consequence × evidence analysis, provided their identities and effects match the documented classification.\nRecord them explicitly as owner-accepted, scoped residual risks. Do not label them KILLED, fabricate audit evidence, or modify historical measurements.\nDo not add tests or change product code solely to eliminate these survivors.\nRuff F541 — APPROVED\nFix the single-line helper-script lint issue. No additional refactoring.\nV2.1 release — AUTHORIZED TO PREPARE\nAuthorize the creation of the V2.1.0 release candidate, stable version metadata, release-decision record, and final handover artifacts.\nThis is authorization to complete release preparation, not permission to bypass mandatory safety checks or publish an unverified build.\n2. Execute one final release pipeline\nExecute the following steps sequentially, without requesting additional owner decisions for routine technical work:\n\n1. Apply the approved F541 correction.\n2. Document the A-03 supported-envelope limitation.\n3. Record the seven scoped survivor acceptances with their exact evidence and rationale.\n4. Update mutation records and release documents without altering historical results.\n5. Prepare version 2.1.0 and freeze the release candidate.\n6. Complete the required release-decision and status artifacts.\n7. Commit the finalized changes with traceable release evidence.\n8. Execute the final validation gates, including cross-platform CI where available.\n9. Resolve only newly confirmed release-blocking product defects or mandatory gate failures.\n10. Produce the final V2.1.0 release package and handover documentation.\n\nAuthorization is granted for the minimum necessary local changes, version bump, commits, and release preparation.\nA release-branch push is authorized solely for required CI validation, provided the destination and changes are verified. Do not publish packages, create production deployments, invoke paid providers, or execute APPROVE.sh without separate explicit authorization.\n3. Strict anti-loop rules\nEffective immediately:\n\n* NO new mutation campaigns.\n* NO full mutation remeasurement unless directly required by an actual product-code change.\n* NO repeated attempts to eliminate non-critical survivors.\n* NO refactoring, redesign, architectural improvements, or scope expansion.\n* NO changes to test oracles, thresholds, or timeout limits merely to obtain green results.\n* NO repeated full-suite runs without a concrete change or identified validation need.\n* NO re-opening previously resolved findings without new, material evidence.\n\nIf a critical defect is confirmed, fix it once in a tightly scoped correction, run the directly affected tests, and perform the minimum necessary regression checks.\nNon-critical issues must be documented as known limitations or residual risks rather than creating another endless remediation cycle.\n4. Release acceptance policy\nUse a risk-based release decision.\nA release blocker must involve a confirmed material failure affecting:\n\n* Core product functionality or release-critical obligations.\n* Security, secrets, authorization, or access boundaries.\n* Decision/verdict correctness.\n* Data or evidence integrity within the declared supported envelope.\n* Mandatory deployment or compatibility requirements.\n* A release gate that cannot legitimately be satisfied or explicitly excepted.\n\nDo not treat harmless text differences, cosmetic report changes, equivalent mutants, historical-record currency issues, or documented unsupported edge cases as reasons for indefinite delay.\nHowever, preserve the real verdict of every gate. Do not convert FAIL into PASS through wording or artificial evidence.\n5. Final validation and CI\nRun the minimum sufficient validation for the actual frozen release candidate.\nUse a clean, controlled environment for environment-sensitive tests. Historical evidence tests must retain their original integrity checks.\nRun Linux, Windows, and macOS validation as applicable.\nIf CI fails, classify each failure as a confirmed product defect, test/environment artifact, or release-process problem using evidence.\nFix confirmed release blockers only. Do not initiate broad remediation campaigns.\nIf any mandatory gate remains unsatisfied, report the release as HOLD rather than claiming GO.\n6. Required final deliverables\nProduce one complete V2.1 handover package containing:\n\n1. RELEASE-DECISIONS — explicit owner decisions and scoped acceptances.\n2. GO-NO-GO.md — final consolidated release verdict.\n3. RELEASE-BLOCKER-TABLE.md — remaining blockers, if any.\n4. SURVIVOR-CLASSIFICATION.md — final survivor disposition.\n5. Release candidate/version/commit identification.\n6. Final validation and CI evidence.\n7. Known limitations and residual risks.\n8. Deployment, installation, rollback, and operational instructions.\n9. A concise executive handover summary.\n\nAll artifacts must be mutually consistent, traceable to the final candidate, and clearly distinguish PASS, FAIL, NOT RUN, and ACCEPTED EXCEPTION.\n7. Definition of DONE\nV2.1 is DONE when:\n\n* All approved release-preparation changes are complete.\n* The release candidate is frozen and traceable.\n* Critical release gates pass or have valid, explicitly authorized, narrowly scoped exceptions where permitted.\n* Required platform validation is complete.\n* There are no confirmed release-blocking product defects.\n* The handover package is complete and reproducible.\n* The final GO/NO-GO decision is clearly recorded.\n\nAfter these conditions are satisfied, STOP.\nDo not start another improvement cycle, mutation campaign, exploratory investigation, or V2.2 work.\nIf a genuinely mandatory requirement remains unmet, stop with a precise HOLD report identifying only the unresolved blockers. Do not continue indefinitely.\n8. Execution instruction\nPROCEED NOW. DO NOT ASK FOR FURTHER APPROVAL FOR ROUTINE IMPLEMENTATION AND RELEASE-PREPARATION STEPS ALREADY AUTHORIZED ABOVE.\nMake engineering decisions within the approved scope.\nPrioritize completion, stability, reproducibility, and handover over marginal improvements in test coverage.\nReturn only the final release/handover result or a clearly evidenced, genuinely blocking exception.\nThe instruction is to FINISH V2.1, not to keep optimizing V2.1.\n",
+   "recorded_by": "transcribed verbatim by engineering (Claude Code session 845c9f11) from the owner's chat message of 2026-10-31; the owner wrote the directive text, engineering wrote this file — the owner did not sign it",
+   "basis": {
+    "go_no_go": "closure-evidence/v2/v2.1/GO-NO-GO.md (reviewed by the owner at 8c7bdb44)",
+    "candidate": "aisef2/ product tree frozen at 8c7bdb44 (tree 5f34a3f3 = fce3d7b7); the acceptance and the documented limitation do not change any product code",
+    "mutation_record": "closure-evidence/v2/v2.1/MUTATION-SUMMARY.json (FINAL_HEAD 8c7bdb44, 614/614 accounted, UNAUDITED_SURVIVORS 7, MUTATION_VERDICT FAIL — preserved)"
+   }
   }
  ]
 }
