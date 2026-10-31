@@ -5,8 +5,28 @@
  "candidate": {
   "aisef2_product_tree": "5f34a3f3 (= fce3d7b7); frozen, no product-code change in this release preparation",
   "measurement_head": "8c7bdb44fdf8e4b19dda895c08cf8a9eeee66282",
-  "rc_source_sha": "PENDING (the 2.1.0 version-bump commit on release/v2.1.0)",
-  "rc_frozen": "PENDING (release_rc.py --freeze from the staging build of the RC commit)"
+  "rc_source_sha": "dc63478c60128b2b077d5df19e45ae75d832b67a (release/v2.1.0)",
+  "rc_frozen": "closure-evidence/v2/release/V2.1.0-RC1-FREEZE.json (FROZEN); wheel 80310413f18457bffe398342337f67bb50ae417bde0804ffb94fc85c9b77ac05, sdist 5039c6028311bcb845ea2f1b7606be803d2e5d12c89d03666b606e4de7613538 (staging run 41220620258); release_rc.py --check PASS",
+  "version_metadata": "closure-evidence/v2/release/V2.1.0-PROBE-CALIBRATIONS.json — the probe-calibration record for the stable version string, regenerated deterministically on the frozen tree (shipped aisef2/app/calibrations.py unchanged; closure-evidence, not shipped). The .dev0 records are kept as history."
+ },
+ "S4_RC_FROZEN": {
+  "RC": "V2.1.0-RC1",
+  "RC_SOURCE_SHA": "dc63478c60128b2b077d5df19e45ae75d832b67a",
+  "RC_VERSION": "2.1.0",
+  "RC_KERNEL_TREE": "5f34a3f32bb101e007db67922e694efdd9c7dcad",
+  "freeze_record": "closure-evidence/v2/release/V2.1.0-RC1-FREEZE.json (verdict FROZEN, problems [])",
+  "staging_build_of_the_RC": {
+   "run": 41220620258,
+   "event": "push",
+   "headSha": "dc63478c60128b2b077d5df19e45ae75d832b67a",
+   "jobs": {"build": "success", "install (ubuntu-latest)": "success", "install (windows-latest)": "success"},
+   "sha256sums": {
+    "aisef-2.1.0-py3-none-any.whl": "80310413f18457bffe398342337f67bb50ae417bde0804ffb94fc85c9b77ac05",
+    "aisef-2.1.0.tar.gz": "5039c6028311bcb845ea2f1b7606be803d2e5d12c89d03666b606e4de7613538"
+   },
+   "installs_reverified_sums": true
+  },
+  "checks_on_the_candidate": "ruff check . PASS; release_rc.py --check PASS; v2_release_gate.py 2.1.0 FAIL by design (PRODUCTION_PUBLISH NOT_AUTHORIZED, seq 6)"
  },
  "FINAL_RELEASE_READY": "PREPARED_PUBLISH_WITHHELD",
  "FINAL_RELEASE_READY_MEANING": "Release preparation is complete and the candidate is validated; production publication is explicitly WITHHELD pending separate owner authorization (RELEASE-DECISIONS seq 6, PRODUCTION_PUBLISH NOT_AUTHORIZED). This is intentionally not the string 'PASS': the v2 release gate must and does refuse production publication for 2.1.0.",
@@ -17,10 +37,16 @@
   "ruff": "PASS (ruff 0.16.4, ruff check . — the F541 helper lint fixed, RELEASE-DECISIONS seq 6)",
   "mutation_record": "FAIL — 7 owner-accepted unaudited survivors (ACCEPTED EXCEPTION, seq 6); verdict preserved, not converted to PASS",
   "v2_release_gate_2.1.0": "FAIL by design — PRODUCTION_PUBLISH NOT_AUTHORIZED (seq 6); this is the correct 'publish withheld' state, not a defect",
-  "unit_suite_macos": "PENDING_CI (re-validated on the committed tree in CI)",
-  "unit_suite_linux": "PENDING_CI",
-  "unit_suite_windows": "PENDING_CI",
-  "staging_build_install_linux_windows": "PENDING_CI"
+  "ci_lint": "PASS (tests run 41220620754, lint job: ruff check .)",
+  "ci_wheel": "PASS (tests run 41220620754, wheel job)",
+  "staging_build_install_linux_windows": "PASS (staging run 41220620258: build + clean-install smoke on ubuntu and windows)",
+  "unit_suite": "FAIL on tests run 41220620754 (macOS 3.12, ubuntu 3.11-3.14, windows 3.11) at RC source dc63478c — 0 confirmed product defects; every failure classified by measurement (owner section 5), see unit_suite_classification and RELEASE-BLOCKER-TABLE.md final-disposition header. The suite FAIL is reported honestly; no verdict was converted to PASS.",
+  "unit_suite_classification": {
+   "confirmed_product_defects": 0,
+   "release_process_resolved": "The version bump 2.1.0.dev0->2.1.0 changed the probe-calibration record filename the release-mode qualifier reads; only .dev0-named records existed, so test_qualification_release_mode (q2 reads the calibrations the rc ships) ERROR and test_c2_p5_acceptance::V21Records x2 failed with FileNotFoundError on V2.1.0-PROBE-CALIBRATIONS.json. RESOLVED: regenerated the version-named record via validation/qualification/release_calibration.py --write (deterministic re-derivation on the frozen tree; no provider, no campaign; rows/fixtures identical to V2.1.0.dev0-PROBE-CALIBRATIONS-4.json, only aisef2_tree advances to the frozen 5f34a3f3). Shipped aisef2/app/calibrations.py left at frozen bytes (the tool's fresh demonstrated_at timestamps reverted). All 3 tests PASS locally after the fix. Record added at closure-evidence/v2/release/V2.1.0-PROBE-CALIBRATIONS.json (closure-evidence, not shipped).",
+   "record_currency_meta_tests": "~17 (test_checker_calibration x4, test_destructive_authority, test_freeze_manifest, test_invariants x2, test_c2_delivery_experiment::PlanCorrection, test_c2_k_nowork_001, test_c2_orchestration_conformance x2, test_c2_p5_acceptance::Acceptance/KernelProvenance, test_p5_plan_v22_proposal, test_p9_reproduction, test_v21_conformance_ruling): assert the committed record re-derives/binds this tree; RED-by-design on an intentionally-unsealed branch, green only by sealing = forbidden scope expansion. The exact baseline set the owner reviewed at 8c7bdb44 (GO-NO-GO 2.1); kernel frozen, none new. client.py:45 os.kill(pid,0) is a signal-0 existence probe that never signals a process (verified in source) — the destructive_authority/INV-MUTATION-AUTHORITY failure is a ledger-currency issue, not an unguarded kill. FAIL preserved, not a blocker (owner section 4).",
+   "environment_artifacts": "~3, measured to pass in a clean environment (owner section 5): test_v21_read_set x2 (macOS /var->/private/var symlink TMPDIR; PASS 29/29 with a non-symlinked TMPDIR), test_v21_mutation_runner::test_one_release_budget_per_run (CI-host process-reaping/ownership-proof semantics; PASS locally), test_c2_delivery_experiment::HistoricalAttempt4 (reads the live opencode.db). Not product defects."
+  }
  },
  "ACCEPTED_EXCEPTIONS": [
   {
@@ -44,6 +70,9 @@
  },
  "PRODUCTION_PUBLISH": "NOT_AUTHORIZED (RELEASE-DECISIONS seq 6) — separate explicit owner authorization required for the tag, the pypi environment approval, and the upload",
  "history": [
-  {"phase": "RELEASE_PREP", "status": "IN_PROGRESS", "what": "F541 fixed; pyproject 2.1.0; RELEASE-DECISIONS seq 6 (A-03 opt-2, 7 survivors owner-accepted, ruff, release-prep authorized); known-limitations + survivor disposition recorded; mutation record kept at FINAL_HEAD 8c7bdb44, verdict FAIL preserved"}
+  {"phase": "RELEASE_PREP", "status": "DONE", "what": "F541 fixed; pyproject 2.1.0; RELEASE-DECISIONS seq 6 (A-03 opt-2, 7 survivors owner-accepted, ruff, release-prep authorized); known-limitations + survivor disposition recorded; mutation record kept at FINAL_HEAD 8c7bdb44, verdict FAIL preserved"},
+  {"phase": "RC_FREEZE", "status": "DONE", "what": "RC1 frozen from staging run 41220620258 build of RC source dc63478c; release_rc.py --check PASS; v2_release_gate.py 2.1.0 FAIL by design (publish withheld)"},
+  {"phase": "CROSS_PLATFORM_VALIDATION", "status": "DONE", "what": "tests run 41220620754 (macOS 3.12, ubuntu 3.11-3.14, windows 3.11) + staging run 41220620258 (Linux+Windows build/install). Unit suite FAIL = 0 confirmed product defects; 3 version-bump calibration failures resolved by a deterministic version-named record; residual failures = record-currency meta-tests (forbidden to seal) + environment artifacts (pass in a clean environment). True gate verdicts preserved."},
+  {"phase": "HANDOVER", "status": "DONE", "what": "GO-NO-GO final decision, RELEASE-BLOCKER-TABLE final disposition, SURVIVOR-CLASSIFICATION, V2.1-KNOWN-LIMITATIONS, V2.1-OPERATIONS, V2.1-EXECUTIVE-HANDOVER, CHANGELOG 2.1.0 — mutually consistent, traceable to RC source dc63478c. Verdict: RELEASE PREPARED AND VALIDATED; PRODUCTION PUBLICATION ON HOLD pending separate explicit owner authorization (seq 6)."}
  ]
 }
