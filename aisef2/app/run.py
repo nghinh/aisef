@@ -58,7 +58,7 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, confine, diagnostics, lineage, preflight, review_ocr, review_verify, usage
+from aisef2.app import client, confine, diagnostics, lineage, preflight, review_ocr, review_verify, tripwire, usage
 from aisef2.invariants import registry as invariants
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
@@ -583,6 +583,15 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         check_repository(project, repo, clone=False)     # the run's own clone
         if git(repo, "checkout", "-q", "-B", "main", project.plan.baseline).returncode != 0:
             raise RunRefused("the baseline could not be checked out as main")
+        # ROADMAP-2.2 G1: the serve-surface tripwire — the tree the developer will be served, scanned for the sealed
+        # stimulus/observable content and for the project's own bundle before anything is served; every session's
+        # prompt and environment are scanned again at its start (client.session). tripwire.STATEMENT says what this
+        # does and does not establish.
+        rec["stage"] = "stimulus tripwire"
+        wire = tripwire.needles_of(project)
+        rec["stimulus_tripwire"] = tripwire.scan_repo(repo, project, wire)
+        if rec["stimulus_tripwire"]["hits"]:
+            raise RunRefused(tripwire.refusal(rec["stimulus_tripwire"]["hits"], "the repository tree at the baseline"))
         rec["stage"] = "admission"
         rec["admission"] = admit(project, calibrations() if cals is None else cals)
         if not rec["admission"]["admitted"]:
@@ -643,7 +652,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
               "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8),
               **({"confine": settings.confinement} if settings.confinement is not None else {}),
               **({"fence": {**fence, "allow": (str(repo),)}} if fence is not None else {}),
-              **({"pin_sha256": client_pin["sha256"]} if client_pin is not None else {})}
+              **({"pin_sha256": client_pin["sha256"]} if client_pin is not None else {}),
+              **({"needles": wire["needles"]} if wire["needles"] else {})}   # G1: scanned again at every session
         # PM-8: what a probe saw, for the operator (app/diagnostics) — the directory beside the run's other evidence,
         # outside every checkout; whether the sessions' sandbox mounts it is read from the wrapper's own command line
         sink = diagnostics.Sink(out, kw["secrets"], diagnostics.access_of(

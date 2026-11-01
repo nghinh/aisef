@@ -18,6 +18,7 @@ import shutil
 import time
 
 from aisef2.app import confine as confinement
+from aisef2.app import tripwire
 from aisef2.runtime.process_range import ProcessRange, ProcessTableError, RangeEscaped, process_table
 
 POLL_S = 5.0
@@ -267,7 +268,7 @@ def redact(log: pathlib.Path, secrets) -> int:
 def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: float, *, model: str | None = None,
             env: dict | None = None, budget: Budget | None = None, turn_cap: int | None = None, exe: str | None = None,
             secrets: tuple[str, ...] = (), confine: dict | None = None, workspace_writable: bool = True,
-            fence: dict | None = None, pin_sha256: str | None = None) -> dict:
+            fence: dict | None = None, pin_sha256: str | None = None, needles: dict | None = None) -> dict:
     """One `opencode run --format json` session in a process range of its own; its event stream goes to `log`. Nothing
     starts when anything is unbound, when the evidence shows the budget reached or spend unaccounted, or when `log`
     exists (a session's evidence is never overwritten); the range is released when the budget or the turn cap is
@@ -290,6 +291,11 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
             why = pinned(exe, pin_sha256)
             if why is not None:
                 raise SessionRefused(f"client_pin at the moment of use: {why}")
+        if needles:                     # ROADMAP-2.2 G1: nothing served to a session carries the sealed content
+            found = tripwire.scan_text(prompt, needles) \
+                + [h for v in env.values() for h in tripwire.scan_text(str(v), needles)]
+            if found:
+                raise SessionRefused(tripwire.refusal(found, f"session {name}"))
         fenced = None
         if fence is not None:           # ROADMAP-2.2 G2: limits DECLARED to the client through its environment —
             env = dict(env)             # enforcement is the client's own, not measured here (the result says so)
