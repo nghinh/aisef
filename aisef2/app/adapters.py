@@ -17,7 +17,8 @@ import sys
 import tempfile
 import time
 
-from aisef2.app import client, feedback, review_ocr, review_verify, tripwire
+from aisef2.app import client, feedback, review_ocr, review_verify
+from aisef2.app import tripwire
 from aisef2.app.bundle import Project
 from aisef2.arch.enums import ControlProjection
 from aisef2.journal.format2 import OperationOutcome as O

@@ -28,6 +28,7 @@ from aisef2.app import bundle, client, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.app.verify import _runspec_problems, verify  # noqa: E402
 from aisef2.arch.enums import Enforcement, EventType as T  # noqa: E402
+from aisef2.invariants import registry as reg  # noqa: E402
 from aisef2.journal import format3  # noqa: E402
 from aisef2.journal.format3 import JournalWriter3  # noqa: E402
 from aisef2.product.contract import plain  # noqa: E402
@@ -57,7 +58,12 @@ def write_run(out: pathlib.Path, project, capabilities: list[dict], spec: dict, 
     data = (out / JOURNAL).read_bytes()
     events = [{"seq": e.seq, "type": e.type, "data": plain(e.data)}
               for e in format3.reconstruct(data.decode("utf-8")).events]
-    rec = {"format": R.FORMAT, "bundle_digest": project.digest, "settings": record_settings,
+    armed = reg.arm_runtime()   # ROADMAP-2.2 A1: a current run's record carries its kernel and arming — without them
+    rec = {"format": R.FORMAT, "bundle_digest": project.digest, "settings": record_settings,   # verify notes an older
+           "kernel_digest": R.kernel_digest(),                                                 # release and A22's "one
+           "invariants": {"armed": sorted(i.value for i in armed.invariants),                  # note" would be two
+                          "registry_digest": armed.registry_digest,
+                          "code_mechanism_digest": armed.code_mechanism_digest, "statement": reg.RUNTIME_STATEMENT},
            "journal": {"path": JOURNAL, "sha256": hashlib.sha256(data).hexdigest(), "lines": data.count(b"\n")},
            "story_outcomes": {}, "delivery_verdict": "NOT_REACHED",
            "budget": {"spent": {k: 0 for k in client.Budget.KEYS}},

@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from validation.v2 import mutation as m  # noqa: E402
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
 
 POSIX = os.name == "posix"
 DEFAULT_SETTLE_S = m.SETTLE_S   # before any test patches it
@@ -1648,6 +1649,7 @@ class Classify(unittest.TestCase):
         self.assertIn(f"{target}: mutant {descs[0]!r} is INFRA (see its rows): neither killed nor survived — re-run it", problems)
         self.assertIn(f"{target}: inconsistent record: survivors are not the mutants that were not killed", problems)
 
+    @sealing   # ROADMAP-2.2 F1: binds committed records to this tree's sources — red after any kernel edit, by design
     def test_historical_records_read_as_before(self):
         """§8: every committed record of P1..V2.0-S2 is read by the unchanged legacy branch and checks as it did at
         c9c736f (no problem); V2.1 refuses a result of a runner that does not classify."""

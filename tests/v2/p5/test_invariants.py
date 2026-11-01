@@ -293,7 +293,9 @@ class Arming(unittest.TestCase):
         self.assertEqual(dict(armed()), before)
 
     def test_a_runtime_guard_refuses_to_work_in_an_unarmed_process(self):
-        with mock.patch.dict(reg._ARMED, clear=True):
+        # ROADMAP-2.2 A1: an unarmed process has NEITHER a tier NOR the runtime arming — the suite process carries
+        # both once any test armed it, so both are cleared to reproduce the claim's subject
+        with mock.patch.dict(reg._ARMED, clear=True), mock.patch.object(reg, "_RUNTIME_ARMED", None):
             with self.assertRaisesRegex(InvariantError, "^invariant VIII is not armed in this process: its enforcement mechanism "
                                                         r"is absent, so nothing it guards may proceed \(§4\)$") as cm:
                 require_armed(InvariantId.VIII)
@@ -930,10 +932,12 @@ class MemoryIsContext(unittest.TestCase):
         source = (ROOT / "aisef2/invariants/evidence.py").read_text(encoding="utf-8")
         for name in ("openai", "anthropic", "requests", "http", "subprocess", "sqlite3"):
             self.assertNotIn(f"import {name}", source)
-        with mock.patch.dict(reg._ARMED, clear=True):
+        # ROADMAP-2.2 A1: runtime arming also opens VIII, so it is cleared alongside the tiers in both scenes
+        with mock.patch.dict(reg._ARMED, clear=True), mock.patch.object(reg, "_RUNTIME_ARMED", None):
             with self.assertRaisesRegex(InvariantError, "not armed"):
                 admit(unrunnable("x"))
-        with mock.patch.dict(reg._ARMED, {Tier.P5: frozenset(InvariantId) - {InvariantId.VIII}}, clear=True):
+        with mock.patch.dict(reg._ARMED, {Tier.P5: frozenset(InvariantId) - {InvariantId.VIII}}, clear=True), \
+                mock.patch.object(reg, "_RUNTIME_ARMED", None):
             with self.assertRaisesRegex(InvariantError, "^invariant VIII is not armed in this process"):   # VIII itself
                 admit(unrunnable("x"))
 

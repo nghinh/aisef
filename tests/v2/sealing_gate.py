@@ -38,6 +38,10 @@ GATED = (
     "tests/v2/test_c2_p10_profile_freeze.py::Checker.test_the_evidence_record_re_derives",
     "tests/v2/test_c2_p5_acceptance.py::Acceptance.test_the_acceptance_re_derives_on_this_tree",
     "tests/v2/test_c2_p5_acceptance.py::KernelProvenance.test_on_this_tree_the_committed_proposal_is_current",
+    # §8 reads the committed P1..V2.0-S2 mutation records against THIS tree's sources: any kernel edit after a seal
+    # (wave 1 touched fold.py, run_scope.py, registry.py) honestly flags every target of the edited file
+    # "changed since the mutation run — re-run it"; the re-run/reseal is the owner's act, so the binding is this tier's
+    "tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before",
     "tests/v2/test_cycle2_wp201.py::Baseline.test_the_committed_freeze_manifest_holds",
     "tests/v2/test_p5_plan_v22_proposal.py::Record.test_P5_8_committed_record_is_current",
     "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_18_check_binds_the_record_to_q5_both_kernels_the_corpus_and_the_ruling_s_data",
