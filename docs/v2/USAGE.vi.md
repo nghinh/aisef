@@ -1,9 +1,10 @@
 *[English](USAGE.md) · Tiếng Việt*
 
-# AISEF 2.0 — dùng runtime V2 (`aisef run`)
+# AISEF 2.1 — dùng runtime V2 (`aisef run`)
 
-AISEF 2.0 điều phối và kiểm chứng sản phẩm một cách tất định, gắn với bằng chứng, cho việc làm phần mềm có trợ giúp
-của AI. `aisef run` thực thi một kế hoạch đã được chủ dự án phê duyệt trên một repository git: với mỗi story, một phiên
+AISEF 2.1 điều phối và kiểm chứng sản phẩm một cách tất định, gắn với bằng chứng, cho việc làm phần mềm có trợ giúp
+của AI. Hướng dẫn này mô tả runtime V2 dùng chung cho 2.0 và 2.1; các thay đổi hành vi và di trú của 2.1 nằm ở
+[`../v2.1/USAGE-2.1.md`](../v2.1/USAGE-2.1.md) và [`../v2.1/REPORT.md`](../v2.1/REPORT.md). `aisef run` thực thi một kế hoạch đã được chủ dự án phê duyệt trên một repository git: với mỗi story, một phiên
 developer (client OpenCode, trên đúng một route model cố định) sửa code, và kernel V2 quyết định — dựa trên các probe
 độc lập kiểm tra sản phẩm, không bao giờ dựa trên lời của developer — story đó được giao, chạy lại hay rollback. Mọi
 quyết định được ghi vào một journal chuỗi băm (hash-chained) mà thư mục chạy lưu lại, và `aisef run --verify` kiểm
@@ -12,7 +13,7 @@ một lần chạy đã xong đối chiếu với journal đó.
 ## Cài đặt
 
 ```bash
-pip install aisef==2.0.0
+pip install aisef==2.1.0
 ```
 
 Cần Python 3.11 trở lên, `git` 2.31 trở lên và — cho một lần chạy thật — client `opencode` trên `PATH` cùng một
@@ -125,16 +126,17 @@ giờ chặn; scanner (`ruff`, nếu đã cài) cũng chỉ tham khảo.
 
 Nền tảng: `aisef run` được hỗ trợ trên Linux và macOS; mọi lần chạy thật đến nay đều trên macOS (Linux được kiểm trong
 CI với client và provider giả). Trên Windows gói cài được và bộ test của kernel chạy được, nhưng một lần `aisef run`
-thật không thuộc phạm vi khẳng định của 2.0.
+thật không thuộc phạm vi khẳng định của 2.1.
 
 ## Giới hạn đã biết
 
-- **Criterion đọc mã Python bằng mẫu theo dòng có thể bác bỏ mã đúng.** Trong smoke phát hành 2.0, một story đúng bị
-  rollback vì một criterion "stdlib only" coi một dòng docstring bắt đầu bằng `from …` là một câu lệnh import
-  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). Kernel dừng an toàn — không mã nào trượt một spec của bundle lọt vào `main` — nhưng
-  story đó không được giao. Criterion nhận biết cú pháp được lên kế hoạch cho 2.1 (V21-37).
-- **Hồi quy phát hiện sau merge không quay về developer.** Nó thuộc INTEGRATION và không được chạy lại, nên developer
-  không được biết criterion bị hỏng và không có lượt chạy lại (V21-38, kế hoạch 2.1).
+- **Đã sửa trong 2.1 — criterion kế hoạch nay nhận biết cú pháp (V21-37).** Trong smoke phát hành 2.0, một story đúng
+  bị rollback vì một criterion "stdlib only" coi một dòng docstring bắt đầu bằng `from …` là import
+  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). 2.1 đọc mã Python theo cú pháp, nên một dòng docstring không còn bị nhầm là import
+  — lớp lỗi này đã đóng.
+- **Đã sửa trong 2.1 — hồi quy sau merge được trả về cho developer (V21-38).** Ở 2.0 nó thuộc INTEGRATION và không được
+  chạy lại, nên developer không được biết criterion bị hỏng và không có lượt chạy lại; 2.1 trả nó về cho developer khi
+  chính sách chạy lại cho phép.
 - **Nghiệm thu chỉ tương đối với spec của bundle.** "0 chấp nhận sai" nghĩa là không story nào trượt chính contract
   của nó mà vẫn được giao. Trong smoke phát hành, review của model tìm ra 5 lỗi tái hiện được nằm ngoài 59 spec; chúng
   đã được giao vì review chỉ mang tính tham khảo.
@@ -142,10 +144,11 @@ thật không thuộc phạm vi khẳng định của 2.0.
   cấu hình OpenCode toàn cục (plugin, MCP server) và mạng của người đó. Trong smoke phát hành, các phiên developer đã
   đọc ra ngoài worktree — scratch của probe, journal đang chạy, bundle chứa stimulus của phép chứng minh, kernel đã cài
   — trước khi một story commit (V21-02).
-- **Interpreter của probe ghi được.** Controller của probe chạy venv của lần chạy với `-I` nhưng không `-S`, nên một
-  file `.pth` do test hoặc phiên developer cài vào site-packages của nó sẽ chạy bên trong các controller sau, nơi giữ
-  khoá của kênh. Khẳng định về kênh kết luận đúng trong một lần đánh giá, không đúng giữa các lần đánh giá (V21-28;
-  bản vá dự kiến ở 2.0.1).
+- **Kênh verdict đúng ở mức cơ chế, không ở mức hệ điều hành (V21-28).** Controller của probe nay chạy venv của lần
+  chạy với `-I -S`, nên một file `.pth` do test hoặc phiên developer cài vào site-packages không còn chạy bên trong
+  controller sau — khẳng định về kênh đúng cả giữa các lần đánh giá, đóng ở mức cơ chế. AISEF vẫn chạy developer dưới
+  user hệ điều hành của người vận hành, nên không khẳng định cách ly trước một tiến trình thù địch của cùng user ấy, và
+  việc giả mạo `.pth` đầu-cuối trong một `aisef run` thật chưa được đo.
 - **`--verify` chứng minh tính nhất quán, không chứng minh tính xác thực.** Chuỗi băm không có khoá và `RUN.json` nằm
   cạnh nó; kết quả từng story, điểm dừng ngân sách và lỗi story được đọc từ `RUN.json`, và viết lại nhất quán cả hai
   vẫn VERIFIED (V21-30).

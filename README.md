@@ -9,22 +9,22 @@ The principle behind every decision in this repository:
 
 > **If it needs judgement, give it to the model. If it needs a guarantee, write code.**
 
-**AISEF 2.0** makes that principle the runtime. `aisef run` executes an owner-approved plan on a git repository:
+**AISEF 2.1** makes that principle the runtime. `aisef run` executes an owner-approved plan on a git repository:
 for each story a developer session changes the code, and the V2 kernel decides — from independent probes of the
 product, never from the developer's word or the developer's own tests — whether the story is delivered, retried or
 rolled back. Every decision is written to a hash-chained journal, and `aisef run --verify` checks a finished run
-against it.
+against it. 2.1 is the same V2 runtime as 2.0, requalified — see [What's new in 2.1](#whats-new-in-21).
 
 ```bash
-pip install aisef==2.0.0
+pip install aisef==2.1.0
 ```
 
-- [Using AISEF 2.0](docs/v2/USAGE.md) · [Hướng dẫn tiếng Việt](docs/v2/USAGE.vi.md)
-- [What changed in 2.0](CHANGELOG.md) · [Known limitations](#known-limitations-of-20)
+- [Using AISEF](docs/v2/USAGE.md) · [Hướng dẫn tiếng Việt](docs/v2/USAGE.vi.md)
+- [What's new in 2.1](#whats-new-in-21) · [What changed, per release](CHANGELOG.md) · [Known limitations](#known-limitations-of-21)
 - [Architecture RFC](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) · [Release process](docs/v2/RELEASE-PROCESS.md)
 - [The 1.x framework (legacy surface and planning tools)](#the-v1-framework-legacy-surface-and-planning-tools)
 
-## What AISEF 2.0 does
+## What AISEF 2.1 does
 
 `aisef run` is the authoritative execution path. One run, in order:
 
@@ -38,7 +38,7 @@ pip install aisef==2.0.0
    Anything else is an *identity stop*: no session starts.
 4. **Stories run in dependency order.** For each story the developer session (OpenCode, on the one attested route)
    changes the code in its own git worktree — a workspace, not a sandbox: the client runs as the operator's OS user
-   (see [Known limitations](#known-limitations-of-20)). Then the kernel proves the candidate:
+   (see [Known limitations](#known-limitations-of-21)). Then the kernel proves the candidate:
    - **ProductProof** — harness-owned probes (a Python callable, a CLI invocation, a process effect, a file artifact)
      check each behaviour contract against the candidate. Candidate code runs only in the probe's agent process; the
      verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation
@@ -68,6 +68,28 @@ contracts define product truth), *Independent Evidence* (the actor that writes t
 that certifies it), *Typed Ownership*, *Immutable Provenance* and *No Prose As Control State* (no model output ever
 becomes a control code). See the [architecture RFC](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) §4.
 
+## What's new in 2.1
+
+2.1 is a requalification round on the same `aisef run` V2 runtime — the controller/agent split, the hash-chained
+journal and `aisef run --verify` are unchanged in shape; the product kernel `aisef2` advances from 2.0.0 with no
+change to what a run looks like. Each behaviour change is traced in [`docs/v2.1/REPORT.md`](docs/v2.1/REPORT.md)
+and [`docs/v2.1/TRACEABILITY.md`](docs/v2.1/TRACEABILITY.md):
+
+- **Syntax-aware plan criteria (V21-37).** A criterion that reads Python source no longer mistakes a docstring line
+  beginning with `from …` for an import — the 2.0 false-rollback class is closed. A regression found after the merge
+  is now routed back to the developer when the retry policy permits, instead of being owned by nobody (V21-38).
+- **The verdict channel now holds across evaluations (V21-28).** Probe controllers run with `-S` as well as `-I`,
+  so a `.pth` planted in the venv's site-packages no longer executes inside a later controller — closed at the
+  mechanism level (an end-to-end `.pth` tampering attempt in a live `aisef run` is not yet measured).
+- **Three separated contract identities.** A contract's semantic identity, a probe's capability/API version and the
+  digest of the executed bytes are now distinct, so `bundle migrate` no longer carries an approval across merely
+  because the contract hash is unchanged: it reports `semantic_changes` / `needs_owner_reapproval`, and re-approval
+  is the owner's explicit action. Measured, owner-accepted limit (2026-10-18): on the LedgerLock 2.0.0 bundle 50 of
+  53 kept approvals carry on the capability-version rule alone, because three probes changed behaviour without a
+  capability-version bump — a limit, not a claim.
+- **Mutation scope fully covered** — 614 / 614 targets, 0 MISSING (see
+  [How 2.0 and 2.1 were qualified](#how-20-and-21-were-qualified)).
+
 ## Get started
 
 Needs Python 3.11+, `git` 2.31+ and — for a live run — the [OpenCode](https://opencode.ai) client on `PATH` and an
@@ -90,7 +112,7 @@ aisef run --verify --project bundle.json --out ./runs/r1                        
 
 Field-by-field formats, the run directory and every refusal: [docs/v2/USAGE.md](docs/v2/USAGE.md).
 
-## How 2.0 was qualified
+## How 2.0 and 2.1 were qualified
 
 Release candidate RC2 (`1565bcc`) was frozen with its wheel and sdist digests and qualified as shipped:
 
@@ -109,7 +131,21 @@ Release candidate RC2 (`1565bcc`) was frozen with its wheel and sdist digests an
 The evidence is in [`closure-evidence/v2/release/`](closure-evidence/v2/release/), starting from
 [`V2.0-FINAL-RELEASE-REPORT.md`](closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md).
 
-## What 2.0 claims, and what it does not
+**2.1** is the same V2 runtime requalified — the product kernel `aisef2` (`5f34a3f3`) is byte-for-byte the 2.0
+kernel; no product code was changed to prepare the release. Its distinct qualification:
+
+| check | result |
+|---|---|
+| mutation coverage of the release-critical scope | **614 / 614 targets covered, 0 MISSING**; 97.41% killed in the supplementary campaign (3,500 / 3,593); the CLI parser (`cli.py::_parser`, 31/31) and bundle create (`bundle_cli.py::_create`, 3/3) fully killed |
+| reproducible build | the staging rebuild reproduced the frozen wheel and sdist byte-for-byte |
+| published artifact | **2.1.0 on PyPI (2026-11-01)** — wheel and sdist **byte-identical to the frozen release candidate**, re-verified after upload |
+| mutation gate | **FAIL — 7 survivors** (`client.py::session` ×3, `story_runner.py::_attempt` ×4), owner-accepted as scoped residual risks; the gate keeps its true FAIL, nothing reworded |
+
+The 2.1 evidence is in [`closure-evidence/v2/v2.1/`](closure-evidence/v2/v2.1/), starting from
+[`V2.1-EXECUTIVE-HANDOVER.md`](closure-evidence/v2/v2.1/V2.1-EXECUTIVE-HANDOVER.md) and
+[`GO-NO-GO.md`](closure-evidence/v2/v2.1/GO-NO-GO.md).
+
+## What 2.1 claims, and what it does not
 
 **Claimed:** deterministic, evidence-bound orchestration and product verification; candidate code cannot control
 a verdict channel within an evaluation (a gap across evaluations is listed below); raw run evidence is preserved and
@@ -119,36 +155,44 @@ re-verifiable.
 
 **Not claimed:** generalisation across arbitrary workloads; model quality; superiority over V1; hostile
 multi-tenant isolation; full isolation against a malicious process of the same OS user; protection against the
-machine's owner. `plan_quality_verdict` is always `NOT_CLAIMED` in 2.0.
+machine's owner. `plan_quality_verdict` is always `NOT_CLAIMED` in 2.1.
 
-### Known limitations of 2.0
+### Known limitations of 2.1
 
-- **AISEF 2.0 runs bundles; it does not author them.** A V2 project bundle (contracts, approvals, plan) is prepared
-  and approved outside `aisef run`; there is no automatic conversion from a 1.x project.
-- **Plan criteria that read Python source with line patterns can refute correct code.** In the 2.0 release smoke a
-  correct story was rolled back because a "stdlib only" criterion matched a docstring line beginning with
-  `from …` as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no code failing one of the
-  bundle's specs reached `main` — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
-- **A regression found after the merge goes back to nobody.** It is owned by INTEGRATION and not retryable, so the
-  developer neither learns the failing criterion nor gets a retry (V21-38, planned for 2.1).
+- **AISEF runs bundles; it does not author them.** A V2 project bundle (contracts, approvals, plan) is prepared and
+  approved outside `aisef run`; there is no automatic conversion from a 1.x project. A 2.0.0 bundle is re-bound with
+  `aisef bundle migrate`, which hands back the contracts needing the owner's re-approval (see
+  [What's new in 2.1](#whats-new-in-21)).
 - **Acceptance is relative to the bundle's specs.** "0 false acceptances" means no story landed that fails one of
-  its own contracts. In the release smoke the model review found 5 reproducible defects outside the 59 specs (crashes
-  and wrong exit codes on paths no contract exercises); they shipped, because the review is informational.
-- **The developer is not confined.** The client runs as the operator's OS user with the operator's HOME, PATH, XDG
-  directories, global OpenCode configuration (plugins, MCP servers) and network. In the release smoke, developer
-  sessions read outside their worktree — probe scratch, the live journal, the bundle holding the proofs' stimuli, the
-  installed kernel — before a story committed (V21-02, planned for 2.1).
-- **The probe interpreter is writable.** Probe controllers run the run's own venv with `-I` but not `-S`, so a `.pth`
-  file planted in its site-packages — by the developer's test code or the developer session — runs inside later
-  controllers, which hold the channel key. The verdict-channel claim holds within an evaluation, not across
-  evaluations (V21-28; a fix is planned for 2.0.1).
+  its own contracts. In the 2.0 release smoke the model review found 5 reproducible defects outside the 59 specs
+  (crashes and wrong exit codes on paths no contract exercises); they shipped, because the review is informational.
+- **The developer is not confined (V21-02, still open).** The client runs as the operator's OS user with the
+  operator's HOME, PATH, XDG directories, global OpenCode configuration (plugins, MCP servers) and network. In the
+  2.0 release smoke, developer sessions read outside their worktree — probe scratch, the live journal, the bundle
+  holding the proofs' stimuli, the installed kernel — before a story committed. 2.1 closed the `.pth` verdict-channel
+  gap at the mechanism level (below), but OS-level confinement of the developer remains open; keep the run's
+  `evidence_anchor` outside the run directory, where the developer cannot write it
+  ([ANCHOR-THREAT-MODEL.md](docs/v2.1/ANCHOR-THREAT-MODEL.md)).
+- **The verdict channel holds at the mechanism level, not the OS level.** Probe controllers now run the run's venv
+  with `-I -S` (V21-28), so a `.pth` planted in its site-packages no longer runs inside a later controller — the
+  cross-evaluation gap of 2.0 is closed. AISEF still runs the developer as the operator's OS user, so it does not
+  claim isolation against a malicious process of that same user, and an end-to-end `.pth` tampering attempt in a
+  live `aisef run` has not been measured.
+- **Integrity under an external SIGKILL is bounded (A-03).** If `aisef run` is SIGKILLed in the narrow window
+  between sending a provider request and journaling its result, integrity is **outside the 2.1 supported envelope** —
+  not claimed fixed or fully verified (owner ruling 2026-10-31). Every normal termination path (budget stop, turn
+  cap, timeout, interrupt) redacts and releases in a `finally` and is covered.
 - **`--verify` proves consistency, not authenticity.** The journal chain is unkeyed and `RUN.json` sits beside it in
   the same writable directory; a consistent rewrite of both still verifies (V21-30).
 - **Platforms.** A live `aisef run` is supported on Linux and macOS; every live run so far ran on macOS (Linux is
   exercised in CI with a fake client and provider). On Windows the package installs and the kernel's test suite runs,
-  but a live run is not part of the 2.0 claim.
+  but a live run is not part of the 2.1 claim.
 - **Probes** run with the standard library and the candidate's own source (no third-party project dependencies).
   The model review and the scanner (`ruff`, when installed) are informational and never block.
+- **Mutation gate FAIL — 7 accepted survivors.** The machine mutation gate verdict is preserved as FAIL (7 unaudited
+  survivors in `client.py::session` and `story_runner.py::_attempt`); the owner accepted them as scoped residual
+  risks — not defects of a verdict, obligation, secret, access boundary or evidence integrity. Detail:
+  [`V2.1-KNOWN-LIMITATIONS.json`](closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json).
 
 The full 2.1 backlog, each item with its reproducer status: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md). An
 independent 360° assessment of 2.0: [docs/DANH-GIA-360-V2.0-2026-10-06.md](docs/DANH-GIA-360-V2.0-2026-10-06.md).
@@ -201,8 +245,9 @@ aisef2/                 the V2 kernel and runtime
   quality/              engineering test adequacy
   invariants/           the nine invariants, armed in every test tier
 aisef/                  the 1.x framework: planning pipeline, gates, guards, legacy execution
-docs/v2/                using, releasing and the 2.1 backlog
-closure-evidence/v2/    every qualification record of 2.0
+docs/v2/                using and releasing the V2 runtime
+docs/v2.1/              the 2.1 requalification: report, traceability, usage deltas
+closure-evidence/v2/    every qualification record of 2.0 and 2.1
 ```
 
 ---

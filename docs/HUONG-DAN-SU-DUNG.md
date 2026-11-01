@@ -1,11 +1,11 @@
 # Hướng dẫn sử dụng AISEF
 
-> **AISEF 2.0 — đọc phần này trước.** Từ 2.0, `aisef run` là **runtime V2**: nó thực thi một project bundle đã
+> **AISEF 2.1 — đọc phần này trước.** Từ 2.0, `aisef run` là **runtime V2**: nó thực thi một project bundle đã
 > được chủ dự án phê duyệt dưới kernel V2 và quyết định từng story dựa trên các probe độc lập kiểm tra sản phẩm. Cách
-> dùng: **[docs/v2/USAGE.vi.md](v2/USAGE.vi.md)**. Hướng dẫn này nói về **framework 1.x** mà 2.0 vẫn ship — chuỗi lập
+> dùng: **[docs/v2/USAGE.vi.md](v2/USAGE.vi.md)**. Hướng dẫn này nói về **framework 1.x** mà 2.1 vẫn ship — chuỗi lập
 > kế hoạch (`setup`, `plan`, `mockup`, `approve`, cổng, guard, `qa`, `report`, …) và phần thực thi legacy, giờ chỉ chạy
 > bằng **`aisef legacy run`** (cùng tuỳ chọn như `aisef run` của 1.x) và **`aisef legacy improve`**. Mọi lệnh khác bên
-> dưới giữ nguyên. Cài 2.0 bằng `pip install aisef==2.0.0`.
+> dưới giữ nguyên. Cài bản hiện tại bằng `pip install aisef==2.1.0`.
 
 [Bộ nhớ dài hạn — **ĐÓNG BĂNG**, mặc định TẮT](MEMORY.md): từ phụ lục ADR-007 ngày 2026-09-12, `aisef memory` không còn là "thử nghiệm, sắp có" mà là **đóng băng**: code còn đó và vẫn được sửa lỗi/lỗ bảo mật, nhưng **không thêm năng lực mới**. Rã băng cần một yêu cầu từ bên ngoài, **hoặc** một phép đo có đối chứng cho thấy một lỗi lặp lại mà bộ nhớ hẳn đã ngăn được. Bộ nhớ **không** phải bằng chứng cho cổng. Tham khảo: [nghiên cứu/kế hoạch](MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
 

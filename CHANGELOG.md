@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 — 2026-10-31 (release prepared; production publication pending separate owner authorization)
+## 2.1.0 — 2026-11-01
 
 **AISEF 2.1.0 — the V2.1 requalification round, on the same `aisef run` V2 runtime.** The product kernel
 (`aisef2`) advances from 2.0.0; `aisef run`, the controller/agent split, the hash-chained journal and
@@ -33,9 +33,12 @@ Headline changes (see those docs for the full, traced set and the owner decision
   preserved as FAIL (7 unaudited) and the acceptance is recorded above the gate, not as kills. Detail:
   `closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json`, `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json`
   seq 6.
-- Platforms: Linux and macOS for a live run (Windows runs the test suite). Production publication of 2.1.0 is
-  **not** authorized by the release-preparation directive; it requires a separate explicit owner authorization
-  (the tag, the pypi environment approval, the upload).
+- Platforms: Linux and macOS for a live run (Windows runs the test suite).
+- **Released to PyPI on 2026-11-01** (owner authorization, `RELEASE-DECISIONS.json` seq 7): tag `v2.1.0` at
+  `21dc2e11`; the published wheel (`80310413…ac05`) and sdist (`5039c602…3538`) are byte-identical to the frozen
+  release candidate and were re-verified against it after upload. The product kernel `aisef2` (`5f34a3f3`) is
+  unchanged from 2.0.0. The scoped release qualification passed on all six CI legs; the raw unit suite and the
+  mutation gate keep their true FAIL verdicts (0 confirmed product defects; the 7 survivors are owner-accepted).
 
 ## 2.0.0 — 2026-10-05
 

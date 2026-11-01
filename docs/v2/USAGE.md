@@ -1,9 +1,10 @@
 *English · [Tiếng Việt](USAGE.vi.md)*
 
-# AISEF 2.0 — using the V2 runtime (`aisef run`)
+# AISEF 2.1 — using the V2 runtime (`aisef run`)
 
-AISEF 2.0 provides deterministic, evidence-bound orchestration and product verification for AI-assisted software
-delivery. `aisef run` executes an owner-approved plan on a git repository: for each story a developer session (the
+AISEF 2.1 provides deterministic, evidence-bound orchestration and product verification for AI-assisted software
+delivery. This guide covers the V2 runtime shared by 2.0 and 2.1; the 2.1 behaviour and migration deltas are in
+[`../v2.1/USAGE-2.1.md`](../v2.1/USAGE-2.1.md) and [`../v2.1/REPORT.md`](../v2.1/REPORT.md). `aisef run` executes an owner-approved plan on a git repository: for each story a developer session (the
 OpenCode client, on one fixed model route) changes the code, and the V2 kernel decides — from independent probes of
 the product, never from the developer's word — whether the story is delivered, retried or rolled back. Every decision
 is written to a hash-chained journal that the run directory keeps, and that `aisef run --verify` checks.
@@ -11,7 +12,7 @@ is written to a hash-chained journal that the run directory keeps, and that `ais
 ## Install
 
 ```bash
-pip install aisef==2.0.0
+pip install aisef==2.1.0
 ```
 
 Needs Python 3.11 or newer, `git` 2.31 or newer, and — for a live run — the `opencode` client on `PATH` and an OpenAI-compatible
@@ -122,16 +123,17 @@ and never blocks; the scanner (`ruff`, when installed) is informational.
 
 Platforms: `aisef run` is supported on Linux and macOS; every live run so far ran on macOS (Linux is exercised in CI
 with a fake client and provider). On Windows the package installs and the kernel's test suite runs, but a live
-`aisef run` is not part of the 2.0 claim.
+`aisef run` is not part of the 2.1 claim.
 
 ## Known limitations
 
-- **Plan criteria that read Python source with line patterns can refute correct code.** In the 2.0 release smoke a
-  correct story was rolled back because a "stdlib only" criterion matched a docstring line beginning with `from …`
-  as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no code failing one of the bundle's specs
-  reached `main` — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
-- **A regression found after the merge goes back to nobody.** It is owned by INTEGRATION and not retryable, so the
-  developer neither learns the failing criterion nor gets a retry (V21-38, planned for 2.1).
+- **Fixed in 2.1 — plan criteria are now syntax-aware (V21-37).** In the 2.0 release smoke a correct story was rolled
+  back because a "stdlib only" criterion matched a docstring line beginning with `from …` as an import
+  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). 2.1 reads Python source syntax-aware, so a docstring line is no longer mistaken
+  for an import — the class is closed.
+- **Fixed in 2.1 — a post-merge regression is routed back to the developer (V21-38).** In 2.0 it was owned by
+  INTEGRATION and not retryable, so the developer learned neither the failing criterion nor got a retry; 2.1 routes it
+  back to the developer when the retry policy permits.
 - **Acceptance is relative to the bundle's specs.** "0 false acceptances" means no story landed that fails one of
   its own contracts. In the release smoke the model review found 5 reproducible defects outside the 59 specs; they
   shipped, because the review is informational.
@@ -139,10 +141,11 @@ with a fake client and provider). On Windows the package installs and the kernel
   directories, global OpenCode configuration (plugins, MCP servers) and network. In the release smoke, developer
   sessions read outside their worktree — probe scratch, the live journal, the bundle holding the proofs' stimuli, the
   installed kernel — before a story committed (V21-02).
-- **The probe interpreter is writable.** Probe controllers run the run's own venv with `-I` but not `-S`, so a `.pth`
-  file planted in its site-packages by the developer's tests or session runs inside later controllers, which hold the
-  channel key. The verdict-channel claim holds within an evaluation, not across evaluations (V21-28; a fix is planned
-  for 2.0.1).
+- **The verdict channel holds at the mechanism level, not the OS level (V21-28).** Probe controllers now run the
+  run's own venv with `-I -S`, so a `.pth` planted in its site-packages by the developer's tests or session no longer
+  runs inside a later controller — the verdict-channel claim holds across evaluations, closed at the mechanism level.
+  AISEF still runs the developer as the operator's OS user, so it does not claim isolation against a malicious process
+  of that same user, and an end-to-end `.pth` tampering attempt in a live `aisef run` has not been measured.
 - **`--verify` proves consistency, not authenticity.** The journal chain is unkeyed and `RUN.json` sits beside it;
   story outcomes, a budget stop and story errors are read from `RUN.json`, and a consistent rewrite of both still
   verifies (V21-30).

@@ -1,18 +1,20 @@
 # Documentation map
 
-AISEF 2.0 ships two surfaces: the V2 runtime (`aisef run`) and the 1.x framework, whose planning pipeline and tools
+AISEF 2.1 ships two surfaces: the V2 runtime (`aisef run`) and the 1.x framework, whose planning pipeline and tools
 are unchanged and whose execution runs behind `aisef legacy run` / `aisef legacy improve`. Pages describe the
 version they were written for; a dated record is never rewritten to match a later release.
 
-## AISEF 2.0 — current
+## AISEF 2.1 — current
 
 | page | what it is |
 |---|---|
 | [v2/USAGE.md](v2/USAGE.md) · [v2/USAGE.vi.md](v2/USAGE.vi.md) | using `aisef run`: the project bundle, run settings, the run directory, exit codes, known limitations |
 | [architecture/AISEF-V2-ARCHITECTURE-RFC.md](architecture/AISEF-V2-ARCHITECTURE-RFC.md) | the four planes, the nine invariants, the kernel's types and why they are shaped this way |
-| [v2/V2.1-BACKLOG.md](v2/V2.1-BACKLOG.md) | what 2.0 does not do yet, each item with a reproducer |
-| [v2/V2-STABLE-RELEASE-CHARTER.md](v2/V2-STABLE-RELEASE-CHARTER.md) · [v2/RELEASE-PROCESS.md](v2/RELEASE-PROCESS.md) | how 2.0 was qualified and released |
-| [../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md](../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md) | the 2.0 release evidence |
+| [v2.1/REPORT.md](v2.1/REPORT.md) · [v2.1/TRACEABILITY.md](v2.1/TRACEABILITY.md) · [v2.1/USAGE-2.1.md](v2.1/USAGE-2.1.md) | what changed in 2.1 and why, each behaviour traced to its evidence, and the 2.1 usage/migration deltas |
+| [../closure-evidence/v2/v2.1/V2.1-EXECUTIVE-HANDOVER.md](../closure-evidence/v2/v2.1/V2.1-EXECUTIVE-HANDOVER.md) · [../closure-evidence/v2/v2.1/GO-NO-GO.md](../closure-evidence/v2/v2.1/GO-NO-GO.md) | the 2.1 qualification and release evidence |
+| [v2/V2.1-BACKLOG.md](v2/V2.1-BACKLOG.md) | what the V2 runtime does not do yet, each item with a reproducer |
+| [v2/V2-STABLE-RELEASE-CHARTER.md](v2/V2-STABLE-RELEASE-CHARTER.md) · [v2/RELEASE-PROCESS.md](v2/RELEASE-PROCESS.md) | how the V2 runtime is qualified and released |
+| [../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md](../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md) | the 2.0 release evidence (same kernel 2.1 ships) |
 | [SALEKIT.html](SALEKIT.html) | one-page overview for evaluators |
 | [DANH-GIA-360-V2.0-2026-10-06.md](DANH-GIA-360-V2.0-2026-10-06.md) | independent 360° assessment of 2.0 (Vietnamese): eleven dimensions, findings, 2.0.1/2.1 plan |
 
@@ -36,4 +38,4 @@ version they were written for; a dated record is never rewritten to match a late
 - Releases and plans: `RELEASE-*`, `PLAN-v0.4.0.md`, `ROADMAP-POST-1.0.md`, `V1-READINESS.md`, `STABILITY.md`, `EXECUTION-PLAN.md`, `ACTION-PLAN-2026-09-05.md`, `SPIKE-REPORT.md`, `REQUIREMENTS-EVIDENCE.md`.
 - Reviews and status: `DEEP-REVIEW-2026-09-05.md`, `DANH-GIA-360-2026-09-12.md`, `DANH-GIA-360-VA-LO-TRINH.md`, `ASSESSMENT-360-v2.html`, `STATUS-2026-09-05.md`, `CLAIM-AUDIT-1.7.2.md`, `DOGFOOD-*.md`, `handoff/`.
 - External validation of 1.x (G6): `EXTERNAL-VALIDATION-v1.1.0.md`, `EXTERNAL-VALIDATION-QUICKSTART.md`, `TEMPLATE-EXTERNAL-VALIDATION-REPORT.md`, `G6-RETURN-PLAYBOOK.md`.
-- 2.0 working material: `implementation/v2/`, `research/v2/`.
+- 2.0 / 2.1 working material: `implementation/v2/`, `research/v2/`, `v2.1/`.

@@ -1,11 +1,11 @@
 # AISEF Usage Guide
 
-> **AISEF 2.0 — read this first.** From 2.0, `aisef run` is the **V2 runtime**: it executes an owner-approved
+> **AISEF 2.1 — read this first.** Since 2.0, `aisef run` is the **V2 runtime**: it executes an owner-approved
 > project bundle under the V2 kernel and decides every story from independent product probes. How to use it:
-> **[docs/v2/USAGE.md](v2/USAGE.md)**. This guide covers the **1.x framework** that 2.0 still ships — the planning
+> **[docs/v2/USAGE.md](v2/USAGE.md)**. This guide covers the **1.x framework** that 2.1 still ships — the planning
 > pipeline (`setup`, `plan`, `mockup`, `approve`, gates, guards, `qa`, `report`, …) and the legacy execution, which
 > now runs only as **`aisef legacy run`** (same options as 1.x `aisef run`) and **`aisef legacy improve`**. Every
-> other command below is unchanged. Install 2.0 with `pip install aisef==2.0.0`.
+> other command below is unchanged. Install the current release with `pip install aisef==2.1.0`.
 
 Optional [long-term memory guide](MEMORY.md): `aisef memory` is **frozen** and OFF by default — the code stays and keeps its bug and security fixes, no new capability is added. Includes configuration, CLI, provenance, security and retrieval-only benchmark limitations; memory is never gate evidence. Cross-references: [research/plan](MEMORY-RESEARCH-PLAN.md), [validation report](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
 
@@ -148,7 +148,7 @@ The package, Python module, and CLI command are all named `aisef`.
 `aisef --version` prints the version; to inspect the whole environment, use
 `aisef doctor`.
 
-This guide describes the 1.x framework as **2.0.0** ships it: every V1 command behaves as in 1.7.6, except that V1
+This guide describes the 1.x framework as **2.1.0** ships it: every V1 command behaves as in 1.7.6, except that V1
 execution moved behind `aisef legacy` (`aisef legacy run`, `aisef legacy improve`) — `aisef run` is now the V2
 runtime ([v2/USAGE.md](v2/USAGE.md)). History: 1.7.2 was released 2026-09-15 (1.0.0 was 2026-09-08, and
 1.2.x, 1.3.0, 1.3.1, 1.4.0, 1.5.0, 1.6.0, 1.7.1 came between); it changed

@@ -1,7 +1,8 @@
 # AISEF 2.1 — Hướng dẫn sử dụng và di trú từ 2.0.0
 
-Áp dụng cho nhánh `v2.1/foundation` (`2.1.0.dev0`, **chưa phát hành**). Mọi lệnh dưới đây không gọi provider, trừ
-`aisef run` không kèm `--check`/`--verify`.
+Áp dụng cho runtime V2 của **AISEF 2.1.0** — phát hành 2026-11-01 trên PyPI, bản phát hành đóng băng từ `dc63478c`,
+kernel `aisef2` không đổi từ 2.0.0. (Mục 8 và các ghi chú "cửa sổ probe" bên dưới mô tả một cây ứng viên *khác*, chưa
+phát hành — xem đoạn ngay sau.) Mọi lệnh dưới đây không gọi provider, trừ `aisef run` không kèm `--check`/`--verify`.
 
 Mục 8 và các ghi chú "cửa sổ probe" mô tả cây ứng viên `v2.1/probe-window` (2026-10-15 … 2026-10-17, từ `2d01fe4` tới
 `3e1e83a`, hai đợt): *đã làm trên nhánh ứng viên, bằng chứng đo (hiệu chuẩn lại, mutation, suite đầy đủ) chưa có*. Đó

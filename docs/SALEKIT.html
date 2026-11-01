@@ -326,9 +326,9 @@ section { padding: 80px 0; }
 <!-- Hero -->
 <section class="hero">
   <div class="wrap">
-    <div class="hero-badge">AISEF 2.0 &middot; Open Source</div>
+    <div class="hero-badge">AISEF 2.1 &middot; Open Source</div>
     <h1>Your agent says <em>"done"</em>.<br>Can you prove it?</h1>
-    <p>AISEF 2.0 runs an owner-approved plan with a coding agent and decides delivery from harness-owned probes of the product &mdash; never from the agent's word. Every decision lands in a hash-chained journal you can re-verify. Zero dependencies.</p>
+    <p>AISEF 2.1 runs an owner-approved plan with a coding agent and decides delivery from harness-owned probes of the product &mdash; never from the agent's word. Every decision lands in a hash-chained journal you can re-verify. Zero dependencies.</p>
     <div class="hero-install">
       <span class="dollar">$</span> pip install aisef
     </div>
@@ -370,8 +370,8 @@ section { padding: 80px 0; }
 <!-- 2.0 kernel -->
 <section class="usp">
   <div class="wrap">
-    <h2>What AISEF 2.0 guarantees</h2>
-    <p class="subtitle">The 2.0 kernel: deterministic, evidence-bound orchestration and product verification. Threat model: a trusted operator; generated code may be faulty or opportunistic.</p>
+    <h2>What AISEF 2.1 guarantees</h2>
+    <p class="subtitle">The V2 kernel (unchanged in 2.1): deterministic, evidence-bound orchestration and product verification. Threat model: a trusted operator; generated code may be faulty or opportunistic.</p>
     <div class="usp-grid">
       <div class="usp-card">
         <div class="usp-num">01</div>
@@ -382,7 +382,7 @@ section { padding: 80px 0; }
       <div class="usp-card">
         <div class="usp-num">02</div>
         <h3>A Verdict Channel the Code Cannot Forge</h3>
-        <p>Candidate code runs only inside the probe's agent process; the verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation the code under test cannot forge a verdict the controller accepts; at most it can suppress its own observation, which is reported as a harness failure, not as SATISFIED. It can still misreport itself &mdash; its exit code, its returned value &mdash; so a candidate written to do that, or one that recognises it is being probed, can turn a broken product into a SATISFIED result: the guarantee is about the channel, not about the value a subject reports. Known gap across evaluations: a <code>.pth</code> planted in the run&rsquo;s writable probe interpreter runs inside later controllers (V21-28, scheduled for 2.0.1).</p>
+        <p>Candidate code runs only inside the probe's agent process; the verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation the code under test cannot forge a verdict the controller accepts; at most it can suppress its own observation, which is reported as a harness failure, not as SATISFIED. It can still misreport itself &mdash; its exit code, its returned value &mdash; so a candidate written to do that, or one that recognises it is being probed, can turn a broken product into a SATISFIED result: the guarantee is about the channel, not about the value a subject reports. In 2.1 this also holds across evaluations: probe controllers run with <code>-S</code>, so a <code>.pth</code> planted in the venv no longer runs inside a later controller (V21-28, closed at the mechanism level).</p>
         <span class="usp-tag">Channel guarantee</span>
       </div>
       <div class="usp-card">
@@ -626,7 +626,7 @@ section { padding: 80px 0; }
         <div class="stat-label">Independent rebuilds byte-identical to the frozen wheel and sdist</div>
       </div>
     </div>
-    <p class="subtitle" style="margin-top: 32px;">The live release smoke ran one workload (LedgerLock), 7 stories and 67 proof obligations on one real model route, on macOS. It did not pass its own preregistered criteria: 6 stories were delivered, one correct story was rolled back because a plan criterion read a docstring line as an import, and 2.0.0 was released on a single-case owner waiver. The 59/59 is measured against the bundle&rsquo;s own specs; the run&rsquo;s model review found 5 defects outside them, which shipped. Not claimed in 2.0: generalisation across arbitrary workloads, model quality, superiority over 1.x, hostile multi-tenant or same-user isolation, a live run on Windows. Known gaps: the developer client is not confined (V21-02), and the probe interpreter is writable across evaluations (V21-28). The evidence is published in <code>closure-evidence/v2/release/</code>.</p>
+    <p class="subtitle" style="margin-top: 32px;">The numbers above are the 2.0 qualification of the V2 kernel that 2.1 ships byte-for-byte. The live 2.0 release smoke ran one workload (LedgerLock), 7 stories and 67 proof obligations on one real model route, on macOS; it did not pass its own preregistered criteria: 6 stories were delivered, one correct story was rolled back because a plan criterion read a docstring line as an import, and 2.0.0 was released on a single-case owner waiver &mdash; 2.1 closes that class with syntax-aware criteria (V21-37). The 59/59 is measured against the bundle&rsquo;s own specs; the run&rsquo;s model review found 5 defects outside them, which shipped. 2.1 adds full mutation coverage (614/614 targets, 0 MISSING) and was published to PyPI on 2026-11-01 byte-identical to its frozen release candidate; the mutation gate keeps a true FAIL on 7 owner-accepted survivors. In 2.1 probe controllers run with <code>-S</code>, closing the cross-evaluation <code>.pth</code> gap (V21-28) at the mechanism level. Not claimed in 2.1: generalisation across arbitrary workloads, model quality, superiority over 1.x, hostile multi-tenant or same-user isolation, a live run on Windows. Known gaps: the developer client is not OS-confined (V21-02); and integrity under an external SIGKILL in the request-sent / result-not-journaled window is outside the supported envelope (A-03). The evidence is published in <code>closure-evidence/v2/release/</code> and <code>closure-evidence/v2/v2.1/</code>.</p>
   </div>
 </section>
 
@@ -696,6 +696,6 @@ section { padding: 80px 0; }
 
 <footer class="footer">
   <div class="wrap">
-    AISEF — AI Software Engineering Framework &middot; v2.0.0 &middot; Open Source
+    AISEF — AI Software Engineering Framework &middot; v2.1.0 &middot; Open Source
   </div>
 </footer>
