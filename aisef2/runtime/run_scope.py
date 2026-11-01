@@ -24,8 +24,9 @@ import threading
 import time as _time
 from typing import Any, Callable, Mapping
 
-from aisef2.arch.enums import ControlProjection as P, EventType as T
+from aisef2.arch.enums import ControlProjection as P, EventType as T, InvariantId
 from aisef2.control import budget
+from aisef2.invariants.registry import require_armed
 from aisef2.journal.event import Event, JournalError
 from aisef2.journal.fold import Authority
 from aisef2.journal.format3 import FORMAT, JournalWriter3
@@ -108,6 +109,7 @@ class RunScope:
 
     # ---- begin
     def begin(self) -> sentinel.Preflight:
+        require_armed(InvariantId.II)   # ROADMAP-2.2 A1: a run begins only in a process whose invariants are armed
         if self._state != "NEW":
             raise JournalError(f"run {self.run_id} is {self._state}: a RunScope begins once")
         self.root.mkdir(parents=True, exist_ok=True)

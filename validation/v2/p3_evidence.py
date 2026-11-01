@@ -330,6 +330,8 @@ def fold_oracle() -> dict:
         ("stale row (shorter prefix)", row), ("edited state", wrong), ("version mismatch", sealed(row, version=row.version + 1)),
         ("head differs", sealed(row, head="f" * 64)), ("ahead of the journal", sealed(row, length=full.length + 1)))}
     forged = sealed(row, state=wrong.state)
+    from aisef2.invariants.registry import arm_runtime
+    arm_runtime()   # ROADMAP-2.2 A1: journal appends happen only in an armed process; this harness writes evidence
     with _journal_dir() as d:
         w = JournalWriter(d / "authority.jsonl", clock=lambda: 0.0)
         authority = fo.Authority(w, six)

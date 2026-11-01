@@ -744,6 +744,8 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
         for n in ("ws", "merge", "run"):
             (tmp / n).mkdir()
         ws, merger = GitWorkspace(repo, tmp / "ws"), GitMerger(repo, "main", tmp / "merge")
+        from aisef2.invariants.registry import arm_runtime
+        arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process
         run_ = RunScope(tmp / "run", "c2-p9-ledgerlock", spec=lambda: resolve(caps, layers, base["baseline"]))
         run_.begin()
         if exp:     # the budget reads the journal, the session streams and the preflight's accounting — it counts nothing itself

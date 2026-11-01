@@ -25,6 +25,7 @@ import pathlib
 
 from aisef2.app import client, diagnostics, preflight, review_verify, settings, usage
 from aisef2.app import run as R
+from aisef2.invariants import registry as invariants
 from aisef2.app.bundle import Project
 from aisef2.arch.enums import Enforcement, IdentityGrade
 from aisef2.journal import format3
@@ -92,6 +93,26 @@ def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict], rec: dic
                   f"(restore it — its permissions, or a faithful copy of the run directories at {lineage.unread_runs(inherited)}"
                   " — and verify again): " + "; ".join(inherited["unread"])[:600])
     return b.spend(), None if cannot else b.exceeded(), cannot
+
+
+def _invariant_problems(rec: dict) -> tuple[list[str], list[str]]:
+    """ROADMAP-2.2 A1: the record's invariant arming against what THIS process re-derives — comparable only when the
+    verifying kernel is the run's (the run's enforcement bytes are not in the run directory; what a verifier can
+    recompute is its own). An absent field is a run of an earlier release (the EVIDENCE.json precedent): a note,
+    never a problem. Nothing here can raise a verdict."""
+    inv = rec.get("invariants")
+    if inv is None:
+        return [], ["no invariants field: a run of a release before runtime invariant arming was recorded"]
+    if not isinstance(inv, dict):
+        return ["RUN.json's invariants field is not an object"], []
+    if rec.get("kernel_digest") != R.kernel_digest():
+        return [], ["invariant digests not compared: the verifying kernel is not the run's (kernel_digest differs)"]
+    problems = []
+    if inv.get("registry_digest") != invariants.registry_digest():
+        problems.append("the record's invariant registry digest is not this kernel's (same kernel_digest)")
+    if inv.get("code_mechanism_digest") != invariants.runtime_mechanism_digest():
+        problems.append("the record's invariant enforcement digest is not this kernel's (same kernel_digest)")
+    return problems, []
 
 
 def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None) -> dict:
@@ -183,6 +204,9 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
         refused = R.unfinished(events)
         bound, s = _runspec_problems(project, rec, events)
         problems += bound
+        found, said = _invariant_problems(rec)   # ROADMAP-2.2 A1: the record's invariant arming, re-derived
+        problems += found
+        notes += said
         stop = None
         if s is not None:
             spent, stop, cannot = _spend(out, s, events, rec)

@@ -432,6 +432,7 @@ class AppExecute(unittest.TestCase):
         self.assertEqual((out / "RUN.json").read_text(encoding="utf-8"), json.dumps(rec, indent=1, sort_keys=True, default=str) + "\n")
         self.assertEqual(sorted(rec), sorted([
             "format", "bundle_digest", "project", "plan_hash", "settings", "started", "stage", "kernel_digest", "platform",
+            "invariants",   # ROADMAP-2.2 A1: the runtime arming and its digests
             "admission", "preflight", "runspec_hash", "aggregate_min_grade", "scanner", "journal", "finished", "story_outcomes",
             "story_errors", "final_main", "delivery_verdict", "delivery_blocked_by", "plan_quality_verdict",
             "generalization_claim", "productproof", "budget", "budget_stop", "sessions", "failure",

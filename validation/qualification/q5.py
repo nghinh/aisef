@@ -707,6 +707,8 @@ def execute(item: Item, mode: str, *, ledger: list[dict] | None = None, variant:
             limits = {o: item.limits.get(o.value, 1) for o in Owner}
             spec_fn = lambda: resolve(caps, {"limits": {"value": {o.value: n for o, n in limits.items()}, "layer": "item"},   # noqa: E731
                                             "corpus_item": {"value": item.id, "layer": "corpus"}}, base)
+            from aisef2.invariants.registry import arm_runtime
+            arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process
             run = RunScope(tmp / "run", f"q5-{item.id}", spec=spec_fn)          # the real clock
             run.begin()
             cap_id = {"name": "model-stream", "grade": "VERIFIED", "developer": next(c.tuple_["digest"] for c in caps if c.name == "developer"),

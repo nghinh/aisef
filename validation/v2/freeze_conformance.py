@@ -318,6 +318,8 @@ def _lifetime_matches_rfc(rfc: RFC, code) -> dict:
     from aisef2.arch.enums import Enforcement
     from aisef2.runtime.capability import verified
     from aisef2.runtime.runspec import resolve
+    from aisef2.invariants.registry import arm_runtime
+    arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process; this harness writes journal evidence
     with tempfile.TemporaryDirectory(prefix="aisef2-f8-") as d:
         run = rs.RunScope(d, "f8", spec=lambda: resolve([verified("kernel", b"f8", Enforcement.FULL)], {}, "0" * 40))
         run.begin()

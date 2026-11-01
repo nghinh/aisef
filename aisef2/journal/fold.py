@@ -23,6 +23,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Protocol
 
+from aisef2.arch.enums import InvariantId
+from aisef2.invariants.registry import require_armed
 from aisef2.journal.compat import Journal
 from aisef2.journal.event import Event, JournalError
 from aisef2.product.contract import ContractError, digest, freeze
@@ -143,6 +145,7 @@ class Authority:
                 self._folders[p.id].advance(event)
 
     def append(self, event_type, data: Mapping, *, source_seqs: tuple[int, ...] = ()) -> Event:
+        require_armed(InvariantId.VI)   # ROADMAP-2.2 A1: no journal is written in a process whose invariants are unarmed
         pending: dict[str, Any] = {}
 
         def check(event: Event) -> None:

@@ -184,6 +184,8 @@ def job_rehearsal(first_wrong: str | None = None, name_every_committed_story: bo
         base = commit_all(repo, "base")
         for n in ("ws", "merge", "run"):
             (tmp / n).mkdir()
+        from aisef2.invariants.registry import arm_runtime
+        arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process
         run = RunScope(tmp / "run", "k-nowork-001-rehearsal",
                        spec=lambda: resolve([verified("kernel", b"k-nowork-001 rehearsal", Enforcement.FULL)], {}, base))
         run.begin()

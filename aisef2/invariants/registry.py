@@ -33,7 +33,8 @@ from aisef2.errors import InvariantError
 
 __all__ = ["Tier", "MechanismKind", "Mechanism", "Invariant", "REGISTRY", "UNCONTAINABLE", "RegistrationError",
            "Registered", "Armed", "resolve", "register", "arm", "armed", "require_armed", "render", "registry_digest",
-           "mechanism_digest", "test_directories"]
+           "mechanism_digest", "test_directories", "RegisteredRuntime", "ArmedRuntime", "register_runtime",
+           "runtime_mechanism_digest", "arm_runtime", "RUNTIME_STATEMENT"]
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 TESTS_V2 = "tests/v2"
@@ -367,11 +368,105 @@ def armed() -> Mapping[Tier, frozenset[InvariantId]]:
 
 
 def require_armed(invariant: InvariantId) -> None:
-    """A runtime guard's first act: refuse to work in a process where its invariant is not armed (fail closed)."""
+    """A runtime guard's first act: refuse to work in a process where its invariant is not armed (fail closed).
+    Armed = by a test tier (`arm`) or by the running kernel itself (`arm_runtime`)."""
+    if isinstance(invariant, InvariantId) and _RUNTIME_ARMED is not None and invariant in _RUNTIME_ARMED:
+        return
     if not isinstance(invariant, InvariantId) or not any(invariant in ids for ids in _ARMED.values()):
         raise InvariantError(f"invariant {getattr(invariant, 'value', invariant)} is not armed in this process: "
                              "its enforcement mechanism is absent, so nothing it guards may proceed (§4)",
                              invariant=getattr(invariant, "value", None))
+
+
+# ------------------------------------------------------------------------------------------------ runtime arming
+
+#: what a run's record says the runtime registration established — and, as plainly, what it did not
+RUNTIME_STATEMENT = ("the nine invariants were registered and armed in the running process: every CODE enforcement "
+                     "mechanism resolved from the installed kernel and its module bytes digested "
+                     "(code_mechanism_digest). The static-rule, checker, test-tier and rendered-document checks are "
+                     "the development tier's enforcement and are not re-resolved at runtime: an installed "
+                     "distribution does not carry them.")
+
+
+@dataclass(frozen=True)
+class RegisteredRuntime:
+    """What a runtime registration established: the typed registry and the identity of the CODE mechanisms."""
+    invariants: tuple[Invariant, ...]
+    digest: str                  # registry_digest: the typed content, same value as the full register()'s
+    code_mechanism_digest: str   # the resolved CODE mechanisms' module bytes, importable installed or in a checkout
+
+
+@dataclass(frozen=True)
+class ArmedRuntime:
+    invariants: frozenset[InvariantId]
+    registry_digest: str
+    code_mechanism_digest: str
+
+
+def runtime_mechanism_digest(registry: tuple[Invariant, ...] = REGISTRY) -> str:
+    """The identity of every CODE mechanism as the running process imports it: sha256 over lines
+    `mechanism.id mechanism.ref sha256(module bytes, CRLF-normalized)`, bytes read from the imported module's own
+    file — so a checkout and the wheel built from it digest identically, and the digest compares across contexts.
+    STATIC_RULE and CHECKER mechanisms are not in it: their files are the development tree's (RUNTIME_STATEMENT)."""
+    lines = []
+    for m in [m for i in registry for m in i.mechanisms] + list(UNCONTAINABLE):
+        if m.kind is not MechanismKind.CODE:
+            continue
+        target = m.ref.partition(":")[0]
+        try:
+            path = pathlib.Path(importlib.import_module(target).__file__)
+            content = path.read_bytes().replace(b"\r\n", b"\n")
+        except (ImportError, AttributeError, TypeError, OSError) as e:
+            raise RegistrationError(f"{m.id}: module {target!r} has no readable file ({type(e).__name__}: {e})") from None
+        lines.append(f"{m.id} {m.ref} {hashlib.sha256(content).hexdigest()}")
+    return hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()
+
+
+def register_runtime(registry: tuple[Invariant, ...] = REGISTRY) -> RegisteredRuntime:
+    """Validate the registry, closed, and resolve every CODE mechanism — the registration a running kernel can make
+    wherever it is installed. It makes the full register()'s pure checks (exactly I..IX in order, frozen titles,
+    every invariant with mechanisms and declared for every tier, InvariantError uncontainable) and resolves the
+    CODE mechanisms; it does NOT run the tree-bound checks (static rules, checkers, tier arming, the rendered
+    document), which the development tier makes (RUNTIME_STATEMENT). Raises RegistrationError: fail closed."""
+    if not isinstance(registry, tuple):
+        raise RegistrationError("the registry is a tuple of invariants, closed at registration")
+    ids = [i.id if isinstance(i, Invariant) else None for i in registry]
+    if any(not isinstance(i, InvariantId) for i in ids):
+        raise RegistrationError("an entry is not one of the nine typed invariants (unknown invariant)")
+    if len(set(ids)) != len(ids):
+        raise RegistrationError("duplicate invariant ids")
+    if ids != list(InvariantId):
+        raise RegistrationError(f"the registry holds exactly I..IX in order; got {[i.value for i in ids]}")
+    for inv in registry:
+        if inv.title != INVARIANT_TITLE[inv.id]:
+            raise RegistrationError(f"{inv.id.value}: title {inv.title!r} is not the frozen {INVARIANT_TITLE[inv.id]!r}")
+        if not inv.mechanisms:
+            raise RegistrationError(f"{inv.id.value} has no enforcement mechanism: a documented intention, not an invariant")
+        if tuple(inv.tiers) != ALL_TIERS:
+            raise RegistrationError(f"{inv.id.value} is declared but not armed in every tier: "
+                                    f"{[t.value for t in ALL_TIERS if t not in inv.tiers]}")
+        for m in inv.mechanisms:
+            if m.kind is MechanismKind.CODE:
+                resolve(m)
+    for m in UNCONTAINABLE:
+        if m.kind is MechanismKind.CODE:
+            resolve(m)
+    if not issubclass(InvariantError, BaseException) or issubclass(InvariantError, Exception):
+        raise RegistrationError("InvariantError must derive from BaseException and not from Exception (§4)")
+    return RegisteredRuntime(registry, registry_digest(registry), runtime_mechanism_digest(registry))
+
+
+_RUNTIME_ARMED: frozenset[InvariantId] | None = None
+
+
+def arm_runtime(*, registry: tuple[Invariant, ...] = REGISTRY) -> ArmedRuntime:
+    """Register at runtime (fail closed) and mark all nine armed in this process. Idempotent; a refused
+    registration leaves the process exactly as armed as it was."""
+    global _RUNTIME_ARMED
+    registered = register_runtime(registry)
+    ids = frozenset(i.id for i in registered.invariants)
+    _RUNTIME_ARMED = ids
+    return ArmedRuntime(ids, registered.digest, registered.code_mechanism_digest)
 
 
 # ------------------------------------------------------------------------------------------------ the document

@@ -59,6 +59,7 @@ import time
 
 from aisef2.app import adapters as ad
 from aisef2.app import client, confine, diagnostics, lineage, preflight, review_ocr, review_verify, usage
+from aisef2.invariants import registry as invariants
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement, ObligationRole
@@ -507,8 +508,18 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     not_run: list[str] = []
     failure: BaseException | None = None
     try:
-        # V2.1: the first thing the run does, before the claim on a predecessor, the clone, the test interpreter, the
-        # route's preflight and any session; a run whose review is not OCR has no such record
+        # ROADMAP-2.2 A1: the nine invariants are armed in THIS process before anything else of the run — the runtime
+        # registration resolves and digests every CODE enforcement mechanism of the installed kernel; a registry that
+        # does not register fails the run closed (RegistrationError is an InvariantError: uncontainable, and the
+        # finally still writes the record, B3). What this does and does not establish: invariants.RUNTIME_STATEMENT.
+        rec["stage"] = "invariants"
+        armed = invariants.arm_runtime()
+        rec["invariants"] = {"armed": sorted(i.value for i in armed.invariants),
+                             "registry_digest": armed.registry_digest,
+                             "code_mechanism_digest": armed.code_mechanism_digest,
+                             "statement": invariants.RUNTIME_STATEMENT}
+        # V2.1: before the claim on a predecessor, the clone, the test interpreter, the route's preflight and any
+        # session; a run whose review is not OCR has no such record
         rec["stage"] = "ocr identity"
         ident = ocr_identity(settings)
         if ident is not None:
