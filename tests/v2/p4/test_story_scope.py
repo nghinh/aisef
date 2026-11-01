@@ -58,6 +58,28 @@ class Scope(Journal2, unittest.TestCase):
         w.close()
         self.assertEqual(reconstruct(self.text()).events, w.events)
 
+    def test_a_resource_is_identified_by_itself_and_a_live_name_collision_fails_closed(self):
+        """ROADMAP-2.2 F4 — the equivalence guard for the two accepted L249 label mutants (RELEASE-DECISIONS seq 6,
+        story_runner.py:249 'developer '/' range' fragments emptied): a resource's NAME is journal payload only —
+        release keys on object identity (the ORDER refusal below names the identity, not the label), and the journal
+        itself REFUSES a second live resource under the same name, so an emptied label can never make one resource
+        stand for another: any collision fails closed before it exists. Defends the equivalence; kills nothing."""
+        w, s = self.scope()
+        log = []
+        first, second = Fake("the-same-name", K.SCRATCH, log), Fake("the-same-name", K.SCRATCH, log)
+        s.acquire(first)
+        with self.assertRaises(JournalError):
+            s.acquire(second)       # a second LIVE "the-same-name": the journal refuses the collision outright
+        self.assertEqual(log, ["the-same-name"])    # the refused offer was released, the held one was not
+        self.assertEqual(s.held, ("the-same-name",))
+        other = Fake("another-name", K.SCRATCH, log)
+        s.acquire(other)
+        with self.assertRaises(ScopeError) as e:
+            s.release(first)        # not the top: identity decides, whatever the labels say
+        self.assertEqual(e.exception.code, "ORDER")
+        self.assertEqual(s.release(other).resource, "another-name")
+        self.assertEqual(s.release(first).resource, "the-same-name")
+
     def test_SCOPE_1_acquisition_during_or_after_disposal_is_refused_and_the_offer_released(self):
         w, s = self.scope()
         log = []

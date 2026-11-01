@@ -277,6 +277,25 @@ class RetryabilityIsTyped(unittest.TestCase):
         self.assertEqual(ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)), [])
 
 
+class CandidateRoutingIsRoleFree(unittest.TestCase):
+    """ROADMAP-2.2 F4 — the equivalence guard for the two accepted L271 role mutants (RELEASE-DECISIONS seq 6,
+    story_runner.py:271 PRESERVE->INTRODUCE/VERIFY): the CANDIDATE point routes role-free BY TABLE — every CANDIDATE
+    row is keyed role=None, and the row answered is identical for every role over every result and every corpus
+    spec. The role the V21-38 re-proof passes can therefore never change a candidate route; the recorded equivalence
+    is defended without killing the accepted mutants."""
+
+    def test_every_candidate_row_is_keyed_role_free(self):
+        keyed = sorted(str(k) for k in routing._EXECUTED if k[0] is CANDIDATE and k[3] is not None)
+        self.assertEqual(keyed, [])
+
+    def test_the_candidate_route_is_identical_across_roles(self):
+        for result, (cid, spec) in itertools.product(RESULTS, SPECS.items()):
+            base = routing.row_for(result, spec, CANDIDATE, None)
+            for role in ObligationRole:
+                with self.subTest(result=result, spec=cid, role=role):
+                    self.assertEqual(routing.row_for(result, spec, CANDIDATE, role), base)
+
+
 def _static():
     s = importlib.util.spec_from_file_location("p1_ks_routing", ROOT / "validation" / "v2" / "kernel_static_checks.py")
     m = importlib.util.module_from_spec(s)

@@ -1,0 +1,23 @@
+{
+ "format": "aisef-correction-record/1",
+ "record": "SURVIVOR-EFFECT-CORRECTION-1",
+ "date": "2026-11-01",
+ "corrects": {
+  "primary": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json entries[5] (seq 6) accepted_survivors.survivors[0] (aisef2/app/client.py::session, position 44, mutant 'L299 dict entry 11 dropped')",
+  "repeats_the_wording": "closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json summary ('the client.session mutants change only ... the redacted count and the left_range_gone naming')"
+ },
+ "finding": "The seq-6 verified_effect for position 44 states the dropped field is the session result's 'redacted' count. It is not: the dropped entry is the **{'left_range_gone': left_gone} splat at the measured client.py:302 (source_sha256 83a170c4ae6aef87fa0c66208c8f969cf39f64ab4bcabb19dd5b91baccb5b87d). All three client.py::session survivors are the left_range_gone report path; the redacted-count report was covered and its mutants were killed.",
+ "evidence": [
+  "The engine numbers dict entries over ast.Dict.keys, which includes **-splats as None keys (validation/v2/mutation.py:1504-1507); on the measured source the L299 result dict has literal entries 0..10 ending at 'redacted' (entry 10), entry 11 = the left_range_gone **splat, entry 12 = the confinement **splat.",
+  "closure-evidence/v2/v2.1/MUTATION.json, target aisef2/app/client.py::session (132 mutants, 129 killed): 'L299 dict entry 10 dropped' KILLED by tests/v2/test_app_run.py; \"L301 string 'redacted' emptied\" KILLED by tests/v2/test_app_run.py; 'L299 dict entry 11 dropped' SURVIVED; 'L302 dict entry 0 dropped' SURVIVED; \"L302 string 'left_range_gone' emptied\" SURVIVED.",
+  "Re-verified on 2026-11-01 directly from the committed MUTATION.json rows and the measured source (sha256 matches seq 6), not from memory or summaries."
+ ],
+ "severity": "LOW — the corrected effect is in the same accepted family (a report-field-only drop; _release_session() enforcement runs unconditionally in a finally). The acceptance's reasoning stands; its stated effect for position 44 did not.",
+ "what_is_not_changed": "No sealed record is edited. RELEASE-DECISIONS.json seq 6 and V2.1-KNOWN-LIMITATIONS.json stay byte-for-byte as sealed; this record is the append-only correction overlay that a reader of either must be pointed to.",
+ "action_taken": {
+  "kill_test": "tests/v2/test_s2_kills.py ClientSession.test_escapees_proved_gone_are_named_on_the_result_under_their_own_key — asserts the result names gone-within-grace escapees under 'left_range_gone' and pins the exact key set; it kills positions 44, 113 and 123 (one assertion, three mutants).",
+  "equivalence_guards": "tests/v2/p1/test_routing.py CandidateRoutingIsRoleFree (positions 144/145: every CANDIDATE routing row is keyed role-free and routes identically across roles) and tests/v2/p4/test_story_scope.py test_a_resource_is_identified_by_itself_and_a_live_name_collision_fails_closed (positions 323/324: release keys on identity and the journal refuses a live name collision outright). Guards defend the recorded equivalences and kill nothing.",
+  "authorization": "RELEASE-DECISIONS seq 6 said 'Do not add tests or change product code solely to eliminate these survivors.' The owner approved ROADMAP-2.2 wave 1 item F4 ('kill the 3 report-field survivors + guard the 4 equivalences') on 2026-11-01 (docs/ROADMAP-2.2-CHECKLIST.md, decision log), which supersedes that constraint for exactly these three. The four story_runner survivors remain accepted and unkilled."
+ },
+ "next_measurement": "The wave-1 targeted mutation re-measure of aisef2/app/client.py::session must show the three mutants KILLED in a NEW record; closure-evidence/v2/v2.1/MUTATION.json is history and is never rewritten."
+}

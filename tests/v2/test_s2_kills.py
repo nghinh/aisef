@@ -813,6 +813,18 @@ class ClientSession(unittest.TestCase):
         s = self.client.session("n", "p", str(self.tmp), capped / "c.jsonl", 30, **{**self.kw, "turn_cap": 1, "budget": budget})
         self.assertEqual((s["exit"], s["timed_out"], s["stopped"]), (None, False, "session turn cap: 1 turns"))
 
+    def test_escapees_proved_gone_are_named_on_the_result_under_their_own_key(self):
+        """ROADMAP-2.2 F4 (owner-approved 2026-11-01; supersedes RELEASE-DECISIONS seq 6 for exactly these three):
+        kills the three client.py::session survivors — the **left_range_gone splat dropped (position 44), its inner
+        pair dropped (113) and its key emptied (123). PL-7's contract is that gone-within-grace escapees are NAMED
+        on the result, never silent — this pins the naming, not only that enforcement ran."""
+        self.mode("exit")
+        with mock.patch.object(self.client, "_release_session", return_value=[4242]):
+            s = self.client.session("S1-dev", "the prompt", str(self.tmp), self.logs / "g.jsonl", 30, **self.kw)
+        self.assertEqual(s["left_range_gone"], [4242])
+        self.assertEqual(set(s), {"exit", "timed_out", "stopped", "started", "error", "text", "turns", "tokens",
+                                  "seconds", "log", "redacted", "left_range_gone"})
+
     def test_a_session_that_never_starts_answers_whole(self):
         self.logs.mkdir(parents=True)
         (self.logs / "x.jsonl").write_text("", encoding="utf-8")
