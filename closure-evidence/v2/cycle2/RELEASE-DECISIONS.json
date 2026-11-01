@@ -259,6 +259,57 @@
     "candidate": "aisef2/ product tree frozen at 8c7bdb44 (tree 5f34a3f3 = fce3d7b7); the acceptance and the documented limitation do not change any product code",
     "mutation_record": "closure-evidence/v2/v2.1/MUTATION-SUMMARY.json (FINAL_HEAD 8c7bdb44, 614/614 accounted, UNAUDITED_SURVIVORS 7, MUTATION_VERDICT FAIL — preserved)"
    }
+  },
+  {
+   "seq": 7,
+   "id": "AISEF_V2_1_0_PRODUCTION_PUBLISH_AUTHORIZED_OPTION_1",
+   "authority": "owner directive 2026-11-01 (chat) 'OWNER FINAL DECISION — AISEF 2.1.0 — OPTION 1 APPROVED', accepting the 2026-11-01 mandatory-gate blocker report",
+   "approver": "human:owner",
+   "decision": {
+    "PRODUCTION_PUBLISH": "AUTHORIZED",
+    "VERSION": "2.1.0",
+    "RELEASE_POLICY_EXCEPTION": "SCOPED_QUALIFICATION_ALLOWLIST_2_1_0",
+    "A_03_CONTINUE_INTEGRITY": "remains SCOPE_LIMITATION_DOCUMENTED (seq 6)",
+    "SEVEN_MUTATION_SURVIVORS": "remains OWNER_ACCEPTED_SCOPED_RESIDUAL_RISK (seq 6)"
+   },
+   "subject_to": "a successful scoped release qualification on the tagged commit AND the protected `pypi` environment approval (a human reviewer — the owner — must approve; engineering cannot). Either control failing withholds publication.",
+   "release_policy_change": {
+    "what": "the smallest version-scoped change: .github/workflows/tests.yml runs the suite through validation/qualification/release_qualify.py ONLY for the exact `v2.1.0` tag; every other ref runs the raw `unittest discover` unchanged. release.yml's job graph and every test assertion are unchanged.",
+    "qualifier": "validation/qualification/release_qualify.py — runs the real suite in process (inside owned_run.py, process-leak discipline intact), keeps every test's authentic PASS/FAIL, and passes only when the failing set is a subset of the 2.1.0 allowlist with no new/unclassified failure and clean-environment evidence for every security/isolation/destructive-authority/process-safety exception.",
+    "allowlist": "closure-evidence/v2/release/V2.1.0-QUALIFICATION-ALLOWLIST.json (56 exceptions measured from CI run 41229691252 @ ce78464f; aisef2 tree identical to the tag commit).",
+    "preserves_raw_verdicts": "the qualifier prints the raw failing set; V2.1.0-STATUS.json keeps unit_suite FAIL and mutation_record FAIL; no FAIL is converted to PASS."
+   },
+   "exception_manifest": {
+    "allowlist_ref": "closure-evidence/v2/release/V2.1.0-QUALIFICATION-ALLOWLIST.json",
+    "by_category": {
+     "record-currency": 15,
+     "ci-environment-artifact": 16,
+     "release-state (test_Q5_15)": 1,
+     "destructive-authority": 3,
+     "isolation": 5,
+     "process-safety": 15,
+     "security": 1
+    },
+    "scope_bound": "each exception falls in one of the owner-authorized classes above: evidenced baseline record-currency failures (RED on the intentionally-unsealed branch; kernel aisef2 5f34a3f3 frozen), the frozen-RC test_Q5_15 release-state mismatch, and confirmed CI environment/harness artifacts. No confirmed material product/security/authorization/verdict/supported-envelope defect is excepted.",
+    "safety_evidence": "every security/isolation/destructive-authority/process-safety exception carries clean-environment evidence: process-safety/isolation/security tests each pass on >=1 clean leg of the same CI run (same commit); the 3 destructive-authority currency tests are backed by aisef2 kernel byte-identity with the owner-reviewed sealed baseline 8c7bdb44 (destructive sites unchanged) and measured green there. A safety-category exception without evidence is a blocker."
+   },
+   "constraints": [
+    "No new mutation campaign.",
+    "No broad historical evidence resealing.",
+    "No modification of frozen product bytes.",
+    "No fabricated PASS verdicts.",
+    "No blanket exemption for security or integrity tests.",
+    "No scope expansion into V2.2.",
+    "No repeated optimization cycles.",
+    "No publication without a successful scoped release qualification."
+   ],
+   "owner_text": "OWNER FINAL DECISION — AISEF 2.1.0\n\nDECISION: OPTION 1 APPROVED — CONTROLLED RELEASE-GATE EXCEPTION AND PRODUCTION RELEASE.\n\nI accept the reported mandatory-gate blocker and authorize a narrowly scoped V2.1.0 release-policy exception.\n\nWe will NOT reopen product engineering, mutation campaigns, broad test remediation, or historical evidence sealing merely to achieve a fully green CI suite.\n\nThe objective is to complete the V2.1.0 production release, not to resume the fix–measure cycle.\n\n1. Owner authorization\n\nAuthorize RELEASE-DECISIONS seq 7 to record:\n\n* PRODUCTION_PUBLISH = AUTHORIZED, subject to successful release qualification and protected-environment approval.\n* Existing owner-accepted A-03 and seven mutation survivor exceptions remain valid.\n* Additional release-validation exceptions may cover only the specifically identified, evidenced baseline record-currency failures, the frozen-RC test_Q5_15 state mismatch, and confirmed CI environment/harness artifacts.\n* No confirmed material product, security, authorization, verdict, or supported-envelope integrity defect may be excepted.\n\n2. Implement the smallest possible release-policy change\n\nModify the V2.1.0 release workflow and qualification logic only.\n\nKeep the original unit tests executing and retain their authentic PASS/FAIL results.\n\nIntroduce an explicit, version-scoped release-qualification decision that:\n\n1. Uses an exact allowlist of accepted failing test identities and their documented reasons.\n2. Requires evidence tying each exception to the previously observed failure.\n3. Rejects any new, unclassified, or materially different failure.\n4. Requires all non-excepted tests and mandatory build, installation, integrity, and release checks to pass.\n5. Requires equivalent evidence for any excepted test protecting security, isolation, destructive authority, or process safety. If that evidence does not exist, treat it as a blocker.\n6. Applies exclusively to version 2.1.0.\n7. Preserves raw FAIL verdicts while reporting the separate release-policy qualification result.\n\nDo not disable the entire test suite, broadly skip tests, or use unconditional continue-on-error to bypass validation.\n\nDo not alter product code, test assertions, test thresholds, historical mutation results, or frozen artifact contents.\n\n3. Execute the final release procedure\n\nPerform these steps:\n\n1. Record seq 7 authorization and the exact exception manifest.\n2. Implement the minimal release-policy change.\n3. Verify the release workflow accepts only the explicitly authorized exceptions and rejects unexpected failures.\n4. Confirm frozen RC wheel/sdist hashes remain unchanged.\n5. Commit the release-policy and authorization changes.\n6. Run one final release-qualification CI validation on the intended tag commit.\n7. If qualification succeeds, create and push v2.1.0 pointing to that verified commit.\n8. Execute the official publication workflow, including the protected PyPI environment approval.\n9. Verify the published package version and SHA256 hashes against the frozen RC.\n10. Mark V2.1.0 RELEASED and close the release.\n\nIf a genuinely new material blocker appears, STOP and report it. Do not enter another open-ended fix–measure cycle.\n\n4. Non-negotiable constraints\n\n* No new mutation campaign.\n* No broad historical evidence resealing.\n* No modification of frozen product bytes.\n* No fabricated PASS verdicts.\n* No blanket exemption for security or integrity tests.\n* No scope expansion into V2.2.\n* No repeated optimization cycles.\n* No publication without a successful scoped release qualification.\n\n5. Final reporting\n\nReturn one concise production-release report containing:\n\n* Version and release tag.\n* Tagged commit and frozen RC identity.\n* Release-policy qualification result.\n* Actual test verdicts and accepted exceptions.\n* CI/release workflow outcomes.\n* PyPI publication status.\n* Published artifact SHA256 verification.\n* Any remaining material blocker, if publication did not complete.\n\nEXECUTE WITHIN THIS AUTHORIZATION. DO NOT REQUEST FURTHER OWNER DECISIONS FOR ROUTINE RELEASE-PREPARATION WORK.\n\nThe protected PyPI environment approval remains a mandatory separate control.\n\nThe target is to RELEASE AISEF 2.1.0 AND CLOSE THE PROJECT PHASE — not to make every historical validation test green.",
+   "recorded_by": "transcribed verbatim by engineering (Claude Code session 845c9f11) from the owner's chat message of 2026-11-01; the owner wrote the directive text, engineering wrote this file — the owner did not sign it",
+   "basis": {
+    "blocker_report": "the 2026-11-01 mandatory-gate blocker report the owner accepted (release.yml `tests` gate could not pass on the unsealed branch)",
+    "candidate": "aisef2 product tree frozen at 5f34a3f3 (= 8c7bdb44's, = dc63478c's); no product code changed; shipped trees equal the frozen RC (release_rc.py --check PASS)",
+    "rc_freeze": "closure-evidence/v2/release/V2.1.0-RC1-FREEZE.json (wheel 80310413..., sdist 5039c602...)"
+   }
   }
  ]
 }

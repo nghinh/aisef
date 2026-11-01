@@ -1,0 +1,360 @@
+{
+ "record": "AISEF 2.1.0 — measured evidence for the scoped release-qualification safety-category exceptions",
+ "version": "2.1.0",
+ "authority": "RELEASE-DECISIONS seq 7 (owner Option 1, 2026-11-01); allowlist V2.1.0-QUALIFICATION-ALLOWLIST.json",
+ "kernel_identity": {
+  "aisef2_tree": {
+   "HEAD": "5f34a3f32bb101e007db67922e694efdd9c7dcad",
+   "rc_dc63478c": "5f34a3f32bb101e007db67922e694efdd9c7dcad",
+   "sealed_baseline_8c7bdb44": "5f34a3f32bb101e007db67922e694efdd9c7dcad"
+  },
+  "note": "the aisef2 kernel tree is byte-identical across HEAD, the frozen RC and the owner-reviewed baseline, so every destructive SITE in the shipped product is unchanged; the record-currency tests are RED on the intentionally-unsealed branch (and at 8c7bdb44, which is itself unsealed) because the committed ledger binds an earlier frozen snapshot, not because any site changed."
+ },
+ "destructive_authority_at_head": {
+  "check_problems": [
+   "aisef2/app/client.py:45 [_is_gone] os.kill(pid): destructive site with no ledger row — its authority source is undeclared",
+   "tests/v2/test_v21_pl7_session_teardown.py:51 [PL7SessionTeardown.test_a_process_that_stays_alive_refuses_the_session] p.kill(p): destructive site with no ledger row — its authority source is undeclared",
+   "tests/v2/test_v21_pl7_session_teardown.py:83 [IsGoneConfirmation.test_a_table_read_error_never_reads_a_live_escapee_as_gone] p.kill(p): destructive site with no ledger row — its authority source is undeclared",
+   "tests/v2/test_v21_pw_lineage_continue.py:291 [TheRecordItself.test_the_refusal_text_says_what_the_record_is_and_that_nothing_was_written] (run / 'RUN.json').unlink(run / 'RUN.json'): destructive site with no ledger row — its authority source is undeclared",
+   "tests/v2/test_v21_pw_lineage_continue.py:487 [TheOperatorAsksForAnAnchor.test_the_mismatch_names_the_evidence_file_that_no_longer_matches] (run / R.STARTED).unlink(run / R.STARTED): destructive site with no ledger row — its authority source is undeclared"
+  ],
+  "total_sites_audited": 58,
+  "product_scope_nonpass_sites": [
+   {
+    "file": "aisef2/app/client.py",
+    "line": 45,
+    "scope": "_is_gone",
+    "operation": "os.kill",
+    "target": "pid",
+    "target_kind": "process",
+    "authority_source": null,
+    "derivation": null,
+    "independently_established": false,
+    "verdict": "FAIL",
+    "problems": [
+     "no ledger row"
+    ]
+   }
+  ],
+  "product_site_source_verified": {
+   "file": "aisef2/app/client.py",
+   "line": 45,
+   "source": "os.kill(pid, 0)   # existence probe only; no signal is ever sent to a process whose ownership is unproven",
+   "finding": "os.kill(pid, 0) is the POSIX signal-0 existence probe: signal 0 is never delivered to the process, so this is NOT a destructive operation (it only asks whether the pid exists / is signalable). The 'no ledger row' is a ledger-record currency gap on the unsealed branch, not an unguarded kill. This is the ONLY product-scope (aisef2) site flagged; the other problems are in tests/v2 (test/harness code, not shipped)."
+  },
+  "conclusion": "NOT a material product destructive-authority defect (owner Option 1 constraint satisfied); it is the owner-reviewed record-currency class. Not fixed (adding a ledger row would be resealing, which the owner forbids); excepted with this evidence, verdict preserved FAIL."
+ },
+ "clean_env_pass_by_safety_test": {
+  "v2.p0.test_destructive_authority.Checker.test_this_tree_passes_and_every_site_is_ledgered": {
+   "category": "destructive-authority",
+   "failing_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "windows-3.11",
+    "macos-3.12"
+   ],
+   "clean_pass_legs": []
+  },
+  "v2.p5.test_invariants.MutationAuthority.test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered": {
+   "category": "destructive-authority",
+   "failing_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "windows-3.11",
+    "macos-3.12"
+   ],
+   "clean_pass_legs": []
+  },
+  "v2.p5.test_invariants.Uncontainable.test_the_audit_holds_over_the_whole_kernel": {
+   "category": "destructive-authority",
+   "failing_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "windows-3.11",
+    "macos-3.12"
+   ],
+   "clean_pass_legs": []
+  },
+  "v2.test_v21_confine.FailClosed.test_a_check_that_did_not_run_is_a_problem_never_a_pass": {
+   "category": "isolation",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end": {
+   "category": "isolation",
+   "failing_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14"
+   ],
+   "clean_pass_legs": [
+    "windows-3.11",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own": {
+   "category": "isolation",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_confine.Setting.test_not_with_open_code_review_which_calls_the_model_outside_the_sessions": {
+   "category": "isolation",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_fa_grep_worker.FailureModes.test_a_range_whose_anchor_never_says_it_started_is_LAUNCH_and_leaves_nothing": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_fa_grep_worker.RangeIsEmptied.test_the_range_is_given_to_the_harness_hook_once_and_is_empty_after": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_fa_grep_worker.RangeIsEmptied.test_the_real_worker_leaves_nothing_behind_when_it_is_stopped": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_fa_grep_worker.TheResultIsDataFromAnotherProcess.test_the_size_a_result_may_have_is_what_the_request_can_produce": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_mutation_runner.Proc.test_a_detached_helper_that_names_no_tree_is_found_by_its_token": {
+   "category": "process-safety",
+   "failing_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14"
+   ],
+   "clean_pass_legs": [
+    "windows-3.11",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_mutation_runner.Proc.test_a_helper_with_its_own_environment_is_found_by_its_cwd": {
+   "category": "process-safety",
+   "failing_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14"
+   ],
+   "clean_pass_legs": [
+    "windows-3.11",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_mutation_runner.Proc.test_a_range_that_never_empties_is_bounded_and_never_a_kill": {
+   "category": "process-safety",
+   "failing_legs": [
+    "macos-3.12"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "windows-3.11"
+   ]
+  },
+  "v2.test_v21_mutation_runner.Proc.test_one_release_budget_per_run": {
+   "category": "process-safety",
+   "failing_legs": [
+    "macos-3.12"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "windows-3.11"
+   ]
+  },
+  "v2.test_v21_pl7_session_teardown.PL7SessionTeardown.test_a_process_that_stays_alive_refuses_the_session": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_pl7_session_teardown.PL7SessionTeardown.test_an_escapee_gone_within_the_grace_keeps_the_outcome_and_is_named": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_r3_auth_other_readers.WindowsTable.test_every_line_that_is_no_row_refuses_the_reading": {
+   "category": "security",
+   "failing_legs": [
+    "ubuntu-3.11",
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_r4_probe_record.TheReportIsTheRecord.test_what_a_run_refused_with_is_what_its_record_says_when_judged_again": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_r5_regex_worker.AStuckSearchStopsAtItsDeadline.test_the_catastrophic_pattern_stops_at_the_deadline_and_says_what_it_is": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_r5_regex_worker.TheRangeIsEmptied.test_a_worker_that_answers_leaves_nothing_behind_either": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_r5_regex_worker.TheRangeIsEmptied.test_the_range_is_given_to_the_harness_hook_once_and_is_empty_after": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_r5_regex_worker.TheRangeIsEmptied.test_the_real_worker_leaves_nothing_behind_when_it_is_stopped": {
+   "category": "process-safety",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  },
+  "v2.test_v21_review_ocr.Process.test_the_environment_is_scrubbed_and_isolated": {
+   "category": "isolation",
+   "failing_legs": [
+    "windows-3.11"
+   ],
+   "clean_pass_legs": [
+    "ubuntu-3.11",
+    "ubuntu-3.12",
+    "ubuntu-3.13",
+    "ubuntu-3.14",
+    "macos-3.12"
+   ]
+  }
+ },
+ "product_process_safety_on_windows": "CI run 41229691252 windows leg: owned_run windows-job measured the whole suite's process range released_empty=True with 0 residual (from the job log tail) — the shipped product's Windows process-safety mechanism is clean; the failing process-safety tests are the validation harness's POSIX `ps`/process-range readers, not shipped.",
+ "ci_run": "41229691252 @ ce78464f (aisef2 tree identical to the tag commit)"
+}
