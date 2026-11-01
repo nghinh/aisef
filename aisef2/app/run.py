@@ -526,6 +526,23 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             rec["ocr_identity"] = ident
             if ident["status"] != "PASSED":
                 raise RunRefused(ocr_refusal(ident))
+        # ROADMAP-2.2 D4: the pinned client binary, checked before anything is started or sent (and re-checked by
+        # every session at the moment of use) — the review_ocr pattern; a run with no pin resolves the client on the
+        # PATH it gives, 2.0.0's rule. Byte identity, never build provenance (review_ocr's own caveat).
+        client_pin = getattr(settings, "client_pin", None)    # a settings stand-in may not carry it (S2 kill test)
+        if client_pin is not None:
+            rec["stage"] = "client identity"
+            pin = client_pin
+            why = review_ocr.pinned(pin["exe"], pin["sha256"])
+            rec["client_pin"] = {"exe": pin["exe"], "sha256": pin["sha256"], "when": OCR_WHEN,
+                                 "status": "PASSED" if why is None else "REFUSED",
+                                 "statement": "sha256 byte identity against the operator's pin; not build provenance"}
+            if why is not None:
+                raise RunRefused(f"client_pin: the client binary fails the identity check before the run — {why}. "
+                                 f"Find out why before changing the pin: a wrong path, a file that cannot be read, a "
+                                 f"binary that was replaced or updated. Re-pin only a file you have checked: set "
+                                 f"client_pin.exe to its absolute path and client_pin.sha256 to its sha256 "
+                                 f"({SHA256_OF}). No session was started and no provider request was sent.")
         if predecessor is not None:     # V2.1: before any provider request — a run that loses the claim spends nothing
             rec["stage"] = "claim"
             try:
@@ -572,7 +589,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             raise RunRefused(f"the plan is not admitted (RFC §12): {rec['admission']['failed']}")
         rec["stage"] = "test interpreter"
         python = probe_interpreter(out / "test-python")
-        exe = client_exe or client_on_path(settings)
+        # D4: a declared pin names the binary; the PATH lookup (and the test-only client_exe override) is the unpinned rule
+        exe = (client_pin["exe"] if client_pin is not None else None) or client_exe or client_on_path(settings)
         if settings.confinement is not None:    # V2.1 (F): measured before the first provider request, never assumed —
             rec["stage"] = "confinement"        # with the sessions' client and a worktree of the run's repository
             rec["confinement"] = confine.measure(settings.confinement, out / "confinement", exe, repo)
@@ -608,12 +626,24 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         logs = out / "sessions"
         budget = client.Budget(settings.budget, pre["accounting"], logs,
                                lambda: sum(1 for e in run.events if e.type == "provider/request"), inherited)
+        # ROADMAP-2.2 G2: the fence the settings declare — run-scoped XDG data/state/cache (never CONFIG, which
+        # resolves the provider key), a per-worktree OPENCODE_PERMISSION composed in client.session where the cwd is
+        # known (the run's repo is allowed: a worktree's .git file points into it), and an output-token ceiling
+        fence = getattr(settings, "client_fence", None)       # a settings stand-in may not carry it
+        xdg_home = None
+        if fence is not None and fence.get("xdg") == "run-scoped":
+            xdg_home = out / "client-xdg"
+            for sub in ("data", "state", "cache"):
+                (xdg_home / sub).mkdir(parents=True, exist_ok=True)
         kw = {"model": settings.route,
-              "env": client.environment(settings.client_env, client.overlay(settings.route, settings.model_limit)),
+              "env": client.environment(settings.client_env, client.overlay(settings.route, settings.model_limit),
+                                        xdg_home=str(xdg_home) if xdg_home is not None else None),
               "budget": budget, "turn_cap": settings.max_turns_per_session, "exe": exe,
               # the operator's values the client receives, and the provider key: never left in a session's evidence
               "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8),
-              **({"confine": settings.confinement} if settings.confinement is not None else {})}
+              **({"confine": settings.confinement} if settings.confinement is not None else {}),
+              **({"fence": {**fence, "allow": (str(repo),)}} if fence is not None else {}),
+              **({"pin_sha256": client_pin["sha256"]} if client_pin is not None else {})}
         # PM-8: what a probe saw, for the operator (app/diagnostics) — the directory beside the run's other evidence,
         # outside every checkout; whether the sessions' sandbox mounts it is read from the wrapper's own command line
         sink = diagnostics.Sink(out, kw["secrets"], diagnostics.access_of(

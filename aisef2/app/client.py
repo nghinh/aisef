@@ -193,12 +193,19 @@ class Budget:
                 **({"inherited_unaccounted": list(self.inherited_unaccounted)} if self.inherited_unaccounted else {})}
 
 
-def environment(names: tuple[str, ...], overlay: dict) -> dict:
+def environment(names: tuple[str, ...], overlay: dict, xdg_home: str | None = None) -> dict:
     """The client's whole environment, built: the operator's PATH, HOME and locale, the variables the settings name,
-    and the configuration overlay that fixes the route — nothing else of the caller's environment."""
+    and the configuration overlay that fixes the route — nothing else of the caller's environment. `xdg_home`
+    (ROADMAP-2.2 G2, settings client_fence.xdg "run-scoped"): the client's data, state and cache land under it
+    instead of the operator's own — never its CONFIG, which resolves the provider endpoint and key
+    (`configured_provider`); None is 2.0.0's environment, byte for byte."""
     keep = ("PATH", "HOME", "USERPROFILE", "SYSTEMROOT", "SystemRoot", "WINDIR", "LANG", "LC_ALL", "TMPDIR", "TEMP", "TMP",
             "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME", "XDG_CACHE_HOME", *names)
-    return {**{k: os.environ[k] for k in keep if k in os.environ}, "OPENCODE_CONFIG_CONTENT": json.dumps(overlay, sort_keys=True)}
+    out = {**{k: os.environ[k] for k in keep if k in os.environ}, "OPENCODE_CONFIG_CONTENT": json.dumps(overlay, sort_keys=True)}
+    if xdg_home is not None:
+        for name, sub in (("XDG_DATA_HOME", "data"), ("XDG_STATE_HOME", "state"), ("XDG_CACHE_HOME", "cache")):
+            out[name] = os.path.join(xdg_home, sub)
+    return out
 
 
 def overlay(route: str, model_limit: dict | None = None) -> dict:
@@ -259,7 +266,8 @@ def redact(log: pathlib.Path, secrets) -> int:
 
 def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: float, *, model: str | None = None,
             env: dict | None = None, budget: Budget | None = None, turn_cap: int | None = None, exe: str | None = None,
-            secrets: tuple[str, ...] = (), confine: dict | None = None, workspace_writable: bool = True) -> dict:
+            secrets: tuple[str, ...] = (), confine: dict | None = None, workspace_writable: bool = True,
+            fence: dict | None = None, pin_sha256: str | None = None) -> dict:
     """One `opencode run --format json` session in a process range of its own; its event stream goes to `log`. Nothing
     starts when anything is unbound, when the evidence shows the budget reached or spend unaccounted, or when `log`
     exists (a session's evidence is never overwritten); the range is released when the budget or the turn cap is
@@ -277,6 +285,29 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
         exe = exe or shutil.which("opencode", path=env.get("PATH"))
         if not exe:
             raise SessionRefused("the client (opencode) is not on the PATH the run gives it")
+        if pin_sha256 is not None:      # ROADMAP-2.2 D4: the pin, re-checked at the moment of use (the OCR pattern)
+            from aisef2.app.review_ocr import pinned
+            why = pinned(exe, pin_sha256)
+            if why is not None:
+                raise SessionRefused(f"client_pin at the moment of use: {why}")
+        fenced = None
+        if fence is not None:           # ROADMAP-2.2 G2: limits DECLARED to the client through its environment —
+            env = dict(env)             # enforcement is the client's own, not measured here (the result says so)
+            said = []
+            if fence.get("external_directory") == "workspace-only":
+                allow: dict = {"*": "deny", cwd: "allow", f"{cwd}/**": "allow"}
+                for root in fence.get("allow", ()):
+                    allow[str(root)] = "allow"
+                    allow[f"{root}/**"] = "allow"
+                env["OPENCODE_PERMISSION"] = json.dumps({"external_directory": allow}, sort_keys=True)
+                said.append("external_directory=workspace-only")
+            if fence.get("xdg") == "run-scoped":
+                said.append("xdg=run-scoped")       # the environment itself was built run-scoped (environment())
+            if fence.get("output_token_max"):
+                env["OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX"] = str(int(fence["output_token_max"]))
+                said.append(f"output_token_max={int(fence['output_token_max'])}")
+            fenced = " ".join(said) + " (declared to the client via its environment; enforcement is the client's " \
+                                      "own and is NOT measured by this run)"
         argv = [exe, "run", "--format", "json", "--model", model, "--title", name, "--dir", cwd, prompt]
         if confine is not None:
             try:
@@ -300,6 +331,8 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
                 "error": seen["error"], "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
                 "seconds": round(time.monotonic() - started, 1), "log": log.name, "redacted": redacted,
                 **({"left_range_gone": left_gone} if left_gone else {}),
+                **({"fence": fenced} if fenced else {}),
+                **({"pinned_sha256": pin_sha256} if pin_sha256 is not None else {}),
                 **({"confinement": f"bwrap network={confine['network']}" + ("" if workspace_writable else " workspace=read-only")}
                    if confine is not None else {})}
     return {"exit": None, "timed_out": False, "stopped": stopped, "started": False, "error": stopped, "text": "", "turns": 0,
