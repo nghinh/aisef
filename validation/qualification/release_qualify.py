@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 import sys
 import tomllib
 import unittest
@@ -30,6 +31,15 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 SAFETY_CATEGORIES = {"security", "isolation", "destructive-authority", "process-safety"}
+
+
+def base_id(test_id: str) -> str:
+    """The test method identity, dropping any subTest parametrisation suffix. unittest reports a failing subTest's
+    id() as '<module>.<Class>.<method> (param=...)' or '... [param]'; the allowlist names the method, and a subTest
+    is a parametrisation of it, so comparison and the safety-evidence check are made on the method identity. A new
+    method failing is still caught (its base id is not in the allowlist); only further subTests of an already-accepted
+    method are covered."""
+    return re.split(r" [\(\[]", test_id, maxsplit=1)[0]
 
 
 def platform_token() -> str:
@@ -58,8 +68,9 @@ def decide(version: str, measured_fail: set[str], manifest: dict, token: str) ->
     applicable = [e for e in exceptions if token in e.get("platforms", [])]
     allowed = {e["test"] for e in applicable}
 
-    unexpected = sorted(measured_fail - allowed)
-    stale = sorted(allowed - measured_fail)              # excepted but passed now — fine, just unused
+    measured_base = {base_id(t) for t in measured_fail}  # a failing subTest is matched by its method identity
+    unexpected = sorted(measured_base - allowed)
+    stale = sorted(allowed - measured_base)              # excepted but passed now — fine, just unused
     missing_evidence = sorted(
         e["test"] for e in applicable
         if e.get("category") in SAFETY_CATEGORIES and not e.get("clean_env_evidence")
@@ -70,8 +81,9 @@ def decide(version: str, measured_fail: set[str], manifest: dict, token: str) ->
     return {
         "version": version, "platform": token, "scoped_to_version": scoped,
         "raw_failing": sorted(measured_fail), "raw_fail_count": len(measured_fail),
+        "failing_methods": sorted(measured_base), "failing_method_count": len(measured_base),
         "allowlisted_applicable": sorted(allowed),
-        "excepted_and_observed": sorted(measured_fail & allowed),
+        "excepted_and_observed": sorted(measured_base & allowed),
         "excepted_but_passed": stale,
         "unexpected": unexpected, "missing_clean_env_evidence": missing_evidence,
         "qualification": "PASS" if not problems else "FAIL", "problems": problems,
@@ -103,7 +115,8 @@ def main(argv: list[str] | None = None) -> int:
     for t in d["raw_failing"]:
         print(f"  FAIL  {t}")
     print(f"\n=== RELEASE QUALIFICATION ({version}, platform {token}, scoped={d['scoped_to_version']}) ===")
-    print(f"excepted & observed: {len(d['excepted_and_observed'])}  "
+    print(f"failing methods: {d['failing_method_count']} (from {d['raw_fail_count']} failing tests/subTests)  "
+          f"excepted & observed: {len(d['excepted_and_observed'])}  "
           f"excepted but now passing: {len(d['excepted_but_passed'])}  unexpected: {len(d['unexpected'])}")
     for p in d["problems"]:
         print(f"  BLOCKER  {p}")
@@ -131,6 +144,10 @@ def _selftest() -> None:
     # excepted but passing is not a failure
     r = decide("2.1.0", set(), m, "darwin")
     assert r["qualification"] == "PASS" and r["excepted_but_passed"] == ["t.a"]
+    # a failing subTest is matched by its method identity (base id), not reported as unexpected
+    assert decide("2.1.0", {"t.a (checker='mutation')", "t.a [registry]"}, m, "darwin")["qualification"] == "PASS"
+    # but a new METHOD failing (even as a subTest) is still rejected
+    assert decide("2.1.0", {"t.brand_new (x=1)"}, m, "darwin")["qualification"] == "FAIL"
     print("release_qualify selftest: OK")
 
 

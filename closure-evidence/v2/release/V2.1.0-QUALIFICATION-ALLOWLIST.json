@@ -17,7 +17,8 @@
    "ubuntu-3.14",
    "windows-3.11",
    "macos-3.12"
-  ]
+  ],
+  "confirmed_on_tag_run": "run 41265073135 @ 7d1da61f (the v2.1.0 tag commit) reproduced the identical 56 base failing methods across all 6 legs (subTest granularity expands some to more lines, e.g. checker_calibration x3, pm6_host_faults, read_set, r3_auth); release_qualify.py matches a failing subTest by its method identity (base_id). No new base-method failure appeared on the tag commit."
  },
  "owner_bound": "owner Option 1: exceptions may cover only (a) evidenced baseline record-currency failures, (b) the frozen-RC test_Q5_15 release-state mismatch, and (c) confirmed CI environment/harness artifacts; no confirmed material product/security/authorization/verdict/supported-envelope defect is excepted",
  "counts": {
