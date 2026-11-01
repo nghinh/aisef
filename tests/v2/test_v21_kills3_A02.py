@@ -45,23 +45,24 @@ def refusal(doc: dict) -> str:
 
 
 class AContractThatBreaksItsKeySetIsLocatedByItsOwnPath(unittest.TestCase):
-    """The closed-key refusal of one contract is raised by `_closed` inside seal's requirement/contract block and
-    re-wrapped there with the cause class in front of it, so the author's only statement of WHICH contract is malformed
-    (`$.contracts[n]`) comes straight after that class. It must stay a token of its own, delimited from the class, and
-    carry the index of the broken contract (1), not of its neighbour.
+    """The closed-key refusal of one contract is `_closed`'s own, carried UNWRAPPED out of seal's contracts loop
+    (ROADMAP-2.2 G7: never re-wrapped in a cause class), so the author's only statement of WHICH contract is malformed
+    (`$.contracts[n]`) is the message's first token, and it carries the index of the broken contract (1), not of its
+    neighbour.
 
-    Pins aisef2/app/bundle_cli.py::seal [122]; the path's own pieces [119, 120] are killed with it."""
+    Pins aisef2/app/bundle_cli.py::seal; the path's own pieces are killed with it."""
 
-    def test_the_locator_of_the_second_contract_is_delimited_from_the_cause_class(self):
+    def test_the_locator_of_the_second_contract_is_its_messages_first_token(self):
         a = authoring()
         broken = copy.deepcopy(a["contracts"][0])
         broken["id"] = "BC-TWO"
         broken["spec"] = "PPS-x"          # a key no contract has
         a["contracts"].append(broken)
         msg = refusal(a)
-        m = re.search(r"(?P<cls>\w+)\W+\$\.contracts\[(?P<n>\d+)\](?!\w)", msg)
+        m = re.match(r"\$\.contracts\[(?P<n>\d+)\](?!\w)", msg)
         self.assertIsNotNone(m, msg)
-        self.assertEqual((m["cls"], m["n"]), ("BundleError", "1"), msg)
+        self.assertEqual(m["n"], "1", msg)
+        self.assertIn(repr("spec"), msg)
 
     def test_the_unbroken_contract_alone_is_sealed(self):
         """The other side of the decision: the same document without the extra key is not refused, and both of its

@@ -482,6 +482,19 @@ def _closed(obj, keys: tuple[str, ...], where: str) -> None:
         raise B.BundleError(f"{where}: an object of exactly {list(keys)} (it holds {held})")
 
 
+def _refuse(problems: list[str]) -> None:
+    """ROADMAP-2.2 G7: a phase's problems, raised once and all of them — the single-problem text is exactly what each
+    site raised (byte-identical to the fail-fast wording), so one mistake reads as before and ten read as ten lines
+    instead of ten seal runs. The text doubles as the author's (or a drafting model's) retry feedback."""
+    if problems:
+        raise B.BundleError(problems[0] if len(problems) == 1 else "\n".join(problems))
+
+
+def _named(item, where: str) -> str:
+    """`where`, with the item's own id when it carries one — an error a human can find without counting."""
+    return where + (f" (id {item['id']!r})" if isinstance(item, Mapping) and isinstance(item.get("id"), str) else "")
+
+
 def exposure_of(old: Mapping) -> dict[str, dict]:
     """For `seal --keep-approvals-from`: contract id -> the declared capability changes that evaluate that contract of
     the earlier bundle `old` differently now (`_exposure`, the rule `migrate` applies), derived from the release its own
@@ -532,42 +545,61 @@ def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=(), 
         if blob.returncode != 0:
             raise B.BundleError(f"$.requirements_document.path: {doc['path']} is not in {repo} at {baseline[:12]}")
         sha = R._sha(blob.stdout.encode("utf-8"))      # exactly as the run checks it (run.check_repository)
-    try:
-        requirements = [Requirement.create(**r) for r in authoring["requirements"]]
-        contracts = []
-        for n, c in enumerate(authoring["contracts"]):
+    problems: list[str] = []    # ROADMAP-2.2 G7: every requirement and contract is checked; one raise carries all
+    requirements = []
+    for i, r in enumerate(authoring["requirements"]):
+        try:
+            requirements.append(Requirement.create(**r))
+        except (KeyError, TypeError, ValueError) as e:
+            problems.append(f"{_named(r, f'$.requirements[{i}]')}: {type(e).__name__}: {e}")
+    contracts = []
+    for n, c in enumerate(authoring["contracts"]):
+        try:
             _closed(c, CONTRACT_KEYS, f"$.contracts[{n}]")
             contracts.append(BehaviorContract.create(
                 id=c["id"], requirement_ids=tuple(c["requirement_ids"]),
                 subject=Subject(SubjectKind(c["subject"]["kind"]), c["subject"]["locator"]),
                 stimulus=c["stimulus"], observable=c["observable"], polarity=Polarity(c["polarity"]),
                 subject_absence=SubjectAbsence(c["subject_absence"]), rationale=c["rationale"]))
-    except (KeyError, TypeError, ValueError) as e:
-        raise B.BundleError(f"a requirement or contract does not hold: {type(e).__name__}: {e}") from e
+        except B.BundleError as e:
+            problems.append(str(e))     # already named by its path: never re-wrapped
+        except (KeyError, TypeError, ValueError) as e:
+            problems.append(f"{_named(c, f'$.contracts[{n}]')}: {type(e).__name__}: {e}")
+    _refuse(problems)
     by_id = {c.id: c for c in contracts}
     refs = _refs()
     obligations, facts, stories = [], {}, {}
     if not isinstance(authoring["stories"], Mapping) or not authoring["stories"]:
         raise B.BundleError("$.stories: an object of story id -> {depends_on, tests, criteria}")
-    for sid, s in authoring["stories"].items():
-        _closed(s, ("depends_on", "tests", "criteria"), f"$.stories.{sid}")
+    for sid, s in authoring["stories"].items():     # G7: every story and criterion checked; one raise carries all
+        try:
+            _closed(s, ("depends_on", "tests", "criteria"), f"$.stories.{sid}")
+        except B.BundleError as e:
+            problems.append(str(e))
+            continue
         stories[sid] = {"depends_on": s["depends_on"], "tests": s["tests"]}
         for n, cr in enumerate(s["criteria"]):
             where = f"$.stories.{sid}.criteria[{n}]"
-            _closed(cr, CRITERION_KEYS, where)
-            contract = by_id.get(cr["contract"])
-            if contract is None:
-                raise B.BundleError(f"{where}.contract: {cr['contract']!r} is not a contract of the document")
-            ref = refs.get(contract.subject.kind)
-            if ref is None:
-                raise B.BundleError(f"{where}: no active probe observes {contract.subject.kind.value}")
+            try:
+                _closed(cr, CRITERION_KEYS, where)
+                contract = by_id.get(cr["contract"])
+                if contract is None:
+                    raise B.BundleError(f"{where}.contract: {cr['contract']!r} is not a contract of the document")
+                ref = refs.get(contract.subject.kind)
+                if ref is None:
+                    raise B.BundleError(f"{where}: no active probe observes {contract.subject.kind.value}")
+            except B.BundleError as e:
+                problems.append(str(e))
+                continue
             try:
                 role = ObligationRole(cr["role"])
                 obligations.append(PlanObligation(cr["id"], _mint(contract, ref).id, sid, role, EXPECTED_AT_PARENT[role],
                                                   tuple(cr["depends_on"]), cr["why"]))
             except (KeyError, TypeError, ValueError) as e:
-                raise B.BundleError(f"{where}: {type(e).__name__}: {e}") from e
+                problems.append(f"{where}: {type(e).__name__}: {e}")
+                continue
             facts[cr["id"]] = cr["facts"]
+    _refuse(problems)
     try:
         plan = Plan.create(id=f"PLAN-{authoring['name']}", baseline=baseline, obligations=tuple(obligations),
                            plan_quality_policy=NOT_PREREGISTERED)
@@ -575,11 +607,12 @@ def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=(), 
         raise B.BundleError(f"the plan does not hold: {e}") from e
     reqs = {r.id: r for r in requirements}
     kept, dropped, withheld = [], [], []
-    for a in approvals:
+    for i, a in enumerate(approvals):   # G7: every approval named by its index; one raise carries all
         try:
             ap = ContractApproval(**a)
         except (TypeError, ValueError) as e:
-            raise B.BundleError(f"an approval to keep does not load: {e}") from e
+            problems.append(f"an approval to keep does not load ($.approvals[{i}]): {e}")
+            continue
         c, r = by_id.get(ap.contract_id), reqs.get(ap.requirement_id)
         if c is None or r is None or binding_problems(ap, r, c):
             dropped.append(ap)
@@ -587,11 +620,13 @@ def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=(), 
             withheld.append(ap)
         else:
             kept.append(ap)
+    _refuse(problems)
     bundle = B.dump(name=authoring["name"], description=authoring["description"], requirements_path=doc["path"],
                     requirements_sha256=sha or "", product_roots=authoring["product_roots"], requirements=requirements,
                     contracts=contracts, approvals=kept, plan=plan, facts=facts, stories=stories)
     B.shape_problems(bundle)
     return bundle, {"plan_hash": plan.plan_hash, "specs": len({o.product_proof_spec_id for o in obligations}),
+                    "facts_oracle_content": facts_oracle_content(bundle),   # G8a: informational, never a refusal
                     "approvals_kept": len(kept), "approvals_dropped": [f"{a.contract_id}/{a.requirement_id}" for a in dropped],
                     "approvals_withheld_semantic": [
                         {"contract": a.contract_id, "requirement": a.requirement_id, "approver": a.approver,
@@ -699,11 +734,56 @@ def coverage(bundle: Mapping) -> dict:
             "limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document"}
 
 
+#: probe-grammar vocabulary distinctive enough to flag in public facts text (never common words like "returns")
+_GRAMMAR_KEYS = ("within_s", "imports_outside", "grep_count", "exits_streams", "scenario_returns", "subject_absence")
+#: the facts fields scanned — "clause" is a label (its "1.1" would collide with any small scalar)
+_FACT_SCAN = ("requirement", "section", "clause_text", "subject")
+
+
+def _scalar_tokens(value, *, skip_key: str = "within_s") -> set[str]:
+    out: set[str] = set()
+    if isinstance(value, Mapping):
+        for k, v in value.items():
+            if k != skip_key:
+                out |= _scalar_tokens(v)
+    elif isinstance(value, (list, tuple)):
+        for v in value:
+            out |= _scalar_tokens(v)
+    elif isinstance(value, (str, int, float)) and not isinstance(value, bool) and str(value).strip():
+        out.add(str(value))
+    return out
+
+
+def facts_oracle_content(bundle: Mapping) -> list[str]:
+    """ROADMAP-2.2 G8a: facts text that carries its OWN contract's stimulus/observable content (a word-bounded scalar
+    value, within_s excluded) or distinctive probe-grammar vocabulary — the oracle leaking into what the developer is
+    told. Informational: listed here and in the seal report; it does not flip the lint verdict."""
+    by_id = {c["id"]: c for c in bundle.get("contracts", []) if isinstance(c, Mapping) and isinstance(c.get("id"), str)}
+    rows = _spec_rows(bundle)
+    out: list[str] = []
+    for cid, row in sorted(rows.items()):
+        contract = by_id.get(row["contract"])
+        fact = bundle["facts"].get(cid, {})
+        text = "\n".join(str(fact.get(f, "")) for f in _FACT_SCAN)
+        if contract is not None:
+            tokens = _scalar_tokens(contract.get("stimulus")) | _scalar_tokens(contract.get("observable"))
+            for tok in sorted(tokens):
+                if re.search(rf"(?<![\w.]){re.escape(tok)}(?![\w.])", text):
+                    out.append(f"{cid}: the facts carry a stimulus/observable value of contract {row['contract']} "
+                               f"({len(tok)} chars)")
+        for word in _GRAMMAR_KEYS:
+            if re.search(rf"\b{word}\b", text):
+                out.append(f"{cid}: the facts name probe-grammar vocabulary ({word!r})")
+    return sorted(set(out))
+
+
 def lint(bundle: Mapping) -> dict:
     """READY when every contract is approved, the plan is admitted (the nine static checks, with this release's
-    calibrations) and every requirement is covered; otherwise NOT_READY and why."""
+    calibrations) and every requirement is covered; otherwise NOT_READY and why. `facts_oracle_content` (G8a) is
+    informational: the oracle's own values in public facts text, named, never a verdict flip."""
     B.shape_problems(bundle)
-    out = {"to_approve": unapproved(bundle), "coverage": coverage(bundle)}
+    out = {"to_approve": unapproved(bundle), "coverage": coverage(bundle),
+           "facts_oracle_content": facts_oracle_content(bundle)}
     rows = _spec_rows(bundle)
     out["criteria_without_calibration"] = sorted(c for c, r in rows.items() if r.get("calibrated") is False)
     out["criteria_without_contract"] = sorted(c for c, r in rows.items() if r["contract"] is None)
