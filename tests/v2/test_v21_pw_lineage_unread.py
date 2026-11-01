@@ -510,11 +510,12 @@ class ChildEvidenceThatIsThereAndDamaged(UnreadContract, Lineage):
         self.claim_by(self.child)
         state, why = lineage.child_evidence(self.child)
         self.assertEqual(state, lineage.UNREAD)
-        want = r"link that leads nowhere|is not a directory"
-        if os.name == "nt":    # NT opens a looping link with EINVAL: the cause still names the file and the error
-            want += r"|cannot be read \(OSError"
-        self.assertRegex(why, want)
-        self.assertIn(str(self.child), why)
+        if os.name == "nt" and "cannot be read (OSError" in why:
+            # NT opens a looping link with EINVAL: that cause names the journal file and the error, not the directory
+            self.assertIn("aisef-run.jsonl", why)
+        else:
+            self.assertRegex(why, r"link that leads nowhere|is not a directory")
+            self.assertIn(str(self.child), why)
         self.assertIn(why, self.assert_not_superseded((self.pred / lineage.CLAIM).read_bytes()))
 
     def test_the_cause_says_what_stands_where_the_journal_should_be(self):
