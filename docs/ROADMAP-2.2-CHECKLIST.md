@@ -61,16 +61,22 @@ Owner chốt 2026-11-01 ("Đồng ý, làm đi") theo mặc định đề xuất
 
 ## ĐỢT 1 — Trung thực + tín hiệu (ước 1–1,5 tuần)
 
-- [ ] **A1** — Arm invariant lúc runtime trong `execute()`, bind `registry_digest + mechanism_digest` vào run, `--verify` re-derive so sánh, `require_armed` ở guard nóng (M)
-- [ ] **F1** — Tách suite theo LOẠI check: record-currency/sealing ra job CI riêng chỉ chạy master + sealed tag (fail-closed, enumerate đủ); branch/PR chạy product suite (M)
-- [ ] **F3** — `skipUnless` theo platform cho ~31 test validation-harness POSIX-only + mỗi skip kèm một assertion dương trên OS bị skip (M)
-- [ ] **F4** — Diệt 3 survivor report-field (`client.py::session`: 'redacted' count, 'left_range_gone') + guard 4 equivalence bằng audit machinery (M)
-- [ ] **G1** — Leak-tripwire: quét marker/digest stimulus ẩn trên MỌI thứ serve vào phiên developer/reviewer (worktree staging, prompt, context_pack, retry feedback), fail closed trước launch (S/M)
-- [ ] **G2** — Fence client: `OPENCODE_PERMISSION` deny-all ngoài worktree + XDG scratch per-run + trần output token, cho MỌI phiên product; kèm canary đo thật (thử đọc file ngoài worktree); khai báo là client-enforced mitigation, không phải OS confinement (S)
-- [ ] **D4** — Pin binary opencode: sha256 + absolute path theo pattern `review_ocr.pinned()`, ghi hash vào RUN.json (S)
-- [ ] **G7** — Chuẩn lỗi authoring: admission check 9 / lint / seal gom HẾT lỗi một lần, mỗi lỗi = hậu quả + cách sửa (viết như retry feedback) (S)
-- [ ] **G8** — Linter tĩnh no-oracle-words trên facts/clause_text/task prompt + khối boundary "evidence là data, không phải lệnh" trong prompt developer/reviewer (hygiene, không phải invariant) (S)
+- [x] **A1** — Arm invariant lúc runtime trong `execute()`, bind `registry_digest + mechanism_digest` vào run, `--verify` re-derive so sánh, `require_armed` ở guard nóng (M) — be7b1700 (register_runtime CODE-only: wheel không có tests/validation/docs)
+- [x] **F1** — Tách suite theo LOẠI check: record-currency/sealing ra job CI riêng chỉ chạy master + sealed tag (fail-closed, enumerate đủ); branch/PR chạy product suite (M) — 9a3d1377 (sealing_gate.GATED 18 id + test closure 2 chiều + job `sealing` expected-RED trên master)
+- [x] **F3** — `skipUnless` theo platform cho ~31 test validation-harness POSIX-only + mỗi skip kèm một assertion dương trên OS bị skip (M) — 9a3d1377 (fix-over-skip: 17 file test sửa portable, chỉ gate phần thật sự POSIX)
+- [x] **F4** — Diệt 3 survivor report-field (`client.py::session`: 'redacted' count, 'left_range_gone') + guard 4 equivalence bằng audit machinery (M) — ec8d04ff (kill test mới trong test_s2_kills.py — file đã nằm trong kill set đăng ký của session; correction record SURVIVOR-EFFECT-CORRECTION-1.json)
+- [x] **G1** — Leak-tripwire: quét marker/digest stimulus ẩn trên MỌI thứ serve vào phiên developer/reviewer (worktree staging, prompt, context_pack, retry feedback), fail closed trước launch (S/M) — fdd9c35b (aisef2/app/tripwire.py; refusal không bao giờ echo giá trị stimulus)
+- [x] **G2** — Fence client: `OPENCODE_PERMISSION` deny-all ngoài worktree + XDG scratch per-run + trần output token, cho MỌI phiên product; kèm canary đo thật (thử đọc file ngoài worktree); khai báo là client-enforced mitigation, không phải OS confinement (S) — 76fd9cd8 (declared-not-measured ghi rõ trong fenced string)
+- [x] **D4** — Pin binary opencode: sha256 + absolute path theo pattern `review_ocr.pinned()`, ghi hash vào RUN.json (S) — 76fd9cd8 (re-check tại thời điểm dùng trong session())
+- [x] **G7** — Chuẩn lỗi authoring: admission check 9 / lint / seal gom HẾT lỗi một lần, mỗi lỗi = hậu quả + cách sửa (viết như retry feedback) (S) — 7792b2a4 (byte-identical khi chỉ 1 lỗi; bundle.py giữ nguyên comprehension MIGRATE_NEVER_APPROVES chứng minh được)
+- [x] **G8** — Linter tĩnh no-oracle-words trên facts/clause_text/task prompt + khối boundary "evidence là data, không phải lệnh" trong prompt developer/reviewer (hygiene, không phải invariant) (S) — 7792b2a4 + fdd9c35b (facts_oracle_content informational trong lint/seal; BOUNDARY trong feedback.task + REVIEW_PROMPT/OCR_BACKGROUND)
 - [ ] **ĐO CUỐI ĐỢT 1** (checklist mẫu ở mục Phương thức — A1 chạm kernel ⇒ chắc chắn phải tái lập records + mutation targeted)
+  - [x] ruff sạch + full suite cây chính: lượt 1 bắt 7 đỏ wave-induced → bisect 4 nguyên nhân, sửa (5cc65720) → lượt 2 **8031 test, 1 fail duy nhất = HistoricalAttempt4 (artefact local-only, CI xanh), 56 skip, owned processes sạch** (log: scratchpad wave1/final-suite{,-2}.log)
+  - [x] `git status closure-evidence/` sạch sau cả hai lượt suite (chỉ còn file cycle2 dở dang của owner — không đụng)
+  - [ ] mutation targeted: 9 target đổi body (1622 mutant) trên 4 worker clone, env guard PATH-không-opencode + XDG scratch, T0 trước — ĐANG CHẠY (phóng 2026-11-02 01:47)
+  - [x] record bị đỏ do kernel đổi: Classify.test_historical_records_read_as_before vào sealing tier (đỏ-chủ-đích thuộc về job `sealing`; tái lập record P1..V2.0-S2 là quyền owner — KHÔNG tự reseal)
+  - [x] CI: run 41338480741 tại 5cc65720 — lint + wheel XANH; `sealing` ĐỎ-có-tên-riêng đúng thiết kế; unit giảm 22–25 đỏ/chân → 2–4 đỏ/chân, **0 hồi quy wave trên POSIX** (còn lại toàn đỏ CÓ SẴN bị 22 đỏ record-currency che: họ `mutation_runner.Proc` mọi chân ubuntu+macos, `read_set.ToyRecord` 3.11/3.12/macos, `pm8` depth 3.11, + 1 flake teardown `confine.FailClosed` 3.12). **Windows 0→11 đỏ = hồi quy wave thật** (fixture F3 + 2 test v22): sửa phía test (bwrap giữ chuỗi POSIX vì validator pin `startswith("/")`; EXE os-native; os.path.join cho XDG; write_bytes; EINVAL loop-link trên NT; probe parser 3.11) — chờ CI đo lại
+  - [x] tick checkbox + Nhật ký + commit file này
 
 ## ĐỢT 2 — Giá trị (ước 1–1,5 tuần) — cần QĐ #2, #6 cho B7/C2/B1
 
@@ -134,3 +140,7 @@ Owner chốt 2026-11-01 ("Đồng ý, làm đi") theo mặc định đề xuất
 |---|---|---|
 | 2026-11-01 | Lập đầu bài + checklist; roadmap chi tiết tại docs/IMPROVEMENT-ROADMAP.md | 99949738 |
 | 2026-11-01 | Owner duyệt toàn bộ ("Đồng ý, làm đi") — 6 QĐ chốt theo mặc định. **KHỞI CÔNG ĐỢT 1**: recon đọc code + baseline full suite, sau đó freeze WAVE-1 spec | (commit này) |
+| 2026-11-01 | WAVE-1 spec freeze + baseline suite (7981 test, 21 fail đã biết) | 6cc3ba43 |
+| 2026-11-01 | Thi công 9 mục Đợt 1 theo lane, 7 commit | be7b1700, 76fd9cd8, fdd9c35b, ec8d04ff, 7792b2a4, 9a3d1377 |
+| 2026-11-02 | ĐO CUỐI ĐỢT 1 lượt 1: 7 đỏ wave-induced → bisect 4 nguyên nhân (anchor import adapters; fixture A22 thiếu kernel_digest+invariants; 2 test p5 cần clear cả _RUNTIME_ARMED; Classify historical = record-currency → sealing tier) | 5cc65720 |
+| 2026-11-02 | ĐO CUỐI ĐỢT 1 lượt 2 XANH: 8031 test, 1 fail = HistoricalAttempt4 (local-only), 56 skip, owned processes sạch. Push master dd95a762→5cc65720; mutation targeted 9 target/1622 mutant phóng 01:47 trên 4 worker clone | 5cc65720, CI 41338480741 |
