@@ -48,14 +48,14 @@
 
 | # | Quyết định | Chặn mục | Trạng thái |
 |---|---|---|---|
-| 1 | A2: key authenticity để đâu (off-box secret / Keychain / transparency log) | A2 | **OPEN** |
-| 2 | Bảng giá token chính thức theo route (cho trần tiền + cost-of-trust) | C2, B7, C9 | **OPEN** |
-| 3 | Scope confinement đợt này: chỉ G1+G2, hay cả D1 (probe/test) + D2 (Seatbelt) + D3 (broker) | D1, D2, D3 | **OPEN** |
-| 4 | Có làm B5 acceptance-gate độc lập kỳ này không | B5 | **OPEN** |
-| 5 | Có mở G10 developer-harness/OKL (ADR-002) kỳ này không | G10 | **OPEN** |
-| 6 | Ngân sách run trả tiền cho B1/B7/C7 (ước ~$30–60) | B1, B7, C7 | **OPEN** |
+| 1 | A2: key authenticity để đâu | A2 | **CHỐT:** khoá ký per-run (ephemeral keypair), public half escrow ngoài máy như anchor hiện tại; transparency-log anchor là tuỳ chọn khi có hạ tầng |
+| 2 | Bảng giá token theo route | C2, B7, C9 | **CHỐT cơ chế:** giá do operator khai trong settings per-route; bật `max_cost` mà thiếu giá/thiếu token ⇒ fail closed; số liệu route hiện hành lấy lúc Đợt 2 khởi công |
+| 3 | Scope confinement | D1, D2, D3 | **CHỐT:** làm đủ D1 + D2 + D3 trong Đợt 4 |
+| 4 | B5 acceptance-gate độc lập | B5 | **CHỐT:** CÓ — Đợt 5 |
+| 5 | G10 developer-harness/OKL | G10 | **CHỐT:** CÓ — Đợt 5 |
+| 6 | Ngân sách run trả tiền Đợt 2 | B1, B7, C7 | **CHỐT:** trần $60 |
 
-Đợt 1 **không bị chặn** bởi quyết định nào → luôn bắt đầu được.
+Owner chốt 2026-11-01 ("Đồng ý, làm đi") theo mặc định đề xuất. Muốn đảo quyết định nào thì đảo **trước khi đợt liên quan khởi công**. Đợt 1 không phụ thuộc quyết định nào.
 
 ---
 
@@ -132,4 +132,5 @@
 
 | Ngày | Sự kiện | Commit / evidence |
 |---|---|---|
-| 2026-11-01 | Lập đầu bài + checklist; roadmap chi tiết tại docs/IMPROVEMENT-ROADMAP.md | (commit này) |
+| 2026-11-01 | Lập đầu bài + checklist; roadmap chi tiết tại docs/IMPROVEMENT-ROADMAP.md | 99949738 |
+| 2026-11-01 | Owner duyệt toàn bộ ("Đồng ý, làm đi") — 6 QĐ chốt theo mặc định. **KHỞI CÔNG ĐỢT 1**: recon đọc code + baseline full suite, sau đó freeze WAVE-1 spec | (commit này) |
