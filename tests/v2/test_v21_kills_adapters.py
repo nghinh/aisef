@@ -3,6 +3,7 @@ by the target and the mutants it kills. In the kill set of exactly the targets i
 
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 import tempfile
@@ -184,22 +185,33 @@ class TreeOf(_Reviewer):
 
     def test_the_record_distinguishes_each_kind_of_entry_and_leaves_out_git(self):
         import hashlib
-        import os
         repo = self.tmp / "repo"
         (repo / "sub").mkdir()
         (repo / "sub" / "f.txt").write_text("x\n")
-        os.symlink("sub/f.txt", repo / "link")
+        t = ad.tree_of(str(repo))
+        self.assertEqual(t["sub"], "dir")
+        self.assertEqual(t["sub/f.txt"], hashlib.sha256(b"x\n").hexdigest())
+        self.assertEqual([k for k in t if k == ".git" or k.startswith(".git/")], [])
+
+    @unittest.skipUnless(hasattr(os, "geteuid"), "chmod(0) locks nothing on Windows, and geteuid is absent")
+    def test_a_symlink_is_recorded_by_target_and_an_unreadable_file_by_its_error(self):
+        """The POSIX half of the record: symlink creation is a privilege on Windows and chmod(0) a no-op there, so these
+        branches run where the mechanism exists — probed, not inferred from the platform name."""
+        repo = self.tmp / "repo"
+        (repo / "sub").mkdir()
+        (repo / "sub" / "f.txt").write_text("x\n")
+        try:
+            os.symlink("sub/f.txt", repo / "link")
+        except OSError as e:     # a filesystem without symlinks
+            self.skipTest(f"cannot create a symlink here: {e}")
         locked = repo / "locked.txt"
         locked.write_text("secret\n")
         locked.chmod(0)
         self.addCleanup(locked.chmod, 0o600)
         t = ad.tree_of(str(repo))
-        self.assertEqual(t["sub"], "dir")
-        self.assertEqual(t["sub/f.txt"], hashlib.sha256(b"x\n").hexdigest())
         self.assertEqual(t["link"], "link:sub/f.txt")
         if os.geteuid() != 0:     # root reads a 000 file
             self.assertEqual(t["locked.txt"], "unreadable:PermissionError")
-        self.assertEqual([k for k in t if k == ".git" or k.startswith(".git/")], [])
 
     def test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change(self):
         import os

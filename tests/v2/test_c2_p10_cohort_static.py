@@ -95,7 +95,10 @@ class Rules(unittest.TestCase):
                 "a.json $.x[0].y", "b.jsonl $1", f"c.json (unparsed; names {schema})"])
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class Record(unittest.TestCase):
+    @sealing
     def test_the_evidence_record_re_derives_from_the_tree(self):
         from validation.qualification import c2_p10_cohort as B
         self.assertEqual(B.check(), [])

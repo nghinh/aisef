@@ -247,9 +247,13 @@ class DeveloperWorkRemains(Fixture):
         self.assertEqual({owner for _, owner, _ in self.failures("S1")}, {"DEVELOPER"})
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
+
 @unittest.skipUnless((ROOT / "validation/qualification/c2_k_nowork_001.py").exists(),
                      "validation/qualification is not in this tree (the mutation runner's copy); the suite runs it")
 class Record(unittest.TestCase):
+    @sealing
     def test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after(self):
         """B-03a: the v2.1 record binds this tree (and the v2.1 plan correction); the 2.0 record is history — its blob
         is tag v2.0.0's, its verdict and problems the recorded ones."""

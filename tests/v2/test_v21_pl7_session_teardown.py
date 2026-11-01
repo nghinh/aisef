@@ -36,6 +36,7 @@ class PL7SessionTeardown(unittest.TestCase):
     def test_a_clean_release_returns_no_escapees(self):
         self.assertEqual(client._release_session(_FakeRange("developer S1", [], raise_escaped=False)), [])
 
+    @unittest.skipUnless(os.name == "posix", "reads the live POSIX process table")
     def test_an_escapee_gone_within_the_grace_keeps_the_outcome_and_is_named(self):
         # a process that exited before (or during) the post-release snapshot: reaped, so absent from the table — gone.
         p = subprocess.Popen([sys.executable, "-c", ""])
@@ -45,6 +46,7 @@ class PL7SessionTeardown(unittest.TestCase):
         r = _FakeRange("developer S1", [Proc(pid=dead, ppid=1, group=None, created=None, command="gone")])
         self.assertEqual(client._release_session(r), [dead])   # named on the result, NO RangeEscaped: the session is not refused
 
+    @unittest.skipUnless(os.name == "posix", "reads the live POSIX process table")
     def test_a_process_that_stays_alive_refuses_the_session(self):
         # a real escapee that outlives release(): detection is kept — RangeEscaped is re-raised and the session refused.
         p = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
@@ -57,6 +59,29 @@ class PL7SessionTeardown(unittest.TestCase):
         try:
             with self.assertRaises(RangeEscaped):
                 client._release_session(r)
+        finally:
+            client.ESCAPEE_GRACE_S, client.POLL_S = grace, poll
+
+    def test_escapees_proved_gone_by_the_mocked_table_keep_the_outcome_and_are_named(self):
+        # the gone-within-grace path with the table FAULT-INJECTED (empty, ESRCH from the per-pid probe), as
+        # IsGoneConfirmation does: every platform runs it; the real reaped-process case above is POSIX (the live table).
+        r = _FakeRange("developer S1", [Proc(pid=4242, ppid=1, group=None, created=100.0, command="gone"),
+                                        Proc(pid=4243, ppid=1, group=None, created=100.0, command="gone too")])
+        with mock.patch.object(client, "process_table", return_value={}), \
+                mock.patch.object(client.os, "kill", side_effect=ProcessLookupError(3, "ESRCH")):
+            self.assertEqual(client._release_session(r), [4242, 4243])   # named on the result, NO RangeEscaped
+
+    def test_a_process_the_mocked_table_keeps_alive_refuses_the_session(self):
+        # the refuse side with the table FAULT-INJECTED: the escapee stays in the table under its own start time, so it
+        # is never proved gone, and RangeEscaped is re-raised when the grace runs out — on every platform.
+        proc = Proc(pid=4242, ppid=1, group=None, created=100.0, command="alive")
+        r = _FakeRange("developer S1", [proc])
+        grace, poll = client.ESCAPEE_GRACE_S, client.POLL_S
+        client.ESCAPEE_GRACE_S, client.POLL_S = 0.3, 0.05   # do not wait the full production grace in a test
+        try:
+            with mock.patch.object(client, "process_table", return_value={4242: proc}):
+                with self.assertRaises(RangeEscaped):
+                    client._release_session(r)
         finally:
             client.ESCAPEE_GRACE_S, client.POLL_S = grace, poll
 

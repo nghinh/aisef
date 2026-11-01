@@ -242,11 +242,15 @@ class Writers(unittest.TestCase):
         outs = [*q5.V2_0_RECORD_DIRS, *fresh, f"{q5.CYCLE1_OUT_REL}/corpus", str(ROOT / "closure-evidence/v2/release/Q5-RC2")]
         outs += [rel.upper() for rel in q5.V2_0_RECORD_DIRS if (ROOT / rel.upper()).exists()]   # a case-insensitive file system
         # the allow-list: any other 2.0-era record directory (Q4's, P10's), closure-evidence itself, a sibling of a 2.0 Q5
-        # directory or of 2.1's, a 2.1 candidate's directory while none is frozen; the repository named in another case
+        # directory or of 2.1's, a 2.1 candidate's directory that is not the frozen one; the repository named in another case
         outs += ["closure-evidence/v2/Q4", "closure-evidence/v2/cycle2/Q4-FINAL", "closure-evidence/v2/P10", "closure-evidence",
                  "closure-evidence/v2/cycle2/Q5-FINAL-2", f"{q5.V21_DIR}-attempt", "closure-evidence/v2/release/Q5-2.1.0-RC1"]
         alt = pathlib.Path(str(ROOT).swapcase())
         outs += [str(alt / "closure-evidence/v2/Q4")] if alt.exists() else []
+        # the live state decides whether a 2.1 candidate is frozen: its own directory is then the one allowed release
+        # directory, not a must-refuse (the mocked frozen/unfrozen cases below pin both behaviours)
+        allowed = q5.release_q5_dir()
+        outs = [o for o in outs if allowed is None or (ROOT / o).resolve() != allowed.resolve()]
         from validation.qualification import q4_aggregate
         with mock.patch.multiple(q5, record=_reached, reproduce=_reached, calibrate=_reached, freeze=_reached), \
                 mock.patch.object(q4_aggregate, "conformance", _reached), mock.patch.object(pathlib.Path, "mkdir", _reached):
@@ -286,6 +290,9 @@ def _obs(**over):
             "journal": [{"type": "probe/evaluated", "data": {"record": {"spec_id": spec, "passed": True}}},
                         {"type": "story/resource-acquired", "data": {"resource": f"probe {spec} [admission 1]"}}]}
     return json.loads(json.dumps(base)) | over
+
+
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
 
 
 class KernelComparison(unittest.TestCase):
@@ -380,6 +387,7 @@ class KernelComparison(unittest.TestCase):
             self.assertIn("outside closure-evidence/v2/v2.1", M.refused(alt / "closure-evidence/v2/cycle2/Q5/x.json"))
             self.assertIn("outside closure-evidence/v2/v2.1", M.refused(alt / "validation/x.json"))
 
+    @sealing
     def test_Q5_18_check_binds_the_record_to_q5_both_kernels_the_corpus_and_the_ruling_s_data(self):
         from validation.qualification import v21_q5_changes as X
         M = self.M
@@ -454,6 +462,7 @@ class KernelComparison(unittest.TestCase):
                              ["q5's fixture helpers differ between the two kernels' trees: the comparison is not the kernels' alone"])
         self.assertEqual(M.check(pathlib.Path(t) / "absent.json"), [f"{pathlib.Path(t) / 'absent.json'}: no record (v21_q5_compare.py --write)"])
 
+    @sealing
     def test_Q5_19_the_kernel_comparison_record_binds_this_tree(self):
         """Red until the lead writes closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json (v21_q5_compare.py --write) on the
         final 2.1 kernel; then it fails whenever q5.py, the tool, the fixture helpers or the kernel move."""

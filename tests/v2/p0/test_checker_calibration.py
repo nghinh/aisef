@@ -21,6 +21,9 @@ else:
     _s.loader.exec_module(cc)
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
+@sealing
 class CheckerCalibration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

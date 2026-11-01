@@ -105,7 +105,7 @@ class Table(unittest.TestCase):
         self.assertRegex(eo.check(self.table)[0], "or its sweep record cannot be read")
 
     def test_the_runner_s_committed_reads_head_s_bytes_only(self):
-        self.table.write_text("{}\n", encoding="utf-8")
+        self.table.write_bytes(b"{}\n")   # exact bytes: committed() compares blobs, and write_text CRLFs \n on Windows
         self.assertEqual(m.committed(self.root, self.table, b"{}\n"), ("order.json", None))   # untracked
         head = self.commit("order.json")
         self.assertEqual(m.committed(self.root, self.table, b"{}\n"), ("order.json", head))

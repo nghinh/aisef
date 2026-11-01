@@ -391,9 +391,10 @@ class Uncontainable(unittest.TestCase):
         real = {(b["catches"], b["disposition"]) for b in result["boundaries"] if b["path"] == "aisef2/runtime/story_scope.py"}
         self.assertEqual(real, {("JournalError", eb.STRUCTURAL), ("InvariantError", eb.RERAISES), ("Exception", eb.RERAISES),
                                 ("BaseException", eb.RERAISES), ("Residual", eb.RERAISES)})
-        # the boundaries that could hold it all re-raise: the kernel's seven, and the product run's (aisef2/app/run.py,
-        # V2.0 B3: the run record is written in a `finally` as any exception propagates)
-        self.assertEqual(result["counts"][eb.RERAISES], 8)
+        # the boundaries that could hold it all re-raise: the kernel's seven, the product run's (aisef2/app/run.py,
+        # V2.0 B3: the run record is written in a `finally` as any exception propagates), and PL-7's escapee handler
+        # (aisef2/orchestrate/story_runner.py: RangeEscaped is re-raised when the grace proves nothing gone)
+        self.assertEqual(result["counts"][eb.RERAISES], 9)
         self.assertEqual({(b["catches"], b["disposition"]) for b in result["boundaries"] if b["path"] == "aisef2/app/run.py"},
                          {("BaseException", eb.RERAISES), ("Exception", eb.STRUCTURAL), ("ImportError", eb.STRUCTURAL),
                           ("(OSError, subprocess.SubprocessError)", eb.STRUCTURAL), ("ShutdownRefused", eb.STRUCTURAL),
@@ -982,7 +983,10 @@ class NoDeveloperArtefactAtParent(unittest.TestCase):
 
 # ------------------------------------------------------------------------------------------------ operational
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class MutationAuthority(unittest.TestCase):
+    @sealing
     def test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered(self):
         self.assertEqual(da.check(ROOT), [])
         for rel in ("aisef2/invariants/registry.py", "aisef2/invariants/evidence.py", "validation/v2/except_boundaries.py"):

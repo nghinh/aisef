@@ -184,9 +184,12 @@ def _win_rows(raw: bytes) -> dict[int, Host]:
             raise _not_a_row("powershell", line)
         pid, ppid, born, command = m.groups()
         try:
-            text = base64.b64decode(command, validate=True).decode("utf-8", "replace")
+            blob = base64.b64decode(command, validate=True)
         except binascii.Error:
             raise _not_a_row("powershell", line) from None
+        if base64.b64encode(blob).decode("ascii") != command:   # 3.11's b64decode(validate=True) swallows excess
+            raise _not_a_row("powershell", line)                # padding ('QUJD='): only the canonical token round-trips
+        text = blob.decode("utf-8", "replace")
         if int(pid) in out:
             raise _twice("powershell", pid, line)
         out[int(pid)] = Host(int(pid), int(ppid), -1, float(born), text)

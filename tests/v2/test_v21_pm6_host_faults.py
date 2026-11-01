@@ -32,7 +32,24 @@ from aisef2.product.spec import ProductProofSpec  # noqa: E402
 SHA = "89abcdef0123456789abcdef0123456789abcdef"
 ENV = ExecutionEnv(sys.executable, 30, Enforcement.PARTIAL)
 SUBJECT = "def main(argv=None):\n    return 0\n"
-PREPARED = "the evaluation directory cannot be prepared: IsADirectoryError"
+
+
+def _host_open_error() -> str:
+    """The class `open(.., "wb")` raises when a *directory* holds the written file's path is the host's to name —
+    IsADirectoryError on POSIX, PermissionError on Windows, the same (correct) refusal — and the probe's detail carries
+    `type(e).__name__` verbatim. The expected class is therefore computed by provoking that exact fault once, so the
+    equality assertions below pin the full typed answer on every OS instead of one OS's spelling."""
+    with tempfile.TemporaryDirectory(prefix="aisef2-pm6-class-") as t:
+        taken = os.path.join(t, "taken")
+        os.mkdir(taken)
+        try:
+            open(taken, "wb").close()
+        except OSError as e:
+            return type(e).__name__
+    raise AssertionError("opening a directory for writing did not fail on this host")
+
+
+PREPARED = f"the evaluation directory cannot be prepared: {_host_open_error()}"
 
 
 def _spec(probe, kind, locator, stimulus, observable):

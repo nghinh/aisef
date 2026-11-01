@@ -39,7 +39,10 @@ def tree(files: dict, ledger: list | None) -> pathlib.Path:
     return t
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class Checker(unittest.TestCase):
+    @sealing
     def test_this_tree_passes_and_every_site_is_ledgered(self):
         self.assertEqual(da.check(ROOT), [])
         sites, _ = da.discover(ROOT)

@@ -27,6 +27,9 @@ def _copy_tree(tmp: pathlib.Path, skip: tuple = ()) -> pathlib.Path:
     return tmp
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
+
 class FreezeManifest(unittest.TestCase):
     def setUp(self):
         self.text = (ROOT / fm.RFC_REL).read_text(encoding="utf-8")
@@ -98,8 +101,8 @@ class FreezeManifest(unittest.TestCase):
             d = json.loads(p.read_text(encoding="utf-8"))
             d["rfc_normative_digest"] = "0" * 64
             p.write_text(json.dumps(d, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-            data = p.read_bytes()
-            self._pin = hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+            data = p.read_bytes().replace(b"\r\n", b"\n")   # the pin rule hashes LF bytes, as history_problems does:
+            self._pin = hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()   # write_text emits CRLF on Windows
         with tempfile.TemporaryDirectory() as t:
             root = _copy_tree(pathlib.Path(t))
             edit(root)
@@ -189,6 +192,7 @@ class FreezeManifest(unittest.TestCase):
         self.assertIn("the RFC at HEAD does not match the approval record", out)
         self.assertNotIn("2.0 manifest", out)
 
+    @sealing
     def test_the_V2_007_exception_records_what_the_owner_decided_and_when(self):
         """The load-bearing content of the write-once V2-007 records, checked against their sources."""
         def git(*a):

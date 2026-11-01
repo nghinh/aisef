@@ -215,6 +215,14 @@ class AStuckSearchStopsAtItsDeadline(Work):
                      "changes nothing"):
             self.assertIn(said, text)
         self.assertEqual(len(ranges), 1)
+
+    @posix
+    def test_the_catastrophic_pattern_stops_at_the_deadline_and_the_range_is_emptied(self):
+        """The process-table half of the test above: `members()` and `alive()` read the ps table, which the range has
+        only on POSIX; the deadline, the reason and the refusal's text are pinned everywhere by the sibling."""
+        ranges = []
+        with self.assertRaises(ci.StreamSearchFailed):
+            search(EVIL, EVIL_LINE.encode("utf-8"), work=self.work(), timeout=1.0, stream="stderr", on_range=ranges.append)
         self.assertEqual(ranges[0].members(), [])
         self.assertFalse(alive(ranges[0].target_pid))
 
@@ -254,7 +262,14 @@ class TheRangeIsEmptied(Work):
     def test_the_range_is_given_to_the_harness_hook_once_and_is_empty_after(self):
         e, ranges = self.run_with("import time\ntime.sleep(600)\n")
         self.assertEqual(e.reason, "DEADLINE")
-        self.assertEqual((len(ranges), ranges[0].members(), ranges[0].name), (1, [], "test regex search"))
+        self.assertEqual((len(ranges), ranges[0].name), (1, "test regex search"))
+
+    @posix
+    def test_the_range_given_to_the_harness_hook_is_emptied(self):
+        """The ps-table half of the test above (`members()`/`alive()` are POSIX reads); the hook's count and the
+        range's name are pinned everywhere by the sibling."""
+        _, ranges = self.run_with("import time\ntime.sleep(600)\n")
+        self.assertEqual(ranges[0].members(), [])
         self.assertFalse(alive(ranges[0].target_pid))
 
     @posix
@@ -300,13 +315,30 @@ class TheRangeIsEmptied(Work):
         ranges = []
         with self.assertRaises(ci.StreamSearchFailed):
             search(EVIL, EVIL_LINE.encode("utf-8"), work=self.work(), timeout=1.0, on_range=ranges.append)
-        self.assertEqual((len(ranges), ranges[0].members()), (1, []))
+        self.assertEqual(len(ranges), 1)
+
+    @posix
+    def test_the_stopped_real_workers_range_is_emptied(self):
+        """The ps-table half of the test above (`members()`/`alive()` are POSIX reads); that EVIL over the real worker
+        is StreamSearchFailed is pinned everywhere by the sibling."""
+        ranges = []
+        with self.assertRaises(ci.StreamSearchFailed):
+            search(EVIL, EVIL_LINE.encode("utf-8"), work=self.work(), timeout=1.0, on_range=ranges.append)
+        self.assertEqual(ranges[0].members(), [])
         self.assertFalse(alive(ranges[0].target_pid))
 
     def test_a_worker_that_answers_leaves_nothing_behind_either(self):
         ranges = []
         self.assertTrue(search("a", b"banana", work=self.work(), on_range=ranges.append))
-        self.assertEqual((len(ranges), ranges[0].members()), (1, []))
+        self.assertEqual(len(ranges), 1)
+
+    @posix
+    def test_an_answering_workers_range_is_emptied_too(self):
+        """The ps-table half of the test above (`members()`/`alive()` are POSIX reads); the answer itself is pinned
+        everywhere by the sibling."""
+        ranges = []
+        self.assertTrue(search("a", b"banana", work=self.work(), on_range=ranges.append))
+        self.assertEqual(ranges[0].members(), [])
         self.assertFalse(alive(ranges[0].target_pid))
 
 

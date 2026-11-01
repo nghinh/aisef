@@ -63,6 +63,29 @@ jobs:
       # route (including a subprocess) fails the build. Compares git objects, so Windows autocrlf is safe.
       - run: python -P validation/v2/v1_evidence_guard.py --check
 
+  # ROADMAP-2.2 F1 — the sealing tier. Record-currency tests assert that committed evidence records are what the tree
+  # re-derives: on every unsealed branch they are red BY DESIGN (re-sealing is the owner's act), and until 2.2 those
+  # reds drowned the product signal in the unit job. They now run behind AISEF_SEALING=1 (tests/v2/sealing_gate.py,
+  # the closed GATED list; tests/v2/test_sealing_gate.py refuses a gated test missing from it) in THIS job only — on
+  # master and on tags, where sealing truth belongs. EXPECTED RED on master while the tree is unsealed: that red is
+  # honest and carries its own name instead of poisoning `unit`; on a release tag a red `sealing` job fails the
+  # release.yml `tests` gate, so a release from an unsealed tree stays blocked unless owner-excepted (exactly the
+  # 2.1.0 Option-1 discipline). The job runs the full `unittest discover` so no future record-currency test can be
+  # silently absent from it; fetch-depth: 0 for the history-rebuilding tests, as in `unit`.
+  sealing:
+    if: github.ref == 'refs/heads/master' || github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: sealing suite (record-currency tier, AISEF_SEALING=1)
+        shell: bash
+        run: AISEF_SEALING=1 python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q
+
   # Cổng lint — bật 2026-09-12. Tập rule ở `[tool.ruff.lint]` của pyproject là
   # cổng chứ không phải sở thích: F (pyflakes), B (bugbear), E9. Lượt bật đã bắt
   # một lỗi thật ngay trong chính lượt ấy, nên phép này có giá trị chứng minh

@@ -507,7 +507,9 @@ class PrivateAndFailOpen(Scratch):
             self.assertEqual(self.sink().report()["permissions"], "platform default (modes are not applied)")
         finally:
             importlib.reload(D)      # restore to the real os.name for the rest of the suite
-        self.assertEqual(D.PERMISSIONS, "directory 0700, files 0600")
+        # the restore pins the host's own branch — on a real non-POSIX host that IS the branch under test
+        self.assertEqual(D.PERMISSIONS, "directory 0700, files 0600" if os.name == "posix"
+                         else "platform default (modes are not applied)")
 
 
 class TheStatementOfWhoCanRead(Scratch):
@@ -543,6 +545,8 @@ class TheStatementOfWhoCanRead(Scratch):
         self.assertNotIn(str(self.folder), mounted)
         self.assertFalse([m for m in mounted if str(self.folder).startswith(m.rstrip("/") + "/")], mounted)
 
+    @unittest.skipUnless(os.name == "posix", "models Linux bind/tmpfs paths: access_of realpaths the folder on the "
+                                             "HOST, and Windows drive-anchors '/tmp/...'")
     def test_a_sandbox_made_mount_over_the_run_directory_is_not_a_host_mount(self):
         # The run directory sits under /tmp. A confined session gets a FRESH --tmpfs at /tmp
         # (sandbox-made, empty), not the host's /tmp: it exposes nothing of the directory, so the

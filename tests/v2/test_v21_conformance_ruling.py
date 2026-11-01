@@ -159,7 +159,10 @@ class Tolerated(unittest.TestCase):
                 self.assertEqual(R.tolerated(), {})                          # edited after its commit
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class CommittedRuling(unittest.TestCase):
+    @sealing
     def test_the_committed_ruling_is_what_this_tree_derives(self):
         """Red until the ruling is generated on the final 2.1 tree and committed (the lead's step); then any change to a
         file it names, to its reasons or to the Q5 data it carries makes it stale."""

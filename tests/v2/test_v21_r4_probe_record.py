@@ -88,6 +88,7 @@ class TheReportIsTheRecord(unittest.TestCase):
         self.assertFalse(any(DID_NOT_RUN in p for p in rep["problems"]), rep["problems"])
         self.assertIn(READABLE, replayed(rep, home, ws))
 
+    @unittest.skipUnless(os.name == "posix", "confine.measure's host-side machinery (the ps scan, the POSIX PATH) is POSIX")
     def test_what_a_run_refused_with_is_what_its_record_says_when_judged_again(self):
         # two tries that never reported, in the probe's order (workspace, then user_namespace), not the alphabetical one
         out = "\n".join([f"{M}try read_canary", "cat: canary: No such file or directory", f"{M}rc 1",
@@ -98,6 +99,26 @@ class TheReportIsTheRecord(unittest.TestCase):
         live = [p for p in rep["problems"] if DID_NOT_RUN in p]
         self.assertEqual(len(live), 1, rep["problems"])
         self.assertEqual([p for p in replayed(rep, home, ws) if DID_NOT_RUN in p], live)
+
+    def test_the_record_alone_is_judged_as_the_run_was_without_any_host_machinery(self):
+        """The replay half of the test above, portable: `_judge` over the report as RUN.json serialises it (sorted
+        keys, so `tried` comes back alphabetical) refuses with the very problems the live judgement over the probe's
+        own order (workspace before user_namespace) refused with — `sorted()` inside `_judge`, not the dict's order,
+        is what makes the two readings one record. No measure, no shell, no ps: the report is built here."""
+        tried = {"read_canary": (1, "cat: canary: No such file or directory"),
+                 "read_git_directory": (0, "ref: refs/heads/main"),
+                 "workspace": (None, "ok"),
+                 "user_namespace": (None, "unshare failed: Operation not permitted")}
+        rep = {"network": "host", "setsid_survivors": [], "created_outside_workspace": {},
+               "tried": {k: {"exit": rc, "output": said} for k, (rc, said) in tried.items()},
+               "inside": {"mounts": [], "mount_targets": [], "home_listing": [], "unix_sockets": [],
+                          "routed_interfaces": [], "no_new_privs": "1",
+                          "namespaces": {n: "own" for n in ("user", "pid", "ipc", "uts", "mnt")},
+                          "capabilities": {k: "0" for k in ("CapInh", "CapPrm", "CapEff", "CapAmb")}}}
+        live = confine._judge(rep, "tok", "", tried, "/nonexistent", pathlib.PurePosixPath("/ws"))
+        self.assertEqual([p for p in live if DID_NOT_RUN in p],
+                         [f"the probe's user_namespace, workspace {DID_NOT_RUN}"])
+        self.assertEqual(replayed(rep, "/nonexistent", pathlib.PurePosixPath("/ws")), live)
 
 
 if __name__ == "__main__":

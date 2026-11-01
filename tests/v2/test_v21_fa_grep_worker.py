@@ -299,6 +299,7 @@ class RangeIsEmptied(Tmp):
     def pids(self, name: str) -> dict:
         return json.loads(pathlib.Path(self.dir, name).read_text(encoding="utf-8"))
 
+    @posix
     def test_the_range_is_given_to_the_harness_hook_once_and_is_empty_after(self):
         o, ranges = self.run_with("import time\ntime.sleep(600)\n")
         self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
@@ -349,6 +350,7 @@ class RangeIsEmptied(Tmp):
             sentinel.stdin.close()
             sentinel.wait(timeout=30)
 
+    @posix
     def test_the_real_worker_leaves_nothing_behind_when_it_is_stopped(self):
         ref = self.tree("evil", {"f.txt": EVIL_LINE})
         ranges = []
@@ -577,10 +579,25 @@ class FailureModes(Tmp):
         self.assertTrue(o.detail.startswith("grep_count worker LAUNCH: "), o.detail)
         self.assertIn("RangeError", o.detail)
 
-    def test_a_range_whose_anchor_never_says_it_started_is_LAUNCH_and_leaves_nothing(self):
+    def test_a_range_whose_anchor_never_says_it_started_is_LAUNCH(self):
         # V2.1 review (r2-2): the watchdog does not shorten the range's own handshake (`ProcessRange.start` waits up to
         # 30 s for its target to say it started, whatever timeouts_s.probe is: said in the module's docstring). What it
-        # ends as is pinned: the answer is given at once here, as the range gives it when its wait is over
+        # ends as is pinned: the answer is given at once here, as the range gives it when its wait is over. The
+        # observation needs no process table, so it runs on every platform; that nothing of the anchor is left is the
+        # POSIX sibling below (the table that proves it is read with `ps`).
+        class Unanswered(PR.ProcessRange):
+            def _line(self, timeout):
+                return ("TIMEOUT", "") if timeout == 30.0 else super()._line(timeout)
+        with mock.patch.object(fa, "ProcessRange", Unanswered):
+            o = P.observe(spec("path:f.txt", 0, "x"), self.ref, ExecutionEnv(sys.executable, 1.5, Enforcement.PARTIAL))
+        self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
+        self.assertTrue(o.detail.startswith("grep_count worker LAUNCH: the worker did not start (RangeError)"), o.detail)
+
+    @posix
+    def test_a_range_whose_anchor_never_says_it_started_is_LAUNCH_and_leaves_nothing(self):
+        # the same unanswered handshake, with the anchor accounted for: ended and reaped, nothing of this one is left.
+        # The proof reads the live process table (`ps` off Linux), so the case is POSIX; the observation half is the
+        # ungated sibling above.
         class Unanswered(PR.ProcessRange):
             def _line(self, timeout):
                 return ("TIMEOUT", "") if timeout == 30.0 else super()._line(timeout)
@@ -703,7 +720,30 @@ class TheResultIsDataFromAnotherProcess(unittest.TestCase):
         # the ascending form of the very same indexes is accepted: this is not a blanket refusal
         self.assertEqual(fa._worker_facts({**obj, "skipped_binary": [0, 8]}, rels)["skipped_binary"],
                          ["f0.py", "f8.py"])
+        # The acceptance side of the result-size cap, at exactly the cap (the same arithmetic the POSIX real-worker
+        # test below exercises on both sides): the result is laid down by a stand-in range, no process started, so
+        # the boundary runs on every platform. One byte more is BAD_RESULT (FailureModes, "BAD_RESULT/too large").
+        facts = '{"files": 1, "matches": 0, "skipped_binary": [], "locations": []}'
+        cap = 65536 + 8 * (len("f.txt") + 8)
 
+        class AtCap:
+            """All grep_facts drives of a range — made, started, waited on, released — with a result of cap bytes."""
+            def __init__(self, name, argv, **kwargs):
+                self._result = argv[-2]      # the protocol: argv ends with the request, result and progress paths
+
+            def start(self):
+                pathlib.Path(self._result).write_text(facts + " " * (cap - len(facts)), encoding="ascii")
+
+            def wait(self, timeout=None):
+                return 0
+
+            def release(self):
+                pass
+        with tempfile.TemporaryDirectory(prefix="aisef2-pm13-atcap-") as d, \
+                mock.patch.object(fa, "ProcessRange", AtCap):
+            self.assertEqual(fa.grep_facts("x", [("f.txt", b"x\n")], timeout_s=60.0, work=d)["files"], 1)
+
+    @posix
     def test_the_size_a_result_may_have_is_what_the_request_can_produce(self):
         cap = 65536 + 8 * (len("f.txt") + 8)
         facts = '{"files": 1, "matches": 0, "skipped_binary": [], "locations": []}'

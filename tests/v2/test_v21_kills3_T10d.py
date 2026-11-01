@@ -213,6 +213,7 @@ class OcrCoverageDetail(_Finder):
         self.assertNotIn("(", reviewed.detail.split("coverage COMPLETE", 1)[1])
 
 
+@POSIX
 class OcrGitDiffRefusal(_Finder):
     """Reviewer._ocr [190] [191] — "L169 string '..' emptied", "L169 string ' exited ' emptied": a review whose change
     cannot be listed (the journal's parent of the story is no object of the checkout) is refused as CapabilityUnrunnable,
@@ -231,13 +232,27 @@ class OcrGitDiffRefusal(_Finder):
         self.assertRegex(str(c.exception), rf"\b{parent[:7]}[0-9a-f]*\.\.{self.head[:7]}[0-9a-f]*\b.*\b{status}\b")
 
 
+class OcrGitDiffRefusalShape(unittest.TestCase):
+    """[190] [191] on every OS: OcrGitDiffRefusal's structural regex, held here against the refusal string exactly as
+    Reviewer._ocr builds it (adapters: `git diff {base[:12]}..{head[:12]} exited {status}`) and against the two mutated
+    shapes — '..' emptied and ' exited ' emptied — so the Windows leg, whose fixture cannot start the shebang finder,
+    still proves the regex tells the range-then-status shape apart from both."""
+
+    def test_the_regex_pins_the_range_then_the_status_and_refuses_the_mutated_shapes(self):
+        base, head, status = "0" * 40, "f" * 40, 128
+        pattern = rf"\b{base[:7]}[0-9a-f]*\.\.{head[:7]}[0-9a-f]*\b.*\b{status}\b"
+        self.assertRegex(str(ad.CapabilityUnrunnable(f"git diff {base[:12]}..{head[:12]} exited {status}")), pattern)
+        self.assertNotRegex(f"git diff {base[:12]}{head[:12]} exited {status}", pattern)    # [190]: '..' emptied
+        self.assertNotRegex(f"git diff {base[:12]}..{head[:12]}{status}", pattern)          # [191]: ' exited ' emptied
+
+
+@POSIX
 class OcrCeiling(_Finder):
     """Reviewer._ocr [196] — "L176 True->False" (`budget.reached(in_progress=True)`): the review is the provider request
     in progress (orchestrate.review journals it before the finder is called), so the request ceiling ends it only when
     EXCEEDED — a run whose limit is exactly the requests it needs still reviews its story; every other ceiling ends it
     at its value (app/client.Budget.reached)."""
 
-    @POSIX
     def test_the_review_whose_request_is_the_last_one_allowed_runs(self):
         limits = {**self.LIMITS, "provider_requests": 3}
         _, s, _ = self.reviewer(requests=3, limits=limits)._ocr(self.scope, 1, self.head)      # spent == limit
@@ -258,6 +273,30 @@ class OcrCeiling(_Finder):
             self.reviewer(preflight=preflight)._ocr(self.scope, 1, self.head)
         self.assertIn("max_turns", str(c.exception))
         self.assertFalse(self.log.exists())
+
+
+class OcrCeilingBudget(unittest.TestCase):
+    """[196] on every OS: OcrCeiling drives the ceiling through the shebang finder (POSIX-only fixture), so the
+    semantics and the refusal's text — budget.reached(in_progress=True), raised verbatim as the ProviderOutage — are
+    pinned here directly on a client.Budget over sessions that were never started (no fake binary, no repo): the
+    request in progress passes at its ceiling's value, is refused beyond it naming the ceiling and the spend, and
+    every other ceiling ends the run at its value even while a request is in progress."""
+
+    def reached(self, requests: int = 0, preflight: dict | None = None) -> str | None:
+        limits = {**_Finder.LIMITS, "provider_requests": 3}
+        budget = client.Budget(limits, preflight or _Finder.PREFLIGHT,
+                               pathlib.Path("sessions-that-were-never-started"), requests=lambda: requests)
+        return budget.reached(in_progress=True)
+
+    def test_the_request_at_the_ceilings_value_is_allowed_while_in_progress(self):
+        self.assertIsNone(self.reached(requests=3))
+
+    def test_a_request_beyond_the_ceiling_is_refused_naming_the_ceiling_and_the_spend(self):
+        self.assertEqual(self.reached(requests=4), "max_provider_requests: 4 of 3")
+
+    def test_another_ceiling_at_its_value_ends_the_run_even_in_progress(self):
+        turns = _Finder.LIMITS["turns"]
+        self.assertEqual(self.reached(preflight={**_Finder.PREFLIGHT, "turns": turns}), f"max_turns: {turns} of {turns}")
 
 
 @POSIX

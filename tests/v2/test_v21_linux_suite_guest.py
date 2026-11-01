@@ -6,9 +6,11 @@ when it is killed would report a green or a time that is not the run's, so each 
 suite of three modules run for real by the real runner (a subprocess, the way the guest starts it).
 """
 
+import importlib.util
 import json
 import os
 import pathlib
+import py_compile
 import subprocess
 import sys
 import tempfile
@@ -61,7 +63,14 @@ def run_toy(*names):
         return r, json.loads(out.read_text(encoding="utf-8")) if out.exists() else None
 
 
+#: the runner imports the POSIX-only `resource` module at its top, so the subprocess dies at import where that module
+#: is absent (Windows) — the capability, not the OS name, is what gates; the compile test below runs everywhere.
+NEEDS_RESOURCE = unittest.skipUnless(importlib.util.find_spec("resource") is not None,
+                                     "linux_suite_guest imports the POSIX resource module")
+
+
 class Runner(unittest.TestCase):
+    @NEEDS_RESOURCE
     def test_discovery_counts_every_outcome_and_names_each_failure_and_module(self):
         r, s = run_toy()
         self.assertEqual(r.returncode, 1, r.stderr)
@@ -78,12 +87,20 @@ class Runner(unittest.TestCase):
         self.assertIn("test_broken", mods, "a module that did not import is a module, not nothing")
         self.assertTrue(all(v["seconds"] >= 0 for v in mods.values()))
 
+    @NEEDS_RESOURCE
     def test_named_modules_run_as_discover_names_them_and_only_those(self):
         r, s = run_toy("test_green")
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual((s["ran"], s["failures"], s["errors"], s["skipped"]), (2, [], [], 0))
         self.assertEqual(list(s["modules"]), ["test_green"])
         self.assertTrue(s["successful"])
+
+    def test_the_runner_compiles_on_every_os(self):
+        """The two subprocess tests skip where `resource` is absent, so a syntax break in the runner would go unseen
+        there: compiling the file (bytecode to a scratch path, never beside the source) keeps that caught on every OS."""
+        with tempfile.TemporaryDirectory() as d:
+            out = py_compile.compile(str(RUNNER), cfile=str(pathlib.Path(d) / "linux_suite_guest.pyc"), doraise=True)
+            self.assertTrue(pathlib.Path(out).exists())
 
 
 if __name__ == "__main__":

@@ -169,25 +169,24 @@ def load(data: Mapping) -> Project:
     problems: list[str] = []    # ROADMAP-2.2 G7: every object is loaded and every contract compiled; one raise, all of it
     requirements: dict[str, Requirement] = {}
     contracts: dict[str, BehaviorContract] = {}
-    loaded_approvals: list[ContractApproval] = []
     for kind, make in (("requirements", lambda r: (r["id"], Requirement(**r))),     # the id is read first, as the
-                       ("contracts", lambda c: (c["id"], BehaviorContract.from_json(c))),   # dict comprehension did
-                       ("approvals", lambda a: (None, ContractApproval(**a)))):     # model_reviews: the approval's own tuple
+                       ("contracts", lambda c: (c["id"], BehaviorContract.from_json(c)))):  # dict comprehension did
         for item in data[kind]:
             try:
                 key, obj = make(item)
             except (KeyError, TypeError, ValueError) as e:
                 problems.append(f"the bundle's kernel objects do not load: {type(e).__name__}: {e}")
                 continue
-            if kind == "requirements":
-                requirements[key] = obj
-            elif kind == "contracts":
-                contracts[key] = obj
-            else:
-                loaded_approvals.append(obj)
+            (requirements if kind == "requirements" else contracts)[key] = obj
+    approvals: tuple[ContractApproval, ...] = ()
+    try:
+        # exactly this comprehension: MIGRATE_NEVER_APPROVES (validation/qualification/authority_limits.py) proves a
+        # migration only RE-LOADS the input's approvals by this one shape — ContractApproval(**a) over data["approvals"]
+        approvals = tuple(ContractApproval(**a) for a in data["approvals"])     # model_reviews: the approval's own tuple
+    except (KeyError, TypeError, ValueError) as e:
+        problems.append(f"the bundle's kernel objects do not load: {type(e).__name__}: {e}")
     if problems:
         raise BundleError(problems[0] if len(problems) == 1 else "\n".join(problems))
-    approvals = tuple(loaded_approvals)
     try:
         plan = _plan(data["plan"])
     except (KeyError, TypeError, ValueError) as e:

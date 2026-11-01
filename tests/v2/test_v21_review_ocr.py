@@ -102,9 +102,10 @@ class Process(unittest.TestCase):
     def test_the_environment_is_scrubbed_and_isolated(self):
         base = {"PATH": "/bin", "OCR_LLM_TOKEN": "t", "ANTHROPIC_AUTH_TOKEN": "a", "OTEL_EXPORTER_OTLP_ENDPOINT": "e",
                 "OCR_ENABLE_TELEMETRY": "1", "HOME": "/Users/me"}
-        env = O.environment(base, pathlib.Path("/iso"))
-        self.assertEqual(env, {"PATH": "/bin", "HOME": "/iso", "USERPROFILE": "/iso", "OCR_NO_UPDATE": "1"})
-        routed = O.environment({**base, "XDG_CONFIG_HOME": "/Users/me/.config"}, pathlib.Path("/iso"),
+        iso = pathlib.Path("/iso")      # environment() str()s it, and str(Path("/iso")) is "\\iso" on Windows
+        env = O.environment(base, iso)
+        self.assertEqual(env, {"PATH": "/bin", "HOME": str(iso), "USERPROFILE": str(iso), "OCR_NO_UPDATE": "1"})
+        routed = O.environment({**base, "XDG_CONFIG_HOME": "/Users/me/.config"}, iso,
                                {"url": "https://p.example/v1", "token": "k", "model": "m"})
         self.assertEqual(routed, env | {"OCR_LLM_URL": "https://p.example/v1", "OCR_LLM_TOKEN": "k", "OCR_LLM_MODEL": "m",
                                         "OCR_LLM_PROTOCOL": "openai"})    # the operator's token and XDG never pass

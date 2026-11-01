@@ -167,6 +167,8 @@ PASSING = [k for k in KILL if k != T.format("fails")]
 def build(base: pathlib.Path) -> pathlib.Path:
     root = base / "root"
     for rel, text in FILES.items():
+        if "\t" in rel and not POSIX:   # NTFS holds no control character in a name; only POSIX-gated tests read it
+            continue
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_text(text, encoding="utf-8")
     return root
@@ -377,7 +379,9 @@ class Merge(unittest.TestCase):
 
     def test_paths_are_made_relative_to_the_tree_under_either_spelling_and_what_is_outside_is_dropped(self):
         with tempfile.TemporaryDirectory() as t:
-            base = pathlib.Path(t)
+            # realpath'd: macOS tempdirs sit under the /var -> /private/var symlink, an unmodeled resolution layer;
+            # the only symlink this test exercises must be its own `link`
+            base = pathlib.Path(t).resolve()
             real = base / "real"
             real.mkdir()
             link = base / "link"
@@ -595,6 +599,7 @@ class Cli(unittest.TestCase):
         self.assertIn("none clears anything", err)
         self.assertEqual(sorted(D._read_set(self.dir / "R.json", self.head)), [T.format("nothing")])
 
+    @unittest.skipUnless(POSIX, "exercised on POSIX only")
     def test_a_live_mutation_record_is_not_a_change_of_the_tree(self):
         (self.root / "data/live.json").write_text("{}", encoding="utf-8")   # a record the runner's copy leaves out
         self.git("add", "-A")
@@ -606,6 +611,7 @@ class Cli(unittest.TestCase):
             with contextlib.redirect_stderr(io.StringIO()):
                 RS.head_of(self.root, None)
 
+    @unittest.skipUnless(POSIX, "exercised on POSIX only")
     def test_a_changed_tree_a_foreign_commit_and_a_bad_path_are_refused(self):
         (self.root / "data/a.txt").write_text("changed", encoding="utf-8")
         code, err = self.run_main("--files", T.format("nothing"))
@@ -616,6 +622,13 @@ class Cli(unittest.TestCase):
         self.assertEqual(self.run_main("--files", T.format("nothing"), "--commit", "0" * 40)[0], 2)
         self.assertEqual(self.run_main("--files", "../x.py")[0], 2)
         self.assertEqual(self.run_main("--files", "/etc/passwd")[0], 2)
+        self.assertFalse((self.dir / "R.json").exists())
+
+    def test_a_foreign_commit_is_refused_before_any_path_is_touched(self):
+        """main() refuses a --commit that is not HEAD before it opens or validates any file path, so this refusal
+        is path-free and runs on Windows too, where the siblings' path assertions cannot (build leaves out the
+        tab-named file NTFS refuses, and the rest of the toy repo is portable)."""
+        self.assertEqual(self.run_main("--files", T.format("nothing"), "--commit", "0" * 40)[0], 2)
         self.assertFalse((self.dir / "R.json").exists())
 
 

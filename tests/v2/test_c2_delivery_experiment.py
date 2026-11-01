@@ -47,12 +47,15 @@ BIG = {"provider_requests": 10**9, "turns": 10**9, "input_tokens": 10**15, "outp
 NOW = 1_800_000_000.0
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class PlanCorrection(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.b = pc.build()
         cls.rec = pc.record()
 
+    @sealing
     def test_the_committed_record_is_what_this_tree_derives(self):
         """B-03a: the committed v2.1 record is what this tree derives, exactly; the 2.0 record (made on the 2.0 kernel)
         is history — its blob is tag v2.0.0's, its verdict the recorded one."""

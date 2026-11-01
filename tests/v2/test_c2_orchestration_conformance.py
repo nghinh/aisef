@@ -713,9 +713,14 @@ class LedgerLockStories(unittest.TestCase):
 
 # ------------------------------------------------------------------------------------------- the record (case 15)
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
+
 @unittest.skipUnless((QUALIFICATION / "c2_orchestration_repair.py").exists(),
                      "validation/qualification is not in this tree (the mutation runner's copy); the suite runs it")
+
 class Record(unittest.TestCase):
+    @sealing
     def test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story(self):
         """Agreement is identity for six of the seven Cycle-1 items; the seventh is a fully PRE_SATISFIED story, which
         under K-PRESAT-001 runs no engineering-adequacy stage: it must differ from the old kernel by that stage and by
@@ -742,6 +747,7 @@ class Record(unittest.TestCase):
         self.assertEqual(old["raised"], "InvariantError: cycle 1 proves a story with exactly one probe factory")
         self.assertEqual((new["raised"], new["attempts"]), (None, ["COMMIT"]))
 
+    @sealing
     def test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds(self):
         """V2.0's named changes as before; 2.1's only as the committed ruling names them, at the bytes it names
         (v21_conformance_ruling.tolerated, mocked here); the (e) gate is B-03a's — the 2.0 acceptance kept as history and

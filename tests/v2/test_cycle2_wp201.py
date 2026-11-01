@@ -110,7 +110,10 @@ class ProbeRules(unittest.TestCase):
         self.assertTrue(any("not registered" in p for p in found), found)
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class Baseline(unittest.TestCase):
+    @sealing
     def test_the_committed_freeze_manifest_holds(self):
         self.assertEqual(cb.check(), [])
 

@@ -134,7 +134,10 @@ class Coverage(unittest.TestCase):
         self.assertEqual(sorted(m["spec"] for m in corpus), sorted(A.SPECS))
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class Record(unittest.TestCase):
+    @sealing
     def test_P5_8_committed_record_is_current(self):
         # V2.1 (owner B-03a): the admission engine digest moved, so the record current on this tree is the v2.1 one — the
         # aid's record() EXACTLY, no provenance tolerated, no probe-identity re-binding (it has no document); the accepted

@@ -168,6 +168,8 @@ class ConfiguredProfile(unittest.TestCase):
             self.assertNotIn(secret, out)
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class Checker(unittest.TestCase):
     def test_the_checker_passes_the_tree_and_refuses_a_forged_attestation(self):
         self.assertEqual(pf.check(ROOT), [])
@@ -192,6 +194,7 @@ class Checker(unittest.TestCase):
         profile["bars_sealing"] = not profile["bars_sealing"]
         self.assertTrue(pf.record_problems({"profiles": [profile]}))
 
+    @sealing
     def test_the_evidence_record_re_derives(self):
         from validation.qualification import c2_p10_profile as B
         self.assertEqual(B.check(), [])

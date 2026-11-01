@@ -59,7 +59,10 @@ class Approvals(unittest.TestCase):
         self.assertTrue(any("is not human:owner" in p for p in problems))
 
 
+from tests.v2.sealing_gate import sealing  # noqa: E402 — ROADMAP-2.2 F1: the sealing tier's gate
+
 class Acceptance(unittest.TestCase):
+    @sealing
     def test_the_acceptance_re_derives_on_this_tree(self):
         # V2.1 (owner B-03a): the owner's 2.0 acceptance is history (its v2.0.0 blob, its verdict, the closed C2-P5 history,
         # the approvals never rewritten); the boundary re-derives on this tree as the v2.1 re-verification, exactly
@@ -538,6 +541,7 @@ class KernelProvenance(unittest.TestCase):
         self.assertEqual((r["current"], sorted(r["differing_paths"])), (True, sorted([A.AID_PATH, A.PROVENANCE_PATH])))
         self.assertIsNotNone(A.aid_provenance())        # on this tree: the aid changed in calibrations() alone
 
+    @sealing
     def test_on_this_tree_the_committed_proposal_is_current(self):
         # V2.1 (owner B-03a): the admission engine moved (ProbeIdentityRebinding measures it), so the proposal current on
         # this tree is the v2.1 record — EXACTLY, with no kernel provenance, aid sha or probe-identity re-binding

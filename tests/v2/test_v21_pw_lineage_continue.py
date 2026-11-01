@@ -286,14 +286,15 @@ class TheRecordItself(Continuation):
         self.assertRegex(str(err), r"restore|faithful copy")        # what the operator does
         self.assertIn("nothing was written", str(err))              # the refusal changed nothing
         # a record that is there but cannot be read (an OSError that is not "not there"): EVIDENCE_UNREADABLE.
-        # A directory in its place raises IsADirectoryError — reachable without a permission mode, so as root too.
+        # A directory in its place raises IsADirectoryError (PermissionError on Windows, the same refusal) —
+        # reachable without a permission mode, so as root too.
         run = self.run_dir(self.delivered())
         (run / "RUN.json").unlink()
         (run / "RUN.json").mkdir()
         err = self.refused(run)
         self.assertEqual(getattr(err, "code", None), "EVIDENCE_UNREADABLE", str(err))
         self.assertIn("RUN.json", str(err))
-        self.assertIn("IsADirectoryError", str(err))               # why it could not be read
+        self.assertRegex(str(err), r"IsADirectoryError|PermissionError")    # why it could not be read, host-named
         self.assertRegex(str(err), r"restore read access|restore|copy")
         self.assertIn("nothing was written", str(err))
 

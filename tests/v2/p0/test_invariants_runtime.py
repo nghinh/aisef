@@ -69,7 +69,8 @@ class RuntimeArming(unittest.TestCase):
             "    pass    # past the guard: whatever the payload validation says is not the arming's subject\n"
             "print('ARMED-AND-OPEN')\n"
         )
-        p = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True, timeout=120)
+        p = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", timeout=120)
         self.assertEqual((p.returncode, p.stdout.strip()[-14:]), (0, "ARMED-AND-OPEN"), p.stderr[-2000:])
 
     def test_a_registry_that_does_not_register_arms_nothing(self):

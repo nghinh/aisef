@@ -47,8 +47,10 @@ if str(ROOT / "validation" / "v2") not in sys.path:
 import cleanup_authority as ca  # noqa: E402  — INV-MUTATION-AUTHORITY: what the measurement reports is never permission
 
 #: what a run may ask for: the shared network (a session must reach its provider); "none" is measurement-only
-SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
-OCR = {"exe": "/opt/ocr", "sha256": "0" * 64, "timeout_min": 1, "max_tokens": 9}
+#: the two binaries by paths absolute on the HOST (settings.load refuses a relative one, and "/usr/bin/bwrap" is
+#: relative on Windows — no drive): nothing ever runs them, tests that run substitute their own
+SPEC = {"backend": "bwrap", "bwrap": str(pathlib.Path(tempfile.gettempdir(), "bwrap")), "network": "host", "read_only": []}
+OCR = {"exe": str(pathlib.Path(tempfile.gettempdir(), "ocr")), "sha256": "0" * 64, "timeout_min": 1, "max_tokens": 9}
 #: a "bubblewrap" that confines nothing: it drops every option and runs the command
 NOT_A_SANDBOX = '#!/bin/sh\nwhile [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done\n[ $# -gt 0 ] || exit 0\nshift\nexec "$@"\n'
 #: a "bubblewrap" for the tests that must never run anything under it: it runs no command, so a measurement that
@@ -625,7 +627,7 @@ class FailClosed(unittest.TestCase):
 
     def test_each_check_refuses_on_its_own(self):
         """One departure at a time from a clean measurement: each check names it (none of them may be dropped)."""
-        ws = pathlib.Path("/w/ws")
+        ws = pathlib.PurePosixPath("/w/ws")     # the report models a LINUX sandbox: its paths stay POSIX on any host
 
         def judged(change=lambda rep, tries: None, out="", home="/nonexistent"):
             rep = {"network": "host", "created_outside_workspace": {"kernel": False}, "setsid_survivors": [],
@@ -696,7 +698,7 @@ class FailClosed(unittest.TestCase):
     def test_a_check_that_did_not_run_is_a_problem_never_a_pass(self):
         """The user-namespace denial counts only when the kernel's refusal is seen; unshare absent or no try at all
         is 'not measured'; and the mounts must be what the wrapper names."""
-        ws = pathlib.Path("/w/ws")
+        ws = pathlib.PurePosixPath("/w/ws")     # the report models a LINUX sandbox: its paths stay POSIX on any host
         rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [], "host_mounts": rows.HOST,
                "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0"),
                           "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),

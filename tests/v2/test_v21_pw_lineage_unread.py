@@ -125,9 +125,10 @@ class UnreadContract:
     superseded by the claimant's absence, superseded only by the operator naming the claim's sha256. A mixin: the
     concrete class gives `variants()`, a name -> a function that makes the child's evidence such a state."""
 
-    def each(self, check) -> None:
-        """`check(name)` for each variant, on a predecessor, a child and a new run of its own (nothing is shared)."""
-        variants = self.variants()
+    def each(self, check, variants: dict | None = None) -> None:
+        """`check(name)` for each variant (every `self.variants()` unless a test narrows to its own subset), on a
+        predecessor, a child and a new run of its own (nothing is shared)."""
+        variants = self.variants() if variants is None else variants
         self.assertTrue(variants)
         for n, (name, make) in enumerate(variants.items()):
             with self.subTest(name):
@@ -467,7 +468,10 @@ class ChildEvidenceThatIsThereAndDamaged(UnreadContract, Lineage):
     by the claimant's absence. Something stands on the journal's path: it is evidence there and damaged (UNREAD). What
     is genuinely not there stays an absence (`WhatStaysAsItWas`, `NothingOnThePathIsStillAbsent`)."""
 
-    def variants(self) -> dict:
+    def _link_variants(self) -> dict:
+        """The damage only `os.symlink` can make — a privilege on Windows unless Developer Mode grants it, so these
+        run behind the capability probe of `..._a_link_stands_there` (and skip per-variant through `self.link`
+        wherever the mixin's own tests reach them)."""
         def dangling_link() -> None:
             self.link(self.child / "nowhere.jsonl", self.journal_path())
 
@@ -478,6 +482,12 @@ class ChildEvidenceThatIsThereAndDamaged(UnreadContract, Lineage):
             (self.child / "run").mkdir(parents=True)
             self.link(self.root / "no-such-directory", self.child / "run" / "journals")
 
+        return {"the journal is a link that leads nowhere": dangling_link,
+                "the journal is a link that loops": looping_link,
+                "journals is a link that leads nowhere": link_to_nothing_in_place_of_the_directory}
+
+    def _file_variants(self) -> dict:
+        """The file-shaped damage: plain files where directories belong, makeable on every OS and user."""
         def the_child_is_a_file() -> None:
             self.child.write_text("not a run directory", encoding="utf-8")
 
@@ -489,22 +499,34 @@ class ChildEvidenceThatIsThereAndDamaged(UnreadContract, Lineage):
             (self.child / "run").mkdir(parents=True)
             (self.child / "run" / "journals").write_text("not a directory", encoding="utf-8")
 
-        return {"the journal is a link that leads nowhere": dangling_link,
-                "the journal is a link that loops": looping_link,
-                "journals is a link that leads nowhere": link_to_nothing_in_place_of_the_directory,
-                "the child's path is a file": the_child_is_a_file,
+        return {"the child's path is a file": the_child_is_a_file,
                 "run is a file": run_is_a_file,
                 "journals is a file": journals_is_a_file}
 
+    def variants(self) -> dict:
+        return {**self._link_variants(), **self._file_variants()}
+
+    def _the_cause(self, _name: str) -> None:
+        self.claim_by(self.child)
+        state, why = lineage.child_evidence(self.child)
+        self.assertEqual(state, lineage.UNREAD)
+        self.assertRegex(why, r"link that leads nowhere|is not a directory")
+        self.assertIn(str(self.child), why)
+        self.assertIn(why, self.assert_not_superseded((self.pred / lineage.CLAIM).read_bytes()))
+
     def test_the_cause_says_what_stands_where_the_journal_should_be(self):
-        def check(_name: str) -> None:
-            self.claim_by(self.child)
-            state, why = lineage.child_evidence(self.child)
-            self.assertEqual(state, lineage.UNREAD)
-            self.assertRegex(why, r"link that leads nowhere|is not a directory")
-            self.assertIn(str(self.child), why)
-            self.assertIn(why, self.assert_not_superseded((self.pred / lineage.CLAIM).read_bytes()))
-        self.each(check)
+        """The file-shaped half runs everywhere: no capability, mode or privilege is needed to put a file there."""
+        self.each(self._the_cause, self._file_variants())
+
+    def test_the_cause_says_what_stands_where_the_journal_should_be_when_a_link_stands_there(self):
+        """The symlink half of the same contract, behind a real capability probe: `os.symlink` is a privilege on
+        Windows without Developer Mode, and probing it once up front makes the absence a skip before any fixture is
+        half-built — a host that can link (Developer-Mode Windows included) runs all three."""
+        try:
+            os.symlink(self.root / "nowhere", self.root / "symlink-probe")
+        except (OSError, NotImplementedError) as e:
+            self.skipTest(f"no symbolic links here ({type(e).__name__})")
+        self.each(self._the_cause, self._link_variants())
 
 
 class NothingOnThePathIsStillAbsent(Lineage):
