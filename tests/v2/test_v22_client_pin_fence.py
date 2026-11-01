@@ -6,12 +6,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import pathlib
 import tempfile
 import unittest
 from unittest import mock
 
 from aisef2.app import client, settings
+
+#: an absolute path on THIS host (the pin's validator is os-native `PurePath.is_absolute`: "/x" has no drive on NT)
+EXE = str(pathlib.Path(tempfile.gettempdir(), "opencode"))
 
 BASE = {"format": "aisef-v2-run/1", "client": "opencode", "route": "prov/m",
         "provider": {"name": "prov", "endpoint": "https://api.example/v1", "api_key_env": None,
@@ -31,14 +35,14 @@ class PinSetting(unittest.TestCase):
 
     def test_the_pin_is_an_absolute_path_and_a_sha256(self):
         for bad in ({"exe": "opencode", "sha256": "a" * 64},            # not absolute
-                    {"exe": "/x/opencode", "sha256": "A" * 64},         # not lowercase hex
-                    {"exe": "/x/opencode", "sha256": "a" * 63},         # not 64
-                    {"exe": "/x/opencode"},                             # not closed
-                    {"exe": "/x/opencode", "sha256": "a" * 64, "extra": 1}):
+                    {"exe": EXE, "sha256": "A" * 64},                   # not lowercase hex
+                    {"exe": EXE, "sha256": "a" * 63},                   # not 64
+                    {"exe": EXE},                                       # not closed
+                    {"exe": EXE, "sha256": "a" * 64, "extra": 1}):
             with self.assertRaises(settings.SettingsError):
                 settings.load({**BASE, "client_pin": bad})
-        s = settings.load({**BASE, "client_pin": {"exe": "/x/opencode", "sha256": "a" * 64}})
-        self.assertEqual(s.client_pin, {"exe": "/x/opencode", "sha256": "a" * 64})
+        s = settings.load({**BASE, "client_pin": {"exe": EXE, "sha256": "a" * 64}})
+        self.assertEqual(s.client_pin, {"exe": EXE, "sha256": "a" * 64})
 
 
 class FenceSetting(unittest.TestCase):
@@ -54,9 +58,9 @@ class FenceSetting(unittest.TestCase):
     def test_run_scoped_xdg_moves_data_state_cache_and_never_config(self):
         plain = client.environment((), {"a": 1})
         scoped = client.environment((), {"a": 1}, xdg_home="/run/client-xdg")
-        self.assertEqual(scoped["XDG_DATA_HOME"], str(pathlib.PurePath("/run/client-xdg", "data")))
-        self.assertEqual(scoped["XDG_STATE_HOME"], str(pathlib.PurePath("/run/client-xdg", "state")))
-        self.assertEqual(scoped["XDG_CACHE_HOME"], str(pathlib.PurePath("/run/client-xdg", "cache")))
+        self.assertEqual(scoped["XDG_DATA_HOME"], os.path.join("/run/client-xdg", "data"))      # the product joins
+        self.assertEqual(scoped["XDG_STATE_HOME"], os.path.join("/run/client-xdg", "state"))    # with os.path.join,
+        self.assertEqual(scoped["XDG_CACHE_HOME"], os.path.join("/run/client-xdg", "cache"))    # asserted as such
         self.assertEqual(scoped.get("XDG_CONFIG_HOME"), plain.get("XDG_CONFIG_HOME"))
         self.assertEqual(client.environment((), {"a": 1}), plain)      # no xdg_home: byte-for-byte 2.0.0
 

@@ -310,6 +310,11 @@ class WhatIsKept(Scratch):
         sink, _ = self.see(refuted(deep))
         (d,) = self.docs()
         self.assertEqual((sink.written, sink.not_written), (1, 0))
+        try:
+            json.loads(deep)
+        except RecursionError:   # 3.11's C parser gives up before the cut can apply: the detail is the probe's own
+            self.assertEqual(d["observation"]["detail"], deep)         # text, the same rule as "{broken"
+            return
         self.assertIn(f"<nested deeper than {V.DEPTH_MAX} levels>", json.dumps(d["observation"]["detail"]))
         self.assertLess(json.dumps(d).count("["), 2 * V.DEPTH_MAX)      # the file holds the cut, not 3,000 levels
 

@@ -187,7 +187,7 @@ class TreeOf(_Reviewer):
         import hashlib
         repo = self.tmp / "repo"
         (repo / "sub").mkdir()
-        (repo / "sub" / "f.txt").write_text("x\n")
+        (repo / "sub" / "f.txt").write_bytes(b"x\n")    # bytes: text mode would write x\r\n on NT
         t = ad.tree_of(str(repo))
         self.assertEqual(t["sub"], "dir")
         self.assertEqual(t["sub/f.txt"], hashlib.sha256(b"x\n").hexdigest())

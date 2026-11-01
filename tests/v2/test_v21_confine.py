@@ -47,9 +47,10 @@ if str(ROOT / "validation" / "v2") not in sys.path:
 import cleanup_authority as ca  # noqa: E402  — INV-MUTATION-AUTHORITY: what the measurement reports is never permission
 
 #: what a run may ask for: the shared network (a session must reach its provider); "none" is measurement-only
-#: the two binaries by paths absolute on the HOST (settings.load refuses a relative one, and "/usr/bin/bwrap" is
-#: relative on Windows — no drive): nothing ever runs them, tests that run substitute their own
-SPEC = {"backend": "bwrap", "bwrap": str(pathlib.Path(tempfile.gettempdir(), "bwrap")), "network": "host", "read_only": []}
+#: bwrap models a LINUX path on any host (confine.problem pins `startswith("/")`: the backend is Linux-only, so an
+#: NT path is rightly refused); the OCR exe runs through the os-native `PurePath.is_absolute` check, so it is a path
+#: absolute on THIS host. Nothing ever runs either binary; tests that run substitute their own.
+SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
 OCR = {"exe": str(pathlib.Path(tempfile.gettempdir(), "ocr")), "sha256": "0" * 64, "timeout_min": 1, "max_tokens": 9}
 #: a "bubblewrap" that confines nothing: it drops every option and runs the command
 NOT_A_SANDBOX = '#!/bin/sh\nwhile [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done\n[ $# -gt 0 ] || exit 0\nshift\nexec "$@"\n'
