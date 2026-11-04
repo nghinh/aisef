@@ -53,7 +53,7 @@ KEYS = ("format", "client", "route", "provider", "client_env", "budget", "max_tu
 #:   (ROADMAP-2.2 G2): limits DECLARED to the client through its environment (OPENCODE_PERMISSION, run-scoped
 #:   XDG data/state/cache — never XDG_CONFIG_HOME, which resolves the provider key — and an output-token ceiling).
 #:   Enforcement is the client's own and is not measured by the run; the record says so. Absent: 2.0.0's environment
-OPTIONAL = ("review", "prices", "confinement", "client_pin", "client_fence")
+OPTIONAL = ("review", "prices", "confinement", "client_pin", "client_fence", "max_cost")
 FENCE_KEYS = ("external_directory", "output_token_max", "xdg")
 #: what an absent `review` means: 2.0.0's rule (no finding blocks), named, never a silent default
 REVIEW_ABSENT = {"policy": "advisory", "min_severity": "critical", "finder": "model", "ocr": None, "given": False}
@@ -117,6 +117,12 @@ class Settings:
         return self.content.get("prices")
 
     @property
+    def max_cost(self) -> float | None:
+        """ROADMAP-2.2 C2: the operator's live dollar ceiling, enforced by Budget against the price table (load()
+        refuses it without prices). None: no cost ceiling — the budget is 2.0.0's four counters, byte for byte."""
+        return self.content.get("max_cost")
+
+    @property
     def model(self) -> str:
         return self.route.split("/", 1)[1]
 
@@ -160,6 +166,12 @@ def load(data: Mapping) -> Settings:
         why = price_problem(data["prices"])
         if why:
             raise SettingsError(why)
+    if "max_cost" in data:      # ROADMAP-2.2 C2: the live dollar ceiling (Budget enforces it against the price table)
+        mc = data["max_cost"]
+        if isinstance(mc, bool) or not isinstance(mc, (int, float)) or not math.isfinite(mc) or mc <= 0:
+            raise SettingsError("max_cost is a positive amount of money, in the price table's currency")
+        if "prices" not in data:    # without a price table every cost is unknown: fail closed at the door
+            raise SettingsError("max_cost needs a price table (prices): without it cost is unknown — fail closed")
     if "confinement" in data:
         from aisef2.app.confine import problem
         why = problem(data["confinement"])

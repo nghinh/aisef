@@ -133,10 +133,14 @@ def read_session(log: pathlib.Path) -> dict:
 class Budget:
     KEYS = ("provider_requests", "turns", "input_tokens", "output_tokens")
 
-    def __init__(self, limits: dict, base: dict, logs: pathlib.Path, requests=lambda: 0, inherited: dict | None = None) -> None:
+    def __init__(self, limits: dict, base: dict, logs: pathlib.Path, requests=lambda: 0, inherited: dict | None = None,
+                 prices: dict | None = None, max_cost: float | None = None) -> None:
         if sorted(limits) != sorted(self.KEYS) or sorted(k for k in base if k in self.KEYS) != sorted(self.KEYS):
             raise ValueError("a budget has the four ceilings, and a base that accounts for each of them")
         self.limits, self.base, self.logs, self.requests = dict(limits), {k: int(base[k]) for k in self.KEYS}, logs, requests
+        #: ROADMAP-2.2 C2: the live dollar ceiling and the price table it is computed with. max_cost None (settings gives
+        #: none) ⇒ no cost key is added and the ceiling is the four counters, byte for byte — 2.0.0's budget.
+        self.prices, self.max_cost = prices, max_cost
         #: V2.1: what the lineage this run continues spent (app/lineage) — continuing never resets a ceiling
         self.inherited = {k: int((inherited or {}).get(k, 0)) for k in self.KEYS}
         #: what the lineage's account lists as unknown and the operator accepted by name: the ceilings are then
@@ -160,11 +164,36 @@ class Budget:
             if p != live and not x["turns"]:
                 unaccounted.append(f"{p.name}: a session that started finished no step — what it sent is unknown")
         inh = self.inherited
-        return {"provider_requests": self.base["provider_requests"] + inh["provider_requests"] + recorded,
-                "turns": self.base["turns"] + inh["turns"] + sum(x["turns"] for x in seen.values()),
-                "input_tokens": self.base["input_tokens"] + inh["input_tokens"] + sum(x["tokens"]["input"] for x in seen.values()),
-                "output_tokens": self.base["output_tokens"] + inh["output_tokens"] + sum(x["tokens"]["output"] for x in seen.values()),
-                "sessions_started": len(logs), "requests_recorded": recorded, "unaccounted": unaccounted}
+        out = {"provider_requests": self.base["provider_requests"] + inh["provider_requests"] + recorded,
+               "turns": self.base["turns"] + inh["turns"] + sum(x["turns"] for x in seen.values()),
+               "input_tokens": self.base["input_tokens"] + inh["input_tokens"] + sum(x["tokens"]["input"] for x in seen.values()),
+               "output_tokens": self.base["output_tokens"] + inh["output_tokens"] + sum(x["tokens"]["output"] for x in seen.values()),
+               "sessions_started": len(logs), "requests_recorded": recorded, "unaccounted": unaccounted}
+        if self.max_cost is not None:   # C2: the dollar figure the ceiling is read against — only when the operator set one
+            out["cost"], out["max_cost"] = self._cost(logs, live), self.max_cost
+        return out
+
+    def _cost(self, logs: list, live: pathlib.Path | None) -> float | None:
+        """The run's spend in money (base + inherited + the sessions), computed from the five token classes against the
+        price table — the SAME reading as the account (`usage.session_tokens`/`_usd`). None when a session's cost is
+        unknown (a finished step reported no tokens, or a session finished no step): that session is also `unaccounted`,
+        so the run stops regardless (fail-closed); the figure is None so no partial number is mistaken for the total.
+        The preflight and the inherited lineage are priced as input/output (no cache class is recorded for them), as
+        the account prices the preflight."""
+        from aisef2.app import usage
+        total = dict.fromkeys(usage.CLASSES, 0)
+        known = True
+        for p in logs:
+            s = usage.session_tokens(p)
+            for k in usage.CLASSES:
+                total[k] += s["tokens"][k]
+            if s["steps_without_tokens"] or (p != live and s["steps"] == 0):
+                known = False
+        if not known:
+            return None
+        pre_inh = {"input": self.base["input_tokens"] + self.inherited["input_tokens"], "cache_read": 0, "cache_write": 0,
+                   "output": self.base["output_tokens"] + self.inherited["output_tokens"], "reasoning": 0}
+        return round(usage._usd(total, self.prices) + usage._usd(pre_inh, self.prices), 6)
 
     def reached(self, live: pathlib.Path | None = None, in_progress: bool = False) -> str | None:
         """Why the run must end now — a ceiling reached, or spend that cannot be accounted for — or None. While a
@@ -175,6 +204,8 @@ class Budget:
         for k in self.KEYS:
             if spent[k] > self.limits[k] or (spent[k] == self.limits[k] and not (in_progress and k == "provider_requests")):
                 return f"max_{k}: {spent[k]} of {self.limits[k]}"
+        if self.max_cost is not None and spent.get("cost") is not None and spent["cost"] >= self.max_cost:
+            return f"max_cost: {spent['cost']} of {self.max_cost}"   # at or past the dollar ceiling: no more work starts
         return None
 
     def exceeded(self) -> str | None:
@@ -186,6 +217,8 @@ class Budget:
         for k in self.KEYS:
             if spent[k] > self.limits[k]:
                 return f"max_{k} exceeded: {spent[k]} of {self.limits[k]}"
+        if self.max_cost is not None and spent.get("cost") is not None and spent["cost"] > self.max_cost:
+            return f"max_cost exceeded: {spent['cost']} of {self.max_cost}"
         return None
 
     def account(self) -> dict:

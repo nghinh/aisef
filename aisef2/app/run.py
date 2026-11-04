@@ -634,7 +634,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         ws, merger = GitWorkspace(repo, work / "ws"), GitMerger(repo, "main", work / "merge")
         logs = out / "sessions"
         budget = client.Budget(settings.budget, pre["accounting"], logs,
-                               lambda: sum(1 for e in run.events if e.type == "provider/request"), inherited)
+                               lambda: sum(1 for e in run.events if e.type == "provider/request"), inherited,
+                               prices=settings.prices, max_cost=getattr(settings, "max_cost", None))   # C2: dollar ceiling
         # ROADMAP-2.2 G2: the fence the settings declare — run-scoped XDG data/state/cache (never CONFIG, which
         # resolves the provider key), a per-worktree OPENCODE_PERMISSION composed in client.session where the cwd is
         # known (the run's repo is allowed: a worktree's .git file points into it), and an output-token ceiling
