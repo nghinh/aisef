@@ -1,0 +1,37 @@
+{
+  "record": "AISEF V2 — ROADMAP-2.2 WAVE-2 lane Findings (owner item 4): analysis only; the kernel is frozen and no kernel code is changed here. Each item is for an owner remediation decision.",
+  "findings": [
+    {
+      "id": "FINDING-WIN-OSKILL-001",
+      "title": "os.kill(pid, 0) is a killing call on Windows, not an existence probe",
+      "severity": "latent (not reachable by any claimed/tested path today; reachable by a real `aisef run` on Windows)",
+      "site": "aisef2/app/client.py:46, _is_gone() — the escapee existence probe called from _release_session() on a RangeEscaped teardown",
+      "intended_behavior": "_is_gone is a PURE existence probe: its docstring states 'Never signals the process: signal 0 only asks whether the pid exists for us', and the module header says 'Nothing is ever signalled here'. This is the range teardown contract (P4-LIFETIME-SEMANTICS §3) and INV-MUTATION-AUTHORITY: a probe must never expand into a signal.",
+      "actual_on_windows": "CPython maps os.kill(pid, sig) on Windows, for any sig other than CTRL_C_EVENT/CTRL_BREAK_EVENT, to OpenProcess + TerminateProcess(handle, sig). So os.kill(pid, 0) on a LIVE pid calls TerminateProcess(handle, 0): it TERMINATES the process (exit code 0) and returns success. _is_gone then returns False ('cannot prove gone -> alive'), so the caller both KILLED the escapee and reported it still alive — an unauthorized signal from a probe, violating the stated invariant.",
+      "reachability_analysis": {
+        "range_has_a_windows_path": "yes — ProcessRange uses _Job (a Windows Job Object) where POSIX uses _Posix (aisef2/runtime/process_range.py).",
+        "process_table_on_windows": "process_table() is '/proc on Linux, ps elsewhere' (process_range.py:117-119); Windows has no `ps`, so _ps_table() raises, _is_gone catches it (present=None) and ALWAYS falls through to the os.kill branch — so on Windows the hazard is the common path, not an edge.",
+        "exercised_today": "NO. The range/escapee tests are @skipUnless(posix) so they never run on the Windows CI leg; the wheel/product smoke runs only on ubuntu; `aisef run` is documented for Linux and macOS (docs/v2/USAGE.md). So no claimed or tested path reaches it.",
+        "real_risk": "a user who runs `aisef run` on Windows and whose session process escapes its Job Object range and is seen alive at release would have it TerminateProcess'd by the teardown probe — an unauthorized kill, and a mis-report ('alive' after killing it)."
+      },
+      "proposed_remediation_NOT_APPLIED": "Guard the probe by platform: on POSIX keep os.kill(pid, 0); on Windows replace it with a non-killing existence check (OpenProcess(SYNCHRONIZE|PROCESS_QUERY_LIMITED_INFORMATION) + GetExitCodeProcess via ctypes, treating STILL_ACTIVE as alive and a closed/absent handle as gone) — never TerminateProcess. Alternatively, make the escapee path POSIX-only and have the Windows Job Object teardown carry its own non-killing liveness check. Either is a kernel change; the kernel is frozen, so this awaits an owner decision.",
+      "owner_decision_needed": true
+    },
+    {
+      "id": "OPEN-FREEZE-MANIFEST-V2_007",
+      "title": "freeze_manifest V2_007 promoted_from.sha256 does not match the dossier's _lf_sha",
+      "status": "OPEN (carried from wave 1; no change here)",
+      "detail": "The V2_007 freeze-manifest exception records a promoted_from.sha256 that differs from the dossier's LF-normalized sha (_lf_sha). It is a provenance-record drift, not a product defect.",
+      "remediation_plan": "Re-derive the two shas on this tree, confirm which is the authentic LF-normalized digest of the promoted source, and correct the stale field with an append-only correction record (never rewrite the sealed manifest). Prepare the evidence (both digests + the bytes they are over) for owner review before any edit. No reseal without separate owner approval.",
+      "owner_decision_needed": true
+    },
+    {
+      "id": "OPEN-Q5-KERNEL-COMPARISON-STALE",
+      "title": "Q5-KERNEL-COMPARISON.json is stale after wave-1/wave-2 kernel changes",
+      "status": "OPEN (carried from wave 1; wave 2 changed client.py/settings.py/feedback.py/adapters.py, so it is staler)",
+      "detail": "The kernel-comparison record was written against an earlier kernel; the wave edits make its digests no longer match the tree. It is a record-currency item, part of the sealing tier's remit.",
+      "remediation_plan": "Re-run validation/qualification/v21_q5_compare.py --write (the owner/lead's act) to refresh the comparison against the current kernel, as part of the owner's reseal of the record-currency tier. Not done here: reseal is owner-gated.",
+      "owner_decision_needed": true
+    }
+  ]
+}
