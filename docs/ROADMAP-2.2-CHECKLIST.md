@@ -57,6 +57,13 @@
 
 Owner chốt 2026-11-01 ("Đồng ý, làm đi") theo mặc định đề xuất. Muốn đảo quyết định nào thì đảo **trước khi đợt liên quan khởi công**. Đợt 1 không phụ thuộc quyết định nào.
 
+**Owner directive 2026-11-04 — duyệt khép Đợt 1 + khởi công Đợt 2** (spec đông cứng: `docs/implementation/v2/ROADMAP-2.2-WAVE-2-SPEC.md`):
+- Mutation: duyệt bổ sung kill test đã có vào TARGETS; re-run target bị ảnh hưởng, phân loại KILLED/SURVIVED/**EQUIVALENT**; KHÔNG giảm phạm vi / nới tiêu chí; lưu evidence trước+sau.
+- CI: 4 nhóm đỏ (Proc×2, FailClosed, read_set) vào Đợt 2 xử lý gốc; KHÔNG allowlist mới nếu chưa chứng minh không ảnh hưởng correctness; phân biệt lỗi thật/flaky/platform/sealing-chủ-đích; **KHÔNG tuyên bố CI PASS khi job bắt buộc còn đỏ**.
+- Thứ tự Đợt 2: **C2 (gate) → B1 → B3+G5 → B7 → C3a/C4/C9**. Trần 2 lượt paid ≤ **$60**. **C2 chưa chứng minh kiểm soát chi phí ⇒ chưa được live paid run.**
+- Findings: os.kill(pid,0) Windows lập finding + phân tích tác động trước khi đề xuất sửa kernel; freeze_manifest + Q5-COMPARISON giữ OPEN có phương án evidence; KHÔNG reseal/tag v2.2 nếu chưa phê duyệt riêng.
+- Báo cáo cuối Đợt 2: commit SHA, CI, mutation, live PASS/FAIL, verification, USD thật, blocker, QĐ cần owner. KHÔNG tự sang Đợt 3.
+
 ---
 
 ## ĐỢT 1 — Trung thực + tín hiệu (ước 1–1,5 tuần)
@@ -87,7 +94,10 @@ Owner chốt 2026-11-01 ("Đồng ý, làm đi") theo mặc định đề xuất
 - [ ] **C3a** — no_progress → 1 dòng trong retry prompt ("N attempt fail với bằng chứng y hệt — đổi cách tiếp cận"); text thuần từ journal, không authority (S)
 - [ ] **C4** — Chặn attempt no-op: candidate == base (so SHA) ⇒ skip quality/review/scan, route DEVELOPER failure tại điểm đo CANDIDATE, tái dùng probe result của admission (S)
 - [ ] **C9** — Spend của stuck-retry tính vào trần tiền C2 (quyết định retry vẫn thuộc taxonomy) (S)
-- [ ] **ĐO CUỐI ĐỢT 2**
+- [ ] **Lane M (mutation registry)** — đăng ký kill test v22/invariants đã có vào TARGETS + target mới (tripwire, registry arming, _invariant_problems); re-measure; phân loại KILLED/SURVIVED/EQUIVALENT; evidence trước+sau *(owner item 1)*
+- [ ] **Lane CI (root-cause)** — Proc×2 (`leaked`), FailClosed (flaky teardown), read_set (opened set); phân loại + sửa gốc; sealing giữ đỏ-chủ-đích *(owner item 2)*
+- [ ] **Findings** — os.kill(pid,0) Windows (finding + phân tích, chưa sửa kernel); freeze_manifest V2_007 + Q5-COMPARISON (OPEN, phương án evidence) *(owner item 4)*
+- [ ] **ĐO CUỐI ĐỢT 2** — ruff + full suite + mutation + CI (KHÔNG tuyên bố PASS khi job bắt buộc đỏ) + USD thật + báo cáo owner (commit/CI/mutation/PASS-FAIL/verification/USD/blocker/QĐ)
 
 ## ĐỢT 3 — Adoption / authoring (ước 2–2,5 tuần)
 
@@ -145,4 +155,6 @@ Owner chốt 2026-11-01 ("Đồng ý, làm đi") theo mặc định đề xuất
 | 2026-11-02 | ĐO CUỐI ĐỢT 1 lượt 1: 7 đỏ wave-induced → bisect 4 nguyên nhân (anchor import adapters; fixture A22 thiếu kernel_digest+invariants; 2 test p5 cần clear cả _RUNTIME_ARMED; Classify historical = record-currency → sealing tier) | 5cc65720 |
 | 2026-11-02 | ĐO CUỐI ĐỢT 1 lượt 2 XANH: 8031 test, 1 fail = HistoricalAttempt4 (local-only), 56 skip, owned processes sạch. Push master dd95a762→5cc65720; mutation targeted 9 target/1622 mutant phóng 01:47 trên 4 worker clone | 5cc65720, CI 41338480741 |
 | 2026-11-02 | CI lượt 1 lộ Windows 0→11 đỏ (hồi quy wave: fixture F3 + 2 test v22) → sửa test-side 2 nhịp; chốt **unit windows-3.11 XANH**, POSIX chỉ còn đỏ-có-sẵn (Proc×2, FailClosed flake, read_set intermittent); pm8 depth 3.11 sửa xong | 79660c8f, 5ff67a33, CI 41352680305 |
-| 2026-11-04 | Mutation targeted XONG (~48h): 9 target / 1651/1910 killed / 259 survivor (code mới, kill test chưa đăng ký) / 0 INFRA; 3 survivor gốc F4 KILLED; record mới v2.2/WAVE1-MUTATION.json. **ĐỢT 1 KHÉP** — chờ owner duyệt báo cáo + quyết 3 việc: đăng ký kill set mới, nhóm đỏ CI có sẵn vào Đợt 2, khởi công Đợt 2 | (commit này) |
+| 2026-11-04 | Mutation targeted XONG (~48h): 9 target / 1651/1910 killed / 259 survivor (code mới, kill test chưa đăng ký) / 0 INFRA; 3 survivor gốc F4 KILLED; record mới v2.2/WAVE1-MUTATION.json. **ĐỢT 1 KHÉP** — chờ owner duyệt báo cáo + quyết 3 việc: đăng ký kill set mới, nhóm đỏ CI có sẵn vào Đợt 2, khởi công Đợt 2 | db922fed |
+| 2026-11-04 | CI @db922fed đúng hình: lint+wheel+windows XANH, sealing đỏ-chủ-đích, 3.13 chỉ còn đỏ-có-sẵn (Proc×2, FailClosed), macos bị runner huỷ (hạ tầng). 0 đỏ mới từ commit evidence | run 41698412997 |
+| 2026-11-04 | **Owner duyệt khép Đợt 1 + khởi công Đợt 2.** Model đổi sang Opus 4.8. Freeze WAVE-2 spec (7 lane: M mutation, CI, C2 gate, B3+G5, C3a/C4/C9, PAID B1+B7, Findings). C2 là gate paid; trần $60 | (commit này) |
