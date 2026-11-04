@@ -187,6 +187,8 @@ def build_parser() -> argparse.ArgumentParser:
                                "see docs/v2/USAGE.md")
     # V2.1: `aisef bundle ...` → aisef2.app.bundle_cli.main, the bundle's own tools (no run, no provider)
     sub.add_parser("bundle", help="the V2 project bundle's tools (migrate, ...); arguments go to aisef2.app.bundle_cli")
+    # ROADMAP-2.2 B3+G5: `aisef demo` → aisef2.app.demo.main, the trust loop offline (no network, no credentials)
+    sub.add_parser("demo", help="run the trust loop offline on the packaged example (no network, no credentials)")
 
     # V1 execution survives only behind this explicitly named legacy surface, never as the default.
     lg = sub.add_parser("legacy", help="V1 compatibility surface (legacy, never the default): `aisef legacy run ...`")
@@ -424,6 +426,9 @@ def main(argv: list[str] | None = None) -> int:
     if argv[i:i + 1] == ["bundle"]:
         from aisef2.app.bundle_cli import main as v2_bundle
         return v2_bundle(argv[i + 1:])
+    if argv[i:i + 1] == ["demo"]:
+        from aisef2.app.demo import main as v2_demo
+        return v2_demo(argv[i + 1:])
     parser = build_parser()
     _cho_moi_lenh_nhan_project(parser)
     args = parser.parse_args(argv)
