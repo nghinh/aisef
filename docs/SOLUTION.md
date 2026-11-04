@@ -374,6 +374,9 @@ aisef bundle  init|seal|approve|lint|explain|migrate|continue
                                       (2.1) công cụ của bundle V2, không chạy, không gọi provider: soạn, niêm
                                       phong, duyệt từng contract, kiểm, giải thích, chuyển từ 2.0.0, nối tiếp
                                       một lượt chạy đã dừng — aisef2.app.bundle_cli
+aisef demo                            (2.2) chạy vòng tin cậy ngoại tuyến trên ví dụ đóng gói calc-1-story:
+                                      không mạng, không khoá — ba kịch bản correct/caught/escape cho ba phán
+                                      quyết kernel phân biệt (escape = ranh giới trung thực G5) — aisef2.app.demo
 # V1 chỉ còn ở bề mặt legacy đặt tên tường minh, không bao giờ là mặc định:
 aisef legacy run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
 aisef legacy run --verify-only --story S [--client c] [--repeat K]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
