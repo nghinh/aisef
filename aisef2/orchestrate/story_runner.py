@@ -256,17 +256,6 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                         candidate = implemented.candidate
                     checks.append(gate.check(run, story_id, "developer", implemented.outcome is O.COMPLETED,
                                              implemented.detail))
-            if failure is None and not no_work and candidate == base:
-                # C4 (K-NOOP-001): the developer ran but the candidate is the parent tree unchanged (same revision).
-                # not-no_work means an obligation is still unsatisfied here, and the tree is byte-identical to the one
-                # admission already measured — so re-proving at the candidate, judging engineering quality, and calling
-                # the (paid) reviewer and the scanner would only repeat admission and spend a review on a no-op. Route
-                # the DEVELOPER failure now: §10.3 CANDIDATE/UNSATISFIED -> DEVELOPER is exactly what the identical-
-                # candidate proof would reach. No authority or invariant changes — admission already proved this tree,
-                # and the outcome (a DEVELOPER failure, a retry the policy may permit) is unchanged.
-                failure = classify(FailureCode.CONTRACT_UNSATISFIED)
-                detail = "the developer changed nothing: the candidate is the parent (admission already measured this tree)"
-                checks.append(gate.check(run, story_id, "candidate", False, detail))
             if failure is None:
                 try:
                     ws.move(impl, candidate)
