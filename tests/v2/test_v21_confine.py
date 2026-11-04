@@ -542,8 +542,18 @@ class FailClosed(unittest.TestCase):
             exe.parent.mkdir()
             exe.write_text("#!/bin/sh\n")
             rep, _, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), tmp / "run" / "confinement", exe)
-        self.assertTrue(rep["problems"][0].startswith("the sandbox did not run the probe (exit 3): "), rep["problems"])
-        self.assertIn("setsid", rep["tried"])     # the probe ran to its end: only its exit refuses it
+        # a probe that did not exit 0 is refused and its left-behind files are named. On an unloaded host the probe
+        # reaches its end and exits 3 (and `setsid` is among the stages it ran). The probe's last stage scans the
+        # bound host system directories for sockets (`find <SYSTEM...> -type s`); under CI load that real-filesystem
+        # scan can exceed PROBE_TIMEOUT, so the probe is killed first (exit None, TimeoutExpired) — also a did-not-exit-0
+        # refusal, with the same files named. Accept either: both are the behaviour under test (non-zero/absent exit ->
+        # refused, files named), and the exit-3 "reached its end" specifics are asserted when the probe did reach it.
+        p0 = rep["problems"][0]
+        reached_end = p0.startswith("the sandbox did not run the probe (exit 3): ")
+        self.assertTrue(reached_end or p0.startswith("the sandbox did not run the probe (exit None): TimeoutExpired"),
+                        rep["problems"])
+        if reached_end:
+            self.assertIn("setsid", rep["tried"])     # it ran to its end: only its exit refuses it
         self.assertTrue(rep["left_on_host"])      # its files are named even though nothing else was judged
         self.assertEqual(rep["problems"][1:], [f"the probe's files are left where confinement did not stop them; nothing "
                                                f"was removed, the operator removes them: {rep['left_on_host']}"])

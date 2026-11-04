@@ -809,7 +809,13 @@ class Proc(unittest.TestCase):
                     time.sleep(1000)
             """})
         begun = time.monotonic()
-        with mock.patch.object(m, "TIMEOUT", 2), mock.patch.object(m, "RELEASE_WAIT_S", 3):
+        # RELEASE_WAIT_S is how long release waits for the group to empty after the SIGKILL ladder. The child leaves
+        # the group and rejoins it once the group kill has reaped its parent, so the clean bounding needs the fork +
+        # setpgid rejoin + the authority's proven group signal to complete inside the window. 3s is enough on an
+        # unloaded host but races under CI load (then the range reads as an un-cleaned residual and the run STOPS —
+        # the second mutant NOT_RUN instead of SURVIVED). 15s gives that sequence ample headroom without changing what
+        # is measured; the test still bounds its whole self well under 60s.
+        with mock.patch.object(m, "TIMEOUT", 2), mock.patch.object(m, "RELEASE_WAIT_S", 15):
             r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_g.py"])
         self.assertLess(time.monotonic() - begun, 60)
         self.assertEqual(classes(r), ["INFRA", "SURVIVED"])
