@@ -1249,6 +1249,37 @@ for _t, _fs in _V21_R5B_APPEND.items():
 #: `superseded()` reads it as historical in the V2.1 record too, whose old row (runner 2, measured at 2d01fe4 while
 #: the function existed) is never re-checked and goes at that record's next write (`kept` in main()). Its row of
 #: the generated kills3 list is gone with it.
+# ROADMAP-2.2 WAVE-2 lane M (owner directive 2026-11-04). The kill tests for wave-1 new code EXIST but were not in the
+# registered kill sets, so wave 1 left 259 survivors there. Register them: on the nine affected targets the wave's kill
+# files are APPENDED (after their existing files, so an already-killed mutant is still killed by the same earlier test
+# and the re-measure costs no more; only the former survivors additionally run these), and the wave's new modules
+# (tripwire, the runtime-arming functions, verify._invariant_problems) become targets of their own so wave-1 new code
+# is not left with zero mutation coverage (owner: do not reduce scope). Re-measuring reclassifies the survivors; the
+# sealed records are untouched — the run writes a new record.
+_W1_PIN_FENCE, _W1_TRIPWIRE = "tests/v2/test_v22_client_pin_fence.py", "tests/v2/test_v22_tripwire.py"
+_W1_LINT, _W1_INV = "tests/v2/test_v22_authoring_lint.py", "tests/v2/p0/test_invariants_runtime.py"
+for _t, _fs in {
+        "aisef2/app/run.py::execute": (_W1_TRIPWIRE, _W1_INV),
+        "aisef2/app/adapters.py::Reviewer._ocr": (_W1_TRIPWIRE,),
+        "aisef2/app/client.py::session": (_W1_PIN_FENCE,),
+        "aisef2/app/client.py::environment": (_W1_PIN_FENCE,),
+        "aisef2/app/verify.py::verify": (_W1_INV,),
+        "aisef2/app/settings.py::load": (_W1_PIN_FENCE,),
+        "aisef2/app/bundle_cli.py::lint": (_W1_LINT,),
+        "aisef2/app/bundle_cli.py::seal": (_W1_LINT,),
+        "aisef2/app/bundle.py::load": (_W1_LINT,)}.items():
+    V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
+for _t, _fs in {
+        **{f"aisef2/app/tripwire.py::{_f}": [_W1_TRIPWIRE] for _f in
+           ("_canonical", "_fragments", "_public_text", "needles_of", "scan_text", "_bundle_hit", "scan_repo", "refusal")},
+        # require_armed already has a home phase (P5); wave 1 CHANGED it (the _RUNTIME_ARMED branch), which makes its
+        # P5 record stale — a P5 re-measure/reseal item for the owner, not a dual-home here. Only the functions wave 1
+        # ADDED (no prior phase) are new V2.1 targets.
+        **{f"aisef2/invariants/registry.py::{_f}": [_W1_INV] for _f in
+           ("registry_digest", "runtime_mechanism_digest", "register_runtime", "arm_runtime")},
+        "aisef2/app/verify.py::_invariant_problems": [_W1_INV]}.items():
+    V21_TARGETS[_t] = list(_fs)
+
 V21_RETIRED = ("aisef2/probe/process_effect.py::HARNESS/guarded",)
 for _t in V21_RETIRED:
     del V21_TARGETS[_t]
