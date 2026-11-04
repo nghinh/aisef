@@ -75,6 +75,14 @@ class BudgetCost(unittest.TestCase):
         self.assertIsNone(self.budget(steps, max_cost=2.00).exceeded())         # exactly at is not exceeded
         self.assertEqual(self.budget(steps, max_cost=1.99).exceeded(), "max_cost exceeded: 2.0 of 1.99")
 
+    def test_every_session_including_retry_attempts_counts_toward_the_ceiling(self):
+        # C9: spend() sums every session log in out/sessions; a stuck story's retry attempts each leave a session, so
+        # their spend counts toward the dollar ceiling exactly like a first attempt's — no attempt is exempt
+        attempts = [[{"input": 1_000_000, "output": 0}] for _ in range(3)]      # three attempts, $1.00 each
+        b = self.budget(attempts, max_cost=2.50)
+        self.assertEqual(b.spend()["cost"], 3.0)
+        self.assertEqual(b.reached(), "max_cost: 3.0 of 2.5")
+
     def test_base_and_inherited_count_toward_the_ceiling(self):
         base = {"provider_requests": 0, "turns": 0, "input_tokens": 3_000_000, "output_tokens": 0}   # preflight $3.00
         b = self.budget([[{"input": 0, "output": 0}]], max_cost=2.50, base=base)
