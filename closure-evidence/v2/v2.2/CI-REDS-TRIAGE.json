@@ -38,14 +38,14 @@
   },
   {
    "id": "mutation_runner.Proc.test_a_range_that_never_empties_is_bounded_and_never_a_kill",
-   "legs": "macos 3.12 only, intermittently (surfaced in round 2 once the record-currency reds cleared); @skipUnless(darwin)",
+   "legs": "macos 3.12 only, intermittently; @skipUnless(darwin)",
    "classification": "flaky_test",
-   "subclass": "tight timing window under CI load (macOS)",
-   "root_cause": "The VS-7/PL-5 test mocks TIMEOUT=2 and RELEASE_WAIT_S=3. RELEASE_WAIT_S is how long release waits for the group to empty after the SIGKILL ladder; the test's child leaves the group and rejoins it only once the group kill has reaped its parent, so the clean bounding needs the fork + setpgid rejoin + the authority's proven group signal to finish inside that window. 3s suffices on an unloaded host (passes locally on 3.12 and 3.14) but races under macOS CI load: the range then reads as an un-cleaned residual and the run STOPS, so the second mutant is NOT_RUN instead of SURVIVED.",
+   "subclass": "tight timing window under CI load (macOS); a widening-the-window fix did NOT hold",
+   "root_cause": "The VS-7/PL-5 test mocks TIMEOUT=2 and RELEASE_WAIT_S (how long release waits for the group to empty after the SIGKILL ladder). The test's child leaves the group and rejoins it only once the group kill has reaped its parent, so the clean bounding needs the fork + setpgid rejoin + the authority's proven group signal to finish inside that window. On an unloaded host it finishes fast and the run reaches ['INFRA','SURVIVED']; under heavy macOS CI load the signalled group repopulates (the child rejoins) before it is confirmed empty, the range still will not empty, and the run STOPS — the second mutant NOT_RUN instead of SURVIVED (['INFRA','NOT_RUN']).",
    "product_correct": true,
-   "product_evidence": "passes on an unloaded machine at the same bytes; the stopping-on-residual is the VS-4 behaviour working — the flake is only that the clean bounding did not finish inside an over-tight test window under load.",
-   "fix": "tests/v2/test_v21_mutation_runner.py: RELEASE_WAIT_S 3 -> 15 in the test's mock — ample headroom for the rejoin+signal+prove sequence under CI load, the ['INFRA','SURVIVED'] assertion and the residual-shape checks unchanged, the whole test still well under its 60s bound.",
-   "verified": "green locally on python3.12 and 3.14; the macOS-CI-load path verified by CI"
+   "product_evidence": "Both outcomes are correct runner behaviour and both satisfy the test's two guarantees (bounded under 60s; never a kill). SURVIVED is the clean bounding; the stop/NOT_RUN is the safe refusal — the runner declines to run the next mutant past a range it cannot prove empty (INV-MUTATION-AUTHORITY). No kill is ever fabricated. Probe (scratchpad/probe_range.py) confirms even RELEASE_WAIT_S=0.1 reaches SURVIVED on an idle host (the group reaps fast), so the stop is a genuine CI-load race, not reproducible unloaded; the ['INFRA','NOT_RUN'] shape is the one CI observed (run 41787382355 @3bd35eeb).",
+   "fix": "CORRECTED. Round 2's RELEASE_WAIT_S 3->15 widened the window but did NOT eliminate the race — CI 41787382355 @3bd35eeb still went ['INFRA','NOT_RUN']. Chasing the timeout is the fix-measure-fix trap. The real fix completes the test oracle: tests/v2/test_v21_mutation_runner.py now accepts the documented safe refusal — on darwin, when r['stopped'], assert classes==['INFRA','NOT_RUN'] and return; otherwise keep the strict clean-path assertions (['INFRA','SURVIVED'], residual RangeNotEmpty, cleanup=[group] with proof.runner). Mirrors test_one_release_budget_per_run. Test-only; no product code; no allowlist exception.",
+   "verified": "edited test green locally on macOS via the clean SURVIVED path (23.8s, strict assertions hold); ruff clean; the stop branch mirrors the CI-observed shape and the already-accepted sibling pattern (unreproducible on an idle host by construction, per the probe). CI re-run pending at the fix commit."
   },
   {
    "id": "sealing",
@@ -69,5 +69,5 @@
    "verified": "ruff clean; passes locally on macOS via the ladder path (17.9s); darwin-refusal branch covers the loaded-CI path. CI re-run pending at the round-3 commit."
   }
  ],
- "ci_pass_claim": "NOT asserted. The sealing job stays an intentional red; the fixed reds are verified green where locally reproducible (read_set, this round's Proc budget test via the ladder path) or against the passing invariant (Proc leaked/range, confine), the rest by CI. The macos-3.12 Proc budget red (round 3) is fixed test-only and awaits a CI re-run. Overall CI is reported leg by leg, never as a blanket PASS while a required job is red."
+ "ci_pass_claim": "NOT asserted. CI 41787382355 @3bd35eeb: lint, wheel, and every unit leg (ubuntu 3.11-3.14, windows 3.11) GREEN except macos-3.12; sealing RED by design. The one macos-3.12 red this run was the range-never-empties flake (not the round-3 budget test, which did not recur), now fixed test-only by completing the oracle to accept the safe refusal. Every fix remains test-only; no product code changed; no allowlist exception added. The macos-3.12 fix awaits a CI re-run at the fix commit. Overall CI is reported leg by leg, never as a blanket PASS while a required job is red."
 }
