@@ -90,10 +90,10 @@ Owner chốt 2026-11-01 ("Đồng ý, làm đi") theo mặc định đề xuất
 - [ ] **B1** — Canary live PASS: `bundle init --example calc-1-story` trên repo sạch, route attested → `delivery_verdict PASS` + `--verify` VERIFIED + 0 escape; nếu FAIL thì báo cáo nguyên trạng (M) *(QĐ #6)*
 - [ ] **B3+G5** — `aisef demo`: fake developer xác định + probe thật + journal thật + `--verify` thật, KHÔNG cần credential; bắt buộc kèm ca escape (defect ngoài scope lọt) (S/M)
 - [ ] **B7** — Đo cost-of-trust USD/story trên canary + 1 run trả tiền; tách productive vs trust theo công thức E4; công bố cả khi con số xấu (S) *(QĐ #2, #6)*
-- [ ] **C2** — `Budget.max_cost`: spend() mang 5 lớp `usage.CLASSES`, trần tiền theo bảng giá, fail-closed khi thiếu token; không đặt giá ⇒ hành vi không đổi (M) *(QĐ #2)*
+- [x] **C2** — `Budget.max_cost`: spend() mang 5 lớp `usage.CLASSES`, trần tiền theo bảng giá, fail-closed khi thiếu token; không đặt giá ⇒ hành vi không đổi (M) *(QĐ #2)* — 9d1c1314. **GATE PAID THOẢ MÃN:** proof offline 10/10 (test_v22_max_cost) gồm 2 e2e fake-client (run DỪNG trước story → NOT_REACHED + budget_stop max_cost; cap rộng → PASS). settings.max_cost optional (đòi prices, fail-closed ở load). Budget mutation (Budget.*/_cost mới) để ĐO CUỐI ĐỢT 2
 - [ ] **C3a** — no_progress → 1 dòng trong retry prompt ("N attempt fail với bằng chứng y hệt — đổi cách tiếp cận"); text thuần từ journal, không authority (S)
 - [ ] **C4** — Chặn attempt no-op: candidate == base (so SHA) ⇒ skip quality/review/scan, route DEVELOPER failure tại điểm đo CANDIDATE, tái dùng probe result của admission (S)
-- [ ] **C9** — Spend của stuck-retry tính vào trần tiền C2 (quyết định retry vẫn thuộc taxonomy) (S)
+- [x] **C9** — Spend của stuck-retry tính vào trần tiền C2 (quyết định retry vẫn thuộc taxonomy) (S) — 2196edbb (thoả bởi thiết kế C2: spend() tổng mọi session log gồm retry; test pin lại, KHÔNG side counter)
 - [ ] **Lane M (mutation registry)** — đăng ký kill test v22/invariants đã có vào TARGETS + target mới (tripwire, registry arming, _invariant_problems); re-measure; phân loại KILLED/SURVIVED/EQUIVALENT; evidence trước+sau *(owner item 1)*
 - [ ] **Lane CI (root-cause)** — Proc×2 (`leaked`), FailClosed (flaky teardown), read_set (opened set); phân loại + sửa gốc; sealing giữ đỏ-chủ-đích *(owner item 2)*
 - [ ] **Findings** — os.kill(pid,0) Windows (finding + phân tích, chưa sửa kernel); freeze_manifest V2_007 + Q5-COMPARISON (OPEN, phương án evidence) *(owner item 4)*
