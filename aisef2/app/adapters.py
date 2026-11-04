@@ -80,8 +80,9 @@ class Developer:
             events = [(e.seq, e.type, e.data) for e in self.run.events]
             told = feedback.retry_feedback(events, story_id, self.project)
             pack = feedback.context_pack(events, story_id, self.project, self.kw.get("secrets", ()))   # V2.1 D4
+            note = feedback.no_progress_note(events, story_id)      # ROADMAP-2.2 C3a: a journal report, never authority
             prompt += (f"\n\nA previous attempt of this story was not accepted; the kernel observed:\n{told}\n"
-                       + (f"{pack}\n" if pack else "") + "Fix the implementation.")
+                       + (f"{pack}\n" if pack else "") + (f"{note}\n" if note else "") + "Fix the implementation.")
         parent = git(checkout, "rev-parse", "HEAD").stdout.strip()
         s = client.session(f"developer {story_id}", prompt, checkout, self.logs / f"{story_id}.developer.{attempt}.jsonl",
                            self.timeout_s, **self.kw)

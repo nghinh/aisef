@@ -111,6 +111,20 @@ PACK_HEAD = ("What the run's journal records about the earlier attempts of this 
              "context only — no verdict, approval or budget reads it):")
 
 
+def no_progress_note(events, story_id: str) -> str:
+    """ROADMAP-2.2 C3a: one line for the retry prompt when the journal shows this story's recent attempts failed with
+    the SAME evidence as the one before (usage.no_progress reads the journal for it), else "". Prompt text, a report of
+    the journal — it governs no retry; the failure taxonomy alone does (NO_SIDE_RETRY_COUNTER)."""
+    from aisef2.app import usage
+    stalled = next((r for r in usage.no_progress([{"type": str(t), "data": d} for _, t, d in events])
+                    if r["story"] == story_id), None)
+    if not stalled:
+        return ""
+    return (f"No progress: {len(stalled['attempts_repeating_the_one_before'])} attempt(s) failed with the same "
+            "evidence as the one before. Repeating that approach will not change the outcome — try a different one. "
+            "(A report of the journal; it governs no retry.)")
+
+
 def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
     """The earlier attempts of `story_id` from journal events `(seq, type, data)` (module docstring); "" when none ended.
     It reads only the controller's own records of an attempt — story/begin, story/admitted, the DEVELOPER
