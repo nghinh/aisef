@@ -422,21 +422,27 @@ class Proc(unittest.TestCase):
         self.assertTrue(r["stopped"])
         self.assertEqual(classes(r), ["INFRA", "NOT_RUN"])   # the leaking mutant has no verdict; nothing ran after it
         self.assertFalse(r.get("cleanup"))                # nothing was signalled
-        self.assertEqual([(x["pid"], x["proved"]) for x in r["leaked"]], [(pid, False)])
         self.assertTrue(alive(pid), "an unproven helper is never signalled")
+        # macOS has no PR_SET_CHILD_SUBREAPER (range_anchor._subreaper is Linux-only): the orphan re-parents to launchd,
+        # outside the range, so the TOKEN/CWD SCAN is the detector — it names the leftover on the top-level `leaked`,
+        # and without the scan (the second helper) the target "completes" beside it (the old PL-1 failure). On Linux the
+        # subreaper re-parents the orphan in-range, so the range's own escaped() detection stops the run and the scan is
+        # not the detector; the leftover is not under this macOS-only key. The invariant above — stopped, never
+        # signalled — holds on both; here only the detector's shape differs.
+        if sys.platform == "darwin":
+            self.assertEqual([(x["pid"], x["proved"]) for x in r["leaked"]], [(pid, False)])
         self.end_helper(pid)
-        # the old failure (PL-1): without the token scan (and the cwd scan, which the old runner did not have either)
-        # the helper is invisible, and the target "completes" beside it
-        sentinel, pidfile = self.dir / "stop-2", self.dir / "helper-2.pid"
-        self.addCleanup(sentinel.touch)
-        root = toy(self.dir / "2", POSITIVE, leaky(sentinel, pidfile))
-        with mock.patch.object(m.ca, "carriers", lambda prefix, table=None: []), \
-                mock.patch.object(m.ca, "cwd_under", lambda prefix, table=None, since=None: []):
-            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_l.py"])
-        pid = self.helper_pid(pidfile)
-        self.assertNotIn("error", r)
-        self.assertTrue(alive(pid))
-        self.end_helper(pid, sentinel)
+        if sys.platform == "darwin":
+            sentinel, pidfile = self.dir / "stop-2", self.dir / "helper-2.pid"
+            self.addCleanup(sentinel.touch)
+            root = toy(self.dir / "2", POSITIVE, leaky(sentinel, pidfile))
+            with mock.patch.object(m.ca, "carriers", lambda prefix, table=None: []), \
+                    mock.patch.object(m.ca, "cwd_under", lambda prefix, table=None, since=None: []):
+                r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_l.py"])
+            pid = self.helper_pid(pidfile)
+            self.assertNotIn("error", r)
+            self.assertTrue(alive(pid))
+            self.end_helper(pid, sentinel)
 
     def test_a_helper_with_its_own_environment_is_found_by_its_cwd(self):
         """PL-1 (3), process-env prover: a helper spawned with `env={'PATH': ...}` carries no token and names no scratch
@@ -452,21 +458,25 @@ class Proc(unittest.TestCase):
         pid = self.helper_pid()
         self.assertIn(f"{m.ca.RESIDUAL_OWNERSHIP_UNKNOWN} at mutant 'L2 returns None' (tests/v2/test_l.py)", r["error"])
         self.assertEqual(classes(r), ["INFRA", "NOT_RUN"])
-        self.assertEqual([(x["pid"], x["proved"]) for x in r["leaked"]], [(pid, False)])
         self.assertTrue(alive(pid), "an unproven helper is never signalled")
+        # macOS-only: the cwd scan is the detector (no Linux subreaper), so it names the leftover on the top-level
+        # `leaked`, and without the scan the target completes beside it. On Linux the subreaper catches the orphan
+        # in-range; the invariant above (stopped at the leaking mutant, never signalled) holds on both.
+        if sys.platform == "darwin":
+            self.assertEqual([(x["pid"], x["proved"]) for x in r["leaked"]], [(pid, False)])
         self.end_helper(pid)
-        # the old failure: without the cwd scan the helper is invisible, and the target "completes" beside it
-        sentinel, pidfile = self.dir / "stop-2", self.dir / "helper-2.pid"
-        self.addCleanup(sentinel.touch)
-        files = {k: v.replace(str(self.sentinel), str(sentinel)).replace(str(self.pidfile), str(pidfile))
-                 for k, v in files.items()}
-        root = toy(self.dir / "2", POSITIVE, files)
-        with mock.patch.object(m.ca, "cwd_under", lambda prefix, table=None, since=None: []):
-            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_l.py"])
-        pid = self.helper_pid(pidfile)
-        self.assertNotIn("error", r)
-        self.assertTrue(alive(pid))
-        self.end_helper(pid, sentinel)
+        if sys.platform == "darwin":
+            sentinel, pidfile = self.dir / "stop-2", self.dir / "helper-2.pid"
+            self.addCleanup(sentinel.touch)
+            files = {k: v.replace(str(self.sentinel), str(sentinel)).replace(str(self.pidfile), str(pidfile))
+                     for k, v in files.items()}
+            root = toy(self.dir / "2", POSITIVE, files)
+            with mock.patch.object(m.ca, "cwd_under", lambda prefix, table=None, since=None: []):
+                r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_l.py"])
+            pid = self.helper_pid(pidfile)
+            self.assertNotIn("error", r)
+            self.assertTrue(alive(pid))
+            self.end_helper(pid, sentinel)
 
     def test_a_baseline_stray_is_blamed_on_the_baseline(self):
         root = toy(self.dir, POSITIVE, leaky(self.sentinel, self.pidfile, when="True"))

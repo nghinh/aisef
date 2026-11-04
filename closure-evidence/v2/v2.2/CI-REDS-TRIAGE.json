@@ -1,0 +1,50 @@
+{
+  "record": "AISEF V2 — ROADMAP-2.2 WAVE-2 lane CI: triage of the four standing CI reds",
+  "owner_directive": "2026-11-04: root-cause the standing reds; distinguish real bug / flaky / platform limitation / intentional sealing failure; no new allowlist exception without evidence the error does not affect product correctness; CI is never declared PASS while a required job is red.",
+  "method": "A read-only diagnosis of each red (ci-reds-diagnose workflow + hands-on verification). Every fix is test-only; no product code changed; no allowlist exception added. Each classification carries the mechanism and the evidence.",
+  "reds": [
+    {
+      "id": "read_set.ToyRecord.test_each_kill_file_has_exactly_what_it_read",
+      "legs": "ubuntu 3.11/3.12, macos 3.12 (red); 3.13/3.14 green on both OSes",
+      "classification": "platform_limitation",
+      "subclass": "python stdlib version difference, not OS",
+      "root_cause": "pathlib's pre-3.13 glob stats the rglob root (parent_path.is_dir() in _Selector.select_from); 3.13+ rewrote glob to a scandir-only globber that stats no root. The read-set recorder treats a stat as a read, so on 3.11/3.12 the only kill file that rglobs (registry.py) records an extra root stat 'data'. Verified on this host: pathlib.Path('data').rglob('*.txt') made 1 os.stat on data under python3.12 and 0 under 3.14.",
+      "product_correct": true,
+      "product_evidence": "the recorder faithfully records a real os.stat the interpreter performs; filtering directory stats out would mask a genuine read and change the recorded read-set on every version.",
+      "fix": "tests/v2/test_v21_read_set.py: version-gate the 'registry' expected opened set (+ 'data' when sys.version_info < (3,13)).",
+      "verified": "locally green on BOTH python3.12 (was red) and python3.14 (stays green)"
+    },
+    {
+      "id": "mutation_runner.Proc.{test_a_detached_helper_that_names_no_tree_is_found_by_its_token, test_a_helper_with_its_own_environment_is_found_by_its_cwd}",
+      "legs": "ubuntu 3.11-3.14 (red, deterministic); macos green",
+      "classification": "platform_limitation",
+      "subclass": "Linux PR_SET_CHILD_SUBREAPER vs macOS launchd re-parenting",
+      "root_cause": "The test spawns a detached helper (start_new_session=True) that orphans when the target is reaped. On Linux range_anchor sets PR_SET_CHILD_SUBREAPER, so the orphan re-parents in-range and the range's own escaped() detection is the detector — the leftover is recorded on the per-file row, not the macOS-only top-level 'leaked' key (hence KeyError on that assertion). On macOS there is no subreaper, so the orphan re-parents to launchd and the token/cwd scan is the detector, naming it on top-level 'leaked'. The common invariant — the target stops at the leaking mutant, the unprovable helper is never signalled — holds on both; only the detector differs.",
+      "product_correct": true,
+      "product_evidence": "the error (RESIDUAL_OWNERSHIP_UNKNOWN at the leaking mutant), stopped, classes [INFRA, NOT_RUN], and 'helper never signalled' pass on both OSes; the Linux path is in fact the stronger detector (the subreaper catches the escapee in-range).",
+      "fix": "tests/v2/test_v21_mutation_runner.py: the two Proc cases assert the common invariant on both OSes; the macOS-only top-level 'leaked' shape and the scan-off second half (vacuous on Linux, where the subreaper not the scan is the detector) run under sys.platform == 'darwin'.",
+      "verified": "macOS branch green locally; Linux branch asserts only the already-passing invariant (per the CI traceback), verified by CI"
+    },
+    {
+      "id": "confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end",
+      "legs": "ubuntu 3.11/3.13 intermittently (red); macos green",
+      "classification": "flaky_test",
+      "subclass": "harness teardown race under CI load, Linux setsid path only",
+      "root_cause": "Under CI load the probe's socket-find over the bound host dirs can exceed PROBE_TIMEOUT; the subprocess timeout SIGKILLs only the direct bwrap child, not the tree. The setsid'd sleeper re-parents to the subreaper anchor under a surviving probe shell, so its ppid is that shell, not the anchor. measure_in_range's cleanup selected only processes whose ppid == the anchor group, so it missed the sleeper; release() then recorded the still-live escapee and raised RangeEscaped. macOS passes because it has no setsid, so the sleeper stays in the range group and the killpg ladder kills it directly.",
+      "product_correct": true,
+      "product_evidence": "the range raising RangeEscaped on an escapee it cannot prove cleaned up IS the fail-closed invariant working; the defect is in the test harness's cleanup selection, not in confine.",
+      "fix": "tests/v2/test_v21_confine.py: measure_in_range signals every cleanup_authority-proven-owned pid (runner and anchor excluded), not only the anchor's direct children. signal_owned only ever signals proven-owned processes, so this respects INV-MUTATION-AUTHORITY (an independent controller view).",
+      "verified": "full confine module green on macOS (no measure_in_range caller regressed); the Linux race path is verified by CI"
+    },
+    {
+      "id": "sealing",
+      "legs": "master and tags",
+      "classification": "intentional_sealing_failure",
+      "root_cause": "ROADMAP-2.2 F1: the record-currency tier is RED by design on every unsealed tree; re-sealing is the owner's act.",
+      "product_correct": true,
+      "fix": "none — it carries its own name and never poisons the unit signal; a release tag is still blocked by it unless owner-excepted. NOT counted toward any 'CI PASS' claim.",
+      "verified": "by design"
+    }
+  ],
+  "ci_pass_claim": "NOT asserted. The sealing job stays an intentional red; the three fixed reds are verified green where locally reproducible (read_set) or against the passing invariant (Proc, confine), the rest by CI. Overall CI is reported leg by leg, never as a blanket PASS while a required job is red."
+}

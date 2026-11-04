@@ -205,9 +205,14 @@ class ToyRecord(unittest.TestCase):
         base = set(self.kf[nothing]["opened"]) - {nothing}
         self.assertEqual(base, {INIT, "tests/v2"})   # the package its import opens, the directory discover looked up
         reg = {"pkg/__init__.py", "pkg/registry.py"}
+        # pathlib's pre-3.13 glob stats the rglob root (parent_path.is_dir() in _Selector.select_from); 3.13+ rewrote
+        # glob to a scandir-only globber that stats no root. registry.py is the only kill file that rglobs, so on 3.11/
+        # 3.12 its recorded read set has the extra root stat "data" (the recorder treats a stat as a read). Not a
+        # product difference — a stdlib behavioural change, version-gated (same on either OS).
+        reg_rglob = reg | ({"data"} if sys.version_info < (3, 13) else set())
         extra = {"opens": {"data/a.txt", "pkg/__init__.py", "pkg/mod.py"}, "stats": {"data/c.txt"},
                  "lists": set(), "child": {"data/a.txt"}, "child_env": set(), "child_isolated": set(),
-                 "child_pythonpath": set(), "registry": reg, "two_callers": reg, "child_lists": reg,
+                 "child_pythonpath": set(), "registry": reg_rglob, "two_callers": reg, "child_lists": reg,
                  "child_other": set(), "dirfd": {"data/sub"}}
         for name, more in extra.items():
             with self.subTest(name):

@@ -216,7 +216,14 @@ def measure_in_range(tmp: pathlib.Path, spec: dict, where: pathlib.Path, exe: pa
                          output=log, grace_s=(0.1, 2.0), wait_s=10.0).start()
     try:
         r.wait(confine.PROBE_TIMEOUT + 60)
-        adopted = [p.pid for p in ca.owned(boundary).values() if p.ppid == r.group]
+        # every process cleanup_authority PROVES is the runner's (born after the boundary, parent chain to the runner;
+        # the runner itself excluded), not only the anchor's direct children. Under CI load a probe can exceed
+        # PROBE_TIMEOUT so the timeout SIGKILLs only the direct bwrap child; the setsid'd sleeper then re-parents to the
+        # anchor under a surviving probe shell, so its ppid is that shell, not the anchor — the old `ppid == r.group`
+        # filter missed it and release() raised RangeEscaped on the live escapee. signal_owned only ever signals
+        # proven-owned processes (INV-MUTATION-AUTHORITY: an independent controller view), so widening the selection is
+        # sound; on macOS (no setsid) nothing extra is owned at this point, so the path is unchanged.
+        adopted = [p.pid for p in ca.owned(boundary).values() if p.pid != r.group]
         ca.signal_owned(boundary, pids=adopted)
     finally:
         r.release()
