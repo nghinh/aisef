@@ -768,8 +768,20 @@ class Proc(unittest.TestCase):
         with mock.patch.object(m, "RELEASE_WAIT_S", wait):
             r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_r.py"])
         pid = self.helper_pid()
-        row = r["t0"][0]
         self.assertTrue(r["stopped"])
+        # macOS has no subreaper and reads births on a whole-second clock with _SLACK_S=0.5 (cleanup_authority):
+        # under load the ownership proof can quantize a just-spawned helper child's birth to before the boundary
+        # and exclude it, so the runner refuses conservatively with RESIDUAL_OWNERSHIP_UNKNOWN — never signalling
+        # what it cannot prove its own (INV-MUTATION-AUTHORITY) — before the release ladder is reached. That safe
+        # refusal is a valid outcome; the budget is simply not measured on that run. Linux keeps the chain through
+        # the subreaper, so it reaches the ladder every time and the measurement below stays strict there (the
+        # unloaded macOS run reaches it too). Mirrors the confine FailClosed fix: accept either safe outcome.
+        if sys.platform == "darwin" and m.ca.RESIDUAL_OWNERSHIP_UNKNOWN in r.get("error", ""):
+            self.assertFalse(r.get("cleanup"), r)
+            self.assertTrue(alive(pid), "an unproven helper is never signalled")
+            self.end_helper(pid)
+            return
+        row = r["t0"][0]
         self.assertIn("the range would not empty", r["error"])
         self.assertIn("not empty after ['cooperative', 'terminate', 'kill', 'cooperative', 'terminate', 'kill']", r["error"])
         from aisef2.runtime.process_range import GRACE_S
