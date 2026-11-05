@@ -1,0 +1,79 @@
+{
+ "record": "AISEF ROADMAP-2.2 Đợt 2 — B1 (canary live PASS) + B7 (cost-of-trust) on the packaged calc-1-story",
+ "owner_authorization": "2026-11-06 chat: 'Chạy đi, không bị giới hạn tiền' — explicit GO for the paid live run, money cap lifted.",
+ "when": "2026-11-06T02:00:14+07:00",
+ "working_tree": "master @ ad7164d3 (wave-2 HEAD, run on the working-tree code, not the frozen 2.1.0 release)",
+ "route": "9router/ds/deepseek-v4-pro",
+ "provider_endpoint": "https://9router.vnteki.com/v1 (served_model deepseek-v4-pro, listed_owner ds); key from operator's opencode.json (api_key_env null)",
+ "B1": {
+  "requirement": "bundle init --example calc-1-story on a clean repo, route attested -> delivery PASS + --verify VERIFIED + 0 escape",
+  "delivery_verdict": "PASS",
+  "story_outcomes": {
+   "S1": [
+    "COMMIT"
+   ]
+  },
+  "verify": "VERIFIED (aisef run --verify, 0 problems, exit 0)",
+  "escapes": 0,
+  "run_exit": 0,
+  "journal_events": 68,
+  "evidence_anchor": "9862c41ee56540b93855ac63c79b00dfac47c68d353c3154c5ef2b78ffd3f9b2"
+ },
+ "B7": {
+  "requirement": "cost-of-trust USD/story on the canary; productive vs trust split (E4); publish even if ugly",
+  "usd_per_story": 0.166598,
+  "usd_status": "known",
+  "usd_source": "https://api-docs.deepseek.com/quick_start/pricing/ — deepseek-v4-pro peak rate (upper bound); cache write priced as cache miss; the route is served by 9router, whose own price is not known here",
+  "cache_aware": true,
+  "tokens_total": {
+   "cache_read": 461056,
+   "cache_write": 0,
+   "input": 99804,
+   "output": 1943,
+   "reasoning": 322
+  },
+  "wall_s": 80.019,
+  "sessions": [
+   {
+    "session": "S1.developer.1.jsonl",
+    "role": "developer (productive)",
+    "cost_usd": 0.090188,
+    "steps": 10,
+    "tokens": {
+     "cache_read": 297600,
+     "cache_write": 0,
+     "input": 54147,
+     "output": 1211,
+     "reasoning": 208
+    }
+   },
+   {
+    "session": "S1.reviewer.1.jsonl",
+    "role": "reviewer (trust)",
+    "cost_usd": 0.070809,
+    "steps": 6,
+    "tokens": {
+     "cache_read": 163456,
+     "cache_write": 0,
+     "input": 45657,
+     "output": 732,
+     "reasoning": 114
+    }
+   }
+  ],
+  "preflight": {
+   "input_tokens": 4180,
+   "output_tokens": 21,
+   "provider_requests": 3,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "E4_split_usd": {
+   "productive_developer": 0.090188,
+   "trust_reviewer": 0.070809,
+   "trust_preflight_note": "preflight attestation (model-list + chat probes) is trust overhead; its tokens are in usage.preflight (input 4180/output 21). The E4 productive/trust ratio here: productive=developer session, trust=reviewer+preflight+probe setup."
+  },
+  "honest_caveat": "9router's own price to the operator is not published; USD is an UPPER BOUND computed from deepseek-v4-pro upstream peak rates. Tokens are measured exactly. Per QĐ #2: no rate card -> report tokens, treat USD as upper-bound estimate."
+ },
+ "cost_control_note": "Owner lifted the $60 cap. The single-story canary cost $0.167 (upper bound); token/turn budgets in run.json remained as a runaway safeguard, not reached. C2's max_cost gate (proven offline in C2) was not needed to enforce a ceiling here."
+}
