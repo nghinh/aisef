@@ -521,6 +521,67 @@
    "authority_source": "TEST_CREATED_PATH",
    "justification": "the RUN.started.json of a run directory the test itself built in a temporary directory",
    "enforcement": "static: nothing is bound to self.run_dir(...), a helper of the class that creates the directory under tempfile"
+  },
+  {
+   "path": "aisef2/runtime/process_range.py",
+   "scope": "pid_alive",
+   "callable": "os.kill",
+   "target": "pid",
+   "target_kind": "process",
+   "authority_source": "LIVENESS_PROBE_SIGNAL_0",
+   "justification": "H2: pid_alive asks whether a pid exists with kill(pid, 0); no signal is delivered (the read-only probe _is_gone uses in place of a bare os.kill on POSIX)",
+   "enforcement": "static: second argument is the literal 0"
+  },
+  {
+   "path": "tests/v2/test_v22_win_oskill_is_gone.py",
+   "scope": "H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+   "callable": "child.kill",
+   "target": "child",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the escapee subprocess the test started (cleanup)",
+   "enforcement": "static: child bound to subprocess.Popen( in the function"
+  },
+  {
+   "path": "tests/v2/test_v22_win_oskill_is_gone.py",
+   "scope": "H2ProbeIsReadOnly.test_pid_alive_reports_a_live_child_and_a_reaped_child",
+   "callable": "child.kill",
+   "target": "child",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the live child the test started, reaped to show pid_alive reads it as gone",
+   "enforcement": "static: child bound to subprocess.Popen( in the function"
+  },
+  {
+   "path": "tests/v2/test_v22_win_oskill_is_gone.py",
+   "scope": "H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not",
+   "callable": "child.kill",
+   "target": "child",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the escapee subprocess the test started (cleanup, and the reap the case is about)",
+   "enforcement": "static: child bound to subprocess.Popen( in the function",
+   "occurrences": 2
+  },
+  {
+   "path": "tests/v2/test_v22_win_oskill_is_gone.py",
+   "scope": "H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix",
+   "callable": "child.kill",
+   "target": "child",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the child the test started so the probe has a live pid to ask about (cleanup)",
+   "enforcement": "static: child bound to subprocess.Popen( in the function"
+  },
+  {
+   "path": "tests/v2/test_v22_win_oskill_is_gone.py",
+   "scope": "WinOsKillIsDestructive.test_is_gone_must_not_terminate_a_live_escapee_on_windows",
+   "callable": "child.terminate",
+   "target": "child",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the live child the test started, torn down only if it survived the probe",
+   "enforcement": "static: child bound to subprocess.Popen( in the function"
   }
  ]
 }
