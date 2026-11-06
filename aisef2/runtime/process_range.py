@@ -119,14 +119,40 @@ def process_table() -> dict[int, Proc]:
     return _linux_table() if LINUX else _ps_table()
 
 
+# Win32 liveness-probe constants (FINDING-WIN-OSKILL-001 H2, + the gate-3 false-gone fix 2026-11-06).
+_WIN_PROCESS_QUERY_LIMITED_INFORMATION = 0x1000   # OpenProcess access: query only, NO PROCESS_TERMINATE
+_WIN_ERROR_INVALID_PARAMETER = 87                 # OpenProcess's "no such process id": the ONLY reliable "gone"
+_WIN_STILL_ACTIVE = 259                           # GetExitCodeProcess: the process has not terminated
+
+
+def _win_liveness(handle_opened: bool, last_error: int, exit_code_read: bool, exit_code: int) -> bool:
+    """Pure decision for the Windows liveness probe (the live probe below feeds it the real ctypes results),
+    so every branch is provable off-Windows. Returns True=alive / False=gone. GONE is concluded ONLY from
+    reliable evidence of non-existence: OpenProcess failing with ERROR_INVALID_PARAMETER (87 — no such pid),
+    or a handle that opened and reported a real exit code (the process terminated). EVERY other OpenProcess
+    failure — ERROR_ACCESS_DENIED (5, exists but not ours), resource exhaustion (ERROR_NOT_ENOUGH_MEMORY 8 /
+    ERROR_NO_SYSTEM_RESOURCES 1450), or any other/unknown error — is ambiguous and reads ALIVE (fail closed:
+    a false 'gone' would let a live developer escapee pass as gone and the session keep its outcome). The
+    STILL_ACTIVE=259 case where a process exited with code 259 also reads ALIVE — the safe direction.
+    DOCUMENTED LIMIT: Windows gives no way to tell a true exit from an unreadable probe except error 87 and a
+    read exit code, so an ambiguous failure is NEVER inferred as GONE; the session is refused rather than
+    guessed (gate-3 owner directive: fail closed, do not infer)."""
+    if not handle_opened:
+        return last_error != _WIN_ERROR_INVALID_PARAMETER
+    if not exit_code_read:
+        return True                     # handle opened but exit code unreadable: cannot prove gone -> alive
+    return exit_code == _WIN_STILL_ACTIVE
+
+
 def pid_alive(pid: int) -> bool:
     """Whether a process with this id exists on this host, read-only — it never signals and never terminates. The
     probe `_is_gone` uses in place of a bare `os.kill(pid, 0)`, which on Windows is destructive (signal 0 is
     CTRL_C_EVENT, routed to TerminateProcess on CPython <= 3.12; FINDING-WIN-OSKILL-001 H2). POSIX: signal 0 — ESRCH
     means gone, EPERM (or any other OSError) means it exists and is not ours. Windows: OpenProcess for limited query +
-    GetExitCodeProcess — STILL_ACTIVE (259) is running, ERROR_ACCESS_DENIED (5) means it exists, any other open
-    failure means gone. Ambiguity always reads as ALIVE, never dead: a wrong 'dead' is the costlier mistake here (it
-    would let a live developer process pass as gone and the session keep its outcome)."""
+    GetExitCodeProcess, decided by `_win_liveness` — only ERROR_INVALID_PARAMETER (no such pid) or a read exit code
+    is gone; ACCESS_DENIED, resource exhaustion and every other failure read ALIVE. Ambiguity always reads as ALIVE,
+    never dead: a wrong 'dead' is the costlier mistake here (it would let a live developer process pass as gone and the
+    session keep its outcome)."""
     if pid <= 0:
         return False
     if os.name == "nt":
@@ -137,14 +163,13 @@ def pid_alive(pid: int) -> bool:
         k.GetExitCodeProcess.restype = wintypes.BOOL
         k.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
         k.CloseHandle.restype, k.CloseHandle.argtypes = wintypes.BOOL, [wintypes.HANDLE]
-        h = k.OpenProcess(0x1000, False, pid)   # PROCESS_QUERY_LIMITED_INFORMATION — no PROCESS_TERMINATE
+        h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
         if not h:
-            return ctypes.get_last_error() == 5   # ERROR_ACCESS_DENIED: exists, not ours
+            return _win_liveness(False, ctypes.get_last_error(), False, 0)
         try:
             code = wintypes.DWORD()
-            if not k.GetExitCodeProcess(h, ctypes.byref(code)):
-                return True                        # could not read the exit code: cannot prove gone -> alive
-            return code.value == 259               # STILL_ACTIVE
+            got = bool(k.GetExitCodeProcess(h, ctypes.byref(code)))
+            return _win_liveness(True, 0, got, code.value)
         finally:
             k.CloseHandle(h)
     try:

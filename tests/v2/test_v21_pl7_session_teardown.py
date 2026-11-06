@@ -13,7 +13,14 @@ import unittest
 from unittest import mock
 
 from aisef2.app import client
-from aisef2.runtime.process_range import Proc, ProcessTableError, RangeEscaped, process_table
+from aisef2.runtime.process_range import (
+    Proc,
+    ProcessTableError,
+    RangeEscaped,
+    _win_liveness,
+    pid_alive,
+    process_table,
+)
 
 
 class _FakeRange:
@@ -111,11 +118,22 @@ class IsGoneConfirmation(unittest.TestCase):
             self.assertFalse(client._is_gone(p.pid, proc))
 
     def test_an_eperm_from_kill_is_not_taken_for_gone(self):
-        # FAULT-INJECTED: the pid is absent from the table and os.kill raises EPERM (a process we may not signal). EPERM
-        # is not proof of exit -> not gone (the refuse side).
+        # A permission-denied observation is not proof of exit -> NOT gone (the refuse side). Checked against the
+        # REAL post-H2 probe on BOTH platforms (gate-3 owner #1): the old form fault-injected os.kill, which the
+        # Windows path no longer calls, so it could not see a Windows regression. Now:
+        #  - Windows seam: OpenProcess failing with ERROR_ACCESS_DENIED (5) must read ALIVE -> not gone. The real
+        #    _win_liveness decision is exercised on EVERY OS, so a Windows regression is caught on Linux/macOS too.
+        self.assertTrue(_win_liveness(False, 5, False, 0),
+                        "Windows ERROR_ACCESS_DENIED means the process exists (not ours) -> ALIVE, never gone")
+        #  - the ALIVE decision must propagate through _is_gone to 'not gone', whatever the platform reason:
         with mock.patch.object(client, "process_table", return_value={}), \
-             mock.patch.object(client.os, "kill", side_effect=PermissionError(1, "EPERM")):
+             mock.patch.object(client, "pid_alive", return_value=True):
             self.assertFalse(client._is_gone(4242, Proc(4242, 1, None, None, "x")))
+        #  - POSIX seam: os.kill raising EPERM (where os.kill IS the probe) must read not gone:
+        if os.name == "posix":
+            with mock.patch.object(client, "process_table", return_value={}), \
+                 mock.patch.object(client.os, "kill", side_effect=PermissionError(1, "EPERM")):
+                self.assertFalse(client._is_gone(4242, Proc(4242, 1, None, None, "x")))
 
     def test_an_esrch_from_kill_on_an_absent_pid_is_gone(self):
         with mock.patch.object(client, "process_table", return_value={}), \
@@ -134,6 +152,81 @@ class IsGoneConfirmation(unittest.TestCase):
         same = Proc(pid=4242, ppid=1, group=None, created=100.0, command="escapee")
         with mock.patch.object(client, "process_table", return_value={4242: same}):
             self.assertFalse(client._is_gone(4242, same))
+
+
+class WinLivenessDecision(unittest.TestCase):
+    """The Windows liveness decision `_win_liveness` — the post-H2 probe (OpenProcess + GetExitCodeProcess), fed the
+    real ctypes results in production — proven on EVERY OS so a Windows regression is caught on Linux/macOS CI too
+    (gate-3 owner #1/#2). GONE is concluded ONLY from reliable non-existence evidence; every ambiguous failure reads
+    ALIVE (fail closed). The five owner-mandated branches follow, plus an exact-boundary case that detects divergence."""
+
+    def test_process_alive_reports_alive(self):
+        # OpenProcess opened the handle, GetExitCodeProcess read STILL_ACTIVE (259): running.
+        self.assertTrue(_win_liveness(True, 0, True, 259))
+
+    def test_process_genuinely_gone_reports_gone(self):
+        # the only two reliable 'gone' signals: OpenProcess "no such pid" (ERROR_INVALID_PARAMETER 87), and a handle
+        # that opened and reported a real (non-STILL_ACTIVE) exit code -> the process terminated.
+        self.assertFalse(_win_liveness(False, 87, False, 0))   # no such process id
+        self.assertFalse(_win_liveness(True, 0, True, 0))      # opened, exited with code 0
+
+    def test_access_denied_reports_alive(self):
+        # ERROR_ACCESS_DENIED (5): the process exists, we just may not query it -> ALIVE, never gone.
+        self.assertTrue(_win_liveness(False, 5, False, 0))
+
+    def test_resource_exhaustion_reports_alive_not_gone(self):
+        # a transient kernel resource failure for a process that may well exist -> conservatively ALIVE.
+        self.assertTrue(_win_liveness(False, 8, False, 0))      # ERROR_NOT_ENOUGH_MEMORY
+        self.assertTrue(_win_liveness(False, 1450, False, 0))   # ERROR_NO_SYSTEM_RESOURCES
+
+    def test_unknown_open_failure_reports_alive_not_gone(self):
+        # any error that is neither "no such pid" (87) nor success is ambiguous -> ALIVE (fail closed, no inference).
+        self.assertTrue(_win_liveness(False, 0, False, 0))      # GetLastError set nothing
+        self.assertTrue(_win_liveness(False, 1, False, 0))      # ERROR_INVALID_FUNCTION, arbitrary
+        self.assertTrue(_win_liveness(False, 1300, False, 0))   # ERROR_NOT_ALL_ASSIGNED, arbitrary
+
+    def test_handle_opened_but_exit_code_unreadable_reports_alive(self):
+        # GetExitCodeProcess failed: cannot prove gone -> ALIVE.
+        self.assertTrue(_win_liveness(True, 0, False, 0))
+
+    def test_a_process_that_exited_with_code_259_reads_alive_the_safe_direction(self):
+        # the documented STILL_ACTIVE ambiguity: a process that exited with 259 reads ALIVE — false-alive is safe.
+        self.assertTrue(_win_liveness(True, 0, True, 259))
+
+    def test_only_no_such_pid_among_open_failures_is_gone(self):
+        # exact boundary: for EVERY OpenProcess-failure error, ALIVE unless it is exactly 87. Kills a mutant that
+        # flips the test back to `== 5` (old false-gone), to `== 87`, or to a constant.
+        for err in (0, 1, 5, 6, 8, 14, 87, 122, 299, 1300, 1450):
+            self.assertEqual(_win_liveness(False, err, False, 0), err != 87, f"open-failure error {err}")
+
+
+@unittest.skipUnless(os.name == "posix", "os.kill(pid, 0) is the POSIX branch of pid_alive")
+class PidAlivePosixSeam(unittest.TestCase):
+    """pid_alive's POSIX branch (os.kill(pid, 0)) — unchanged by the gate-3 fix, pinned against a future weakening:
+    only ESRCH is gone; EPERM and every other OSError read ALIVE. The owner-mandated branches for POSIX."""
+
+    def _kill(self, **kw):
+        return mock.patch("aisef2.runtime.process_range.os.kill", **kw)
+
+    def test_process_alive_reports_alive(self):
+        with self._kill(return_value=None):
+            self.assertTrue(pid_alive(4242))
+
+    def test_process_genuinely_gone_reports_gone(self):
+        with self._kill(side_effect=ProcessLookupError(3, "ESRCH")):
+            self.assertFalse(pid_alive(4242))
+
+    def test_access_denied_reports_alive(self):
+        with self._kill(side_effect=PermissionError(1, "EPERM")):
+            self.assertTrue(pid_alive(4242))
+
+    def test_unknown_or_resource_oserror_reports_alive_not_gone(self):
+        with self._kill(side_effect=OSError(12, "ENOMEM")):   # resource exhaustion / any non-ESRCH OSError
+            self.assertTrue(pid_alive(4242))
+
+    def test_a_non_positive_pid_is_never_alive(self):
+        self.assertFalse(pid_alive(0))
+        self.assertFalse(pid_alive(-1))
 
 
 class PL7DeveloperEscapeeHoldsWorkspace(unittest.TestCase):
