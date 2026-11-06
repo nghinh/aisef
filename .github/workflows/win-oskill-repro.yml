@@ -1,0 +1,26 @@
+# FINDING-WIN-OSKILL-001 — opt-in Windows reproduction (owner decision #2).
+#
+# Manual-only (workflow_dispatch): it NEVER runs on push or PR, so it cannot affect the mandatory `tests` CI
+# picture. It runs exactly one test — closure-evidence/v2/v2.2/win-oskill/repro_test_win_oskill.py — on a
+# windows-latest runner, to PROVE the FINDING reproduces on Windows (owner #2 precondition).
+#
+#   RED run  = reproduction confirmed: on the unfixed kernel, `aisef2/app/client.py::_is_gone`'s bare
+#              `os.kill(pid, 0)` TERMINATES a live process on Windows (os.kill(pid,0) is destructive there).
+#   GREEN run = the safe fix (Option A: OpenProcess + GetExitCodeProcess, query-only) is in place.
+#
+# Dispatch:  gh workflow run win-oskill-repro.yml
+name: win-oskill-repro
+on:
+  workflow_dispatch:
+jobs:
+  reproduce:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # The test imports aisef2 straight from the source tree (it inserts ROOT on sys.path) and uses only the
+      # stdlib, so no install step is needed. A non-zero exit here IS the reproduction evidence.
+      - name: reproduce FINDING-WIN-OSKILL-001 on Windows
+        run: python closure-evidence/v2/v2.2/win-oskill/repro_test_win_oskill.py -v
