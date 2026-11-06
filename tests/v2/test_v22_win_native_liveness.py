@@ -20,10 +20,8 @@ import sys
 import unittest
 
 from aisef2.runtime.process_range import (
-    _WIN_ERROR_INVALID_PARAMETER,
     _WIN_PROCESS_QUERY_LIMITED_INFORMATION,
     pid_alive,
-    process_table,
 )
 
 
@@ -62,32 +60,33 @@ class WinNativeLiveness(unittest.TestCase):
         # 5, != 87) the only correct answer is alive. This is deterministic regardless of runner integrity.
         self.assertTrue(pid_alive(4), "System (PID 4) must never read gone")
 
-        # Best-effort NATIVE observation of a real access-denied handle, to prove the fail-closed wiring on a
-        # genuinely denied OpenProcess rather than only on the pure decision. If this runner grants QUERY_LIMITED
-        # on every live pid (elevated), no denial is reachable here and the branch stays pinned by the
-        # mutation-proven unit test (WinLivenessDecision); we report, we do not silently skip.
+        # Best-effort NATIVE observation of a real access-denied handle, to prove fail-closed on a genuinely
+        # denied OpenProcess, not only on the pure decision. Enumerate a bounded low-PID range with raw Win32 —
+        # NOT process_table(), which shells out to POSIX `ps` (by design it fails on Windows; H1 catches that in
+        # production). Fully guarded: this observation is best-effort and must never error the test — the
+        # pid_alive(4) anchor above is the deterministic proof.
         # ponytail: access-denied reachability depends on runner integrity — observe when present, else document.
-        k = ctypes.WinDLL("kernel32", use_last_error=True)
-        from ctypes import wintypes
-        k.OpenProcess.restype = wintypes.HANDLE
-        k.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
-        k.CloseHandle.argtypes = [wintypes.HANDLE]
         observed_denied = None
-        for pid in sorted(process_table().keys()):
-            if pid <= 0:
-                continue
-            ctypes.set_last_error(0)
-            h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
-            if h:
-                k.CloseHandle(h)
-                continue
-            if ctypes.get_last_error() == 5:  # ERROR_ACCESS_DENIED on a live, enumerated pid
-                observed_denied = pid
-                break
+        try:
+            k = ctypes.WinDLL("kernel32", use_last_error=True)
+            from ctypes import wintypes
+            k.OpenProcess.restype = wintypes.HANDLE
+            k.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+            k.CloseHandle.argtypes = [wintypes.HANDLE]
+            for pid in range(1, 2048):
+                ctypes.set_last_error(0)
+                h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+                if h:
+                    k.CloseHandle(h)
+                    continue
+                if ctypes.get_last_error() == 5:  # ERROR_ACCESS_DENIED: a live process we may not fully query
+                    observed_denied = pid
+                    break
+        except Exception as e:  # best-effort only — never fail the test on the optional observation
+            print(f"win-native: access-denied scan skipped ({type(e).__name__}: {e})")
         if observed_denied is not None:
             self.assertTrue(pid_alive(observed_denied),
                             f"a live but access-denied pid {observed_denied} read as gone (fail-closed broken)")
-            self.assertNotEqual(5, _WIN_ERROR_INVALID_PARAMETER)  # 5 is denied, not the sole 'gone' code 87
         else:
             print("win-native: no access-denied handle reachable on this runner; "
                   "fail-closed-on-denied remains pinned by WinLivenessDecision (pure + mutation-proven)")
