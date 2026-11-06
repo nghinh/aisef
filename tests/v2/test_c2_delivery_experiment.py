@@ -1116,7 +1116,12 @@ class HistoricalAttempt4(unittest.TestCase):
         self.assertTrue(any("is not the committed" in p for p in found), found)
         self.assertTrue(any("git fsck --full --strict is not clean" in p for p in found), found)
         if (c2_p9.preserve_root() / "attempt-4-evidence").is_dir():   # this machine keeps them: they hold
-            self.assertEqual(dx.external_problems(4), [])
+            problems = dx.external_problems(4)
+            # owner 2026-11-06 #3: attempt 4 predates the client-store snapshot policy, so its store footprint is an
+            # explicit LIMITATION — recorded, never read from the live store, never counted as verified. The tamper
+            # sub-checks (manifest, fsck, journal-named objects) must still be clean.
+            self.assertEqual([p for p in problems if not p.startswith("LIMITATION:")], [])
+            self.assertTrue(any(p.startswith("LIMITATION:") and "not snapshotted" in p for p in problems), problems)
 
 
 class FalsePass(unittest.TestCase):

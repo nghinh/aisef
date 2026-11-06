@@ -1033,8 +1033,10 @@ def historical_problems(n: int, files: dict[str, bytes | None] | None = None) ->
 def external_problems(n: int, root: pathlib.Path | None = None, store: pathlib.Path | None = None) -> list[str]:
     """Why this machine's copies of attempt `n` outside the repository do not hold, or []: the external evidence copy
     is the one its committed manifest names, every checksum of it passes, the preserved git directory is sound and
-    holds every commit the journal names, and the developer client's own store has no session after the run ended.
-    `root`: the preservation root (default c2_p9.preserve_root()); `store`: the client's session database."""
+    holds every commit the journal names, and — from a FROZEN snapshot preserved with the attempt, never the live
+    store — the client's session footprint has no session after the run ended (an attempt without a preserved
+    snapshot records that as a transparent limitation, never read from the live store, never counted as verified).
+    `root`: the preservation root (default c2_p9.preserve_root()); `store`: retained for compatibility, no longer read."""
     ext = HISTORICAL[n].get("external")
     if not ext:
         return []
@@ -1060,13 +1062,21 @@ def external_problems(n: int, root: pathlib.Path | None = None, store: pathlib.P
             out.append(f"{git_dir}: the journal's commit {row['sha'][:12]} is not preserved")
     rec = json.loads((ROOT / c2_p9.attempt_dir(n) / "LEDGERLOCK-REGRESSION.json").read_text(encoding="utf-8"))
     ended = calendar.timegm(time.strptime(rec["finished"], "%Y-%m-%dT%H:%M:%SZ"))
-    store = store or pathlib.Path(os.environ.get("XDG_DATA_HOME") or pathlib.Path.home() / ".local/share") / "opencode" / "opencode.db"
-    if store.is_file():
-        import sqlite3
-        with sqlite3.connect(f"file:{store}?mode=ro", uri=True) as db:
-            latest = db.execute("select max(time_created) from session").fetchone()[0]
-        if latest is not None and latest / 1000 > ended:
-            out.append(f"the client's store {store} has a session created after attempt {n} ended")
+    # G: the client-store footprint — owner 2026-11-06 #3: checked against a FROZEN, digest-bound snapshot preserved
+    # WITH the attempt, never by reading the live store (it legitimately grows after the run) and never by fabricating
+    # a snapshot for an attempt that predates this policy. A missing snapshot is a transparent, recorded LIMITATION —
+    # it is NOT read from the live store and NOT counted as verified. (`store` is retained for call compatibility and
+    # is no longer read: re-deriving a historical footprint from the mutable live store is exactly what this removes.)
+    snap = ext.get("store_snapshot")
+    if not snap:
+        out.append(f"LIMITATION: attempt {n}'s client-store footprint was not snapshotted at preservation time "
+                   f"(it predates the 2026-11-06 immutable-evidence policy): NOT verifiable here and NOT claimed verified")
+    else:
+        snap_path = root / snap["file"]
+        if not snap_path.is_file() or _sha(snap_path.read_bytes()) != snap["sha256"]:
+            out.append(f"the preserved client-store snapshot {snap['file']} is missing or does not match its committed digest")
+        elif any(r["time_created"] / 1000 > ended for r in json.loads(snap_path.read_text(encoding="utf-8"))):
+            out.append(f"the preserved client-store snapshot records a session created after attempt {n} ended")
     return out
 
 

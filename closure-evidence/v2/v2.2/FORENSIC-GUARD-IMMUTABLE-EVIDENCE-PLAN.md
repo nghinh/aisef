@@ -44,5 +44,11 @@ The attempt-n snapshot must capture **attempt-n-era** state. If a faithful attem
 - A unit test that builds a temp store with (a) exactly attempt-n's session ids ≤ finished → PASS, (b) a deleted/renamed attempt-n session → FAIL, (c) a *newer unrelated* session added → **PASS** (the bug this fixes), (d) an attempt-n session whose content digest changed → FAIL.
 - Keep the existing absent-copy / dirty-fsck assertions (the test's first two `assertTrue`s already cover those and must stay red-on-tamper).
 
-## 6. Status
-Plan only. No change to `external_problems`, the test, or any evidence. Awaiting owner go to implement (and, for the attempt-4 backfill, the §4 provenance decision which overlaps owner #4's reseal governance).
+## 6. Status — IMPLEMENTED (owner #3 GO, 2026-11-06)
+
+Implemented in [c2_delivery_experiment.py `external_problems`](../../../validation/qualification/c2_delivery_experiment.py) + its test:
+- The live-store read (`sqlite3` on `~/.local/share/opencode/opencode.db`, `max(time_created)`) is **removed**. The store footprint is now checked against a **frozen, digest-bound snapshot** preserved with the attempt (`ext["store_snapshot"]` = `{file, sha256}`): the snapshot's bytes are verified against the committed digest, then its rows are checked for any session after `finished`. Immutable, like sub-checks 1–3.
+- **Attempt-4 has no snapshot** (none was captured at preservation time; owner #3 forbids fabricating one). The guard therefore emits a transparent `LIMITATION:` line — *"attempt 4's client-store footprint was not snapshotted … NOT verifiable here and NOT claimed verified"* — and does **not** read the live store. The test asserts that line is present and that the tamper sub-checks (manifest / fsck / journal-named objects) are still clean, instead of asserting `== []`. Missing evidence is recorded, never turned into VERIFIED.
+- Verified: `HistoricalAttempt4` 4/4 OK on this machine (the real-machine branch that was the single full-suite failure now passes via the recorded limitation, not a live read); `ruff` clean. The `store` parameter is retained for call compatibility and is no longer read.
+
+This changes a qualification file, so the C2 delivery-experiment record-currency comparison will re-derive differently — folded into the owner #4 reseal set, not resealed here.

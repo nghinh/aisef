@@ -1,0 +1,109 @@
+{
+ "baseline": {
+  "tests.v2.test_v22_hardening_p1_run_pin_fence": 0,
+  "tests.v2.test_v22_hardening_p2_tripwire": 0,
+  "tests.v2.test_v22_hardening_p3_register_runtime": 0
+ },
+ "results": [
+  {
+   "label": "pin_name",
+   "mutant": "run.execute 'client_pin' emptied (getattr name)",
+   "file": "aisef2/app/run.py",
+   "test": "test_a_mismatched_client_pin_refuses_before_any_session",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "fence_name",
+   "mutant": "run.execute 'client_fence' emptied (getattr name)",
+   "file": "aisef2/app/run.py",
+   "test": "test_a_matched_pin_and_declared_fence_reach_every_session",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "pin_kw",
+   "mutant": "run.execute pin_sha256 kw entry dropped",
+   "file": "aisef2/app/run.py",
+   "test": "test_a_matched_pin_and_declared_fence_reach_every_session",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "fence_kw",
+   "mutant": "run.execute fence kw entry dropped",
+   "file": "aisef2/app/run.py",
+   "test": "test_a_matched_pin_and_declared_fence_reach_every_session",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "bundle_none",
+   "mutant": "_bundle_hit L102 returns None",
+   "file": "aisef2/app/tripwire.py",
+   "test": "BundleHitFailsClosed",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "bundle_false",
+   "mutant": "_bundle_hit L102 True->False",
+   "file": "aisef2/app/tripwire.py",
+   "test": "BundleHitFailsClosed",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "canon_comma",
+   "mutant": "_canonical L37 ',' emptied",
+   "file": "aisef2/app/tripwire.py",
+   "test": "CanonicalSeparators",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "canon_colon",
+   "mutant": "_canonical L37 ':' emptied",
+   "file": "aisef2/app/tripwire.py",
+   "test": "CanonicalSeparators",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "scan_ascii",
+   "mutant": "scan_text L90 ensure_ascii False->True",
+   "file": "aisef2/app/tripwire.py",
+   "test": "ScanTextEscapedSpelling",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "fragments_tuple",
+   "mutant": "_fragments L46 element 1 dropped (tuple)",
+   "file": "aisef2/app/tripwire.py",
+   "test": "FragmentsFrozenTuple",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1)"
+  },
+  {
+   "label": "reg_code_static",
+   "mutant": "register_runtime L449 MechanismKind.CODE->STATIC_RULE",
+   "file": "aisef2/invariants/registry.py",
+   "test": "test_v22_hardening_p3_register_runtime",
+   "killed": true,
+   "rc": 1,
+   "last": "FAILED (failures=1, errors=1)"
+  }
+ ],
+ "tree_clean_after": true
+}

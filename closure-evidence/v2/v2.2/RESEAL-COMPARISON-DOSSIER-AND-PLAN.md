@@ -76,6 +76,13 @@ The `freeze_manifest` / `destructive_authority` p0 files produced no additional 
 - **No lost evidence:** historical records stay byte-identical (guarded by `test_historical_records_read_as_before`); the before/after digests in each amendment preserve exactly what the prior tree bound.
 - **Owner gate:** the §5.1 change manifest is presented for approval before any amendment is appended. This dossier authorizes neither.
 
-## 7. Status
+## 7. Status — dry-run authorized; reseal DEFERRED (owner #4 condition, 2026-11-06)
 
-Dossier + plan complete. **No reseal performed.** Awaiting owner approval of the §5.1 change manifest and this §6 provenance plan before executing.
+Owner #4 authorized the dry-run and change-manifest preparation, with reseal only after the dry-run report meets the five confirmations **and** without legitimizing unresolved findings. **The reseal is NOT executed, for two grounded reasons:**
+
+1. **An unresolved finding is open.** Owner #2's reproduction revealed that FINDING-WIN-OSKILL-001's Windows fix is larger than the presented Option A (the repro errors at `process_table()` before `os.kill`; see [FINDING-WIN-OSKILL-001-REPRO-CORRECTION.md](./FINDING-WIN-OSKILL-001-REPRO-CORRECTION.md)). That finding is now back with the owner. Resealing now would seal a tree while a kernel finding is unresolved — exactly what owner #4 forbids (*"không hợp thức hóa findings chưa được giải quyết"*).
+2. **The release candidate is not final.** The Windows fix (once approved) edits the frozen kernel (`aisef2/app/client.py`), which moves `kernel_digest` and re-stales a further set of records. Resealing the current tree would be wasted and would have to be redone after that kernel change. The reseal belongs on the *final* RC.
+
+**Dry-run measured so far (read-only, no write):** the 17 stale record-currency records are enumerated in §2; the p0 subset deltas (mutation / destructive_authority / execution_order checker calibration) are in §4; `freeze_manifest --check` and `checker_calibration --check` pass (records are *stale*, not *broken*); the `mutation` calibration staleness is **pre-Đợt-2** (`fold.py`, wave-1 `be7b1700`). The full per-record before/after digest manifest (§5.1) will be produced against the **final** RC once owner #2 is resolved.
+
+**Five confirmations (design-guaranteed by the append-only mechanism, to be re-verified on the final manifest):** historical records byte-identical (original approval record never changes — §3); amendments append-only with a tamper-evident chain (broken-link check — §3); no back-date / no overwrite (§6); no unresolved finding legitimized (the reason reseal is deferred — above); Q5 and freeze_manifest each compared against their own kernel/record generator (§2 map). **No reseal performed.**
