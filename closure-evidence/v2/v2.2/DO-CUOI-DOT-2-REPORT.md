@@ -13,10 +13,17 @@ All wave-2 work items are complete. No kernel (`aisef2/`) code was changed this 
 
 ## 2. Commit & CI
 
-- Consolidation commit SHA: `[PENDING COMMIT]`
-- Pushed to: `origin/master`
-- CI run: `[PENDING CI]` — expectation: all mandatory jobs green; `sealing` red-by-design (honestly red until owner reseal). **Per owner #2, CI is NOT declared PASS while any mandatory job is red.**
-- Prior CI @346b432e: `unit (ubuntu-latest, 3.12)` was red (1 test); root-caused + fixed this cycle (§4).
+- Consolidation commit SHA: **`7de3af0a`** (`wave2 ĐO CUỐI: mutation Lane M classified, FINDING plan, live canary, acceptance report`), pushed `346b432e..7de3af0a` to `origin/master`. 8 files, additive only.
+- CI run for `7de3af0a`: [`tests` run 42150619299](https://github.com/nghinh/aisef/actions/runs/42150619299) — **in progress** at report time (the unit/sealing cells run the ~60-min suite). Final result to be confirmed from this URL.
+- **CI is NOT declared PASS (owner #2).** The `sealing` job is red and will stay red until owner reseal (#5) — see below. Measured from the two most recent completed runs:
+
+  | job | @ad7164d3 | @346b432e | why |
+  |---|---|---|---|
+  | `lint`, `wheel` | ✅ | ✅ | — |
+  | `unit` ×8 cells | ✅ all | ❌ **ubuntu-3.12 only** | load flake (§4); green @ad7164d3, red @346b432e → intermittent. Fixed by the test-timeout bump in `7de3af0a`. |
+  | `sealing` | ❌ | ❌ | **`FAILED (failures=21)`** — all record-currency / re-derivation staleness (§8.2). Persistent, by owner #5 deferral. |
+
+- **Correction to an earlier draft:** I had written "CI @ad7164d3 green." That was wrong — `ad7164d3` had `sealing` red (only). The accurate statement: `sealing` has been red across recent runs for record-currency reasons; the `unit(ubuntu-3.12)` redness is a separate intermittent load flake that this commit addresses.
 
 ## 3. Full suite (main tree)
 
@@ -74,7 +81,14 @@ Full plan: [FINDING-WIN-OSKILL-001-SAFE-FIX-PLAN.md](./FINDING-WIN-OSKILL-001-SA
 
 **Pending owner decision:**
 1. **FINDING-WIN-OSKILL-001 fix (#2)** — approve applying the guarded safe fix (Option A) + wiring the Windows repro test, as one reviewed change. Currently plan-only.
-2. **Reseal / Q5-KERNEL-COMPARISON / freeze_manifest V2_007 (#5)** — not executed; compiled here for your decision. The record-currency `cleanup_authority.py` staleness (campaign `mutation: FAIL`) sits under this — a reseal would refresh those records.
+2. **Reseal / Q5-KERNEL-COMPARISON / freeze_manifest V2_007 (#5)** — not executed; compiled here for your decision. This is the single cause of the red `sealing` CI job: **`FAILED (failures=21)`, every one a record-currency / re-derivation staleness** (a committed record that no longer re-derives from the current tree after wave-2 edits), not a product-logic failure. The 21, grouped:
+   - **Re-derivation / "binds this tree" / "committed record is current"** (≈14): `test_c2_orchestration_conformance.Record` (×2), `test_p5_plan_v22_proposal.Record`, `test_c2_p5_acceptance` (Acceptance + KernelProvenance), `test_c2_delivery_experiment.PlanCorrection`, `test_v21_conformance_ruling.CommittedRuling`, `test_c2_p10_profile_freeze.Checker`, `test_c2_p10_cohort_static.Record`, `test_c2_k_nowork_001.Record`.
+   - **Checker calibration currency** (×2): `test_p0.test_checker_calibration.CheckerCalibration` (calibrated + committed-record-current; fixture-fails-for-named-reason).
+   - **Mutation record currency**: `test_v21_mutation_runner.Classify.test_historical_records_read_as_before`; plus the campaign's own `cleanup_authority.py` and `registry.py::_arms` "target changed since the mutation run" (§5).
+   - **Destructive-authority ledger (`da.check` whole-tree, `@sealing`-gated)**: `test_p0.test_destructive_authority.Checker.test_this_tree_passes_and_every_site_is_ledgered`; `test_p5.test_invariants.MutationAuthority...destructive_sites...ledgered`.
+   - **Your deferred items by name**: `test_p0.test_freeze_manifest...V2_007_exception...` (freeze_manifest V2_007) and `test_p9_reproduction.KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree` (Q5-KERNEL-COMPARISON).
+
+   A reseal re-derives and re-commits all of these in one controlled pass (the proper independent-controller operation, per INV-MUTATION-AUTHORITY), turning `sealing` green. **Not done — awaiting your go (#5).** No record was refreshed or back-dated this cycle to make CI look green.
 3. **236 mutation real-gaps** — do you want a scoped hardening wave to add kill-tests (owner #4 said no criteria change now; this is a forward-looking ask, not a wave-2 blocker)?
 4. **Fragile cycle-2 forensic test** (§3a) — `HistoricalAttempt4.external_problems(4)` reads this machine's live `~/.local/share/opencode/opencode.db` and fails on *any* opencode session after 2026-10-03, including legitimate approved canary runs. It passes on CI (machine-local guard) but is red on the dev box after each paid run. Candidate fix (not done, needs your go): snapshot the attempt-4 store digest into the committed evidence and compare against that frozen copy instead of live `max(time_created)` — a plan-only item like FINDING-WIN-OSKILL-001, not touched this cycle.
 
