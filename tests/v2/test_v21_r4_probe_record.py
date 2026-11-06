@@ -80,8 +80,12 @@ class TheReportIsTheRecord(unittest.TestCase):
             sink.mkdir(exist_ok=True)
             args = [at[1], *(str(sink / n) for n in ("a", "b", "c")), at[5], str(sink / "d"), "0.01", str(sink / "e"),
                     str(sink / "f"), str(sink)]
+            # timeout guards the harness's own real-probe subprocess; it is not the oracle. A saturated CI runner (a
+            # 54-min suite was observed on ubuntu-3.12) can push the probe past a tight budget, and a timed-out probe
+            # yields NO finding — indistinguishable from the campaign-6 bug this test pins — so the assertion below
+            # would read a flake as a regression. Generous budget so the probe always reports; the oracle is unchanged.
             return subprocess.run(["/bin/sh", "-c", confine.PROBE, "probe", *args], capture_output=True, text=True,
-                                  encoding="utf-8", timeout=60, check=False).stdout
+                                  encoding="utf-8", timeout=300, check=False).stdout
         rep, home, ws = measured(answer)
         self.assertEqual(rep["tried"]["read_canary"]["exit"], 0)
         self.assertIn(READABLE, rep["problems"])

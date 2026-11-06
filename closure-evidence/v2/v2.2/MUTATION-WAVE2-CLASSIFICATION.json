@@ -1,0 +1,1433 @@
+{
+  "record": "MUTATION-WAVE2-CLASSIFICATION",
+  "date": "2026-11-06",
+  "owner_decisions": "#4 complete Lane M + classify by evidence; #1 binding (no scope reduction, no loosened criteria, EQUIVALENT needs documented reasoning)",
+  "campaign": {
+    "frozen_commit": "89de4685",
+    "workers": 4,
+    "totals": {
+      "mutants": 2154,
+      "killed": 1903,
+      "survived_raw": 251,
+      "infra": 0,
+      "not_run": 0
+    },
+    "per_worker": {
+      "w1(run.execute)": "458/380/78",
+      "w2": "493/470/23",
+      "w3": "572/456/116",
+      "w4": "631/597/34"
+    },
+    "note": "run.py::execute 78 raw survivors = 74 distinct descriptions (4 duplicate descriptions share the twin verdict)"
+  },
+  "method": "two-pass per survivor: (1) classify EQUIVALENT vs SURVIVED against frozen source; (2) adversarially refute EVERY EQUIVALENT (find a distinguishing input). Final EQUIVALENT iff upheld. Default SURVIVED; equivalence requires proof.",
+  "classification_final": {
+    "distinct_survivors": 247,
+    "confirmed_equivalent": 11,
+    "real_coverage_gap": 236,
+    "two_pass_funnel": {
+      "classified_equivalent": 45,
+      "upheld_after_refutation": 11,
+      "flipped_to_real": 34
+    }
+  },
+  "record_currency_note": "campaign post-run record-currency gate reported FAIL on validation/v2/cleanup_authority.py (carriers/cwd_under/host_table): 'target changed since the mutation run'. Pre-existing staleness unrelated to the wave-2 targets; does NOT invalidate the kill/survive verdicts above. Relates to reseal (owner decision #5, not executed).",
+  "interpretation": "The 236 real gaps are honest test-coverage gaps (diagnostic strings, digest/record internals, uncovered refusal branches) a test COULD assert but none currently does \u2014 reported as-is, no scope reduction. The 11 equivalents each survived an adversarial refutation attempt with a documented proof.",
+  "targets": [
+    {
+      "target": "aisef2/app/adapters.py::Reviewer._ocr",
+      "distinct_survivors": 13,
+      "equivalent": 0,
+      "real_gap": 13,
+      "verdicts": [
+        {
+          "mutant": "L237 Or swapped",
+          "verdict": "SURVIVED",
+          "basis": "The classifier's claim is 'no observable difference on ANY input' \u2014 that categorical claim is false, so EQUIVALENT cannot stand under owner directive #1. Mechanism: `A or {}` evaluates bool(A) at the `or`, then `if needles:` (L238) evaluates bool(needles) AGAIN; when A is truthy that is a SECOND bool(A) call on the same object. The mutant `{} or A` evaluates bool({}) (False) and assigns needles=A WITHOUT calling bool(A), so bool(A) is called only once, at L238. For any A with a non-idempotent __bool__ the two forms branch differently. Concrete distinguishing input: self.kw['needles'] = a dict subclass F = {'BC-1': ['XYZ']} whose __bool__ returns True on the 1st call and False thereafter, with background_text/rule_text containing 'XYZ'. ORIGINAL: L237 `F or {}` -> bool(F)#1=True -> needles=F; L238 `if needles:` -> bool(F)#2=False -> branch SKIPPED, no scan, _ocr proceeds to write rule/background and run OCR. MUTANT: L237 `{} or F` -> needles=F (no bool(F) call); L238 `if needles:` -> bool(F)#1=True -> branch ENTERED -> tripwire.scan_text finds 'XYZ' -> `if found:` -> raise CapabilityUnrunnable(tripwire.refusal(...)). Observable divergence: mutant raises CapabilityUnrunnable, original does not. A test driving _ocr (via session_kw) with such a needles object and asserting raises-vs-not kills the mutant. For all realistic needles (plain dict / None / absent, i.e. idempotent __bool__) the two forms are indeed indistinguishable (the differing value only occurs when A is falsy, where `if needles:` is False in both and needles is never read after L239) \u2014 so this is a narrow, contrived distinguisher \u2014 but it exists and is constructible, which defeats the 'no test can kill it on any input' basis. Per the binding rule (uphold EQUIVALENT only if confident NO input distinguishes; refute when in doubt), verdict is SURVIVED, not EQUIVALENT."
+        },
+        {
+          "mutant": "L238 condition negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating to `if not needles:` inverts the tripwire gate: with a real non-empty needles dict (the G1 feature's purpose) the scan is skipped, so a sealed stimulus that should refuse the OCR review (CapabilityUnrunnable at L241) would no longer be caught. Live branch, genuine behavior change; no test exercises the _ocr needles path (default kw has no needles), so it is a coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L224 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "`required` is passed to review_ocr.coverage(required=required) and review_ocr.findings(output, required) (L288, L297) and recorded verbatim in s[\"required\"] (L284) into RUN.json. Order is observable in the recorded list and not provably irrelevant to coverage/findings. Survived only because the kill-tests use single-file diffs (one element: sorted==list); multi-file changes make order observable. Per rule, SURVIVED unless every consumer is provably order-insensitive, which I cannot show."
+        },
+        {
+          "mutant": "L284 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "s[\"deleted\"] is stored in the reviewer session record (RUN.json). Its element order is a recorded, assertable value; not provably order-insensitive. Survived because tested diffs delete 0/1 paths. SURVIVED per the sorted()->list() rule."
+        },
+        {
+          "mutant": "L237 string 'needles' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\"needles\" is a dict KEY looked up in self.kw; emptying it makes `self.kw.get(\"\")` which returns None -> needles={} -> the tripwire scan (L239-241) never runs even when needles are supplied. A dict-key operand with a real behavior change (disables the gate). SURVIVED (and the rule explicitly keeps dict-key string mutants out of EQUIVALENT)."
+        },
+        {
+          "mutant": "L253 string 'ocr preview ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This is the `name` passed to _bounded -> ProcessRange(name=...). The name is interpolated into ProcessRange failure messages (RangeError \"{name}: the target did not start\", L365; RangeNotEmpty \"{name}: not empty\", L511; RangeEscaped, L534). On a preview-process range failure the raised exception text changes from 'ocr preview <story>' to '<story>', so it is observable and killable in principle; no test drives a preview range failure. SURVIVED, not a purely-unobserved diagnostic."
+        },
+        {
+          "mutant": "L262 string 'ocr review ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Same as the preview label: `name` for the review process's ProcessRange, which appears in its RangeError/RangeNotEmpty/RangeEscaped messages (process_range.py L365/L511/L534). Observable on a review-process range failure; untested. SURVIVED."
+        },
+        {
+          "mutant": "L241 string 'the OCR review of ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The second arg is the `where` context tripwire.refusal embeds into the refusal message, which becomes the CapabilityUnrunnable text raised and recorded as the failure reason. Emptying it changes that message from 'the OCR review of <story>' to '<story>'. The _ocr tripwire/needles path is untested (no kw needles in the kill-tests), but the refusal string is an assertable exception message, so it is a coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L258 True->False",
+          "verdict": "SURVIVED",
+          "basis": "Flipping either mkdir flag introduces a failure mode: exist_ok=False raises FileExistsError when self.logs already exists (e.g. a developer session or a prior attempt already created the sessions dir in the same run); parents=False is redundant here (L232 already created self.logs.parent) but the survivor label is ambiguous as to which True is mutated. Since the exist_ok interpretation is a real behavior change and I cannot prove self.logs never pre-exists, SURVIVED per the True->False rule (value not provably unused)."
+        },
+        {
+          "mutant": "L268 dict entry 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 2 is `\"reasoning\": 0`. The tokens dict is written to the evidence log (L275 step_finish part) and read back by client.read_session into s[\"tokens\"] (token accounting / RUN.json). Dropping the key changes the recorded token structure's shape; a dict/JSON key in a semantic accounting record. SURVIVED (dict-entry-dropped rule)."
+        },
+        {
+          "mutant": "L268 string 'reasoning' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The dict KEY \"reasoning\" becomes \"\", so the recorded token structure gains key '' instead of 'reasoning'. A JSON/dict key in the token-accounting record carried into s[\"tokens\"]/RUN.json. Explicitly a dict-key string -> SURVIVED, never EQUIVALENT."
+        },
+        {
+          "mutant": "L277 True->False",
+          "verdict": "SURVIVED",
+          "basis": "sort_keys=True produces canonical/deterministic ordering in the written session evidence log. The log is a redacted evidence artifact in a codebase with heavy sha/byte-reproducibility discipline ('a session's evidence is never overwritten'); its byte layout is observable even though client.read_session re-parses it order-insensitively. I cannot prove the log bytes/digest are never compared, so per the True->False rule (not provably unused) SURVIVED."
+        },
+        {
+          "mutant": "L298 string ')' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The trailing ')' closes the parenthesized coverage reasons in the third return value, which review() places into the Reviewed.detail message (L173). That detail string IS asserted in tests (e.g. '0 findings, coverage COMPLETE', '2 findings, parsed=True, confirmed=1'), so the pattern is assertable; dropping ')' leaves an unbalanced ' (reason...' whenever cov.reasons is non-empty (a reachable INDETERMINATE-coverage state under advisory). Survived only because no test drives the real non-empty-reasons path through _ocr+review (that test mocks the coverage string). Coverage gap, not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/bundle.py::load",
+      "distinct_survivors": 12,
+      "equivalent": 0,
+      "real_gap": 12,
+      "verdicts": [
+        {
+          "mutant": "L186 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "The catch of KeyError is REACHABLE, so dropping it is observable. load(data: Mapping) and shape_problems admit ANY Mapping as an approvals element (only isinstance(x, Mapping) is checked at bundle.py:73; elements are never unpacked there). Distinguishing input: an otherwise-valid bundle whose data['approvals'] = [M], where M is a collections.abc.Mapping whose keys() advertises a key for which __getitem__ raises KeyError (a lazy/view mapping). M passes shape_problems, then in load's approvals try `ContractApproval(**M)` performs generic **-unpacking (keys()+__getitem__), raising KeyError INSIDE the try body. Original `except (KeyError, TypeError, ValueError)` catches it -> raise BundleError('the bundle\\'s kernel objects do not load: KeyError: ...'); mutant `except (TypeError, ValueError)` lets the raw KeyError (a LookupError, not a ValueError) escape load. A test `with assertRaises(bundle.BundleError): bundle.load(data)` PASSES on original and FAILS on the mutant (KeyError is neither BundleError nor ValueError); str(exc) also differs. The classifier's 'unreachable for any well-formed Mapping input' narrows 'input' to plain dicts and ignores non-dict Mappings. The author's own contract makes this a coverage gap, not equivalence: the AppBundleLoad docstring (test_s2_kills.py:717-719) states 'a KeyError while loading is a refusal', and the requirements loop's identical catch IS pinned by the exact-message test at line 732 ('...do not load: KeyError: \\'id\\''), which is why the requirements KeyError mutants were killed. The approvals try has the same catch for the same reason but the sole approvals-failure test (lines 736-738) only drives model_reviews='not-a-list' -> ContractError (ValueError), which the mutant still catches, so no frozen test exercises a KeyError here. Merely untested, hence SURVIVED, not EQUIVALENT."
+        },
+        {
+          "mutant": "L186 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops TypeError from the approvals except. TypeError IS reachable: an approval Mapping with missing/extra fields (e.g. {}, which passes shape_problems' list-of-Mappings check) makes `ContractApproval(**a)` raise TypeError 'missing required argument'. With the mutant that TypeError escapes `load` raw instead of being collected into problems -> BundleError. The only approval-failure test (s2_kills:738, model_reviews='not-a-list') raises ContractError(ValueError), not TypeError, so nothing exercises this path: a genuine coverage gap, killable."
+        },
+        {
+          "mutant": "L192 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops KeyError from the plan except guarding `_plan(data[\"plan\"])`. KeyError IS reachable: shape_problems only checks data['plan'] is a Mapping, so a plan missing a key (e.g. {}) makes `_plan` raise KeyError at d['obligations']/o['criterion_id']/d['id']/d['plan_quality_policy']. Dropping KeyError makes it propagate raw instead of becoming BundleError. The only plan test (app_units:404, plan_hash='0'*64) raises ValueError (killed element 2); no test feeds a key-missing plan. Coverage gap, killable."
+        },
+        {
+          "mutant": "L192 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops TypeError from the plan except. TypeError IS reachable in `_plan`: `tuple(o[\"depends_on\"])` with a non-iterable depends_on, or `PlanQualityPolicy(**d[\"plan_quality_policy\"])` where plan_quality_policy is not a mapping, or a bad PlanObligation arg, all raise TypeError. Dropping it makes the TypeError escape raw rather than become BundleError. No test feeds a type-malformed plan, so it survives \u2014 a coverage gap, killable."
+        },
+        {
+          "mutant": "L189 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Negates the `len(problems) == 1` guard at the first aggregation raise. When len==1 (every existing test's single-problem case) original returns problems[0] and the mutant's else returns '\\n'.join([x]) == problems[0] \u2014 identical, so tests don't notice. But with >=2 problems (two bad requirements, or a bad requirement + bad approval \u2014 the explicit G7 'one raise, all of it' design state) original returns the joined list, mutant returns only problems[0], dropping the other messages. Branch is reachable and not dead; no test exercises the multi-problem path. Killable coverage gap."
+        },
+        {
+          "mutant": "L204 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Same construct at the second (contract-compile) aggregation raise. With >=2 non-compiling contracts, original joins all 'contract X does not compile' messages, mutant returns only problems[0]. The compile test (s2_kills:733) uses .startswith(problems[0]) and the fixture has a single contract, so len==1 there (join([x])==problems[0]) and the test can't distinguish. The >=2-contract branch is reachable, not dead. Killable coverage gap."
+        },
+        {
+          "mutant": "L177 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops ValueError from the requirements/contracts loop except. ValueError IS reachable: a requirement with all string fields present but a wrong requirement_hash makes Requirement.__post_init__ raise ContractError (a ValueError) ('requirement_hash does not bind this content'); likewise BehaviorContract.from_json on bad sealed content. Dropping ValueError makes that ContractError escape raw instead of being collected into problems -> BundleError. Existing tests only hit the KeyError path (no id, s2_kills:732 -> killed element 0) and the TypeError path (missing fields {\"id\":\"R\"}, app_units:403 -> killed element 1); none feeds a present-but-wrong-hash object. Killable coverage gap."
+        },
+        {
+          "mutant": "L189 Eq->NotEq",
+          "verdict": "SURVIVED",
+          "basis": "`len(problems) == 1` -> `!= 1`, the exact negation. Identical when len==1 (all tested cases: True->problems[0] vs else '\\n'.join([x])==problems[0]); diverges for >=2 problems (returns problems[0] instead of the full joined report). The >=2-problem state is reachable (G7 aggregation) and not dead, and the value is used (the exception message). Untested multi-problem path -> killable coverage gap."
+        },
+        {
+          "mutant": "L204 Eq->NotEq",
+          "verdict": "SURVIVED",
+          "basis": "Same Eq->NotEq negation at the contract-compile aggregation raise. Identical for the single-contract fixture (len==1), diverges with >=2 failing contracts (drops all but problems[0]). Reachable branch, value used in the message; .startswith assertion with a one-contract fixture can't catch it. Killable coverage gap."
+        },
+        {
+          "mutant": "L193 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Empties the ': ' separator between {type(e).__name__} and {e} in the PLAN-path error message, changing the observable BundleError text (e.g. 'ContractError: plan_hash...' -> 'ContractErrorplan_hash...'). Not a pure-unasserted diagnostic: this codebase asserts exact error text via assertEqual \u2014 the sibling messages at L178/L187 using this very ': ' format are asserted byte-for-byte (s2_kills:732/:738) \u2014 so message text is a tested behavioral contract. The plan path (app_units:404) only matches the substring 'do not load', leaving this occurrence uncaught: a real coverage gap, killable by asserting the plan message exactly."
+        },
+        {
+          "mutant": "L189 string '\\n' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Empties the '\\n' join separator used only in the else branch (len>=2) of the first aggregation raise. With >=2 problems the messages concatenate with no separator ('err1err2' vs 'err1\\nerr2'). Reachable (G7 multi-problem design) and observable; exact BundleError messages are an asserted contract here (assertEqual in s2_kills), so a 2-problem input asserting the joined text would kill it. No test produces >=2 problems -> survives as a coverage gap. Not equivalent: the '\\n' is the record delimiter of the aggregated report, and behaviour differs for >=2 inputs."
+        },
+        {
+          "mutant": "L204 string '\\n' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Same '\\n' join-separator emptied at the contract-compile aggregation raise; else branch reached only with >=2 non-compiling contracts, which the single-contract fixture (s2_kills:733, .startswith) never produces. Observable message change for >=2 contracts; exact messages are asserted elsewhere in the suite. Reachable-but-untested aggregation path -> killable coverage gap, not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::lint",
+      "distinct_survivors": 2,
+      "equivalent": 0,
+      "real_gap": 2,
+      "verdicts": [
+        {
+          "mutant": "L788 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "rows = _spec_rows(bundle) is a dict built in plan-obligation order, so the generator yields criterion ids in plan order; sorted() alphabetizes, list() keeps plan order. With >=2 criteria lacking calibration whose plan order differs from alphabetical, the two produce different lists. The value is returned verbatim in the lint report dict (a list whose order is observable via equality and CLI JSON), so it is killable in principle. The campaign's tests only assert this key as [] (T03a:154/169, migrate:783), a single element (T04a:244), or after re-sorting the report value (T03a:187/200, and T04a:257 compares to sorted(entries) on data already in sorted plan order) -- none pins a multi-element list in a non-alphabetical plan order, so the mutation is a genuine test-coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L789 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "Same structure: rows.items() is in plan-obligation order, so sorted() vs list() differ whenever >=2 criteria lack a contract and plan order != alphabetical. The result is returned verbatim in the lint report dict as an order-observable list and is not re-sorted anywhere in product code (it does not feed the `ready` verdict but is still part of the returned output). Killable in principle; the frozen tests assert this key only as [] (T03a:170/188), a single element ['C-STDLIB-1'] (defects_bundlecli:219), or after re-sorting (sorted(report[...]) at T03a:152), so order is never pinned -- a real coverage gap, not equivalence."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::seal",
+      "distinct_survivors": 16,
+      "equivalent": 6,
+      "real_gap": 10,
+      "verdicts": [
+        {
+          "mutant": "L523 tuple() -> list()",
+          "verdict": "EQUIVALENT",
+          "basis": "After `approvals = list(approvals)` the local is read only for truthiness (L524 `if approvals and exposed is None`) and iteration (L610 `for i, a in enumerate(approvals)`). The container itself never escapes seal: it is not returned, not stored in the bundle or report, never hashed, type-checked, compared by type, or serialized; the report's approvals_kept/dropped/withheld/to_approve are built from the kept/dropped/withheld lists, not from `approvals`. list and tuple are identical for truthiness (empty->False, non-empty->True) and for enumerate order, and the default ()->[] stays falsy and empty-iterable. Both list() and tuple() fully materialize any input (incl. a generator), so even a one-shot iterator behaves identically. No input or observation can distinguish them -> genuinely equivalent."
+        },
+        {
+          "mutant": "L553 element 0 dropped",
+          "verdict": "EQUIVALENT",
+          "basis": "Drops KeyError from the requirements-loop catch (becomes `except (TypeError, ValueError)`). The entire try body is `Requirement.create(**r)`. `**r` on a non-Mapping or with non-str/extra/missing keys raises TypeError; Requirement.__post_init__ validates via require_str_fields (contract.py:172, raising ContractError which subclasses ValueError at contract.py:26) and computes requirement_hash via plain()/json.dumps using only attribute access. There is NO dict subscript on uncontrolled data anywhere in that path, so KeyError is provably never raised. The dropped handler is dead on ALL inputs (not merely untested) -> dropping it changes nothing observable."
+        },
+        {
+          "mutant": "L553 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops ValueError, which IS reachable: `Requirement.create(**r)` with a non-string or empty field raises ContractError (a ValueError subclass) via require_str_fields. With ValueError dropped, that error propagates uncaught out of seal instead of being collected into `problems` and raised as a BundleError. Killable with a bad-value requirement, but the only requirement test uses an extra key (TypeError), so the ValueError path is untested."
+        },
+        {
+          "mutant": "L598 element 0 dropped",
+          "verdict": "EQUIVALENT",
+          "basis": "Drops KeyError from the criterion-loop inner catch. On reaching that try, cr has passed `_closed(cr, CRITERION_KEYS)` in the outer try (else continue), so cr['role'], cr['id'], cr['depends_on'], cr['why'] are all present. `EXPECTED_AT_PARENT[role]` is total: ObligationRole has exactly INTRODUCE/PRESERVE/VERIFY (enums.py:62-65) and all three are mapped (obligation.py:76-78), and role is already a valid ObligationRole (ObligationRole(cr['role']) raises ValueError on a bad value). `_mint`->ProductProofSpec.create/expectation_for and PlanObligation use only attribute access and raise ContractError/CompileError/PlanError (all ValueError) or TypeError; `tuple(cr['depends_on'])` raises only TypeError. No dict subscript on uncontrolled data -> KeyError provably unreachable -> equivalent on all inputs."
+        },
+        {
+          "mutant": "L604 tuple() -> list()",
+          "verdict": "EQUIVALENT",
+          "basis": "Plan.create receives obligations=list(obligations) instead of tuple(obligations). Plan.__post_init__ (obligation.py:93) coerces `obligations = tuple(self.obligations) if isinstance(self.obligations, (list, tuple))` BEFORE computing plan_hash, and both list and tuple satisfy the isinstance check. The resulting frozen Plan, its plan_hash, and the serialized bundle (plain() turns both into JSON arrays) are byte-identical. The empty case: tuple([]) and list([]) are both falsy, so both raise the same PlanError('a plan holds at least one PlanObligation'), caught identically at L606. The seal-local `obligations` list used at L628 is a separate object unaffected by the copy. No observable difference."
+        },
+        {
+          "mutant": "L537 string ')' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The branch is reachable and already executed by tests/v2/test_v21_kills3_T02a.py:449 (test_a_repository_with_no_commit...), which calls seal on an empty git repo and reads str(c.exception). Emptying the trailing \")\" literal changes that observable message from '<repo>: not a git repository with a commit (<git-stderr>)' to the same text missing the final ')'. The existing test only checks stands_alone(message, str(empty)) and assertIn(why.stderr.strip()[:200], message) -- both survive -- but str(exc) is observable program output, and a one-line assertion on that same no-commit input distinguishes them: self.assertIn(f\"({why.stderr.strip()[:200]})\", message) (balanced parens) or self.assertTrue(message.endswith(\")\")) passes on the original and fails on the mutant. This is a real test-coverage gap (merely unasserted), not an unobservable change."
+        },
+        {
+          "mutant": "L554 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The first `: ` separates the locator ($.requirements[i]) from the cause class; emptying it fuses them (e.g. `$.requirements[0]TypeError`), violating the project's explicit requirement that identifying elements stay separate tokens (pinned via a `\\W+` regex for the criterion loop, and via stands_alone for contracts/stories). Killable, but the requirements error path has no such token-separation assertion (its test only checks that 'TypeError' and 'extra' appear)."
+        },
+        {
+          "mutant": "L554 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The second `: ` separates the cause class from the kernel detail {e}; emptying fuses them (e.g. `TypeErrorRequirement.create() got ...`), the same separate-tokens violation. The criterion-loop sibling pins both separators with `\\W+`; the requirements path does not, so this is an untested coverage gap, not an equivalence."
+        },
+        {
+          "mutant": "L560 tuple() -> list()",
+          "verdict": "EQUIVALENT",
+          "basis": "BehaviorContract.create receives requirement_ids=list(c['requirement_ids']) instead of tuple(...). BehaviorContract.__post_init__ (contract.py:127) coerces `ids = tuple(self.requirement_ids) if isinstance(self.requirement_ids, (list, tuple))` before computing contract_hash, and both list and tuple pass the isinstance check, yielding an identical frozen contract, identical contract_hash and identical to_json (both JSON arrays). For any iterable input (str/set/dict/generator) tuple(X) and list(X) produce the same elements in the same order, and for a non-iterable both raise TypeError with the identical message ('...object is not iterable'), caught at L566 producing identical problem text. No input distinguishes them."
+        },
+        {
+          "mutant": "L567 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "First separator on the contract value-error path (line 567, reached when BehaviorContract.create raises KeyError/TypeError/ValueError). Emptying fuses the locator with the cause class. The reaching tests (AContractOrRequirementThatDoesNotBuildIsRefused) use only assertIn('contract'/'KeyError'/\"'kind'\"), which still pass, so the token fusion is uncaught though killable and contrary to the stated separate-tokens contract."
+        },
+        {
+          "mutant": "L567 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Second separator on the contract value-error path, between the cause class and the kernel detail; emptying fuses them. Same untested token-separation gap on line 567; the reaching tests assert only substrings that remain present, so it is a coverage gap rather than an equivalence."
+        },
+        {
+          "mutant": "L597 tuple() -> list()",
+          "verdict": "EQUIVALENT",
+          "basis": "PlanObligation is constructed with depends_on=list(cr['depends_on']) instead of tuple(...). PlanObligation.__post_init__ (obligation.py:48) coerces `deps = tuple(self.depends_on) if isinstance(self.depends_on, (list, tuple))` and setattrs it before the obligation participates in any plan_hash, and both list and tuple satisfy the isinstance check -> identical frozen obligation and identical plan_hash. Any iterable input yields the same elements in the same order for tuple() and list(); a non-iterable raises the identical TypeError on both, caught at L598 with identical message. The container type is normalized away before anything observes it."
+        },
+        {
+          "mutant": "L614 string ']): ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying removes the locator's closing `])` and the `: ` separator, both malforming the `($.approvals[i])` locator and fusing it with the kernel detail {e}. The approval-load-failure test (ApprovalsToKeepThatDoNotLoad) only asserts the word 'approval' is present (still true), so this locator damage and token fusion are untested though clearly killable."
+        },
+        {
+          "mutant": "L554 string '$.requirements[' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This is the JSONPath locator prefix that tells the operator which requirement failed; emptying it degrades the locator to `0]`. It is a structured format/locator token, not decorative prose: the sibling prefix `$.contracts[` IS asserted by tests (and was killed in the campaign). The requirements error path has no locator assertion (grep finds no `$.requirements[` in the test suite), so it is a real gap."
+        },
+        {
+          "mutant": "L554 string ']' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Closing bracket of the `$.requirements[{i}]` JSONPath locator; emptying malforms it to `$.requirements[0`. It is part of a format/locator token (the contract-loop siblings pin the closing `]` via the regex `\\$\\.contracts\\[(\\d+)\\]`). Killable, but untested on the requirements path."
+        },
+        {
+          "mutant": "L567 string ']' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Closing bracket of the `$.contracts[{n}]` locator on the contract value-error path (line 567). Emptying malforms the locator to `$.contracts[0`. The contract value-error tests use plain assertIn and never check the locator's shape on this path, so the malformed format/locator token is uncaught though killable."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/client.py::session",
+      "distinct_survivors": 10,
+      "equivalent": 0,
+      "real_gap": 10,
+      "verdicts": [
+        {
+          "mutant": "L310 condition negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating the guard flips which inputs append 'xdg=run-scoped' to `said`, so the returned s['fence'] body changes (e.g. with xdg='run-scoped' the token is dropped; with any other value it is wrongly added). This is observable in the returned/recorded fence string; the only fence test (test_v22_client_pin_fence.py) asserts just the fixed suffix ('declared to the client' / 'NOT measured'), so a test asserting the composed body would kill it. Killable in principle = coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L310 Eq->NotEq",
+          "verdict": "SURVIVED",
+          "basis": "== -> != inverts the xdg branch: with the valid value 'run-scoped' the 'xdg=run-scoped' token is no longer appended to `said`, changing the returned s['fence'] body. The fence test never asserts that token, so it is uncaught but killable (assert s['fence'] contains 'xdg=run-scoped'). Control-flow/result change, not provably dead or unused -> SURVIVED."
+        },
+        {
+          "mutant": "L310 string 'run-scoped' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The string is a comparison operand (binding rule: comparison operand -> SURVIVED). Emptied, the guard becomes fence.get('xdg') == '', which is False for the valid value 'run-scoped', so 'xdg=run-scoped' is never appended and s['fence'] changes; it would also wrongly fire for xdg==''. Observable, uncaught, killable -> SURVIVED."
+        },
+        {
+          "mutant": "L309 string 'external_directory=workspace-only' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptied -> said.append('') so the returned/recorded s['fence'] body loses the 'external_directory=workspace-only' declaration (the actual permission is set separately at L308, so the env side-effect is unchanged, but the returned fence string differs). The fence test only asserts the fixed suffix, never this fragment, so it is a genuine coverage gap. A test asserting s['fence'] contains 'external_directory=workspace-only' would kill it -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L310 string 'xdg' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'xdg' is the dict key argument to fence.get() (binding rule: dict key -> SURVIVED). Emptied, fence.get('') returns None, so None == 'run-scoped' is always False and the 'xdg=run-scoped' token is never appended, changing s['fence']. Observable, uncaught, killable -> SURVIVED."
+        },
+        {
+          "mutant": "L311 string 'xdg=run-scoped' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptied -> said.append('') so the returned/recorded s['fence'] body loses the 'xdg=run-scoped' token. This is a declaration token composed into the fence summary; the fence test asserts only the fixed suffix, never this fragment. A test asserting s['fence'] contains 'xdg=run-scoped' would kill it. Observable coverage gap -> SURVIVED."
+        },
+        {
+          "mutant": "L308 True->False",
+          "verdict": "SURVIVED",
+          "basis": "sort_keys=True -> False changes the serialized JSON string stored in env['OPENCODE_PERMISSION'] whenever insertion order != sorted order. On the fence test's own input (cwd under /tmp plus allow root '/out/repo') the key orders genuinely differ, so the raw string differs and is passed to the subprocess env. The test parses it with json.loads (order-insensitive) and so never catches it, but a test asserting the exact string would. Value is used, not provably unused -> SURVIVED."
+        },
+        {
+          "mutant": "L314 string 'output_token_max=' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the literal portion of the f-string makes the appended token '64000' instead of 'output_token_max=64000', changing the returned s['fence'] body (the numeric env value at L313 is unaffected). The fence test asserts the env var and the fixed suffix, never this label; a test asserting s['fence'] contains 'output_token_max=' would kill it. Observable coverage gap -> SURVIVED."
+        },
+        {
+          "mutant": "L315 string ' ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The ' ' is the join separator composing the fence summary; emptied, the tokens concatenate ('external_directory=workspace-onlyxdg=run-scoped...') so the returned/recorded s['fence'] differs. fenced stays truthy (fixed suffix), so the 'fence' key is still present but with a different value. The fence test asserts only substrings of the fixed suffix, so this is uncaught but killable by asserting the exact fence string -> SURVIVED."
+        },
+        {
+          "mutant": "L298 string 'session ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'session ' prefixes the `where` label passed to tripwire.refusal; scan_text hits carry no 'file' key, so `where` appears in the raised message both as the h.get('file', where) fallback and in the 'via {where}:' clause. Emptied, the SessionRefused text becomes 'via s: s: ...' instead of 'via session s: session s: ...'. This exception message is observable; no frozen test asserting the needle-refusal path checks this prefix, so it is an uncaught coverage gap killable by asserting the message -> SURVIVED."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/run.py::execute",
+      "distinct_survivors": 74,
+      "equivalent": 1,
+      "real_gap": 73,
+      "verdicts": [
+        {
+          "mutant": "L485 string '--parent ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the '--parent ' prefix changes the refusal text from '--parent <path>: no run record there' to '<path>: no run record there'. That is observably different and killable in principle (a test could assert the flag-name prefix). The campaign's kill files do not assert it: T13a:316 matches re.escape(path)+'.*no run record' and pw_lineage_unread:452 asserts only the substring 'no run record there', neither of which includes '--parent '. The A13 docstring itself flags this as an audited (unasserted) survivor, i.e. a coverage gap, not an equivalence. '--parent' is also a CLI flag/format token, so the rule biases to SURVIVED."
+        },
+        {
+          "mutant": "L487 string '--parent ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This is the LineageRefused-wrapping branch (reached when lineage.is_file raises on an unsearchable predecessor dir, exercised by pw_lineage_unread which notes it raised on 3.11-3.13). Emptying '--parent ' changes the observable wrapped refusal message. Not part of the A13 audit list and not provably unobservable; flag/format token -> SURVIVED."
+        },
+        {
+          "mutant": "L487 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the ': ' separator changes the f-string result from '--parent <path>: <e>' to '--parent <path><e>' whenever the except branch runs (permission-denied predecessor). The string is genuinely evaluated and emitted, so the change is observable and killable in principle; no proof exists that nothing asserts the joined message. Default SURVIVED."
+        },
+        {
+          "mutant": "L492 dict entry 6 dropped",
+          "verdict": "SURVIVED",
+          "basis": "The classifier proved only the VALUE is dead (overwritten at line 515 before any read); it missed that DROPPING the literal entry and re-adding the key at line 515 relocates it. Original inserts 'stage' at literal position 7 (between 'started' and 'kernel_digest'); the mutant, lacking it in the literal, appends 'stage' only at line 515 (rec['stage']='invariants'), i.e. after platform/continues/invariants. rec is not mutated between the literal (495) and 515, so the returned record dict has a different key insertion order. Concrete case: the test_s2_kills 'deep' scenario (or any input reaching the try body) \u2014 list(execute(...)) / json.dumps(returned_rec) without sort_keys places 'stage' at a different index in mutant vs original. RUN.json and STARTED use sort_keys=True so the files are byte-identical and no current test (s2_kills:432 uses sort_keys; :433 uses sorted(rec)) kills it, but the returned value's key order is a deterministic observable a test asserting list(rec) would distinguish. Real coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L493 string 'repository' emptied",
+          "verdict": "EQUIVALENT",
+          "basis": "Proof of equivalence: unlike L492 this does NOT drop the entry \u2014 'stage' stays at its literal position 7, only its transient initial value changes 'repository'->''. That value is unconditionally overwritten at line 515 (rec['stage']='invariants', the first executable statement of the try) before any read. No read of rec['stage'] occurs between line 493 and 515: the STARTED document (497-500) is built from the fixed key tuple format/bundle_digest/project/plan_hash/started/kernel_digest/platform which excludes 'stage'; the only rec.get('stage') read is in the finally (line 717) and only when failure is set, i.e. after an exception inside the try, which cannot occur before 515 completes (515 is a plain dict setitem that never raises). RUN.json (726) and STARTED both use sort_keys=True and reflect the final/live stage (the live 'repository' is set independently at line 577, untouched by this mutant; usage.usage reads only started/finished). Hence the returned dict, both files, every digest (RUN.json is canonicalized by _content_sha) and every exception are identical on all inputs. No input can distinguish."
+        },
+        {
+          "mutant": "L500 True->False",
+          "verdict": "SURVIVED",
+          "basis": "sort_keys=True->False changes the STARTED file's key order (insertion order differs from sorted order: e.g. settings_sha256/continues vs bundle_digest-first). evidence_manifest includes out/STARTED and _content_sha digests STARTED by RAW bytes (only RUN.json is re-canonicalized), so the byte change propagates to the manifest digest = the evidence anchor recorded in continues['evidence_anchor'] and used by lineage.claim. Observable and killable in principle (a test could pin the anchor or STARTED digest); T13a reads STARTED via json.loads (order-insensitive) and so misses it -> coverage gap, SURVIVED."
+        },
+        {
+          "mutant": "L500 string '\\n' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Dropping the trailing newline changes the STARTED file's raw bytes. STARTED is digested by raw bytes in _content_sha and included in evidence_manifest, so the manifest digest / evidence anchor changes - observable and killable in principle. The only STARTED reader in tests (T13a) uses json.loads, which ignores trailing whitespace, so the campaign did not catch it -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L515 string 'invariants' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Unlike line 493, this is a live stage token: if invariants.arm_runtime() at 516 raises (RegistrationError/InvariantError per the comment), the finally records rec.get('stage') as the failure stage, which would become '' instead of 'invariants'. The failure.stage field is asserted elsewhere (e.g. T13a/A13 check specific stage strings), so this stage token is observable in the record -> SURVIVED."
+        },
+        {
+          "mutant": "L517 dict entry 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 0 is 'armed', the sorted list of armed invariant values written into rec['invariants'] in RUN.json. Dropping it removes a meaningful JSON field the record is supposed to carry (A22 and p0/test_invariants_runtime pin this dict's shape). Observable in RUN.json; not provably unused -> SURVIVED."
+        },
+        {
+          "mutant": "L517 dict entry 3 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 3 of the invariants dict is 'statement': invariants.RUNTIME_STATEMENT (armed=0, registry_digest=1, code_mechanism_digest=2, statement=3). Dropping it removes the statement key from rec['invariants'] in RUN.json - an observable record change; not provably unused -> SURVIVED."
+        },
+        {
+          "mutant": "L517 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "rec['invariants']['armed'] is a JSON list; sort_keys=True on RUN.json sorts dict keys, not list elements, so the list order is preserved as produced. Replacing sorted() with list() makes the order follow armed.invariants' iteration order; a consumer/test comparing 'armed' to a deterministically sorted list is order-sensitive. Kernel invariants record -> strong bias to SURVIVED; not proven order-insensitive."
+        },
+        {
+          "mutant": "L517 string 'armed' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'armed' is a dict/JSON key written into rec['invariants'] in RUN.json. Emptying it to '' renames the key, which is directly observable in the record (and pinned by A22/p0 dict shape). By rule, a string that is a dict/JSON key is SURVIVED."
+        },
+        {
+          "mutant": "L520 string 'statement' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'statement' is the JSON key for invariants.RUNTIME_STATEMENT in rec['invariants']. Emptying the key to '' changes the record's structure observably (distinct from the entry-3-dropped mutant, which removes the pair). Dict/JSON key -> SURVIVED."
+        },
+        {
+          "mutant": "L532 string 'client_pin' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'client_pin' is the getattr attribute-name operand. Emptying it to '' makes getattr(settings,'',None) return None always, so the entire pinned-client identity check (533-545), the pin-based exe selection at 602, and pin_sha256 at 655 are all disabled. A run configured with a client_pin would silently skip its byte-identity gate and never record rec['client_pin'] - a major, security-relevant observable change. SURVIVED."
+        },
+        {
+          "mutant": "L534 string 'client identity' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Live stage token: when the pin check fails (raise at 540), the finally records rec.get('stage'); emptying it makes the recorded failure stage '' instead of 'client identity'. Stage strings are asserted in the record elsewhere -> observable, SURVIVED."
+        },
+        {
+          "mutant": "L534 string 'stage' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'stage' is the dict key. Emptying it assigns rec['']='client identity' and leaves rec['stage'] at its prior value ('ocr identity' from 523), so on a pin failure the recorded failure stage is wrong and RUN.json gains a spurious '' key. Dict/JSON key and observable record change -> SURVIVED."
+        },
+        {
+          "mutant": "L536 string 'exe' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'exe' is a dict-subscript key on the client_pin dict. Emptying it to pin[''] raises KeyError (or yields a wrong path) when client_pin is set, changing the identity check's result/behavior. A comparison/path operand feeding review_ocr.pinned -> observable, SURVIVED."
+        },
+        {
+          "mutant": "L536 string 'sha256' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'sha256' is a dict-subscript key on client_pin. pin[''] raises KeyError or supplies a wrong digest to review_ocr.pinned, altering the byte-identity verdict. Sha/digest input and dict key -> observable, SURVIVED."
+        },
+        {
+          "mutant": "L537 dict entry 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the \"exe\" entry from rec[\"client_pin\"], so RUN.json's client_pin record omits the pinned binary path. Observable in the serialized record (a test asserting rec[\"client_pin\"] would catch it). The branch is reachable whenever settings.client_pin is set (the loader accepts a non-None dict), but no execute-level test sets client_pin \u2014 a coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L537 dict entry 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the \"sha256\" entry, so the record omits the pinned digest. Observable in RUN.json; killable by a test that enters the client_pin branch and inspects the record. No execute-level test exercises client_pin."
+        },
+        {
+          "mutant": "L537 dict entry 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the \"when\": OCR_WHEN entry, changing the recorded client_pin dict. Observable in RUN.json content; reachable when client_pin is set. Uncovered by any execute test: coverage gap."
+        },
+        {
+          "mutant": "L537 dict entry 3 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the \"status\" entry (the PASSED/REFUSED outcome token) from the recorded client_pin dict. The status is a meaningful outcome field in RUN.json; its absence is observable and killable in principle. No execute test sets client_pin."
+        },
+        {
+          "mutant": "L537 dict entry 4 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the \"statement\" entry from the record. Changes RUN.json's client_pin dict (one fewer key); observable in the serialized record and killable by a test entering the branch. Coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L537 string 'client_pin' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Writes rec[\"\"] instead of rec[\"client_pin\"], so the record gains an empty-string key and loses the client_pin key entirely. This is a JSON/record key; the change is observable in RUN.json and killable in principle. Per the rules a dict/JSON key emptied is SURVIVED."
+        },
+        {
+          "mutant": "L537 string 'exe' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the \"exe\" key makes the record {\"\": pin[\"exe\"], ...}. A dict/JSON key change, observable in RUN.json. SURVIVED by the key rule; killable when client_pin is set, which no execute test does."
+        },
+        {
+          "mutant": "L537 string 'sha256' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the \"sha256\" key renames it to \"\" in the recorded dict. A dict/JSON key; observable in RUN.json and killable in principle. SURVIVED per the key rule."
+        },
+        {
+          "mutant": "L537 string 'when' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the \"when\" key renames it to \"\" in the record. A dict/JSON key change, observable in RUN.json. SURVIVED; the branch is uncovered by any execute test."
+        },
+        {
+          "mutant": "L538 Is->IsNot",
+          "verdict": "SURVIVED",
+          "basis": "Flips the ternary test: when the pin passes (why is None) the recorded status becomes \"REFUSED\" instead of \"PASSED\", and vice-versa when it fails. The status token written to RUN.json is inverted \u2014 directly observable and killable. Coverage gap: no execute test sets client_pin."
+        },
+        {
+          "mutant": "L538 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating the ternary condition swaps which branch yields PASSED vs REFUSED, inverting the recorded client_pin.status. Observable outcome-token change in RUN.json; killable in principle. Uncovered by execute tests."
+        },
+        {
+          "mutant": "L538 string 'PASSED' emptied",
+          "verdict": "SURVIVED",
+          "basis": "On a passing pin the recorded status becomes \"\" instead of \"PASSED\". \"PASSED\" is an outcome/status token written to RUN.json; emptying it is observable and killable. SURVIVED per the outcome-token rule."
+        },
+        {
+          "mutant": "L538 string 'REFUSED' emptied",
+          "verdict": "SURVIVED",
+          "basis": "On a failing pin the recorded status becomes \"\" instead of \"REFUSED\" (before the raise on L540). \"REFUSED\" is a status/outcome token in RUN.json; the change is observable and killable. SURVIVED."
+        },
+        {
+          "mutant": "L538 string 'status' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the \"status\" key renames it to \"\" in the recorded client_pin dict. A dict/JSON key; observable in RUN.json and killable in principle. SURVIVED per the key rule."
+        },
+        {
+          "mutant": "L539 string \"sha256 byte identity against the operator's pin; not build provenance\" emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the statement VALUE changes rec[\"client_pin\"][\"statement\"] to \"\" in RUN.json. Although descriptive, it is a persisted structured record field (also folded into RUN.json's content_sha and thus the evidence anchor via evidence_manifest), so the mutated output is not byte-identical and a test asserting the field would kill it. Equivalence is not provable; default to SURVIVED. Coverage gap: no execute test sets client_pin."
+        },
+        {
+          "mutant": "L539 string 'statement' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying the \"statement\" key renames it to \"\" in the recorded dict. A dict/JSON key change, observable in RUN.json and killable in principle. SURVIVED per the key rule."
+        },
+        {
+          "mutant": "L540 IsNot->Is",
+          "verdict": "SURVIVED",
+          "basis": "Flips the refusal guard to `if why is None`: the run now RAISES RunRefused when the pinned binary PASSES (why is None), and CONTINUES with a mismatched binary when it FAILS. A severe delivery-path behavior change \u2014 a good pin is refused / a bad pin is accepted and sessions receive pin_sha256 for a non-matching binary. Plainly observable and killable; survived only because no execute test sets client_pin."
+        },
+        {
+          "mutant": "L540 condition negated",
+          "verdict": "SURVIVED",
+          "basis": "`not (why is not None)` == `why is None`, identical to the IsNot->Is flip: refuses a passing pin and admits a failing one. Major observable change on the kernel's identity-check path; killable in principle. SURVIVED (uncovered)."
+        },
+        {
+          "mutant": "L541 string '. Find out why before changing the pin: a wrong path, a file that cannot be read, a binary that was replaced or updated. Re-pin only a file you have checked: set client_pin.exe to its absolute path and client_pin.sha256 to its sha256 (' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptying this operator-guidance chunk shortens the RunRefused message, changing str(exception) and the recorded rec[\"failure\"][\"detail\"] (str(failure)[:2000]) in RUN.json. Though human-facing, it is observable in the persisted record and the raised exception, so a test asserting the refusal text would kill it; equivalence is not provable. Default SURVIVED; the client_pin refusal path is uncovered by execute tests."
+        },
+        {
+          "mutant": "L541 string 'client_pin: the client binary fails the identity check before the run \u2014 ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This literal is the prefix of the client_pin RunRefused f-string. Input that distinguishes: settings carrying client_pin={'exe':<path>,'sha256':<wrong>} so review_ocr.pinned returns a non-None 'why' at line 536 -> raise at 541. The RunRefused propagates (observable to any caller as str(exc)) AND the finally serializes str(failure) into rec['failure']['detail'] in RUN.json (A13 line 79 proves failure.detail carries the refusal text; failure.stage would be 'client identity'). Emptying the prefix changes failure.detail (and the anchor via _content_sha->EVIDENCE.json). Branch is currently uncovered, but 'untested' is a coverage gap, not equivalence \u2014 a test with assertRaisesRegex / assertIn on failure.detail kills it."
+        },
+        {
+          "mutant": "L545 string '). No session was started and no provider request was sent.' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Trailing clause of the SAME client_pin RunRefused message (after SHA256_OF). Same distinguishing input as L541 (client_pin with mismatched sha256). The full message is str(exc) for a caller and is written to rec['failure']['detail'] in RUN.json by the finally. Emptying the clause changes failure.detail and the raised message text / RUN.json digest. Note the identical-looking assertions in test_v21_ocr_identity/ocr_preflight target the SEPARATE ocr_refusal() string (lines 220-226), not this client_pin branch, so they do not cover it \u2014 but an observable difference exists on the client_pin input, so it is a coverage gap."
+        },
+        {
+          "mutant": "L558 string 'the lineage of ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Prefix of the lineage-UNREAD RunRefused (raised when inherited['unread'] is truthy, line 557-570). Reachable input: a predecessor whose own record/journal shows evidence that is gone or unreadable (the lineage-gone/unread fixtures). The RunRefused is observable as str(exc) and, via the finally, as rec['failure']['detail'] with failure.stage='claim' (A13 proves detail carries refusal text). The grep for 'the lineage of' returns 0 hits because the covering assertions (A13 assertNamesTheLineage / lineage-gone tests) check the substring 'lineage' and other needles, not this exact prefix; emptying 'the lineage of ' still changes the detail text. Observable difference on a covered input -> coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L590 string 'stimulus tripwire' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This is the value of the structured outcome token rec['stage'], recorded in RUN.json and machine-compared by tests (e.g. rec['failure']['stage'] == 'preflight'/'claim'/'run'). When a tripwire hit raises at L594 the recorded failure.stage becomes this string, so it is observable and killable. No execute test triggers a tripwire hit (calc repo scans CLEAN), so it is an uncovered outcome-token change, not equivalent."
+        },
+        {
+          "mutant": "L594 string 'hits' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'hits' is a dict key into the scan report. Emptying makes it rec['stimulus_tripwire'][''] -> KeyError instead of the RunRefused, changing the failure type recorded. Reachable whenever L593's hits are truthy; just uncovered (no execute test produces a tripwire hit). Dict-key change -> SURVIVED."
+        },
+        {
+          "mutant": "L594 string 'stimulus_tripwire' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'stimulus_tripwire' is a dict key into rec. Emptying -> rec[''] -> KeyError instead of RunRefused, a changed failure type in the record. Reachable on a tripwire hit, uncovered by the campaign. Dict-key change -> SURVIVED."
+        },
+        {
+          "mutant": "L594 string 'the repository tree at the baseline' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This is the `where` argument to tripwire.refusal, which interpolates it directly into the message: 'sealed stimulus/observable content would reach the developer via {where}: {named}'. Distinguishing input: a baseline repo tree containing sealed stimulus/observable needles so rec['stimulus_tripwire']['hits'] is non-empty (line 593) -> RunRefused(tripwire.refusal(hits,'the repository tree at the baseline')). The message is observable as str(exc) and as rec['failure']['detail'] (failure.stage='stimulus tripwire') in RUN.json. Emptying the label changes the 'via {where}' text in the refusal and record. (The h.get('file', where) fallback is a secondary use, but the top-level {where} interpolation alone is enough.) Uncovered branch, but the observable difference makes it a coverage gap."
+        },
+        {
+          "mutant": "L602 string 'exe' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'exe' is a dict key: client_pin['exe']. Settings validation guarantees a pin is a closed {exe, sha256}, so with a pin set client_pin[''] raises KeyError instead of selecting the pinned binary path. In covered tests client_pin is None so the conditional short-circuits and the key is never read \u2014 identical there \u2014 but it is killable with a pin configured. Reachable, uncovered dict-key change -> SURVIVED."
+        },
+        {
+          "mutant": "L641 string 'client_fence' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'client_fence' is the attribute name read via getattr. Emptying -> getattr(settings, '', None) always returns None, so fence is never seen: the run-scoped XDG branch (L643-646) and the fence kw at L654 are permanently disabled. Observable whenever settings.client_fence is set; execute has no fence coverage (client_fence appears only in client.session/environment tests). Attribute-key change gating real behavior -> SURVIVED."
+        },
+        {
+          "mutant": "L643 Eq->NotEq",
+          "verdict": "SURVIVED",
+          "basis": "Inverts the gate: with xdg=='run-scoped' the original builds the run-scoped XDG home and the mutant does not (and vice versa). The branch is reachable (a fence with xdg 'run-scoped' is a valid closed-world setting) but execute never exercises a fence, so the flip is undetected. Kernel fence/isolation path -> SURVIVED."
+        },
+        {
+          "mutant": "L643 condition negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating the whole condition flips whether the run-scoped XDG home is created, a real behavior change on any configured fence. Reachable, but execute has no fence coverage, so uncovered. -> SURVIVED."
+        },
+        {
+          "mutant": "L643 string 'run-scoped' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'run-scoped' is a comparison operand (and the declared settings token). Emptying makes fence.get('xdg') == '' never true for a real 'run-scoped' fence, disabling the XDG home. Comparison-operand/token change -> SURVIVED; uncovered because no execute test sets a fence."
+        },
+        {
+          "mutant": "L643 string 'xdg' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'xdg' is the dict key read from the fence. Emptying -> fence.get('') returns None, so the condition is False even for a run-scoped fence and the XDG home is never built. Dict-key change gating behavior -> SURVIVED; uncovered."
+        },
+        {
+          "mutant": "L644 string 'client-xdg' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'client-xdg' is a path segment. Emptying makes out / '' == out, so the XDG home becomes the run directory itself: data/state/cache are created directly under out and the client env's XDG_*_HOME point there instead of out/client-xdg. Observable filesystem + env change. Path change -> SURVIVED; uncovered."
+        },
+        {
+          "mutant": "L645 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Dropping 'data' stops pre-creating out/client-xdg/data, the XDG_DATA_HOME of the run-scoped isolation fence. The created directory set is observable and part of the isolation guarantee; not provably unused. Reachable on a run-scoped fence, uncovered -> SURVIVED."
+        },
+        {
+          "mutant": "L645 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Dropping 'state' stops pre-creating out/client-xdg/state (XDG_STATE_HOME). Same observable, isolation-relevant directory omission; reachable, uncovered -> SURVIVED."
+        },
+        {
+          "mutant": "L645 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Dropping 'cache' stops pre-creating out/client-xdg/cache (XDG_CACHE_HOME). Same observable directory omission; reachable, uncovered -> SURVIVED."
+        },
+        {
+          "mutant": "L645 string 'cache' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'cache' is a path segment naming the XDG_CACHE_HOME subdir. Emptying makes the third iteration mkdir(xdg_home / '') == xdg_home (a no-op) instead of creating .../cache, so the cache dir is never pre-created \u2014 the same observable omission as dropping it. Path change, reachable, uncovered -> SURVIVED."
+        },
+        {
+          "mutant": "L645 string 'data' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'data' is a path component: the loop does (xdg_home/sub).mkdir. Emptied, sub='' makes xdg_home itself instead of xdg_home/data, so the run-scoped XDG data dir is never created. A test asserting the client-xdg/{data,state,cache} layout (G2 fence) kills it. Observable directory change, not a diagnostic string."
+        },
+        {
+          "mutant": "L645 string 'state' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'state' is a path component for the run-scoped XDG state dir. Emptied, xdg_home/state is never made (sub='' collapses to xdg_home). Observable in the created dir tree; killable by an xdg-layout assertion."
+        },
+        {
+          "mutant": "L646 True->False",
+          "verdict": "SURVIVED",
+          "basis": "Line has parents=True and exist_ok=True. parents=True->False crashes with FileNotFoundError on the first iteration, since xdg_home (out/client-xdg) does not pre-exist in a fresh run dir and mkdir(parents=False) needs the parent present. That is an observable run failure on any run-scoped-fence path, so the label is killable. (Even the exist_ok interpretation is not provably equivalent here; ambiguity plus the kernel bias resolves to SURVIVED.)"
+        },
+        {
+          "mutant": "L647 dict entry 7 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 7 of the outer kw dict is the fence spread (**({'fence': {**fence, 'allow': (str(repo),)}} if fence is not None else {}) on L654). Dropping it removes 'fence' from the kwargs handed to Developer/Reviewer, so the session runs with no G2 fence. Major observable security-config change; definitely used."
+        },
+        {
+          "mutant": "L647 dict entry 8 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 8 is the pin_sha256 spread (L655). Dropping it strips 'pin_sha256' from kw, so the session no longer re-checks the client binary sha256 at the moment of use (D4). Observable behaviour change in the session; value is consumed."
+        },
+        {
+          "mutant": "L647 dict entry 9 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 9 is the needles spread (L656). Dropping it removes 'needles' from kw, so sessions no longer re-scan prompt/environment for the sealed stimulus needles (G1). Observable; the key is read per session."
+        },
+        {
+          "mutant": "L649 IsNot->Is",
+          "verdict": "SURVIVED",
+          "basis": "Inverts the ternary guard: when xdg_home is a Path it now passes None (XDG env not set though a fence was requested), and when None it passes the literal str(None)='None'. client.environment receives the wrong xdg_home. Clearly observable in the session env."
+        },
+        {
+          "mutant": "L649 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating 'xdg_home is not None' is the same inversion as above: str(xdg_home) is taken when xdg_home is None (-> 'None') and None when it is a Path. Wrong xdg_home argument reaches client.environment; observable."
+        },
+        {
+          "mutant": "L654 dict entry 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 0 of the inner fence dict is **fence. Dropping it yields {'allow': (str(repo),)} only, so the session fence loses all of the operator's fence keys (xdg mode, output-token ceiling, etc.), keeping just allow. Observable change to the fence the session enforces."
+        },
+        {
+          "mutant": "L654 dict entry 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Entry 1 is 'allow': (str(repo),). Dropping it leaves {**fence} with no allow list, so the per-worktree permission no longer allows the run's repo path. Security-relevant, observable in the composed fence."
+        },
+        {
+          "mutant": "L654 string 'allow' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'allow' is a dict key: emptied, the repo path lands under '' and the consumer reading fence['allow'] gets nothing. Per owner rule a dict/JSON key string is SURVIVED; behaviour (missing allow) is observable."
+        },
+        {
+          "mutant": "L654 string 'fence' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'fence' is the kwarg key merged into kw. Emptied, the fence config is passed under '' instead of 'fence', so Developer/Reviewer never see a 'fence' kwarg and run unfenced. Dict/protocol key -> SURVIVED; observable."
+        },
+        {
+          "mutant": "L655 dict entry 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "The inner dict has one entry; dropping it makes the spread add nothing, so 'pin_sha256' never reaches the session (no moment-of-use sha re-check, D4). Same observable effect as removing the whole spread."
+        },
+        {
+          "mutant": "L655 string 'pin_sha256' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'pin_sha256' is the kwarg key the session reads. Emptied, the digest is passed under '' and kw.get('pin_sha256') is absent, disabling the re-check. Dict key -> SURVIVED; observable."
+        },
+        {
+          "mutant": "L655 string 'sha256' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'sha256' indexes client_pin (a dict with keys 'exe'/'sha256'). Emptied, client_pin[''] raises KeyError and the run crashes on any pinned-client path. A comparison/index key and an observable failure -> SURVIVED."
+        },
+        {
+          "mutant": "L656 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating 'if wire[\"needles\"]' inverts it: needles are merged only when wire['needles'] is empty and dropped when non-empty. So when there are real needles the session gets none (G1 re-scan defeated). Observable behaviour change."
+        },
+        {
+          "mutant": "L656 dict entry 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "The inner dict's single entry dropped means the needles spread adds nothing, so sessions never receive 'needles' and skip the per-session stimulus re-scan (G1). Observable; same as removing the spread."
+        },
+        {
+          "mutant": "L728 True->False",
+          "verdict": "SURVIVED",
+          "basis": "sort_keys=True->False changes the EVIDENCE.json on-disk key order (top level 'format','files' insertion order vs sorted, and the files map's insertion order vs global sort). The anchor is recomputed order-independently via anchor_of, but json.loads preserves file key order, so a byte/order-level test on the manifest kills it. Value is used to produce written output -> not provably unused -> SURVIVED."
+        },
+        {
+          "mutant": "L728 string '\\n' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Emptied, EVIDENCE.json is written without a trailing newline. json.loads and the anchor are unaffected, but the file bytes differ and a test asserting the evidence file ends with '\\n' kills it. This is file-output formatting, not a human diagnostic -> SURVIVED."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/settings.py::load",
+      "distinct_survivors": 6,
+      "equivalent": 0,
+      "real_gap": 6,
+      "verdicts": [
+        {
+          "mutant": "L174 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "sorted(cp) is a comparison operand against the already-sorted literal [\"exe\",\"sha256\"]. list(cp) preserves JSON key insertion order, so a valid client_pin given as {\"sha256\": <64hex>, \"exe\": <abs path>} iterates [sha256, exe]: the original accepts it (sorted -> [exe, sha256] == literal) but the mutant rejects it (list -> [sha256, exe] != literal). That is an order-sensitive, observable behavior change (killable in principle). The only good-pin test (test_the_pin_is_an_absolute_path_and_a_sha256) supplies keys in exe-then-sha256 order, so no frozen test ever passes a reverse-order pin \u2014 a genuine coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L178 string 'client_pin is {exe, sha256}: the client binary by absolute path and its sha256' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The branch IS reached: tests/v2/test_v22_client_pin_fence.py::PinSetting.test_the_pin_is_an_absolute_path_and_a_sha256 feeds five malformed client_pin dicts (e.g. {'exe':'opencode','sha256':'a'*64} non-absolute) through settings.load, each raising at L178. SettingsError is a ValueError subclass, so str(exc)==args[0] is a genuine program observable (verified: str(SettingsError(''))=='' vs the full sentence). Original yields str(exc)=='client_pin is {exe, sha256}: the client binary by absolute path and its sha256'; mutant yields ''. Distinguishing assertion on the SAME input already used by the test: self.assertIn('client_pin', str(cm.exception)) or assertRaisesRegex(SettingsError,'client_pin') passes on original, fails on mutant. The classifier's 'nothing asserts the text' argument describes an UNTESTED message, not an unkillable one (owner directive: untested != equivalent). The two programs differ observably on an exercised input -> real coverage gap."
+        },
+        {
+          "mutant": "L184 string 'client_fence names at least one of ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Branch reached: tests/v2/test_v22_client_pin_fence.py::FenceSetting.test_the_fence_is_closed_world_with_fixed_values drives client_fence={} and {'unknown':1} through settings.load, both raising at L184 (the f-string). Only the literal prefix is emptied, leaving f'{list(FENCE_KEYS)}'. On input {}: original str(exc)==\"client_fence names at least one of ['external_directory', 'output_token_max', 'xdg']\"; mutant str(exc)==\"['external_directory', 'output_token_max', 'xdg']\". Concrete killing assertion on that exercised input: assertRaisesRegex(SettingsError,'names at least one of') or assertIn('client_fence names', str(exc)) passes original, fails mutant. Different observable on an input the suite already feeds -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L186 string 'client_fence.external_directory is \"workspace-only\"' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Branch reached: FenceSetting.test_the_fence_is_closed_world_with_fixed_values feeds client_fence={'external_directory':'everything'}, which passes L183 (non-empty closed-world subset) and hits L185-186 raising this message. The WHOLE string is emptied. Original str(exc)=='client_fence.external_directory is \"workspace-only\"'; mutant str(exc)==''. Killing assertion on that exercised input: assertIn('external_directory', str(cm.exception)) (or assertEqual to the full sentence) passes on original, fails on mutant (empty string contains nothing). The message is the raised exception's sole arg and propagates out of load() -> an observable that differs on a tested input. Currently only assertRaises(SettingsError) is checked, so the mutant survives a coverage gap, not an equivalence."
+        },
+        {
+          "mutant": "L188 string 'client_fence.xdg is \"run-scoped\"' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Branch reached: the same test feeds client_fence={'xdg':'operator'}, passing L183 and hitting L187-188 raising this message. Whole string emptied. Original str(exc)=='client_fence.xdg is \"run-scoped\"'; mutant str(exc)==''. Concrete distinguisher on the exercised input: assertIn('run-scoped', str(cm.exception)) or assertIn('xdg', str(cm.exception)) passes original, fails mutant. The exception arg is observable via str()/args and leaves load() unchanged in type but changed in content -> killable, hence SURVIVED. The verdict rested only on 'no test asserts the text', which is the definition of untested, not of equivalent."
+        },
+        {
+          "mutant": "L190 string 'client_fence.output_token_max' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This empties the `name` argument passed to _count at L190. Branch reached: FenceSetting.test_the_fence_is_closed_world_with_fixed_values feeds client_fence={'output_token_max':0}; it passes L183/185/187 and reaches _count(0,'client_fence.output_token_max'), where 0<minimum(1) raises SettingsError(f'{name} is an integer >= {minimum}, not {v!r}'). Original str(exc)=='client_fence.output_token_max is an integer >= 1, not 0'; mutant str(exc)==' is an integer >= 1, not 0'. This is NOT merely-untested theory: sibling _count call sites assert exactly this name-derived observable -- tests/v2/test_app_units.py asserts r'budget\\.turns is an integer >= 1' (L116), r'limits\\.DEVELOPER is an integer >= 0' (L120), r'preflight\\.chat_probes is an integer >= 2' (L129), r'model_limit\\.context is an integer >= 1' (L98), 'max_turns_per_session is an integer >= 1' (L130); and tests/v2/test_s2_kills.py:714 does assertEqual(str(c.exception),'chat_probes is an integer >= 1, not 0'). So the _count `name` is a demonstrably test-asserted observable; this one call site is simply unasserted. assertRaisesRegex(SettingsError, r'client_fence\\.output_token_max is an integer') passes on original, fails on mutant -> real coverage gap, SURVIVED."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::_bundle_hit",
+      "distinct_survivors": 9,
+      "equivalent": 0,
+      "real_gap": 9,
+      "verdicts": [
+        {
+          "mutant": "L98 returns None",
+          "verdict": "SURVIVED",
+          "basis": "This is the no-marker early return. The only consumer (scan_repo L126 `if _bundle_hit(...)`) treats False and None identically (both falsy), and the clean-tree test only asserts hits==[], which None also satisfies. But the function's return value is observably different (False is not None); a direct-call test asserting `is False`/`== False` would kill it. Value is used, branch is live, not a diagnostic -> genuine coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L103 Or swapped",
+          "verdict": "SURVIVED",
+          "basis": "Swapping the or-operands changes short-circuit order. Original evaluates `not isinstance(doc, dict)` first, guarding the `.get` call; the mutant evaluates `doc.get(\"format\")` first, which raises AttributeError when doc is a non-dict JSON value (e.g. text `[\"aisef-v2-project/1\"]` parses to a list that still contains the marker). No test feeds a marker-bearing non-dict JSON, so the exception path is untested. Behavior differs (raises vs returns True) -> killable, not equivalent."
+        },
+        {
+          "mutant": "L104 returns None",
+          "verdict": "SURVIVED",
+          "basis": "This return flags a marker-bearing doc that is not a dict or whose `format` is not in BUNDLE_MARKERS. Returning None instead of True flips a LEAK flag to CLEAN in scan_repo (L126). No test exercises this branch (both test bundles are valid dicts with correct format), so it survived, but it is a real behavior change -> SURVIVED."
+        },
+        {
+          "mutant": "L106 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating the isinstance guard makes `plan` become {} (or a non-dict raising on .get) exactly when the real plan IS a dict, breaking the plan_hash match at L107. Original would return True for a bundle matching only by plan_hash; mutant would not. No test has a plan_hash-only match (the `mine` bundle already matches by contract id and short-circuits), so it survived -> genuine coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L102 returns None",
+          "verdict": "SURVIVED",
+          "basis": "This is the fail-closed return for marker-bearing text that does not parse as JSON. Returning None instead of True turns a refusal into a pass (fail open) in scan_repo. No test feeds an unparseable marker-bearing text, so the except-ValueError branch is untested; the value controls the LEAK flag -> real behavior change, SURVIVED."
+        },
+        {
+          "mutant": "L104 True->False",
+          "verdict": "SURVIVED",
+          "basis": "Same branch as the L104 returns-None mutant: a marker-bearing non-dict/wrong-format doc should be flagged (return True) but the mutant returns False, suppressing the LEAK. Untested branch (both test bundles parse as dicts with valid format) and a genuine observable flip -> SURVIVED."
+        },
+        {
+          "mutant": "L102 True->False",
+          "verdict": "SURVIVED",
+          "basis": "The fail-closed except-ValueError return becomes False, converting the intended refusal of unparseable marker-bearing text into a pass. No test provides a marker-bearing-but-invalid-JSON file, so it survived; it is a real fail-closed-to-fail-open change controlling the LEAK flag -> SURVIVED."
+        },
+        {
+          "mutant": "L106 string 'plan' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'plan' is a JSON/dict key, not a diagnostic. Emptying it to '' makes `doc.get(\"\")` return None, so either `plan` is forced to {} (plan_hash path dead -> L107 cannot match by hash) or `plan` becomes None raising on .get. Binding rule: a dict-key string emptied is SURVIVED. No test matches by plan_hash alone, so the break is unobserved -> coverage gap, SURVIVED."
+        },
+        {
+          "mutant": "L107 string 'plan_hash' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'plan_hash' is a dict key fed to plan.get(...); emptying it makes `plan.get(\"\")` return None, so the comparison becomes None == project.plan.plan_hash (always False for a real 64-char hash), disabling the plan-hash leak signal. Binding rule: dict-key string emptied is SURVIVED. No test exercises a plan_hash-only match (the `mine` bundle short-circuits True via contract-id intersection) -> genuine coverage gap, not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::_canonical",
+      "distinct_survivors": 4,
+      "equivalent": 0,
+      "real_gap": 4,
+      "verdicts": [
+        {
+          "mutant": "L37 True->False",
+          "verdict": "SURVIVED",
+          "basis": "Targets sort_keys=True. For a Mapping with 2+ keys whose insertion order is not already sorted, json.dumps emits the keys in a different order, so _canonical returns a different string -> the fragment/needle set from needles_of differs -> scan_text matching differs. Not identical on all inputs, hence killable. It survives only because the fixtures feed single-key (STIMULUS) or already-sorted (OBSERVABLE: returns<within_s) dicts and tests assert substrings, never the exact canonical ordering. Real coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L37 False->True",
+          "verdict": "SURVIVED",
+          "basis": "Targets ensure_ascii=False. Any value containing a non-ASCII character serializes differently (e.g. 'caf\u00e9' -> 'caf\u00e9'), changing the canonical needle string and thus matching against raw non-ASCII leaked text -- the module's docstring and scan_text's json.dumps(needle, ensure_ascii=False) show raw non-ASCII matching is the design intent. Not identical on all inputs. Survives only because every fixture is ASCII-only. Coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L37 string ',' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Empties the JSON item separator. For any list/tuple or dict with 2+ elements the elements are concatenated with no comma (e.g. [1,2,3] -> '[123]'), producing a different canonical string and a different top-level needle. ',' is a structural JSON format token, not a human-facing diagnostic. Survives only because the asserted substring (a string leaf) is unaffected and no test pins the exact canonical form. Killable in principle; coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L37 string ':' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Empties the JSON key/value separator. For any Mapping the canonical string loses the colon (e.g. {\"a\":1} -> '{\"a\"1}'), changing the top-level needle fragment that needles_of/_fragments emit. ':' is a structural JSON format token, not a diagnostic message. Survives only because tests check string-leaf substrings, not the exact canonical mapping form. Killable in principle; coverage gap, not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::_fragments",
+      "distinct_survivors": 1,
+      "equivalent": 0,
+      "real_gap": 1,
+      "verdicts": [
+        {
+          "mutant": "L46 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Dropping `tuple` from the isinstance tuple turns the check into `isinstance(value, (list,))`, so a tuple value no longer recurses: original returns the array canonical form plus every nested element's fragments, mutant returns only `{_canonical(value)}`. These observably differ for any tuple input (e.g. `_fragments((\"a_sixteen_plus_char_leaf\",))`), so it is killable in principle. It survived only because `_fragments` is driven solely via needles_of on probe_input['stimulus'/'observable'], which are JSON-parsed data (dict/list/str/number, never tuple), and the test fixtures use nested lists (still handled) \u2014 no test passes a tuple. The dropped type IS read back as control flow for tuple inputs, so the branch is not dead over the function's Any domain; this is a coverage gap, not equivalence (owner rule #1: default SURVIVED)."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::_public_text",
+      "distinct_survivors": 5,
+      "equivalent": 0,
+      "real_gap": 5,
+      "verdicts": [
+        {
+          "mutant": "L56 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Removes project.name from `parts`, which is read back via \"\\n\".join(parts) to form `public`, the membership haystack in needles_of's `if n in public` (L76). A needle (>=16 chars) that is a substring of project.name but not of the other fields would flip from DROPPED to a real needle, changing needles_of's `needles`/`dropped` output (and a possible scan_repo LEAK). Not duplicated elsewhere in parts, so not provably unused. Coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L56 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Removes project.description from the `public` haystack used in the `n in public` comparison (L76). Descriptions are the longest free-text field, the most likely to contain a >=16-char stimulus/observable needle; dropping it makes such needles count as real leaks instead of DROPPED, observably changing needles_of output. Comparison operand, read back by the join; not equivalent."
+        },
+        {
+          "mutant": "L56 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Removes project.requirements_path (a filesystem path >=16 chars is plausible) from `public`. A needle coinciding with that path but nothing else would no longer be DROPPED (L76 partition changes). The element is read back through the join and is an independent bundle field, not guaranteed duplicated; behavioral change on some input -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L56 element 3 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Element 3 is the Starred `*project.product_roots`; dropping it excludes every product-root path from `public`. For any project with a non-empty product_roots, a needle matching a product root but no other field flips from DROPPED to a real needle. Equivalence would require product_roots to be empty for ALL projects, which the function (docstring: '...the paths') does not guarantee -> SURVIVED."
+        },
+        {
+          "mutant": "L59 string '\\n' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Changes \"\\n\".join to \"\".join, concatenating parts with no separator. This creates new cross-boundary substrings (e.g. name 'alpha' + description 'betastim...' yields 'alphabeta...' in the mutant but not where the original '\\n' splits them) and loses matches for any needle containing '\\n'. Either direction changes `n in public` (L76) for some input, altering needles_of's partition. Separator is a comparison-operand byte, not a human-facing diagnostic -> SURVIVED, not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::needles_of",
+      "distinct_survivors": 4,
+      "equivalent": 0,
+      "real_gap": 4,
+      "verdicts": [
+        {
+          "mutant": "L75 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "Iterating list(mine) instead of sorted(mine) changes the INSERTION ORDER of keys into the `needles` dict. The dict is never re-sorted: it is returned as-is and flows into scan_text, which iterates needles.items() and appends hits in that order -> report['hits'] order -> refusal(hits[:5]) order, all order-sensitive observables. The test project (STIMULUS+OBSERVABLE) yields >=2 fragments >=16 chars, so sorted vs hash order genuinely differs -> not equivalent, killable by asserting key/hit order. Current tests only use any()/all()/dict-value checks and filter hits by file, so none pins order. Real coverage gap. (dropped/kept are order-insensitive here, but needles order is not.)"
+        },
+        {
+          "mutant": "L83 sorted() -> list() [sorted(set(dropped))]",
+          "verdict": "SURVIVED",
+          "basis": "list(set(dropped)) returns the dropped list in hash order instead of alphabetical. The returned 'dropped' list is order-sensitive under list equality and is passed through scan_repo as \"dropped\": list(wire['dropped']) with no re-sort. With >=2 distinct dropped messages the order observably differs -> killable. Current tests exercise dropped only with 0 entries (== []) or via any(d.startswith('BC-ADD:')), neither of which pins order. Real coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L83 sorted() -> list() [sorted(set(unscanned))]",
+          "verdict": "SURVIVED",
+          "basis": "list(set(unscanned)) returns the unscanned list in hash order instead of alphabetical; the returned 'unscanned' list is order-sensitive under list equality and passed through scan_repo unsorted. With >=2 unscanned contracts the order observably differs -> killable. The only unscanned test (test_a_contract_too_small_to_scan_is_named_unscanned) asserts ['BC-ADD'] with a single element, where list and sorted coincide, so it cannot catch the order change. Real coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L77 string \"-char needle occurs in the bundle's public text\" emptied",
+          "verdict": "SURVIVED",
+          "basis": "The mutated literal is part of a string that is an element of the RETURNED value: needles_of returns {\"dropped\": sorted(set(dropped)), ...} (L83). Original appends e.g. \"BC-ADD: a 29-char needle occurs in the bundle's public text\"; mutant appends \"BC-ADD: a 29\". The returned dropped list therefore holds different string content. The frozen fixture already reaches this branch: test_a_public_facts_collision_is_dropped_by_name builds project(facts_text=\"the clause even quotes the-grand-total-of-the-ledger in public\"); the 29-char leaf 'the-grand-total-of-the-ledger' is >=MIN_NEEDLE and occurs in _public_text, so n in public is True and dropped is non-empty. The existing assertion only checks d.startswith('BC-ADD:') (shared prefix, misses it), but a trivial assertion on the SAME input distinguishes the mutant: assertTrue(any('occurs in the bundle's public text' in d for d in wire['dropped'])) passes on original and fails on mutant; equivalently assertIn('BC-ADD: a 29-char needle occurs in the bundle's public text', wire['dropped']). The value is also serialized verbatim downstream: scan_repo copies it as report['dropped'] = list(wire['dropped']) (L129), which run.py records into rec['stimulus_tripwire'] -> the truncated message is written into the report/record (RUN.json/evidence), a product observable an evidence snapshot or record-currency test would pin. The classifier's count-invariance argument (set()-dedup keyed on (contract_id,len) so len(dropped) is unchanged) is correct but only shows cardinality equality, not output equality -- the string CONTENT differs and is directly returned and serialized. Per owner directive #1 this is an untested observable (real coverage gap), not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::refusal",
+      "distinct_survivors": 14,
+      "equivalent": 0,
+      "real_gap": 14,
+      "verdicts": [
+        {
+          "mutant": "L135 string '; ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\"; \".join -> \"\".join changes the separator between named hits; with 2+ hits (reachable: refusal joins hits[:5], and scan_repo/scan_text can yield multiple) the returned message differs, so not identical on all inputs. No test exercises refusal with >=2 hits, so uncaught = real coverage gap."
+        },
+        {
+          "mutant": "L139 string '. ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\". \" is unconditionally concatenated between the message and the FOUND remediation text; emptying it changes the returned string on EVERY call. Observable on all inputs; no test asserts the joiner, so uncaught."
+        },
+        {
+          "mutant": "L136 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating `if h.get(\"needle_chars\")` inverts which hits get the \" (N chars)\" suffix. scan_text hits always have needle_chars>=16 (truthy), so original emits the suffix and the mutant suppresses it (and vice-versa for the needle_chars==0 bundle hit). Control flow changes, value used in output; no test checks the suffix."
+        },
+        {
+          "mutant": "L139 conditional negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating `if len(hits) > 5` flips the overflow suffix: with <=5 hits the mutant emits \" (+<negative> more)\", with >5 it suppresses it. Both branches reachable (scan_repo can produce >5 hits); observable string differs. Uncaught coverage gap."
+        },
+        {
+          "mutant": "L135 string ': contract ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\": contract \" is a literal in the per-hit f-string; emptying it changes every named hit from '<loc>: contract <id>' to '<loc><id>'. Observable on any call with >=1 hit; no test asserts message format."
+        },
+        {
+          "mutant": "L138 string 'sealed stimulus/observable content would reach the developer via ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "This is the leading prefix of the returned message, emitted on every call; emptying it changes the returned string unconditionally. Though human-facing, it is still observable output and killable (a test asserting the message text would catch it); no such assertion exists."
+        },
+        {
+          "mutant": "L138 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The \": \" between {where} and {named} is unconditionally present; emptying it changes the returned string on every call (\u2026via {where}{named}). Observable on all inputs; uncaught."
+        },
+        {
+          "mutant": "L139 Gt->LtE",
+          "verdict": "SURVIVED",
+          "basis": "`len(hits) > 5` -> `len(hits) <= 5` are exact complements, so for every hit count the branch taken flips (e.g. 5 hits: original '' vs mutant ' (+0 more)'; 3 hits: '' vs ' (+-2 more)'). Changes observable output; both regimes reachable; no test with varied hit counts caught it."
+        },
+        {
+          "mutant": "L136 string 'needle_chars' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'needle_chars' is a dict KEY, not a diagnostic fragment. Emptying either occurrence changes behavior: h['needle_chars']->h[''] raises KeyError when the suffix branch is taken, or h.get('needle_chars')->h.get('') always returns None so the \" (N chars)\" suffix is never emitted for real (len>=16) hits. Semantic operand, reachable, uncaught."
+        },
+        {
+          "mutant": "L136 string ' (' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\" (\" is the opening of the char-count suffix f-string; emptying it changes '... (16 chars)' to '...16 chars)' whenever a needle hit is present (scan_text hits, needle_chars>0). Observable on reachable input; no test asserts the suffix."
+        },
+        {
+          "mutant": "L136 string ' chars)' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\" chars)\" closes the suffix; emptying it drops the trailing ' chars)' from every needle hit's rendering. Observable whenever needle_chars is truthy (all scan_text hits); uncaught by tests."
+        },
+        {
+          "mutant": "L139 string ' (+' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\" (+\" opens the overflow suffix; emptying it changes ' (+2 more)' to '2 more)' when >5 hits. The >5 branch is reachable (scan_repo can find many leaks); observable output differs; no test drives >5 hits."
+        },
+        {
+          "mutant": "L139 string ' more)' emptied",
+          "verdict": "SURVIVED",
+          "basis": "\" more)\" closes the overflow suffix; emptying it changes ' (+2 more)' to ' (+2' when >5 hits. Reachable branch, observable change, uncaught."
+        },
+        {
+          "mutant": "L135 string 'file' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'file' is a dict lookup KEY, not a message fragment. h.get('file', where) -> h.get('', where): for scan_repo hits (run.py:594) which always carry {'file': rel,...}, the original renders the real file path while the mutant always falls back to `where`. Not equivalent despite the shared default \u2014 a real file-bearing input distinguishes them. The one test calling refusal on scan_repo hits only asserts the needle value is absent (file path != needle), so it does not catch this: real coverage gap."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::scan_repo",
+      "distinct_survivors": 9,
+      "equivalent": 0,
+      "real_gap": 9,
+      "verdicts": [
+        {
+          "mutant": "L115 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "sorted() fixes the order files are visited, so the returned `hits` list is built in deterministic path order; list() yields rglob's filesystem-arbitrary order. The `hits` list order IS observable: it is part of the returned dict and refusal() names only hits[:5], so which hits appear depends on order. Killable with two hit-producing files whose rglob order differs from sorted order. Every test produces at most one hit and looks hits up with order-insensitive any()/next(...if h['file']==...), so none catches it. Genuine coverage gap, not order-insensitive consumption."
+        },
+        {
+          "mutant": "L116 Or swapped",
+          "verdict": "SURVIVED",
+          "basis": "Swapping to `\".git\" in p.parts or not p.is_file()` changes short-circuit order. p.is_file() does a stat that can raise a non-ignored OSError (e.g. ENAMETOOLONG/EACCES) which, at L116, is OUTSIDE the try/except (that except at L123 is reached only after L118), so it propagates and crashes scan_repo. For a path under .git the original evaluates p.is_file() first (may raise); the mutant sees '.git' in parts True first and short-circuits, never calling is_file() -> no raise. Not behaviorally identical on all inputs, so equivalence is not proven; defaulting to SURVIVED. No test ever creates a .git path, so the branch is never exercised."
+        },
+        {
+          "mutant": "L116 string '.git' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'.git' is a path-component comparison operand, not a diagnostic. `\"\" in p.parts` is always False (pathlib never produces empty components), so the mutant disables the .git exclusion: .git contents get scanned, changing files_scanned and potentially adding hits. Observable behavior change, killable with a repo that has a .git directory containing scannable content. No frozen test creates a .git directory, so the exclusion is never exercised."
+        },
+        {
+          "mutant": "L122 string 'replace' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'replace' is the codec error-handler name (a semantic protocol token). On valid UTF-8 the handler is never consulted (identical), but on invalid bytes the original substitutes U+FFFD and continues, while `decode(\"utf-8\", \"\")` raises LookupError('unknown error handler name') which is not an OSError, so it escapes the except at L123 and crashes scan_repo. Killable with a file of invalid UTF-8 bytes; all test fixtures are valid UTF-8."
+        },
+        {
+          "mutant": "L127 dict entry 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the 'contract' key from the bundle-self hit. 'contract' is a dict key read by refusal() at L135 (`h['contract']`) and is part of the returned/serialized hits structure. The bundle test (L70-80) asserts only `h['file']=='bundle.json'` and never refuses on a bundle hit, so it survives; killable by asserting the bundle hit's contract field or by calling refusal() on a bundle hit (KeyError). Coverage gap."
+        },
+        {
+          "mutant": "L127 dict entry 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the 'needle_chars' key from the bundle-self hit. It is a JSON key in the function's returned structure (serialized into evidence records). refusal() reads it via .get() so is tolerant, and the bundle test asserts only 'file', so no frozen test catches it; killable by asserting the full bundle-hit dict shape {file, contract, needle_chars}. Coverage gap."
+        },
+        {
+          "mutant": "L127 string 'contract' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Renames the dict key 'contract' -> '' for the bundle-self hit, so refusal()'s `h['contract']` (L135) would KeyError and the returned structure carries a '' key instead. A dict key is semantic. No test asserts the bundle hit's contract or refuses on it, so it survives; killable in principle by asserting the key or refusing on a bundle hit. Coverage gap."
+        },
+        {
+          "mutant": "L127 string 'needle_chars' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Renames the dict key 'needle_chars' -> '' for the bundle-self hit. It is a JSON key in the returned/serialized structure; refusal()'s .get('needle_chars') now returns None (still falsy, like the original 0, so the refusal text is unchanged), but the returned dict shape changes. No test asserts needle_chars for the bundle hit; killable by asserting the dict shape. Coverage gap."
+        },
+        {
+          "mutant": "L127 string '(the project bundle itself)' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Empties the VALUE of the bundle hit's 'contract' field. This value occupies a semantic slot (it identifies the leak source, standing in for a contract_id) and is read by refusal() at L135 (`contract {h['contract']}`) and carried in the returned/serialized hits. Not a throwaway message fragment. The bundle test asserts only `h['file']=='bundle.json'` and never the contract value or refusal for a bundle hit, so it survives; killable by asserting hit['contract']=='(the project bundle itself)'. Per the rule a semantic field value, not a pure diagnostic -> SURVIVED."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/tripwire.py::scan_text",
+      "distinct_survivors": 3,
+      "equivalent": 0,
+      "real_gap": 3,
+      "verdicts": [
+        {
+          "mutant": "L91 dict entry 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Dropping the second entry makes each hit {\"contract\": contract} with no needle_chars. That key is read back: refusal() (L136) builds the \"(N chars)\" suffix from h.get('needle_chars')/h['needle_chars'], and scan_repo (L128) spreads these dicts into report['hits']. With it gone the refusal text loses the char count and the report shape changes \u2014 a real, killable behavior change. The frozen suite never asserts needle_chars (test_a_copied_fragment only checks hit['contract']; the escaped-spelling test only checks [0]['contract']), so it is an uncaught coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L91 string 'needle_chars' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'needle_chars' is a dict key (binding-rule explicit: an emptied string that is a dict key is SURVIVED, never EQUIVALENT). Emptied, the hit becomes {\"contract\": contract, \"\": len(needle)}; refusal()'s h.get('needle_chars') then returns None so the \"(N chars)\" suffix vanishes, and the report/refusal shape changes. Killable in principle but no frozen test asserts the key, so it is an uncaught coverage gap."
+        },
+        {
+          "mutant": "L90 False->True",
+          "verdict": "SURVIVED",
+          "basis": "This flips ensure_ascii=False to True in the JSON-escaped-spelling branch. For a non-ASCII needle the two differ: ensure_ascii=False keeps the literal character (matches text carrying it literally), ensure_ascii=True emits \\uXXXX (matches only the escaped form). Needles come from contracts' stimulus/observable content, which carries non-ASCII (test_v21_r4_anchor_nonascii.py exists precisely because contracts hold Vietnamese text), so the match set genuinely changes \u2014 not equivalent on all inputs. The only scan_text escaped-spelling test (test_the_json_escaped_spelling_is_a_hit_too) uses an ASCII-only needle, where both spellings coincide, so it cannot kill the mutant: a non-ASCII-needle test would. Uncaught coverage gap."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/verify.py::_invariant_problems",
+      "distinct_survivors": 4,
+      "equivalent": 0,
+      "real_gap": 4,
+      "verdicts": [
+        {
+          "mutant": "L107 returns None",
+          "verdict": "SURVIVED",
+          "basis": "Reaches the `not isinstance(inv, dict)` branch (inv present but not a dict, e.g. a forged RUN.json with invariants set to a string/list) \u2014 a reachable, non-dead branch. Original returns the 2-tuple ([msg], []); the mutant returns None. The sole caller `verify()` does `found, said = _invariant_problems(rec)` and the direct unit-test style does `problems, said = _invariant_problems(rec)` \u2014 unpacking None raises TypeError, an observable behavioral change. Survives only because no test ever constructs a non-dict `invariants` record (the one test file hits only the None / valid-dict / wrong-kernel branches). Killable in principle -> coverage gap."
+        },
+        {
+          "mutant": "L107 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "The operator (mutation.py L1539) fires on sequences with len>1, i.e. the 2-element RETURN TUPLE, not the single-element list. Dropping element 0 yields `return ([],)` \u2014 a 1-tuple; the caller's `found, said = ...` (and the direct-test `problems, said = ...`) then raises ValueError (expected 2, got 1), an observable change. The runner's own equivalence exemption (L1314-1317) covers element-dropped only when the tuple is read solely through len(); here both elements are read by name via unpack, so it does not apply. Branch reachable but untested -> coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L107 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Same 2-element return tuple; dropping element 1 yields `return ([\"RUN.json's invariants field is not an object\"],)`, a 1-tuple. The caller `found, said = _invariant_problems(rec)` (and direct-test unpack into two names) raises ValueError. Observable behavioral change on any input that reaches the non-dict branch; that branch has no test. Not read-through-len (unpacked by name), so not equivalent -> coverage gap."
+        },
+        {
+          "mutant": "L107 string \"RUN.json's invariants field is not an object\" emptied",
+          "verdict": "SURVIVED",
+          "basis": "Mutant returns ([\"\"], []); the problem string is a human diagnostic, not a dict key/path/token/digest/comparison operand, and no machine consumer parses verify()'s problem text (callers only test truthiness or join for display). It is NOT equivalent because it is killable: the sole test file for this function already asserts message substrings on sibling branches (assertIn('is not this kernel''s', problems[0]); assertIn('a run of a release before', said[0])), so an analogous test on the non-dict branch \u2014 assertIn('not an object', problems[0]) \u2014 would fail against the empty string. It survived only because line 107's branch is entirely untested. Pure coverage gap; per directive #1 a string that a test could assert (and whose sibling messages ARE asserted) is SURVIVED, not EQUIVALENT."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/app/verify.py::verify",
+      "distinct_survivors": 12,
+      "equivalent": 3,
+      "real_gap": 9,
+      "verdicts": [
+        {
+          "mutant": "L201 sorted() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "differ has two consumers: `if differ:` (order-insensitive) AND the problem message at L203 `f\"the record's story outcomes are not the journal's for {differ}\"`, which is order-SENSITIVE and is returned in problems. With >=2 differing stories whose journal (dict) order is not lexical order (e.g. stories committed S2 then S1), list() yields a different message text than sorted(). Per the binding rule, sorted()->list() is SURVIVED unless every consumer is order-insensitive; the message consumer is not. The only test (test_v21_verify.py::test_story_outcomes_that_are_not_the_journal_s_are_refuted) forges a single differing story (S1) and asserts only `any(\"story outcomes\" in p ...)`, so no test pins order: a genuine coverage gap."
+        },
+        {
+          "mutant": "L155 string ' the run printed' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Branch L154 (`expect_anchor is not None and anchor != expect_anchor`) is reachable and is reached by test_v21_verify.py::test_a_rewritten_manifest_is_refuted_only_against_the_anchor_the_operator_kept (calls verify(...expect_anchor=anchor) after rewriting evidence so anchor!=expect_anchor). The appended string is an element of the returned problems list = an observable. Original yields 'the evidence anchor is <12>, not the <12> the run printed'; mutant yields '...not the <12>'. The existing test asserts only any('anchor' in p); a test on the SAME input doing assertEqual(p, 'the evidence anchor is ..., not the ... the run printed') or assertIn('the run printed', p) distinguishes them. Reachable + observable + only weakly asserted = coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L225 dict entry 0 dropped",
+          "verdict": "EQUIVALENT",
+          "basis": "Dropping the 'story': x pair makes each refused-story entry {'error': '...'} \u2014 still a truthy dict, and the number of list elements is unchanged. `errors` is referenced only at L225 (def) and L226 (passed to R.delivery); grep confirms no other use, and it never enters verify's return dict (verdict/problems/delivery_verdict/journal_events/evidence_anchor/notes). R.delivery (run.py:388) reads errors ONLY as `[f'{len(errors)} stories were refused'] if errors else []` \u2014 len and truthiness, both invariant under this mutation \u2014 and verify discards delivery's `blocked` (`verdict, _, committed`). So the dict content never reaches any observable on any input. This is the owner's stated 'dropped element never read back' exemplar, proven by code trace."
+        },
+        {
+          "mutant": "L225 dict entry 1 dropped",
+          "verdict": "EQUIVALENT",
+          "basis": "Dropping the 'error': ... pair leaves {'story': x} \u2014 still truthy, list length unchanged. Same proof as the sibling: `errors` flows only to R.delivery, which consumes it solely as len(errors)/truthiness (run.py:388); delivery's blocked return is discarded by verify (`verdict, _, committed`); errors never appears in verify's return value. len and truthiness are unaffected by removing a key, so verdict and every returned field are byte-identical for all inputs. No input can distinguish mutant from original \u2014 genuinely equivalent."
+        },
+        {
+          "mutant": "L132 string 'no ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "FileNotFoundError on `out / R.MANIFEST` (a pre-2.1 run with no manifest) is reachable and is exercised by test_v21_defects_verify.py::test_only_an_absent_manifest_is_a_run_of_an_older_release (copytree ignoring R.MANIFEST, then verify). The note is returned in notes[0], an observable. Original: 'no EVIDENCE.json: a run of a release before 2.1 \u2014 ...'; mutant: 'EVIDENCE.json: a run ...'. The test asserts only len(notes)==1 and '2.1' in notes[0], both of which survive. On the SAME input, assertEqual(notes[0], 'no EVIDENCE.json: ...') or notes[0].startswith('no ') distinguishes them. Reachable observable, weakly asserted = SURVIVED."
+        },
+        {
+          "mutant": "L138 string ')' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The OSError branch (not FileNotFoundError, not ValueError) is reachable: test_v21_defects_verify.py::test_only_an_absent_manifest_is_a_run_of_an_older_release does `(older / R.MANIFEST).mkdir()`, so reading the manifest path raises IsADirectoryError (an OSError), hitting L136-138. Returned problem: original 'EVIDENCE.json cannot be read (IsADirectoryError)'; mutant drops the trailing ')' -> '...(IsADirectoryError'. The test asserts only any(R.MANIFEST in p); on the SAME directory-in-place input, assertEqual(p, 'EVIDENCE.json cannot be read (IsADirectoryError)') distinguishes them. Reachable + observable in problems = SURVIVED."
+        },
+        {
+          "mutant": "L225 string 'story' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'story' is a dict/JSON key (the schema of a refused-story error record; the same \"story\"/\"error\" shape as RUN.json's story_errors concatenated on this line). Binding rule 3 classifies a string-emptied mutant that is a dict/JSON key as SURVIVED, and the EQUIVALENT escape is reserved for human-facing message fragments, which a key is not. In the current verify path delivery happens to consume errors only as len(), so the campaign's tests (which never drive verify with a non-empty `refused`, and never assert the error record's structure) could not distinguish it \u2014 a genuine coverage gap. Defaulting to SURVIVED per the key rule."
+        },
+        {
+          "mutant": "L225 string 'error' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'error' is a dict/JSON key of the refused-story error record. Binding rule 3: a string-emptied dict/JSON key is SURVIVED (the EQUIVALENT escape applies only to human-facing message fragments, not keys). No verify test asserts the error record's keys (delivery counts only len(errors)), so the campaign did not catch it \u2014 a coverage gap, classified SURVIVED per the key rule."
+        },
+        {
+          "mutant": "L225 string 'begun and never ended in the journal' emptied",
+          "verdict": "EQUIVALENT",
+          "basis": "This is the VALUE of the 'error' key in each refused-story dict. Emptying it to '' leaves a 2-key truthy dict; list length and truthiness are unchanged. `errors` is used only at L225/L226; it is passed solely to R.delivery, which reads it only as len(errors)/truthiness (run.py:388) and whose `blocked` return verify discards. errors (and this value) never appear in any returned field. No code path reads errors[i]['error'], so the value is never surfaced, parsed, compared, or serialized. Therefore no input produces a different verify output. Upheld EQUIVALENT (owner's 'value never read back' case), proven by trace of the single consumer."
+        },
+        {
+          "mutant": "L124 string ')' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The except (OSError, ValueError) on reading RUN.json is clearly reachable (RUN.json absent -> FileNotFoundError, an OSError; or non-JSON -> ValueError). verify returns {'verdict':'REFUTED','problems':[f\"{out/'RUN.json'}: no readable run record ({type(e).__name__})\"]} \u2014 the problem is an observable in the return. Mutant drops the trailing ')'. No current verify test forces an unreadable/invalid RUN.json (self-admitted), so this is a pure coverage gap, not equivalence: a test that deletes RUN.json then asserts problems[0] == f\"{out/'RUN.json'}: no readable run record (FileNotFoundError)\" kills the mutant. Reachable but untested = SURVIVED per owner directive."
+        },
+        {
+          "mutant": "L221 string 'the run continued a lineage with spend no evidence accounts for (' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Branch L220 (`if accepted:` where accepted = rec['continues']['accepted_unaccounted']) is reachable and is exercised by test_v21_x_lineage_proof.py (asserts any('accepted by name' in n for n in notes)). The note appended at L221-223 is a returned observable. The emptied leading literal is the FIRST segment of the multi-part f-string; original note begins 'the run continued a lineage with spend no evidence accounts for (N listed in ...', mutant begins with the count segment. The test asserts only the 'accepted by name' substring (second segment, survives). On the SAME continuation input, assertIn('the run continued a lineage with spend no evidence accounts for', n) distinguishes them. Reachable observable, weakly asserted = SURVIVED."
+        },
+        {
+          "mutant": "L173 string ')' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The except (OSError, KeyError, TypeError, ValueError) on `(out / j['path']).read_bytes()` is reachable and exercised by test_v21_defects_verify.py::test_a_journal_reference_that_is_no_object_or_no_path_is_refuted: the NUL-path case (journal path 'run/journals/a\\x00b.jsonl') raises ValueError ('embedded null byte'), hitting L171-173. Returned problem: original 'the journal RUN.json names cannot be read (ValueError)'; mutant drops trailing ')' -> '...(ValueError'. The test asserts only that exactly one problem contains 'ValueError' and that it contains 'journal' \u2014 both survive. On the SAME NUL-path input, assertEqual(named[0], 'the journal RUN.json names cannot be read (ValueError)') distinguishes them. Reachable + observable in problems = SURVIVED."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/invariants/registry.py::register_runtime",
+      "distinct_survivors": 19,
+      "equivalent": 1,
+      "real_gap": 18,
+      "verdicts": [
+        {
+          "mutant": "L454 Or swapped",
+          "verdict": "EQUIVALENT",
+          "basis": "`not issubclass(InvariantError, BaseException) or issubclass(InvariantError, Exception)` vs the swapped `issubclass(InvariantError, Exception) or not issubclass(InvariantError, BaseException)`. Both operands are side-effect-free and read the SAME module-global `InvariantError` (the only variable; the `registry` arg cannot touch it, and even a mock.patch of reg.InvariantError feeds both forms the identical class). Logical OR is commutative for truthiness, so the `if` fires under identical conditions for every class X. The only order-sensitive case is a non-class X: original evaluates issubclass(X, BaseException) first, mutant evaluates issubclass(X, Exception) first, but `issubclass()` raises TypeError('arg 1 must be a class') iff X is not a class REGARDLESS of arg 2 \u2014 so both raise the identical TypeError at the first operand, and propagate it out of register_runtime identically. No input (incl. monkeypatched InvariantError, class or not) can distinguish the raise/return behavior or the exception. Genuinely equivalent."
+        },
+        {
+          "mutant": "L432 string 'the registry is a tuple of invariants, closed at registration' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable: `register_runtime(list(REGISTRY))` (non-tuple) hits the L431 guard and materializes this exact message. p5/test_invariants.py:183 already asserts `assertRaisesRegex(RegistrationError, '^the registry is a tuple of invariants, closed at registration')` against register()'s identical copy; the same assertion against register_runtime passes on the original and fails on the mutant (empty prefix). Only untested for register_runtime, not unobservable -> coverage gap."
+        },
+        {
+          "mutant": "L435 string 'an entry is not one of the nine typed invariants (unknown invariant)' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable: `register_runtime(replaced(3, id='X'))` (an Invariant whose id is a str, not InvariantId) makes `ids` contain a non-InvariantId -> L434 any(...) True -> this raise fires with the exact text. p5:175/177 assert 'unknown invariant' against register()'s copy via register(replaced(3, id='X')) / register(REGISTRY[:8]+('IX',)); the parallel assertIn('unknown invariant', str(exc)) on register_runtime kills the emptied-string mutant. Untested for register_runtime, fully observable -> coverage gap."
+        },
+        {
+          "mutant": "L437 string 'duplicate invariant ids' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable: `register_runtime(REGISTRY + (REGISTRY[0],))` passes the isinstance check (all valid InvariantId) but has a duplicate id -> L436 len(set(ids))!=len(ids) True -> this raise fires with the exact text. p5:173 asserts `assertRaisesRegex(RegistrationError, '^duplicate invariant ids')` against register()'s identical copy via register(REGISTRY + (REGISTRY[0],)); the same assertion on register_runtime passes on original, fails on mutant. Untested for register_runtime, observable -> coverage gap."
+        },
+        {
+          "mutant": "L439 string 'the registry holds exactly I..IX in order; got ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable and ALREADY exercised: p0/test_invariants_runtime.py:79 calls `register_runtime(registry=reg.REGISTRY[1:])` which hits this exact branch, but asserts only the exception TYPE. p5:171/181 assert `assertRaisesRegex(RegistrationError, '^the registry holds exactly I..IX in order')` against register()'s identical copy via register(REGISTRY[:-1]) / register(reversed). Adding that regex (or an assertIn on the prefix) to the existing register_runtime(REGISTRY[1:]) test passes on original, fails on mutant (prefix emptied, only the f-string list remains). Reachable + text-assertable = coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L442 string ': title ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable: `register_runtime(replaced(1, title='Determinism'))` builds a valid 9-entry registry in order whose invariant II has a wrong title -> L441 inv.title != frozen True -> raise f\"{inv.id.value}: title {inv.title!r} is not the frozen {INVARIANT_TITLE[inv.id]!r}\" = \"II: title 'Determinism' is not the frozen 'Semantic Determinism'\". p5:179 asserts that EXACT string against register()'s identical copy; the ': title ' literal is part of it. The same assertRaisesRegex on register_runtime fails on the mutant (fragment emptied -> \"IItitle 'Determinism'...\"). Untested for register_runtime, observable -> coverage gap."
+        },
+        {
+          "mutant": "L442 string ' is not the frozen ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Same reachable branch and input as above (`register_runtime(replaced(1, title='Determinism'))`); the ' is not the frozen ' literal is the second segment of the same message asserted verbatim at p5:179 (\"^II: title 'Determinism' is not the frozen 'Semantic Determinism'\"). Emptying it yields \"II: title 'Determinism''Semantic Determinism'\", which fails that regex. A parallel assertRaisesRegex against register_runtime distinguishes mutant from original -> coverage gap, not equivalence."
+        },
+        {
+          "mutant": "L444 string ' has no enforcement mechanism: a documented intention, not an invariant' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable: `register_runtime(replaced(0, mechanisms=()))` yields invariant I with empty mechanisms (correct title, so it passes L441) -> L443 `not inv.mechanisms` True -> raise f\"{inv.id.value} has no enforcement mechanism: ...\" = 'I has no enforcement mechanism: ...'. p5:119/121 assert `assertRaisesRegex(RegistrationError, '^I has no enforcement mechanism')` against register()'s identical copy via register(replaced(0, mechanisms=())). The claim 'no test builds a mechanism-less invariant' is false (replaced(0, mechanisms=()) does); the branch is reachable and the text assertable on register_runtime -> coverage gap."
+        },
+        {
+          "mutant": "L446 string ' is declared but not armed in every tier: ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable: `register_runtime(replaced(4, tiers=tuple(t for t in Tier if t is not Tier.P3)))` gives invariant V tiers != ALL_TIERS (passing title+mechanisms checks) -> L445 True -> raise f\"{inv.id.value} is declared but not armed in every tier: ...\". p5:126 asserts the EXACT string \"^V is declared but not armed in every tier: ['tests/v2/p3']\" against register()'s identical copy via register(replaced(4, tiers=without_p3)); p5:152 likewise for VIII. The branch is merely untested on register_runtime (not dead: constructible Invariant with tiers!=ALL_TIERS reaches it) -> per binding #1 this is SURVIVED, not EQUIVALENT."
+        },
+        {
+          "mutant": "L455 string 'InvariantError must derive from BaseException and not from Exception (\u00a74)' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable via the same technique the suite already uses: p5:186-192 does `class Contained(Exception): pass; with mock.patch.object(reg, 'InvariantError', Contained): assertRaisesRegex(RegistrationError, r'^InvariantError must derive from BaseException and not from Exception \\(\u00a74\\)$')` against register(). Under that patch the L454 guard (`not issubclass(Contained,BaseException) or issubclass(Contained,Exception)` = False or True = True) fires in register_runtime too, materializing this exact message; RegistrationError's base is unchanged by the patch so it still raises. The identical mock.patch + assertRaisesRegex against register_runtime passes on original and fails on the emptied-message mutant. The guard is a live fail-closed check (invariant all.invariant-error-is-base-exception), reachable by monkeypatch, not logically dead -> coverage gap."
+        },
+        {
+          "mutant": "L452 MechanismKind.CODE->STATIC_RULE",
+          "verdict": "SURVIVED",
+          "basis": "Not a no-op: the original's `for m in UNCONTAINABLE: if m.kind is CODE: resolve(m)` VALIDATES that the UNCONTAINABLE CODE mechanism 'aisef2.errors:InvariantError' resolves its ATTRIBUTE; the mutant (STATIC_RULE) never runs the body (no UNCONTAINABLE member is STATIC_RULE), dropping that check. Distinguishing input (same monkeypatch style the suite uses on reg.InvariantError at p5:190 and reg.register at conformance test_freeze_f1_f11.py:100): `mock.patch.object(reg, 'UNCONTAINABLE', (Mechanism('x', MechanismKind.CODE, 'aisef2.errors:NoSuchAttr', ''),))`, then call register_runtime(). Original: resolve() imports the module OK, getattr('NoSuchAttr') fails hasattr -> raise RegistrationError('x: aisef2.errors:NoSuchAttr resolves nowhere'). Mutant: body skipped, L454 passes, and the return's runtime_mechanism_digest (L417) reads only the module's __file__ bytes WITHOUT the attribute -> it succeeds and register_runtime RETURNS a RegisteredRuntime with no raise. assertRaises(RegistrationError, register_runtime) passes on original, fails on mutant -> killed. Reachable, observable raise-vs-return difference -> SURVIVED."
+        },
+        {
+          "mutant": "L452 condition negated",
+          "verdict": "SURVIVED",
+          "basis": "Negating selects the non-CODE UNCONTAINABLE member \u2014 the CHECKER `validation/v2/except_boundaries.py:check` \u2014 and resolve() for a CHECKER calls _load_script(target, ROOT), a tree-bound file. On the dev tree (where all tests run) it exists and succeeds, matching the original; but on an installed distribution without the validation/ tree it raises RegistrationError, contradicting register_runtime's documented installed-distro contract. Killable in an installed-like env; no test exercises that, so it is a real coverage gap."
+        },
+        {
+          "mutant": "L452 Is->IsNot",
+          "verdict": "SURVIVED",
+          "basis": "`is not` selects the non-CODE UNCONTAINABLE member (the CHECKER), same effect as negating the condition: it resolves the tree-bound except_boundaries.py checker, which succeeds on the dev tree but fails on an installed distribution. Genuine behavioral change, uncovered by any installed-env test."
+        },
+        {
+          "mutant": "L452 MechanismKind.CODE->CHECKER",
+          "verdict": "SURVIVED",
+          "basis": "Matching CHECKER selects UNCONTAINABLE[1] and resolves the tree-bound checker file validation/v2/except_boundaries.py (while skipping the CODE member's no-op resolve). Succeeds on the dev tree but raises RegistrationError on an installed distribution lacking the validation/ tree \u2014 exactly the installed-distro property register_runtime must preserve. No test runs in that environment, so it survived; killable in principle."
+        },
+        {
+          "mutant": "L449 condition negated",
+          "verdict": "SURVIVED",
+          "basis": "This is the per-invariant mechanism loop. Negating resolves the non-CODE mechanisms (STATIC_RULE and CHECKER) and skips CODE. resolve() for STATIC_RULE loads validation/v2/kernel_static_checks.py and for CHECKER loads validation/v2/<file>.py \u2014 tree-bound files. They exist on the dev tree (tests pass) but are absent on an installed distribution, where the mutant raises RegistrationError. Real behavioral difference uncovered by the dev-tree-only tests."
+        },
+        {
+          "mutant": "L449 Is->IsNot",
+          "verdict": "SURVIVED",
+          "basis": "`is not` in the per-invariant loop resolves STATIC_RULE/CHECKER mechanisms and skips CODE, same effect as negation: it loads tree-bound validation/v2 files that an installed distribution lacks, changing behavior there. No installed-env test, so it is a genuine coverage gap."
+        },
+        {
+          "mutant": "L449 MechanismKind.CODE->STATIC_RULE",
+          "verdict": "SURVIVED",
+          "basis": "The registry DOES contain STATIC_RULE mechanisms (e.g. I.no-prose-control, II.seq-not-time). The mutant resolves them \u2014 resolve() loads validation/v2/kernel_static_checks.py (a tree-bound file) \u2014 and skips CODE. Succeeds on the dev tree but raises RegistrationError on an installed distribution without that file. Observable difference no test covers."
+        },
+        {
+          "mutant": "L449 MechanismKind.CODE->CHECKER",
+          "verdict": "SURVIVED",
+          "basis": "The registry contains a CHECKER mechanism (VI.frozen-artefacts -> validation/v2/freeze_manifest.py:check). The mutant resolves it via _load_script of a tree-bound file and skips CODE. Succeeds on the dev tree, fails on an installed distribution lacking validation/. Real behavioral change, untested."
+        },
+        {
+          "mutant": "L447 NotIn->In",
+          "verdict": "SURVIVED",
+          "basis": "`not in`->`in` flips the tiers-mismatch diagnostic from listing the MISSING tiers to listing the PRESENT ones \u2014 a semantically wrong message, an observable output change, not a mere emptied fragment. The branch is reachable with a crafted wrong-tiers registry (constructible as a legitimate `registry` argument), and a test asserting the message correctly names the missing tiers would kill it. For REGISTRY all invariants carry ALL_TIERS so it is dead for the default, but it is not provably dead across all inputs and the changed value flows into observable output, so per the conservative rule it is a real coverage gap, not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/invariants/registry.py::registry_digest",
+      "distinct_survivors": 18,
+      "equivalent": 0,
+      "real_gap": 18,
+      "verdicts": [
+        {
+          "mutant": "L281 returns None",
+          "verdict": "SURVIVED",
+          "basis": "Replacing the return with None swaps the 64-hex digest for None. The value is stored as Registered.digest / RegisteredRuntime.digest / ArmedRuntime.registry_digest and consumed widely (the len==(64,64) check at test_invariants.py:113, record re-derivation), so it is killable in principle; it merely was not exercised in this worker tree. Value is used, branch not dead -> SURVIVED, never equivalent."
+        },
+        {
+          "mutant": "L278 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops i.id.value from the per-invariant row tuple, removing a field from repr(rows) and thus changing the sha256 input and the digest. Tests only self-compare the digest or check its length (always 64 for sha256), so the change is uncaught. Observable -> SURVIVED."
+        },
+        {
+          "mutant": "L278 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops i.title from the row tuple; repr(rows) loses the title field, changing the hashed string and the digest. No test pins the digest value -> real coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L278 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops i.rfc from the row tuple; repr(rows) changes, so the digest changes. Only self-comparison / length assertions exist -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L278 element 3 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the whole per-invariant mechanisms tuple (element 3) from the row; repr(rows) loses the mechanisms, changing the sha256 digest. Uncaught by the self-comparing tests -> SURVIVED."
+        },
+        {
+          "mutant": "L278 element 4 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops the tiers tuple (element 4, whose expression continues on L279) from the row; repr(rows) loses the tiers, changing the digest. Not pinned by any test -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L280 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops element 0 of an L280 tuple literal (the 'uncontainable' label of the outer appended row, or m.id of the inner mechanism tuple). Either removes a field from repr(rows), changing the hashed input and the digest. Uncaught -> SURVIVED."
+        },
+        {
+          "mutant": "L280 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops element 1 of an L280 tuple (the inner mechanisms tuple of the outer appended row, or m.kind.value of the inner mechanism tuple); repr(rows) changes, so the digest changes. Not pinned -> SURVIVED."
+        },
+        {
+          "mutant": "L278 tuple() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "The mechanisms tuple(...) becomes list(...). repr(rows) is the digest input and renders a list as [...] versus a tuple's (...), so the sha256 changes. Per the binding rule the consumer (repr) is order-and-type-sensitive, so this is observable -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L279 tuple() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "The tiers tuple(...) becomes list(...); repr(rows) renders [...] instead of (...), changing the hashed string and the digest. repr distinguishes list from tuple -> observable -> SURVIVED."
+        },
+        {
+          "mutant": "L280 string 'uncontainable' emptied",
+          "verdict": "SURVIVED",
+          "basis": "'uncontainable' is element 0 of the appended UNCONTAINABLE row and is fed directly into the sha256 input via repr(rows); emptying it changes the digest. It is a digest input and a row discriminator, not a human-facing diagnostic the binding rule exempts -> SURVIVED, never equivalent."
+        },
+        {
+          "mutant": "L280 tuple() -> list()",
+          "verdict": "SURVIVED",
+          "basis": "The inner UNCONTAINABLE mechanisms tuple(...) becomes list(...); repr(rows) renders [...] instead of (...), changing the hashed string and the digest. Observable via repr -> SURVIVED."
+        },
+        {
+          "mutant": "L278 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Distinct mutant: drops element 0 (m.id) of the inner per-mechanism tuple (m.id, m.kind.value, m.ref). On the real REGISTRY every invariant has mechanisms, so repr(rows) changes and the digest changes. Uncaught -> SURVIVED, not equivalent."
+        },
+        {
+          "mutant": "L278 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Distinct mutant: drops element 1 (m.kind.value) of the inner per-mechanism tuple; repr(rows) loses each mechanism's kind, changing the digest. Not pinned by tests -> SURVIVED."
+        },
+        {
+          "mutant": "L278 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Distinct mutant: drops element 2 (m.ref) of the inner per-mechanism tuple; repr(rows) loses each mechanism's reference, changing the digest. Observable -> SURVIVED."
+        },
+        {
+          "mutant": "L280 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Distinct second mutant on L280: drops element 0 of the other tuple literal (whichever of the outer 'uncontainable' row / inner mechanism tuple the prior L280-element-0 mutant did not target). UNCONTAINABLE is non-empty, so repr(rows) changes and the digest changes -> SURVIVED."
+        },
+        {
+          "mutant": "L280 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Distinct second mutant on L280: drops element 1 of the other L280 tuple literal; repr(rows) changes, so the digest changes. Uncaught by the self-comparing tests -> SURVIVED."
+        },
+        {
+          "mutant": "L280 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Drops element 2 (m.ref) of the inner UNCONTAINABLE mechanism tuple (m.id, m.kind.value, m.ref) \u2014 the only L280 tuple with an index 2, so this is a real element drop, not a no-op on a short tuple. repr(rows) loses each UNCONTAINABLE mechanism's reference, changing the digest -> SURVIVED, not equivalent."
+        }
+      ]
+    },
+    {
+      "target": "aisef2/invariants/registry.py::runtime_mechanism_digest",
+      "distinct_survivors": 12,
+      "equivalent": 0,
+      "real_gap": 12,
+      "verdicts": [
+        {
+          "mutant": "L422 returns None",
+          "verdict": "SURVIVED",
+          "basis": "Replaces the whole return value with None. The value is used (stored by run.py:519, compared by verify.py:113, and by arm_runtime/register_runtime). It is killable in principle, but current tests only compare the digest to itself recomputed the same way (test_arm_runtime..., test_runtime_registration...: `a.code_mechanism_digest == runtime_mechanism_digest()`) so None==None passes, and verify compares None!=None -> no mismatch. No test asserts the result is a non-None 64-hex string. Genuine coverage gap, not dead/unused."
+        },
+        {
+          "mutant": "L419 element 0 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Removes ImportError from the catch, so importlib.import_module(target) raising ImportError/ModuleNotFoundError (reachable by calling this public function directly with a CODE mechanism whose target is unimportable) would propagate raw instead of being converted to RegistrationError. Changes the exception type observed; killable in principle. No test ever enters this except (all tests use the valid REGISTRY; the bad-registry test fails earlier at the I..IX check). Coverage gap, branch is not provably dead."
+        },
+        {
+          "mutant": "L419 element 1 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Removes AttributeError. `.__file__` on a built-in module (e.g. a CODE ref pointing at a module lacking __file__) raises AttributeError, which would then propagate raw rather than becoming RegistrationError. Reachable via a crafted registry even through register_runtime (resolve() imports but never reads __file__). Observable behavior change, untested error path -> coverage gap."
+        },
+        {
+          "mutant": "L419 element 2 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Removes TypeError. A namespace package has __file__ == None, so pathlib.Path(None) raises TypeError; dropping it propagates raw instead of RegistrationError. Reachable with such a module; register_runtime's prior resolve() does not guard against it. Changes observed exception type; no test exercises this arm -> coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L419 element 3 dropped",
+          "verdict": "SURVIVED",
+          "basis": "Removes OSError. path.read_bytes() can raise FileNotFoundError/PermissionError (OSError subclass) when __file__ points to a missing/unreadable file; dropping it propagates raw rather than converting to RegistrationError. Killable in principle; not provably dead; no test forces a read failure here -> coverage gap."
+        },
+        {
+          "mutant": "L421 string ' ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Empties the field separator between {m.id} and {m.ref}, changing the bytes that are later sha256'd. This is a digest input (per binding rule, a sha/digest input is semantic -> SURVIVED). It alters the function's returned hash for the real multi-mechanism registry. Not caught because every consumer recomputes with the same mutated code and no test pins a frozen digest value, but the pure output genuinely changes -> real coverage gap."
+        },
+        {
+          "mutant": "L421 string ' ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Empties the second field separator (between {m.ref} and the per-module sha). Same as the first space: a delimiter inside the digest input, so it changes the produced hash. Semantic (digest/format token), killable by a golden-value or cross-context comparison; current tests only check self-consistency. Coverage gap, not equivalent."
+        },
+        {
+          "mutant": "L422 string '\\n' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Changes the line join separator from '\\n' to '' before hashing, so the final digest differs for any registry with >1 mechanism line. The separator is a format/digest-boundary token (collision-relevant and part of the hashed content) -> semantic -> SURVIVED. Undetected only because nothing asserts a frozen digest and all comparisons recompute identically; the by-design cross-context digest genuinely changes."
+        },
+        {
+          "mutant": "L420 string ': module ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Reachable, observable, uncovered. runtime_mechanism_digest is a public, unvalidated function taking `registry`. Call it with a tuple holding one Invariant whose mechanisms contains a CODE Mechanism ref='sys:modules': importlib.import_module('sys') succeeds but `sys.__file__` raises AttributeError (built-ins have no __file__), caught at L419, so L420 raises. Original str(exc) = \"<id>: module 'sys' has no readable file (AttributeError: ...)\"; the mutant fuses id and target -> \"<id>'sys' has no readable file (...)\". assertRaisesRegex / assertIn(': module ', str(exc)) passes on the original and fails on the mutant. No frozen test enters this branch (both callers use the real REGISTRY on the success path, or REGISTRY[1:] which fails the L438 order check before the digest is computed), so this is a test-coverage gap, not equivalence. The reason conflates 'currently unasserted' with 'inherently unobservable' (owner directive #1)."
+        },
+        {
+          "mutant": "L420 string ' has no readable file (' emptied",
+          "verdict": "SURVIVED",
+          "basis": "Same reachable error branch (e.g. registry with a CODE mechanism ref='sys:modules' -> AttributeError on sys.__file__; also reachable via arm_runtime/register_runtime since resolve() never reads __file__). Original message contains the literal 'has no readable file ('; the mutant removes it, yielding \"<id>: module 'sys'AttributeError: ...)\". assertIn('has no readable file', str(exc)) passes on original, fails on mutant. The equivalence reason itself concedes 'no test asserts it' -- that is precisely a coverage gap (SURVIVED), not proof no input can distinguish (EQUIVALENT). str(exc) is a first-class observable the exception propagates; nothing makes the difference unobservable."
+        },
+        {
+          "mutant": "L420 string ': ' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The emptied ': ' separates {type(e).__name__} from {e} inside the parenthetical. On the reachable AttributeError input (registry CODE mechanism ref='sys:modules'), original = \"...(AttributeError: module 'sys' has no attribute '__file__')\"; mutant fuses the class name into its message -> \"...(AttributeErrormodule 'sys' ...)\". assertRegex(str(exc), r\"\\bAttributeError\\b\") passes on the original but FAILS on the mutant, because there is no longer a word boundary after 'AttributeError' (it abuts 'module'). This is exactly the 'the class name is a token of its own, not run together with its neighbour' assertion style this very repo uses in test_v21_kills3_A22.py (TheCauseClassOfARunSpecThatDoesNotRederiveIsAToken), so a kill is both possible and idiomatic. Reachable + observable + uncovered = SURVIVED."
+        },
+        {
+          "mutant": "L420 string ')' emptied",
+          "verdict": "SURVIVED",
+          "basis": "The trailing ')' closes the diagnostic parenthetical. On the reachable error input (registry CODE mechanism ref='sys:modules' -> AttributeError, whose str has no parens), original str(exc) ends \"...'__file__')\" with one '(' and one ')'; the mutant drops the ')', leaving unbalanced parens and no trailing ')'. str(exc).endswith(')') or str(exc).count('(')==str(exc).count(')') passes on the original and fails on the mutant. No frozen test reaches this branch, so it is an uncovered-but-killable difference (coverage gap), not an input-free equivalence. The project's 'closing punctuation is not asserted' note describes current practice, not unreachability (owner directive #1: untested != EQUIVALENT)."
+        }
+      ]
+    }
+  ]
+}

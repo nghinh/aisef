@@ -21,7 +21,7 @@
  },
  "B7": {
   "requirement": "cost-of-trust USD/story on the canary; productive vs trust split (E4); publish even if ugly",
-  "usd_per_story": 0.166598,
+  "usd_per_story": 0.157066,
   "usd_status": "known",
   "usd_source": "https://api-docs.deepseek.com/quick_start/pricing/ — deepseek-v4-pro peak rate (upper bound); cache write priced as cache miss; the route is served by 9router, whose own price is not known here",
   "cache_aware": true,
@@ -73,7 +73,53 @@
    "trust_reviewer": 0.070809,
    "trust_preflight_note": "preflight attestation (model-list + chat probes) is trust overhead; its tokens are in usage.preflight (input 4180/output 21). The E4 productive/trust ratio here: productive=developer session, trust=reviewer+preflight+probe setup."
   },
-  "honest_caveat": "9router's own price to the operator is not published; USD is an UPPER BOUND computed from deepseek-v4-pro upstream peak rates. Tokens are measured exactly. Per QĐ #2: no rate card -> report tokens, treat USD as upper-bound estimate."
+  "honest_caveat": "9router's own price to the operator is not published; USD is an UPPER BOUND computed from deepseek-v4-pro upstream peak rates. Tokens are measured exactly. Per QĐ #2: no rate card -> report tokens, treat USD as upper-bound estimate.",
+  "runs": [
+   {
+    "run": "b1",
+    "usd": 0.166598,
+    "dev_productive": 0.090188,
+    "rev_trust": 0.070809,
+    "wall_s": 80.019,
+    "tokens": {
+     "cache_read": 461056,
+     "cache_write": 0,
+     "input": 99804,
+     "output": 1943,
+     "reasoning": 322
+    }
+   },
+   {
+    "run": "b1-run2",
+    "usd": 0.147534,
+    "dev_productive": 0.083154,
+    "rev_trust": 0.058752,
+    "wall_s": 71.014,
+    "tokens": {
+     "cache_read": 365056,
+     "cache_write": 0,
+     "input": 89153,
+     "output": 1614,
+     "reasoning": 447
+    }
+   }
+  ],
+  "variance": {
+   "n_runs": 2,
+   "usd_values": [
+    0.166598,
+    0.147534
+   ],
+   "mean": 0.157066,
+   "min": 0.147534,
+   "max": 0.166598,
+   "spread_abs": 0.019064,
+   "spread_pct_of_mean": 12.1,
+   "both_delivered": true,
+   "both_verified": true,
+   "escapes": 0
+  },
+  "usd_per_story_note": "mean of 2 live runs; see variance block"
  },
  "cost_control_note": "Owner lifted the $60 cap. The single-story canary cost $0.167 (upper bound); token/turn budgets in run.json remained as a runaway safeguard, not reached. C2's max_cost gate (proven offline in C2) was not needed to enforce a ceiling here."
 }

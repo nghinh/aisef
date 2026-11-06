@@ -1,0 +1,67 @@
+{
+  "record": "FINDING-WIN-OSKILL-001-SAFE-FIX-PLAN",
+  "date": "2026-11-06",
+  "owner_decision": "#2 (2026-11-06): prepare safe fix (Windows repro test + process-authority impact + regression plan); do NOT patch the frozen kernel before the plan is tabled.",
+  "status": "PLAN_ONLY_NOT_APPLIED",
+  "analysis": {
+    "method": "read-only 6-agent workflow",
+    "run_id": "wf_472215a4-623",
+    "agents": "4 analysis + 2 adversarial refutation",
+    "both_refutations_failed": true
+  },
+  "finding": "aisef2/app/client.py:46 (_is_gone) probes liveness with a bare os.kill(pid, 0) documented as 'no signal is ever sent'; that contract is false on Windows, where os.kill(pid, 0) is destructive or raises, never a safe probe.",
+  "windows_semantics": {
+    "destructive": true,
+    "mechanism": "signal.CTRL_C_EVENT==0 -> console-control branch; CPython<=3.12 falls through to OpenProcess+TerminateProcess(handle,0) (exit code 0); CPython>=3.14/3.13-post-fix delivers a real Ctrl+C or raises OSError. Never a liveness probe in any deployed version.",
+    "citations": [
+      "https://docs.python.org/3/library/os.html#os.kill",
+      "CPython Modules/posixmodule.c os_kill_impl (v3.12.0 read-confirmed)",
+      "CPython gh-58689 / GH-128932 / GH-128937 (3.13 os.kill error-handling fix)"
+    ]
+  },
+  "sites": {
+    "aisef2_signal0": ["aisef2/app/client.py:46 (the only signal-0 probe in aisef2/)"],
+    "v1_legacy_already_safe": [
+      "aisef/control/state.py:73 (POSIX fallback only; Windows uses OpenProcess/GetExitCodeProcess)",
+      "aisef/harness/process_owner.py:153,164 (POSIX-gated)"
+    ]
+  },
+  "reachability_on_windows": {
+    "reachable": false,
+    "confidence": "high",
+    "guarantee": "_is_gone runs only inside `except RangeEscaped`; Windows uses the _Job backend whose escaped() returns [] unconditionally (process_range.py:277-278, KILL_ON_JOB_CLOSE + no BREAKAWAY_OK :250), so flight.escaped is always empty, RangeEscaped (:534) is never raised, and left_the_range()==[] triggers `if not left: raise` (client.py:68-69) before any _is_gone call.",
+    "adversarial_refute_unreachable": "FAILED to refute; corrected mechanism: unreachability comes from the hardcoded [] in _Job.escaped(), not the OS no-breakaway flag.",
+    "caveats": [
+      "Cygwin/MSYS2 Python (os.name=='posix') reaches it via _Posix, but os.kill(pid,0) is a genuine safe POSIX probe there.",
+      "Tests call client._is_gone directly with os.kill mocked (tests/v2/test_v21_pl7_session_teardown.py:98-136); the real-process variant is @skipUnless(linux) (:179). No test exercises real Windows _is_gone."
+    ]
+  },
+  "authority_impact": {
+    "view": "kernel controller view during session release; pid controller-derived, not subject-named",
+    "invariant": "INV-MUTATION-AUTHORITY",
+    "clause1_untrusted_output_expands_authority": "NOT breached",
+    "clause2_independent_controller_view": "letter-level breach IF reachable (os.kill(pid,0) ledgered as a READ / LIVENESS_PROBE_SIGNAL_0 but on Windows is an unledgered terminate; pid-reuse guard skipped because process_table() raises on Windows)",
+    "severity_if_reachable": "HIGH / release-blocking",
+    "severity_given_unreachability": "LOW / LATENT — invariant holds in shipped product; defense-in-depth defect resting on cross-module coincidence (_Job.escaped()==[])"
+  },
+  "why_ci_green": "client.py:46 has no destructive_sites.json ledger row, so whole-tree da.check(ROOT) would FAIL — but the two whole-tree assertions are @sealing-gated (sealing_gate.py GATED :30,:32), skipped on branch/PR CI. Inconsistency: sealing_gate.py:10-13 says live-tree static checks must NOT be gated. Also the LIVENESS_PROBE_SIGNAL_0 class passes on argument shape only (no platform dimension), so it is the wrong guard anyway.",
+  "safe_fix": {
+    "recommended": "Option A",
+    "option_a": "Route the _is_gone fallback through a Windows-safe existence check (pid_alive pattern: OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)+GetExitCodeProcess==259). `return not pid_alive(pid)`. POSIX byte-identical; makes the docstring true on all platforms. Owner question: aisef2-native helper vs importing V1 aisef.control.state.pid_alive.",
+    "option_b": "POSIX-gate the probe (`if os.name!='posix': return False`). Minimal; less complete.",
+    "applied": false,
+    "reason_not_applied": "kernel frozen; owner-gated"
+  },
+  "windows_repro_test": {
+    "path": "closure-evidence/v2/v2.2/win-oskill/repro_test_win_oskill.py",
+    "wired_into_suite": false,
+    "reason_staged": "keeps Windows CI green pre-fix (owner #6); move into tests/v2/ WITH the fix",
+    "asserts": "@skipUnless(win32): a real live child survives client._is_gone (fails on unfixed Windows), and _is_gone returns False for a live process",
+    "validated_off_windows": "imports clean, self-skips on darwin (1 skipped)"
+  },
+  "regression_plan": [
+    "Move the Windows repro test into tests/v2/ with the fix.",
+    "Extend tests/test_meta.py::TestKhongDungApiChiCoTrenPosix: widen scope to aisef/+aisef2/, add a value-trap rule for os.kill(x,0) outside a win32 guard / not delegating to the safe probe (name-only scan cannot catch an argument-value trap).",
+    "Owner-gated: tighten LIVENESS_PROBE_SIGNAL_0 to require a platform guard and unseal the two whole-tree da.check(ROOT) assertions (touching destructive_authority.py/registry needs owner sign-off per #4)."
+  ]
+}
