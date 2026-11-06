@@ -45,3 +45,22 @@ Both H1 and H2 fixes **reduce or preserve** authority, never expand it:
 ## 6. STOP
 
 The reproduction proved the fix scope exceeds the presented Option A (H1 is new). Per owner #2, the kernel is **not** patched; this corrected finding + revised plan is presented for separate approval. The RED-on-old evidence is captured (run 42172469919). GREEN-after-fix, full regression, and mutation-targeted will be produced once the revised plan is approved.
+
+## 7. IMPLEMENTED — owner round-3 APPROVED WITH CONDITIONS (2026-11-06)
+
+Owner round-3 #1 approved the extended H1+H2 fix. Applied as the smallest diff that meets every condition; **nothing beyond H1/H2**.
+
+**H1 — `process_table()` failure never distorts the verdict.** [client.py `_is_gone`](../../../aisef2/app/client.py): the guard now catches `subprocess.SubprocessError` alongside `(ProcessTableError, OSError, UnicodeDecodeError)`, so a `ps` that exits non-zero (`CalledProcessError`) is treated as an unreadable table — `present = None`, fall through to the per-pid probe — never an uncaught raise. An observation failure is **not** evidence of exit; UNKNOWN does not become GONE.
+
+**H2 — the fallback probe is read-only on both platforms.** The bare `os.kill(pid, 0)` is replaced by [`process_range.pid_alive`](../../../aisef2/runtime/process_range.py): POSIX keeps `os.kill(pid, 0)` (non-destructive there); Windows uses a query-only `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) + GetExitCodeProcess == STILL_ACTIVE(259)` handle — **no `PROCESS_TERMINATE`**, mirroring this module's own Job backend (no new `aisef2`→`aisef` dependency). `_is_gone` returns `not pid_alive(pid)`.
+
+**Decision table preserved exactly** (verified against the unchanged `test_v21_pl7_session_teardown.py`): provably-absent → gone; reused pid (different start time) → gone; running / not-ours (EPERM) / any ambiguous or unreadable observation → NOT gone (the refuse side). `client.os` and `process_range.os` are the same module object, so the existing fault-injection tests that patch `client.os.kill` still reach the probe.
+
+**Authority preserved/reduced (INV-MUTATION-AUTHORITY).** The destructive-authority checker derives the new `pid_alive` site as `os.kill(pid, 0)` → **`LIVENESS_PROBE_SIGNAL_0`** (literal-0 second argument) — the same safe classification as the existing ledgered probes; H2 removes a latent *destructive* call and adds only a *query* handle. No signal/kill authority is added.
+
+**Evidence conditions:**
+- **Windows RED-before:** run [42172469919](https://github.com/nghinh/aisef/actions/runs/42172469919) at `ddf1b3d2` (the repro erred at `process_table()`/H1). **Windows GREEN-after:** `win-oskill-repro.yml` re-dispatched at the fixed commit (same file, RED→GREEN).
+- **POSIX H1 RED→GREEN mechanism** reproduced locally: the old except-set lets `CalledProcessError` propagate; the new set catches it.
+- **POSIX + Windows regression:** `tests/v2/test_v22_win_oskill_is_gone.py` (new mandatory-suite guard: H1 fall-through, H2 read-only probe + decision table, Windows non-destructive case) + the unchanged `_is_gone` teardown/range-release suites — green. Full suite + mutation-targeted reported on the RC.
+
+**Deferred to the controlled reseal (owner #2/#4, NOT a hand-edit now):** the `@sealing`-gated destructive-authority ledger (`validation/v2/destructive_sites.json`) must, when regenerated at reseal, gain three rows — `aisef2/runtime/process_range.py::pid_alive os.kill` → `LIVENESS_PROBE_SIGNAL_0`, and the new test's `child.kill`/`child.terminate` → `TEST_CREATED_HANDLE`. No stale `client.py` row exists to drop (the old site was never in the committed ledger — the record is pre-existing-stale, dossier §4). The mandatory (non-sealing) suite does not gate on this.

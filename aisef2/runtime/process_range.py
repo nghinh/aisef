@@ -119,6 +119,43 @@ def process_table() -> dict[int, Proc]:
     return _linux_table() if LINUX else _ps_table()
 
 
+def pid_alive(pid: int) -> bool:
+    """Whether a process with this id exists on this host, read-only — it never signals and never terminates. The
+    probe `_is_gone` uses in place of a bare `os.kill(pid, 0)`, which on Windows is destructive (signal 0 is
+    CTRL_C_EVENT, routed to TerminateProcess on CPython <= 3.12; FINDING-WIN-OSKILL-001 H2). POSIX: signal 0 — ESRCH
+    means gone, EPERM (or any other OSError) means it exists and is not ours. Windows: OpenProcess for limited query +
+    GetExitCodeProcess — STILL_ACTIVE (259) is running, ERROR_ACCESS_DENIED (5) means it exists, any other open
+    failure means gone. Ambiguity always reads as ALIVE, never dead: a wrong 'dead' is the costlier mistake here (it
+    would let a live developer process pass as gone and the session keep its outcome)."""
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+        k = ctypes.WinDLL("kernel32", use_last_error=True)
+        k.OpenProcess.restype, k.OpenProcess.argtypes = wintypes.HANDLE, [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        k.GetExitCodeProcess.restype = wintypes.BOOL
+        k.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+        k.CloseHandle.restype, k.CloseHandle.argtypes = wintypes.BOOL, [wintypes.HANDLE]
+        h = k.OpenProcess(0x1000, False, pid)   # PROCESS_QUERY_LIMITED_INFORMATION — no PROCESS_TERMINATE
+        if not h:
+            return ctypes.get_last_error() == 5   # ERROR_ACCESS_DENIED: exists, not ours
+        try:
+            code = wintypes.DWORD()
+            if not k.GetExitCodeProcess(h, ctypes.byref(code)):
+                return True                        # could not read the exit code: cannot prove gone -> alive
+            return code.value == 259               # STILL_ACTIVE
+        finally:
+            k.CloseHandle(h)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except OSError:
+        return True   # EPERM or any other OSError: it exists / cannot prove gone -> alive
+    return True       # it answered: alive
+
+
 def descendants(table: Mapping[int, Proc], root: int) -> list[int]:
     """Processes whose parent chain reaches `root`, for reporting only. Terminates on any table (a visited set; each
     pid once), and drops a parent edge when the parent was created after the child — Windows and POSIX keep a dead

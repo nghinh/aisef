@@ -15,11 +15,12 @@ import os
 import pathlib
 import re
 import shutil
+import subprocess
 import time
 
 from aisef2.app import confine as confinement
 from aisef2.app import tripwire
-from aisef2.runtime.process_range import ProcessRange, ProcessTableError, RangeEscaped, process_table
+from aisef2.runtime.process_range import ProcessRange, ProcessTableError, RangeEscaped, pid_alive, process_table
 
 POLL_S = 5.0
 #: PL-7: a process that left a session's range (setsid) can be caught mid-exit at release(); a session is not refused for
@@ -31,24 +32,20 @@ ESCAPEE_GRACE_S = 60.0
 def _is_gone(pid: int, proc) -> bool:
     """Whether an escapee that left the range is PROVABLY gone — in the parent's PID namespace, at this moment. A
     pid merely absent from a table read that could itself have failed proves nothing (an unreadable `/proc` row is
-    not an exit); a success or an EPERM from `os.kill(pid, 0)` does not prove it gone; a pid back under a different
-    start time was reused, so the escapee is gone. When nothing proves it gone it is treated as still alive, and the
-    caller refuses the session. Never signals the process: signal 0 only asks whether the pid exists for us. This
-    serves the range's teardown contract (P4-LIFETIME-SEMANTICS §3); it is not a proof that a sandbox contained it."""
+    not an exit, and neither is a `ps` that exits non-zero — FINDING-WIN-OSKILL-001 H1); a success or an EPERM from the
+    existence probe does not prove it gone; a pid back under a different start time was reused, so the escapee is gone.
+    When nothing proves it gone it is treated as still alive, and the caller refuses the session. Never signals the
+    process: the probe is read-only on both platforms — `os.kill(pid, 0)` on POSIX, an `OpenProcess` limited-query
+    handle on Windows, where signal 0 would terminate it (FINDING-WIN-OSKILL-001 H2). This serves the range's teardown
+    contract (P4-LIFETIME-SEMANTICS §3); it is not a proof that a sandbox contained it."""
     try:
         present = process_table().get(pid)
-    except (ProcessTableError, OSError, UnicodeDecodeError):
-        present = None   # a table read that failed (or a torn row) proves nothing: fall through to a per-pid probe
+    except (ProcessTableError, OSError, UnicodeDecodeError, subprocess.SubprocessError):
+        present = None   # a table read that failed (a torn row, or a `ps` that exits non-zero: H1) proves nothing: probe the pid
     if present is not None:
         # same start time (or none to compare on) -> still the escapee; a different one -> the pid was reused -> gone
         return not (proc.created is None or present.created is None or present.created == proc.created)
-    try:
-        os.kill(pid, 0)   # existence probe only; no signal is ever sent to a process whose ownership is unproven
-    except ProcessLookupError:
-        return True        # ESRCH here and now: gone
-    except OSError:
-        return False       # EPERM or anything else: cannot prove gone -> treat as alive (refuse side)
-    return False           # it answered: alive (a reused pid lands here too -> conservatively not gone)
+    return not pid_alive(pid)   # read-only existence probe; provably absent -> gone, anything else -> conservatively not gone
 
 
 def _release_session(r: ProcessRange) -> list[int]:
