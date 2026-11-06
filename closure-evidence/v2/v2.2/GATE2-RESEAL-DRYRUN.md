@@ -50,9 +50,27 @@ Historical mutation records (P1..V2.0-S2, cycle2) and 2.0 calibration/inventory/
 ## 6. Provenance / `--verify` (owner dry-run #4)
 - `aisef run --verify` (per-run evidence re-derivation) and the byte-identity invariants (`v1_evidence_guard.py --check`, `freeze_manifest.py --check`) are **unaffected** by H1/H2 (they bind closure-evidence/ and the RFC, not aisef2/) and are **read-only** verifiers. Only the probe-calibration provenance artifact is stale (§2).
 
-## 7. Discrepancies requiring owner decision (why Gate-2 STOPS)
-1. **Write-once committed v2.1/cycle2 records** (`Q5-KERNEL-COMPARISON.json`, `CONFORMANCE-RULING.json`, `C2-ORCHESTRATION-CONFORMANCE-REPAIR.json`): refreshing in place requires deleting the committed record (**violates "no overwrite/modification of historical evidence"**); writing an `--out` successor requires editing each gated test's hardcoded path (**violates "no code scope beyond H1/H2"**). → **Decision: successor-path (+ accept the minimal test path-binding edit as in-scope) OR declare these standing OPEN CONDITIONs.**
-2. **Destructive ledger scope**: 7 of 14 unledgered sites pre-date H1/H2. Appending all 14 makes the sealing gate green but refreshes non-H1/H2 drift; appending only the 7 H1/H2 rows keeps the gate red. → **Decision: full-ledger refresh (recommended; additive, live-ledger, no historical overwrite) OR H1/H2-only.**
-3. **RC2 freeze & Q5 scope**: RC2 freeze needs a reproducible staging CI build; "cùng RC" = same code `1c42aaad` but mechanically a new `V2.1.0-RC2-FREEZE.json`. Q5 was never run for 2.1.0 (it shipped under the scoped `release_qualify` gate), has no dry mode, and is **not** named in the owner's gate-3 list. → **Decision: confirm RC2-freeze is in scope (after the staging build) and that Q5 is OUT of scope for this reseal.**
+## 7. CRITICAL SCOPE FINDING — the sealing tier is stale from the WHOLE wave delta, not H1/H2
+`v21_conformance_ruling.py --check` and `v21_q5_compare.py --check` FAIL on this tree, but the divergence is **not H1/H2**:
+- `CONFORMANCE-RULING.json` reports `aisef2/probe/catalog.py: missing — 2.1 changed it`; `aisef2/orchestrate/story_runner.py commits_2_1 … 'v2.1(B, V21-38)' … this tree derives … '30da62a6 wave2: revert C4'`; plus cli_invocation/file_artifact sha/commits/owner-approval drift.
+- `Q5-KERNEL-COMPARISON.json`: `q5.py recorded 479ebe47…, now c1719ed4…`; `kernel_2_1 737585ea…, now 045a8fed…`.
+- **Both records were frozen at `c186cb22` (2026-10-15)** — before the v2.1.0 release (`7d1da61f`, 11-01) and all three waves — and untouched since. The divergence source `story_runner.py` was last changed by `30da62a6` (wave-2, 11-04); `catalog.py` by the v2.1 migration (10-17).
 
-No reseal committed. Awaiting owner decisions on §7 before executing the (then fully-specified, append-only) reseal.
+**Consequence:** making these records bind this tree = regenerating a **full v2.1 conformance / kernel-comparison snapshot** that would absorb the entire wave-1 + wave-2 + round-3 delta and **replace frozen 2026-10-15 release-era records**. That is far beyond H1/H2 and collides with "no code scope beyond H1/H2" + "no overwrite of historical evidence". The sealing tier has been red on master since the waves began, by design (master runs raw; v2.1.0 shipped green via the scoped `release_qualify` allowlist, not by regenerating these). `C2-ORCHESTRATION-CONFORMANCE-REPAIR.json` is explicitly designed-frozen ("never re-written on 2.1"; its test passes by verifying the refusal) — not a blocker.
+
+## 8. What the H1/H2 reseal CLEANLY covers vs. what it does not
+**In scope & clean (append-only, strictly H1/H2):**
+- **Probe calibrations** — `release_calibration.py --write` (§2). Clears the gate-1 OPEN CONDITION: the 60+ calibration-admission failures in the RAW full suite. This is the substantive fix.
+- **Destructive ledger — the 7 round-3 rows** (`process_range.py:151` + the new `test_v22_win_oskill` file). Additive to the live ledger; sealing-gated only (not mandatory CI).
+
+**NOT H1/H2 / needs a separate owner-governed 2.1-line re-qualification:**
+- Destructive ledger — the **7 pre-existing** rows (PL-7 era / v2.1 candidate / wave-1 / wave-2 round-2).
+- Sealing tier — `CONFORMANCE-RULING.json` + `Q5-KERNEL-COMPARISON.json` (stale from the wave delta; §7).
+- **RC2 freeze** (needs a reproducible staging CI build; mechanically a new `V2.1.0-RC2-FREEZE.json`) and **Q5** (never run for 2.1.0; no dry mode; not in the owner's gate-3 list).
+
+## 9. Decisions for the owner (why Gate-2 STOPS)
+1. **Reseal scope.** Recommended: execute the **H1/H2-clean reseal only** — (a) `release_calibration.py --write` + append record, (b) append the **7 round-3** destructive rows — committed append-only; and **log the rest (§8 bullet-2) as pre-existing OPEN CONDITIONS** (not waived — logged with this evidence, exactly as gate-1's full-suite-red was). Alternative: full 2.1-line re-qualification (regenerate CONFORMANCE-RULING/Q5-KERNEL-COMPARISON across the whole wave delta + RC2 + Q5) — large, beyond H1/H2, replaces frozen release records.
+2. **Destructive pre-existing 7 rows.** Append them too (live ledger is additive, no historical overwrite — makes the destructive sealing check green) OR leave as pre-existing OPEN CONDITION. These are not H1/H2.
+3. **Gate-3 "sealing PASS" scope.** Confirm it means "the sealing checks H1/H2 touches are green (calibration + the H1/H2 destructive rows)", with the wave-divergence sealing items (§7) recorded as a pre-existing OPEN CONDITION — because a full sealing-green requires the §1-alternative re-qualification the owner separately governs. I will not narrow this criterion without the owner's ruling.
+
+No reseal committed. Awaiting owner ruling on §9 before executing the (then fully-specified, append-only) reseal.
