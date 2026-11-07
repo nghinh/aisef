@@ -49,6 +49,10 @@ from validation.qualification import v21_q5_changes as X  # noqa: E402
 
 OUT_REL = "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json"
 V21_DIR = "closure-evidence/v2/v2.1"
+#: version-forward (owner Option C): the v2.2 qualification round's supersession of OUT_REL. The legacy OUT_REL
+#: record and the --write/--check path below are byte-identical and still the v2.1 path; this is a SEPARATE API that
+#: appends under closure-evidence/v2/v2.2 and is SELECTED by (round, tree) — never a global newest, never a fallback.
+V22_REL = "closure-evidence/v2/v2.2/CONFORMANCE-RULING.json"
 V2_0_0 = X.V2_0_0
 #: 2.0.0 plus docs (aisef2 identical to v2.0.0's): the 2.1 commits are the ones after it
 SINCE = "610a5935281fd01a707e035bef33499569fdbb15"
@@ -474,7 +478,51 @@ def check(path: pathlib.Path | None = None) -> list[str]:
     return out + [f"stale: {p}" for p in rebind.paths(rest(rec), rest(now))]
 
 
+def write_v22() -> int:
+    """Append the v2.2 supersession of OUT_REL (never over the legacy v2.1 ruling), via the shared version-forward
+    API. The body is built exactly as the legacy --write builds it (derive()); it refuses on the same derivation
+    problems, then appends under V22_REL bound to this round and tree. The legacy write()/refused() path is untouched."""
+    from validation.v2 import version_forward as vf
+    rec, problems = derive()
+    if problems:
+        print(f"REFUSED: {'; '.join(problems)}")
+        return 2
+    rc, msg = vf.write_supersession(ROOT, OUT_REL, V22_REL, rec, render=C.render)
+    print(msg if not rc else f"REFUSED: {msg}")
+    return rc
+
+
+def check_version_forward() -> list[str]:
+    """Context-bound currency check for the current round — the separate version-forward API. The record is SELECTED
+    for (CURRENT_ROUND, this tree) with no global newest and no fallback (a missing / tampered / wrong-tree / ambiguous
+    record is refused), then the SAME verdict logic as the legacy check() is applied to the selected body (block
+    stripped). The legacy check()/OUT_REL path is unchanged, so v2.1 verification stays byte-for-byte the legacy code."""
+    import tempfile
+
+    from validation.v2 import version_forward as vf
+    _, tree = vf.current_context(ROOT)
+    try:
+        _, rec = vf.select_for_tree(vf.load_series(ROOT, OUT_REL, V22_REL),
+                                    version_context=vf.CURRENT_ROUND, kernel_digest=tree)
+    except LookupError as e:
+        return [str(e)]
+    body = {k: v for k, v in rec.items() if k != vf.BLOCK}   # the record body; the binding block is not re-derived
+    with tempfile.TemporaryDirectory() as t:
+        p = pathlib.Path(t) / "selected.json"
+        p.write_text(json.dumps(body), encoding="utf-8")
+        return check(p)
+
+
 def main(argv: list[str] | None = None) -> int:
+    args = sys.argv[1:] if argv is None else argv
+    if "--write-v22" in args:
+        return write_v22()
+    if "--check-v22" in args:
+        problems = check_version_forward()
+        for p in problems:
+            print(f"  {p}")
+        print(f"CONFORMANCE-RULING --check-v22 {'PASS' if not problems else 'FAIL'}: {V22_REL}")
+        return 1 if problems else 0
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
