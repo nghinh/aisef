@@ -347,12 +347,85 @@ def write_v21() -> dict:
     return rec
 
 
+# ----------------------------------------------------------------------- V2.2 (owner VERSION-FORWARD QUALIFICATION #1)
+
+V22_OUT_REL = "closure-evidence/v2/v2.2/PLAN-V2.2-CORRECTION-1.json"
+V22_FALSIFIABILITY_REL = "closure-evidence/v2/v2.2/P5-FALSIFIABILITY.json"   # the v2.2 behaviour evidence the mapping names
+IDENTITY_MAPPING_V22 = ("identity mapping (rebind), not a behaviour proof; behaviour: "
+                        "closure-evidence/v2/v2.2/P5-FALSIFIABILITY.json")
+
+
+def _render(rec: dict) -> str:
+    return json.dumps(rec, indent=1, ensure_ascii=False) + "\n"
+
+
+def _behaviour_v22(rows: list[dict]) -> dict:
+    """Cross-record resolution (owner #1): the SAME backing rule as `_behaviour`, reading the v2.2 falsifiability record
+    the version-forward mechanism selects for THIS round+tree (not the stale v2.1 one). Same threshold, same assertion;
+    only the source record is the current round's. No fallback — an unresolvable upstream is reported as not backed."""
+    from validation.qualification import c2_p9
+    from validation.v2 import version_forward as vf
+    try:
+        path, rec = vf.resolve_upstream(ROOT, V21_FALSIFIABILITY_REL, V22_FALSIFIABILITY_REL)
+    except LookupError as e:
+        return {"path": V22_FALSIFIABILITY_REL, "sha256": None, "verdict": None,
+                "qualified_at_this_tree_s_semantic_hash": 0, "resolution_error": str(e),
+                "rule": "the v2.2 falsifiability record resolved by version_forward for this round+tree; not resolvable"}
+    qualified = {r.get("spec_id"): r.get("semantic_hash") for r in rec.get("specs", []) if r.get("status") == "QUALIFIED"}
+    return {"path": path, "round": vf.CURRENT_ROUND, "sha256": c2_p9.C.lf_sha(ROOT / path), "verdict": rec.get("verdict"),
+            "qualified_at_this_tree_s_semantic_hash": sum(1 for r in rows if qualified.get(r["spec_id"]) == r["semantic_hash"]),
+            "rule": f"every spec QUALIFIED in the v2.2 falsifiability record (resolved by version_forward for this round+tree, "
+                    f"provenance-verified, no fallback) at this tree's semantic hash, verdict '{FALSIFIABILITY_PASSED}'"}
+
+
+def record_v22(b: dict | None = None) -> dict:
+    """The v2.2 PLAN record: `record_v21`'s plan facts and literal comparisons, with the identity mapping's behaviour
+    backed by the v2.2 falsifiability record (cross-record). Nothing else changes — same assertions, same thresholds."""
+    from validation.qualification import rebind
+    b = b or build()
+    body = record_v21(b)
+    rows = [dict(zip(("spec_id", *rebind.ROW), r, strict=True)) for r in _rows(b)]
+    body["identity_mapping"]["label"] = IDENTITY_MAPPING_V22
+    body["identity_mapping"]["behaviour"] = _behaviour_v22(rows)
+    body["record"] = "AISEF V2.2 — LEDGERLOCK PLAN-V2.2 CORRECTION 1 on the v2.2 round (owner planning decisions applied; plan only)"
+    for k in ("problems", "verdict"):
+        body.pop(k)
+    body["problems"] = problems(body)
+    body["verdict"] = "PLAN CORRECTION ADMITTED STATICALLY" if not body["problems"] else "PROBLEMS"
+    return json.loads(json.dumps(body))
+
+
+def write_v22() -> tuple[int, str]:
+    from validation.v2 import version_forward as vf
+    rec = record_v22()
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    return vf.write_supersession(ROOT, V21_OUT_REL, V22_OUT_REL, rec, render=_render)
+
+
+def check_v22() -> list[str]:
+    """The v2.2 PLAN record, selected for this round+tree, is exactly what this tree derives (its behaviour backed by the
+    v2.2 falsifiability). Same strictness as the legacy check; only selection and the upstream round differ."""
+    from validation.v2 import version_forward as vf
+    return vf.check_supersession(ROOT, V21_OUT_REL, V22_OUT_REL, derive_body=record_v22, problems=problems, render=_render)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
+    g.add_argument("--write-v22", action="store_true")
+    g.add_argument("--check-v22", action="store_true")
     a = ap.parse_args(argv)
+    if a.write_v22:
+        rc, msg = write_v22()
+        print(msg)
+        return rc
+    if a.check_v22:
+        found = check_v22()
+        print("\n".join(found) if found else "PASS")
+        return 1 if found else 0
     if a.write:
         rec = write_v21()
         print(f"{V21_OUT_REL}: {rec['verdict']}; {rec['old_plan']['plan_hash'][:12]} -> {rec['new_plan']['plan_hash'][:12]}; "

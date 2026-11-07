@@ -107,6 +107,13 @@ B03_REF = {"path": DECISIONS_REL, "seq": 5, "id": B03_ID, "part": "B-03a"}
 #: the owner's B-03a text, verbatim from the decision ledger entry B03_ID
 V21_AUTHORITY = ("Chọn tạo bản ghi v2.1 mới cho các artifact bị ảnh hưởng. Không thêm luật dung sai engine digest chỉ vì verdict "
                  "không đổi. Không dùng ánh xạ rebind để che thay đổi hành vi chưa kiểm chứng.")
+#: V2.2 (owner VERSION-FORWARD QUALIFICATION, Option C): the wave divergence moved this tree's spec identities, so the v2.1
+#: records (pinned to the 2.1 tree) are stale on it. A v2.2 record bound to this round+tree supersedes each, selected by
+#: the version-forward mechanism (validation/v2/version_forward.py); the v2.1 records stay history, byte for byte.
+V22 = "closure-evidence/v2/v2.2"
+V22_PROPOSAL_REL = f"{V22}/P5-PLAN-V2.2-PROPOSAL.json"
+V22_OUT_REL = f"{V22}/C2-P5-ACCEPTANCE-REVERIFICATION.json"
+V22_VERDICT = "C2-P5 ACCEPTANCE BOUNDARY RE-VERIFIED ON V2.2 — NO NEW OWNER ACCEPTANCE"
 
 
 def _sha(data: bytes) -> str:
@@ -743,21 +750,41 @@ def write_v21_proposal() -> dict:
     return rec
 
 
-def reverify(run_guards: bool = True) -> dict:
-    """The C2-P5 acceptance boundary RE-VERIFIED on 2.1 (owner B-03a). Every comparison is literal — no probe-identity
-    re-binding, no engine-digest tolerance — and there is NO new owner acceptance: the 2.0 acceptance is quoted as
-    history, never re-asserted, and no approval is written (the persisted ones are read). The 2.1 identities are this
-    tree's facts, equal to the v2.1 proposal exactly; their behaviour evidence is the v2.1 falsifiability record (every
-    spec re-executed under this tree's probes, pristine and witness). `run_guards` also runs the five guards."""
+def reverify(run_guards: bool = True, round: str = "v2.1") -> dict:
+    """The C2-P5 acceptance boundary RE-VERIFIED on the given round (v2.1: owner B-03a; v2.2: owner Option C). Every
+    comparison is literal — no probe-identity re-binding, no engine-digest tolerance — and there is NO new owner
+    acceptance: the 2.0 acceptance is quoted as history, never re-asserted, and no approval is written. The round's
+    identities are this tree's facts, equal to the round's proposal exactly; their behaviour evidence is the round's
+    falsifiability record. For v2.2 the proposal and falsifiability are the records the version-forward mechanism
+    selects for THIS round+tree (cross-record, provenance-verified, no fallback) — the thresholds and assertions are
+    identical to v2.1; only which record supplies each is the current round's. `run_guards` also runs the five guards."""
     from aisef2.probe import catalog
     from aisef2.product.compiler import ProbeRef, compile_spec
     from validation.qualification import p5_falsifiability as pf
     from validation.qualification import release_calibration as rc
     from validation.qualification.rebind import IDENTITY, ROW
+    from validation.v2 import version_forward as vf
+    is_v22 = round == "v2.2"
+    PROPOSAL_R = V22_PROPOSAL_REL if is_v22 else V21_PROPOSAL_REL
+    FALS_R = pf.V22_OUT_REL if is_v22 else pf.V21_OUT_REL
+    F_HEADER = pf.v22_header() if is_v22 else pf.v21_header()
+    PROP_WRAP = v22_proposal if is_v22 else v21_proposal
     aid = _aid()
     checks: list[tuple[bool, str]] = []
     accepted, prop = _json_or_none(OUT_REL), _json_or_none(PROPOSAL_REL)   # the 2.0 records, through the one reader
-    v21, fals = v21_proposal_record(), _json_or_none(pf.V21_OUT_REL) or {}
+    if is_v22:   # the round's proposal and falsifiability, resolved for this round+tree (cross-record, no fallback)
+        try:
+            _, committed_prop_doc = vf.resolve_upstream(ROOT, V21_PROPOSAL_REL, V22_PROPOSAL_REL)
+        except LookupError:
+            committed_prop_doc = None
+        try:
+            _, fals = vf.resolve_upstream(ROOT, pf.V21_OUT_REL, pf.V22_OUT_REL)
+        except LookupError:
+            fals = {}
+        v21 = committed_prop_doc["record"] if committed_prop_doc and isinstance(committed_prop_doc.get("record"), dict) else {}
+    else:
+        committed_prop_doc = _json_or_none(V21_PROPOSAL_REL)
+        v21, fals = v21_proposal_record(), _json_or_none(pf.V21_OUT_REL) or {}
     entry = next((e for e in json.loads((ROOT / DECISIONS_REL).read_text(encoding="utf-8"))["entries"] if e.get("id") == B03_ID), {})
     reqs, real, cs = aid.requirements(), load_approvals(), contracts()
     approved = {a.contract_id: a for a in real}
@@ -791,11 +818,11 @@ def reverify(run_guards: bool = True) -> dict:
                   "every_spec_id_compiled_here_under_the_real_approvals": {o.product_proof_spec_id for o in plan.obligations} <= set(specs),
                   "accepted_plan_hash": ACCEPTED["plan_hash"]}
     checks += [(plan_facts[k], f"plan: {k} is false") for k in ("is_the_v21_proposal_s", "every_spec_id_compiled_here_under_the_real_approvals")]
-    proposal = {"v2_1": {"record": _file(V21_PROPOSAL_REL) if v21 else None, "proposal_digest": derived["proposal_digest"],
-                         "verdict": derived["verdict"], "current_exactly": v21_proposal(derived) == _json_or_none(V21_PROPOSAL_REL)},
+    proposal = {"v2_1": {"record": _file(PROPOSAL_R) if v21 else None, "proposal_digest": derived["proposal_digest"],
+                         "verdict": derived["verdict"], "current_exactly": PROP_WRAP(derived) == committed_prop_doc},
                 "accepted": {"record": _file(PROPOSAL_REL), "proposal_digest": prop["proposal_digest"],
                              "history_problems": proposal_history_problems()}}
-    checks += [(proposal["v2_1"]["current_exactly"], f"{V21_PROPOSAL_REL} is not what the authoring aid derives from this tree"),
+    checks += [(proposal["v2_1"]["current_exactly"], f"{PROPOSAL_R} is not what the authoring aid derives from this tree"),
                (not proposal["accepted"]["history_problems"], f"{PROPOSAL_REL}: {proposal['accepted']['history_problems']}")]
     stale = [a.contract_id for a in real if (a.requirement_hash, a.contract_hash) !=
              (reqs[a.requirement_id].requirement_hash, cs[a.contract_id[len("BC-V22-"):]].contract_hash)]
@@ -820,15 +847,15 @@ def reverify(run_guards: bool = True) -> dict:
                "p5_falsifiability_2_0_is_its_v2_0_0_blob": _is_blob_at(FALSIFIABILITY_REL, V2_0_0)}
     checks += [(v, f"{k} is false") for k, v in literal.items()]
     here_semantic = {r["spec_id"]: r["semantic_hash"] for r in rows}
-    f_rows, f_ids, f_header, f_tests = fals.get("specs", []), fals.get("identities", {}), pf.v21_header(), fals.get("tests", {})
+    f_rows, f_ids, f_header, f_tests = fals.get("specs", []), fals.get("identities", {}), F_HEADER, fals.get("tests", {})
     falsifiability = {
-        "record": _file(pf.V21_OUT_REL) if fals else None, "verdict": fals.get("verdict"), "summary": fals.get("summary"),
+        "record": _file(FALS_R) if fals else None, "verdict": fals.get("verdict"), "summary": fals.get("summary"),
         "runner": f_ids.get("runner"), "authoring_aid": f_ids.get("authoring_aid"),
         "probe_execution_digests": f_ids.get("probe_execution_digests"),
         "tests": {m: {k: r.get(k) for k in ("status", "exit", "residual")} for m, r in f_tests.items()},
         "header_is_the_v21_one": bool(fals) and {k: fals.get(k) for k in f_header} == f_header,
         "names_the_v21_proposal": bool(v21) and (f_ids.get("proposal"), f_ids.get("proposal_digest"))
-        == (_file(V21_PROPOSAL_REL), v21["proposal_digest"]),
+        == (_file(PROPOSAL_R), v21["proposal_digest"]),
         "p5_corpus_is_this_tree_s": f_ids.get("p5_mutants") == {**corpus["file"], "corpus_sha256": corpus["corpus_sha256"]},
         "kernel_is_this_tree_s": f_ids.get("aisef2_tree") == _git("rev-parse", "HEAD:aisef2"),
         "runner_is_this_tree_s": f_ids.get("runner") == _file("validation/qualification/p5_falsifiability.py"),
@@ -848,7 +875,7 @@ def reverify(run_guards: bool = True) -> dict:
                 "under this tree's probes, against the pristine reference and its own witness; a spec's semantic hash binds "
                 "the probe's capability (V2-007), so the record is current only with this tree's kernel, runner, authoring "
                 "aid, corpus and probe execution digests, compared literally"}
-    checks += [(falsifiability[k], f"{pf.V21_OUT_REL}: {k} is false")
+    checks += [(falsifiability[k], f"{FALS_R}: {k} is false")
                for k in ("header_is_the_v21_one", "names_the_v21_proposal", "p5_corpus_is_this_tree_s", "kernel_is_this_tree_s",
                          "runner_is_this_tree_s", "authoring_aid_is_this_tree_s", "probe_execution_digests_are_this_tree_s",
                          "plan_hash_is_this_tree_s", "semantic_hashes_are_this_tree_s", "every_spec_qualified", "tests_all_ok",
@@ -861,18 +888,30 @@ def reverify(run_guards: bool = True) -> dict:
     calibrations = {"shipped": _file(rc.SHIPPED_REL),
                     "newest_release_record": _file(rc.RECORD_REL) if (ROOT / rc.RECORD_REL).is_file() else None}
     checks.append((calibrations["newest_release_record"] is not None, f"{rc.RECORD_REL} is missing"))
-    authority = {"quote": V21_AUTHORITY, "decision": {"path": DECISIONS_REL, "id": B03_ID, "seq": entry.get("seq"),
-                                                      "approver": entry.get("approver")},
-                 "quoted_verbatim": V21_AUTHORITY in entry.get("owner_text", ""),
-                 "entry_is_the_reference": entry.get("seq") == B03_REF["seq"] and "B-03a" in entry.get("decision", {}),
-                 "not_authorized_by_the_decision": entry.get("not_authorized_by_this_entry")}
-    checks += [(authority["quoted_verbatim"], f"the B-03a text is not in {DECISIONS_REL} entry {B03_ID}"),
-               (authority["entry_is_the_reference"], f"{DECISIONS_REL} entry {B03_ID} is not {B03_REF}")]
+    if is_v22:
+        # a v2.2 re-verification round must cite a COMMITTED owner decision-ledger entry, as v2.1 cites B-03a. The owner's
+        # Option C / version-forward authorization is a directive, not (yet) an entry in RELEASE-DECISIONS.json; this record
+        # is never accepted on a fabricated authority, so without that entry it reports a single, specific problem.
+        authority = {"round": "v2.2", "mechanism": "owner VERSION-FORWARD QUALIFICATION (Option C)", "decision_ledger_entry": None,
+                     "rule": f"the owner records the v2.2 qualification authorization in {DECISIONS_REL} (as v2.1 cites B-03a, "
+                             f"seq {B03_REF['seq']}), or rules how the v2.2 re-verification cites it; the record is not accepted "
+                             "on an uncommitted authority"}
+        checks.append((False, f"no committed owner authority entry for the v2.2 qualification round in {DECISIONS_REL} "
+                              "(owner decision required — the version-forward mechanism resolves the behaviour evidence, but the "
+                              "round's authorization must be a committed ledger entry, not a fabricated one)"))
+    else:
+        authority = {"quote": V21_AUTHORITY, "decision": {"path": DECISIONS_REL, "id": B03_ID, "seq": entry.get("seq"),
+                                                          "approver": entry.get("approver")},
+                     "quoted_verbatim": V21_AUTHORITY in entry.get("owner_text", ""),
+                     "entry_is_the_reference": entry.get("seq") == B03_REF["seq"] and "B-03a" in entry.get("decision", {}),
+                     "not_authorized_by_the_decision": entry.get("not_authorized_by_this_entry")}
+        checks += [(authority["quoted_verbatim"], f"the B-03a text is not in {DECISIONS_REL} entry {B03_ID}"),
+                   (authority["entry_is_the_reference"], f"{DECISIONS_REL} entry {B03_ID} is not {B03_REF}")]
     history_now = history_problems()
     checks.append((not history_now, f"{OUT_REL}: {history_now}"))
     body = {
-        "record": "AISEF V2.1 — C2-P5 ACCEPTANCE BOUNDARY RE-VERIFICATION (no new owner acceptance)",
-        "id": "AISEF-V2.1-C2-P5-ACCEPTANCE-REVERIFICATION",
+        "record": f"AISEF {'V2.2' if is_v22 else 'V2.1'} — C2-P5 ACCEPTANCE BOUNDARY RE-VERIFICATION (no new owner acceptance)",
+        "id": f"AISEF-{'V2.2' if is_v22 else 'V2.1'}-C2-P5-ACCEPTANCE-REVERIFICATION",
         "authority": authority,
         "claims_owner_acceptance": False,
         "new_approvals": [],
@@ -904,7 +943,7 @@ def reverify(run_guards: bool = True) -> dict:
         body["guards"] = guards()
         problems += guard_problems(body["guards"])
     body["problems"] = problems
-    body["verdict"] = V21_VERDICT if not problems else "PROBLEMS"
+    body["verdict"] = (V22_VERDICT if is_v22 else V21_VERDICT) if not problems else "PROBLEMS"
     return json.loads(json.dumps(body))
 
 
@@ -951,6 +990,83 @@ def reverification_problems() -> list[str]:
     return out
 
 
+# ------------------------------------------------------------------------------------------- V2.2 (owner Option C)
+
+def _render(doc: dict) -> str:
+    return json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
+
+
+def v22_proposal(record: dict) -> dict:
+    """The v2.2 proposal body: the authoring aid's `record` on this tree, verbatim, beside the v2.2 version note. Like
+    `v21_proposal` but for the current round; it approves and accepts nothing and is compared exactly. The wave
+    divergence moved this tree's identities, so the committed v2.1 proposal (the 2.1 tree's) is stale on this tree; this
+    is the same derivation, bound to this round+tree by the version-forward mechanism."""
+    return {"v2_2": {"authority": "owner VERSION-FORWARD QUALIFICATION (Option C): a v2.2 record bound to this round+tree, "
+                                  "superseding the v2.1 proposal left stale by the wave divergence; the v2.1 record is history",
+                     "derived_from": {"path": V21_PROPOSAL_REL},
+                     "rule": "'record' is the authoring aid's record() on this tree, verbatim: its status, authority and verdict "
+                             "are the aid's own text and assert nothing new; this record approves and accepts nothing; selected "
+                             "for this round by version_forward and compared exactly (no probe-identity re-binding)"},
+            "record": record}
+
+
+def v22_proposal_record() -> dict:
+    """The authoring aid's record inside the resolved v2.2 proposal supersession ({} when there is none / unresolvable)."""
+    from validation.v2 import version_forward as vf
+    try:
+        _, body = vf.resolve_upstream(ROOT, V21_PROPOSAL_REL, V22_PROPOSAL_REL)
+    except LookupError:
+        return {}
+    return body["record"] if isinstance(body.get("record"), dict) else {}
+
+
+def write_v22_proposal() -> tuple[int, str]:
+    """Append the v2.2 proposal supersession (append-only; never rewrites the v2.1 record). Refused if the authoring
+    aid's record on this tree has problems."""
+    from validation.v2 import version_forward as vf
+    rec = _aid().record()
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    return vf.write_supersession(ROOT, V21_PROPOSAL_REL, V22_PROPOSAL_REL, v22_proposal(rec), render=_render)
+
+
+def check_v22_proposal() -> list[str]:
+    """The v2.2 proposal, selected for this round+tree, is exactly what the authoring aid derives on this tree (the same
+    strictness as v21_proposal_currency: exact equality, no re-binding, no fallback)."""
+    from validation.v2 import version_forward as vf
+    return vf.check_supersession(ROOT, V21_PROPOSAL_REL, V22_PROPOSAL_REL,
+                                 derive_body=lambda: v22_proposal(_aid().record()),
+                                 problems=lambda b: b["record"].get("problems", []), render=_render)
+
+
+def write_v22_reverification() -> tuple[int, str]:
+    """Append the v2.2 re-verification supersession (append-only). Refused with its problems — including, until the
+    owner records a v2.2 qualification authority in the decision ledger, the authority problem (the behaviour evidence
+    resolves by cross-record; the round's authorization must be a committed owner entry, never a fabricated one)."""
+    from validation.v2 import version_forward as vf
+    rec = reverify(run_guards=True, round="v2.2")
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    return vf.write_supersession(ROOT, V21_OUT_REL, V22_OUT_REL, rec, render=_render)
+
+
+def reverification_v22_problems() -> list[str]:
+    """The committed v2.2 re-verification is exactly what `reverify(round=v2.2)` derives on this tree (guards recorded,
+    not repeated); [] when current. Mirrors `reverification_problems` for the v2.2 round."""
+    from validation.v2 import version_forward as vf
+    try:
+        _, committed = vf.resolve_upstream(ROOT, V21_OUT_REL, V22_OUT_REL)
+    except LookupError as e:
+        return [str(e)]
+    ran = committed.pop("guards", {})
+    fresh = reverify(run_guards=False, round="v2.2")
+    out = list(fresh["problems"])
+    if committed != fresh:
+        out.append(f"{V22_OUT_REL} is not what this tree re-verifies")
+    out += [f"{V22_OUT_REL}: {p}" for p in guard_problems(ran)]
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
@@ -960,7 +1076,32 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("--write-v21-proposal", action="store_true")
     g.add_argument("--write-v21", action="store_true")
     g.add_argument("--check-v21", action="store_true")
+    g.add_argument("--write-v22-proposal", action="store_true")
+    g.add_argument("--check-v22-proposal", action="store_true")
+    g.add_argument("--write-v22", action="store_true")
+    g.add_argument("--check-v22", action="store_true")
+    g.add_argument("--reverify-v22", action="store_true", help="print reverify(round=v2.2) problems (no write)")
     a = ap.parse_args(argv)
+    if a.write_v22_proposal:
+        rc, msg = write_v22_proposal()
+        print(msg)
+        return rc
+    if a.check_v22_proposal:
+        found = check_v22_proposal()
+        print("\n".join(found) if found else "PASS")
+        return 1 if found else 0
+    if a.reverify_v22:
+        found = reverify(run_guards=False, round="v2.2")["problems"]
+        print("\n".join(found) if found else "PASS (no problems — only an owner authority entry would remain for --write-v22)")
+        return 1 if found else 0
+    if a.write_v22:
+        rc, msg = write_v22_reverification()
+        print(msg)
+        return rc
+    if a.check_v22:
+        found = reverification_v22_problems()
+        print("\n".join(found) if found else "PASS")
+        return 1 if found else 0
     if a.write_v21_proposal:
         rec = write_v21_proposal()
         print(f"{V21_PROPOSAL_REL}: {rec['verdict']}; plan {rec['plan']['plan_hash'][:12]}; proposal {rec['proposal_digest'][:12]}")

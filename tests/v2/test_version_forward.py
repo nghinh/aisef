@@ -212,5 +212,76 @@ class HelperAPI(unittest.TestCase):
             self.assertTrue(any("no record declared for round" in p for p in out))
 
 
+class Toposort(unittest.TestCase):
+    """The DAG order primitive (owner v2.2 #1: the dependency DAG is resolved in topological order; a cycle is
+    refused)."""
+
+    def test_orders_dependencies_before_dependents(self):
+        order = vf.toposort({"root": [], "mid": ["root"], "leaf": ["mid", "root"]})
+        self.assertLess(order.index("root"), order.index("mid"))
+        self.assertLess(order.index("mid"), order.index("leaf"))
+
+    def test_a_diamond_is_ordered_root_first_join_last(self):
+        order = vf.toposort({"root": [], "l": ["root"], "r": ["root"], "join": ["l", "r"]})
+        self.assertEqual((order[0], order[-1]), ("root", "join"))
+
+    def test_a_cycle_is_refused(self):
+        with self.assertRaises(ValueError) as e:
+            vf.toposort({"a": ["b"], "b": ["a"]})
+        self.assertIn("cycle", str(e.exception))
+
+    def test_a_dependency_on_an_unknown_node_is_refused(self):
+        with self.assertRaises(ValueError) as e:
+            vf.toposort({"a": ["ghost"]})
+        self.assertIn("unknown", str(e.exception))
+
+
+class ResolveUpstream(unittest.TestCase):
+    """Cross-record resolution: a dependent reads its UPSTREAM record for THIS round+tree only (block stripped),
+    provenance-verified, never falling back to the v2.1 base (current_context stubbed, hermetic tempdir)."""
+
+    def _tree(self, d):
+        root = pathlib.Path(d)
+        legacy_rel, v22_rel = "up/legacy.json", "up/v22.json"
+        (root / "up").mkdir(parents=True)
+        (root / legacy_rel).write_text(json.dumps({"record": "UP", "payload": "legacy"}), encoding="utf-8")
+        return root, legacy_rel, v22_rel
+
+    def test_resolves_the_v2_2_upstream_bound_to_this_round_and_tree_block_stripped(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(vf, "current_context", return_value=(COMMIT, K1)):
+            root, legacy_rel, v22_rel = self._tree(d)
+            body = {"record": "UP", "payload": "v2.2-derivation"}
+            vf.write_supersession(root, legacy_rel, v22_rel, body, render=_render)
+            path, up = vf.resolve_upstream(root, legacy_rel, v22_rel)
+            self.assertEqual((path, up), (v22_rel, body))     # the exact body a dependent reads
+            self.assertNotIn(vf.BLOCK, up)                    # block stripped — read like the legacy record
+
+    def test_a_dependent_never_resolves_a_v2_1_upstream_no_fallback(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(vf, "current_context", return_value=(COMMIT, K1)):
+            root, legacy_rel, v22_rel = self._tree(d)   # only the legacy base exists; no v2.2 record for this round
+            with self.assertRaises(LookupError) as e:
+                vf.resolve_upstream(root, legacy_rel, v22_rel)
+            self.assertIn("no record declared for round", str(e.exception))
+
+    def test_a_tampered_upstream_is_refused(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(vf, "current_context", return_value=(COMMIT, K1)):
+            root, legacy_rel, v22_rel = self._tree(d)
+            vf.write_supersession(root, legacy_rel, v22_rel, {"record": "UP", "payload": "v2.2"}, render=_render)
+            doc = json.loads((root / v22_rel).read_text(encoding="utf-8"))
+            doc["payload"] = "TAMPERED"                  # body mutated, record_digest left stale -> recompute fails
+            (root / v22_rel).write_text(json.dumps(doc), encoding="utf-8")
+            with self.assertRaises(LookupError):
+                vf.resolve_upstream(root, legacy_rel, v22_rel)
+
+    def test_a_cross_version_upstream_is_refused(self):
+        # a record bound to a DIFFERENT round (a v2.3 supersession) must not resolve for the v2.2 round.
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(vf, "current_context", return_value=(COMMIT, K1)):
+            root, legacy_rel, v22_rel = self._tree(d)
+            with mock.patch.object(vf, "CURRENT_ROUND", "v2.3"):
+                vf.write_supersession(root, legacy_rel, v22_rel, {"record": "UP", "payload": "v2.3"}, render=_render)
+            with self.assertRaises(LookupError):          # asked for v2.2 (default), only a v2.3 record exists
+                vf.resolve_upstream(root, legacy_rel, v22_rel, version_context="v2.2")
+
+
 if __name__ == "__main__":
     unittest.main()

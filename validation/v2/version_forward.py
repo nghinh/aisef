@@ -121,6 +121,26 @@ def validate_chain(series: list[tuple[str, dict, bytes]]) -> list[str]:
     return problems
 
 
+def toposort(graph: dict[str, list[str]]) -> list[str]:
+    """Kahn topological order of a dependency DAG `{node: [the nodes it depends on]}`, dependencies before dependents.
+    Raises ValueError naming an unknown node referenced as a dependency, or the nodes left in a cycle (owner v2.2 #1:
+    the dependency DAG is checked in topological order and a cyclic dependency is refused)."""
+    deps = {n: set(ds) for n, ds in graph.items()}
+    for n, ds in deps.items():
+        unknown = ds - set(deps)
+        if unknown:
+            raise ValueError(f"{n} depends on unknown node(s) {sorted(unknown)}")
+    order: list[str] = []
+    done: set[str] = set()
+    while len(order) < len(deps):
+        ready = sorted(n for n, ds in deps.items() if n not in done and ds <= done)
+        if not ready:
+            raise ValueError(f"dependency cycle among {sorted(set(deps) - done)}")
+        order.extend(ready)
+        done.update(ready)
+    return order
+
+
 def select_for_tree(series: list[tuple[str, dict, bytes]], *, version_context: str, kernel_digest: str,
                     legacy_binding: tuple[str, str] | None = None) -> tuple[str, dict]:
     """Return the ONE record DECLARED for `version_context` and bound to `kernel_digest` (the tree being verified),
@@ -196,6 +216,23 @@ def write_supersession(root, legacy_rel: str, v22_rel: str, body: dict, *, rende
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render(rec), encoding="utf-8")
     return 0, f"wrote {v22_rel}: round {CURRENT_ROUND}, kernel {tree[:12]}"
+
+
+def resolve_upstream(root, legacy_rel: str, v22_rel: str, *, version_context: str = CURRENT_ROUND,
+                     kernel_digest: str | None = None) -> tuple[str, dict]:
+    """Cross-record resolution (owner v2.2 #1): return (path, body) of the UPSTREAM dependency record DECLARED for
+    `version_context` and bound to `kernel_digest` (the tree being verified), body with its `version_forward` block
+    stripped so a dependent checker reads the dependency exactly as its own legacy check would. Selection is
+    context-bound and provenance-verified (the chain is validated and the selected record's self-digest re-checked by
+    `select_for_tree`); it never falls back. The legacy v2.1 base carries no block and is passed no `legacy_binding`,
+    so it is NOT a candidate in the v2.2 round — a v2.2 dependent never resolves a v2.1 upstream (v2.1 and v2.2 are
+    not mixed). A dependency with no supersession for this round, or an ambiguous / tampered / cross-version one,
+    raises LookupError naming the case."""
+    if kernel_digest is None:
+        _, kernel_digest = current_context(root)
+    path, rec = select_for_tree(load_series(root, legacy_rel, v22_rel),
+                                version_context=version_context, kernel_digest=kernel_digest)
+    return path, {k: v for k, v in rec.items() if k != BLOCK}
 
 
 def check_supersession(root, legacy_rel: str, v22_rel: str, *, derive_body, problems, render) -> list[str]:

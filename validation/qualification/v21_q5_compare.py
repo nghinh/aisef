@@ -356,13 +356,64 @@ def check(path: pathlib.Path | None = None) -> list[str]:
     return out
 
 
+# --------------------------------------------------------------------------------------------- V2.2 (owner Option C)
+
+V22_OUT_REL = "closure-evidence/v2/v2.2/Q5-KERNEL-COMPARISON.json"
+
+
+def write_v22() -> int:
+    """The v2.2 Q5 comparison: the SAME derivation on this tree, appended as a version-forward supersession of the v2.1
+    record (never rewriting it). Commit-then-verify (owner #5): refused unless aisef2/tests/v2/validation are committed,
+    before AND after measuring (the record would otherwise name code that did not run)."""
+    from validation.v2 import version_forward as vf
+    if why := _dirty_why(dirty()) or "; ".join(definition_problems()):
+        print(f"REFUSED: {why}")
+        return 2
+    head = C.git("rev-parse", "HEAD")
+    rec = derive()
+    if why := _dirty_why(rec["tree_dirty"]):
+        print(f"REFUSED: {why}")
+        return 2
+    if rec["execution_commit"] != head:
+        print(f"REFUSED: HEAD moved from {head[:12]} to {rec['execution_commit'][:12]} while the items were measured")
+        return 2
+    rc, msg = vf.write_supersession(ROOT, OUT_REL, V22_OUT_REL, rec, render=C.render)
+    print(msg)
+    return rc
+
+
+def check_v22() -> list[str]:
+    """The v2.2 Q5 comparison, selected for this round+tree (provenance-verified, no fallback), is current by the SAME
+    rules as the legacy check (bindings this tree's, every 2.1-side item at its expected outcomes, the classification
+    v21_q5_changes states). Legacy check() is reused verbatim on the resolved record — identical strictness."""
+    from validation.v2 import version_forward as vf
+    try:
+        _, body = vf.resolve_upstream(ROOT, OUT_REL, V22_OUT_REL)
+    except LookupError as e:
+        return [str(e)]
+    with tempfile.TemporaryDirectory(prefix="aisef-q5-v22-") as t:
+        p = pathlib.Path(t) / "Q5-KERNEL-COMPARISON.json"
+        p.write_text(C.render(body), encoding="utf-8")
+        return check(p)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
+    g.add_argument("--write-v22", action="store_true")
+    g.add_argument("--check-v22", action="store_true")
     ap.add_argument("--out", default=OUT_REL)
     a = ap.parse_args(argv)
+    if a.write_v22:
+        return write_v22()
+    if a.check_v22:
+        problems = check_v22()
+        for p in problems:
+            print(f"  {p}")
+        print(f"Q5-KERNEL-COMPARISON v2.2 {'PASS' if not problems else 'FAIL'}")
+        return 1 if problems else 0
     out = pathlib.Path(a.out) if os.path.isabs(a.out) else ROOT / a.out
     if a.write:
         return write(out)

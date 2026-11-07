@@ -184,8 +184,12 @@ def job_rehearsal(first_wrong: str | None = None, name_every_committed_story: bo
         base = commit_all(repo, "base")
         for n in ("ws", "merge", "run"):
             (tmp / n).mkdir()
-        from aisef2.invariants.registry import arm_runtime
-        arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process
+        try:   # owner VERSION-FORWARD QUALIFICATION #4: harness-defect fix (proven). The frozen BEFORE kernel predates
+            from aisef2.invariants.registry import arm_runtime   # wave-1 A1 runtime arming (added be7b1700); it ran
+        except ImportError:                                      # historically unarmed and has no unarmed-process guard,
+            pass                                                 # so the "before" rehearsal must not assume arm_runtime.
+        else:
+            arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process (current kernel)
         run = RunScope(tmp / "run", "k-nowork-001-rehearsal",
                        spec=lambda: resolve([verified("kernel", b"k-nowork-001 rehearsal", Enforcement.FULL)], {}, base))
         run.begin()

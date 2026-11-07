@@ -428,13 +428,96 @@ def write_v21() -> dict:
     return rec
 
 
+# ----------------------------------------------------------------------- V2.2 (owner VERSION-FORWARD QUALIFICATION)
+
+V22_OUT_REL = "closure-evidence/v2/v2.2/P5-FALSIFIABILITY.json"
+
+
+def _render_v22(rec: dict) -> str:
+    return json.dumps(rec, indent=1, ensure_ascii=False) + "\n"
+
+
+def v22_header() -> dict:
+    """What the v2.2 record states in place of run()'s 2.0 header: a re-execution on this round+tree (owner Option C)
+    that claims no approval and supersedes nothing semantically — the 2.0 (OUT_REL) and 2.1 (V21_OUT_REL) records stay
+    history. The version_forward block (added by write_supersession) carries the round/tree/supersedes binding."""
+    return {"record": "AISEF V2.2 — C2-P5 WP-2.5.2 SPEC FALSIFIABILITY RE-EXECUTED ON V2.2: every retained PLAN-V2.2 "
+                      "ProductProofSpec, compiled under this tree's probes, against the pristine reference and its own "
+                      "controlled witness",
+            "authority": "owner VERSION-FORWARD QUALIFICATION (Option C, 2026-11): behaviour evidence for the v2.2 round, "
+                         "bound to this round+tree by validation/v2/version_forward.py; no new owner acceptance",
+            "status": "RE-EXECUTION on v2.2 (owner Option C) — no approval and no acceptance claimed",
+            "supersedes": None,
+            "history": {"v2_0": OUT_REL, "v2_1": V21_OUT_REL}}
+
+
+def as_v22(rec: dict) -> dict:
+    """run()'s record as the v2.2 record: `v22_header` over its 2.0 header, the v2.2 proposal as the proposal it
+    measured, and the execution digests of the probes its specs ran — refused unless that proposal exists and its plan
+    is the run's. Volatile `elapsed_s` dropped so the record is a function of the tree alone."""
+    from validation.qualification import p5_acceptance as pa
+    prop = pa.v22_proposal_record()
+    if not prop or prop["plan"]["plan_hash"] != rec["identities"]["plan_hash"]:
+        raise SystemExit(f"refused: {pa.V22_PROPOSAL_REL} is missing or its plan is not the run's")
+    ids = {**rec["identities"], "proposal": pa._file(pa.V22_PROPOSAL_REL), "proposal_digest": prop["proposal_digest"],
+           "probe_execution_digests": probe_execution_digests(r["probe_id"] for r in rec["specs"])}
+    return {k: v for k, v in {**rec, **v22_header(), "identities": ids}.items() if k != "elapsed_s"}
+
+
+def write_v22(body: dict | None = None) -> tuple[int, str]:
+    """Append the v2.2 falsifiability supersession of V21_OUT_REL (append-only; never rewrites a record). `body` is a
+    run(matrix=True) result (default: run it now — proven offline, see the C2 offline proof); refused with a problem."""
+    from validation.v2 import version_forward as vf
+    rec = as_v22(body if body is not None else run(matrix=True))
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    return vf.write_supersession(ROOT, V21_OUT_REL, V22_OUT_REL, rec, render=_render_v22)
+
+
+def check_v22() -> list[str]:
+    """The v2.2 falsifiability record, selected for this round+tree (provenance-verified, no fallback), is a COMPLETE
+    re-derivation bound to THIS tree: every retained spec QUALIFIED, and every spec's semantic hash is this tree's spec
+    compilation's (V2-007). This binds the record to the tree without the 836s matrix re-run — the same evidence the
+    dependents (PLAN, P5-REVERIFICATION) read it for."""
+    from validation.v2 import version_forward as vf
+    try:
+        path, rec = vf.resolve_upstream(ROOT, V21_OUT_REL, V22_OUT_REL)
+    except LookupError as e:
+        return [str(e)]
+    out = []
+    if rec.get("verdict") != COMPLETE:
+        out.append(f"{path}: verdict is {rec.get('verdict')!r}, not {COMPLETE!r}")
+    if rec.get("problems"):
+        out.append(f"{path}: {rec['problems'][:3]}")
+    s = rec["summary"]
+    if (s["qualified"], s["not_qualified"], s["reference_not_satisfied"], s["specs_without_witness"]) != (s["retained_specs"], 0, 0, 0):
+        out.append(f"{path}: not every retained spec qualified: {s}")
+    here = {sid: sp.semantic_hash for sid, sp in _aid().build()["compiled"].items()}
+    bad = sorted(r["spec_id"] for r in rec["specs"] if here.get(r["spec_id"]) != r["semantic_hash"])
+    if bad:
+        out.append(f"{path}: the semantic hashes are not this tree's for {bad}")
+    if rec["identities"]["aisef2_tree"] != _git("rev-parse", "HEAD:aisef2"):
+        out.append(f"{path}: aisef2_tree is not this tree's")
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--seal", action="store_true")
     g.add_argument("--run", action="store_true")
     g.add_argument("--run-v21", action="store_true")
+    g.add_argument("--write-v22", action="store_true")
+    g.add_argument("--check-v22", action="store_true")
     a = ap.parse_args(argv)
+    if a.write_v22:
+        rc, msg = write_v22()
+        print(msg)
+        return rc
+    if a.check_v22:
+        found = check_v22()
+        print("\n".join(found) if found else "PASS")
+        return 1 if found else 0
     if a.seal:
         doc = seal()
         print(f"{MUTANTS_REL}: {len(doc['mutants'])} mutants sealed, corpus {doc['corpus_sha256'][:12]}")
