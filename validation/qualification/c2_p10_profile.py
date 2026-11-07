@@ -37,6 +37,9 @@ from aisef2.cohort.preregistration import CohortRefused  # noqa: E402
 from tests.v2 import test_c2_p10_cohort as T  # noqa: E402  — the synthetic preregistration of the kill tests
 
 OUT_REL = "closure-evidence/v2/cycle2/P10-PROFILE-FREEZE.json"
+#: version-forward (owner Option C): the v2.2 qualification round's supersession of OUT_REL. The legacy OUT_REL
+#: record and its --write/check below are byte-identical and still the v2.1 path; this is a SEPARATE API.
+V22_REL = "closure-evidence/v2/v2.2/P10-PROFILE-FREEZE.json"
 BASE = {"commit": "9bd16fa9c578bb91a0a6c0047d2ceb6e6ab3b414", "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904"}
 SOURCES = ("validation/v2/profile_freeze.py", "tests/v2/fixtures/provider/fixture_provider.py",
            "tests/v2/fixtures/provider/opencode.json", "tests/v2/fixtures/known_bad/profile_freeze.json",
@@ -207,8 +210,78 @@ def check() -> list[str]:
     return out
 
 
+def _series() -> list[tuple[str, dict, bytes]]:
+    """The record series for this logical id, base-first: the legacy cycle-2 record then the v2.2 supersession."""
+    out = []
+    for rel in (OUT_REL, V22_REL):
+        p = ROOT / rel
+        if p.exists():
+            b = p.read_bytes()
+            out.append((rel, json.loads(b), b))
+    return out
+
+
+def write_v22() -> int:
+    """Append the v2.2 supersession of OUT_REL under V22_REL (never over the legacy record), bound to this round
+    and tree. Refuses to rewrite an existing v2.2 record with other bytes (append-only)."""
+    from validation.v2 import version_forward as vf
+    base = ROOT / OUT_REL
+    if not base.exists():
+        print(f"FAIL  {OUT_REL} (the base record) is missing")
+        return 1
+    base_bytes = base.read_bytes()
+    body = {**build(), "observed_at_write": json.loads(base_bytes).get("observed_at_write")}
+    problems = problems_of(body)
+    if problems:
+        for p in problems:
+            print(f"FAIL  {p}")
+        return 1
+    out = ROOT / V22_REL
+    if out.exists():
+        existing = {k: v for k, v in json.loads(out.read_text(encoding="utf-8")).items() if k != vf.BLOCK}
+        if existing == body:
+            print(f"{V22_REL} already records this derivation: nothing written")
+            return 0
+        print(f"refused: {V22_REL} exists with other bytes — a record is never rewritten", file=sys.stderr)
+        return 1
+    commit, tree = vf.current_context(ROOT)
+    rec = vf.bind(body, version_context=vf.CURRENT_ROUND, source_commit=commit, kernel_digest=tree,
+                  predecessor_path=OUT_REL, predecessor_bytes=base_bytes)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render(rec), encoding="utf-8")
+    print(f"wrote {V22_REL}: {rec['verdict']}")
+    return 0
+
+
+def check_version_forward() -> list[str]:
+    """Context-bound currency check for the current round: select the record DECLARED for CURRENT_ROUND and bound
+    to this tree (never a global newest, never a silent fallback), then apply the SAME verdict logic as check() —
+    problems_of + exact re-derivation. The v2.1 path stays check()/OUT_REL, unchanged: this is the separate
+    version-forward API, so v2.1 verification is byte-for-byte the legacy code."""
+    from validation.v2 import version_forward as vf
+    _, tree = vf.current_context(ROOT)
+    try:
+        path, rec = vf.select_for_tree(_series(), version_context=vf.CURRENT_ROUND, kernel_digest=tree)
+    except LookupError as e:
+        return [str(e)]
+    body = {k: v for k, v in rec.items() if k != vf.BLOCK}
+    fresh = {**build(), "observed_at_write": body.get("observed_at_write")}
+    out = problems_of(fresh)
+    if render(body) != render(fresh):
+        out.append(f"{path} does not re-derive from the tree")
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if "--write-v22" in argv:
+        return write_v22()
+    if "--check-v22" in argv:
+        problems = check_version_forward()
+        for p in problems:
+            print(f"FAIL  {p}")
+        print(f"c2_p10_profile --check-v22: {'FAIL' if problems else 'PASS'}")
+        return 1 if problems else 0
     if "--write" in argv:
         rec = {**build(), "observed_at_write": observed_at_write()}
         problems = problems_of(rec)
