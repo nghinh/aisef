@@ -310,6 +310,42 @@
     "candidate": "aisef2 product tree frozen at 5f34a3f3 (= 8c7bdb44's, = dc63478c's); no product code changed; shipped trees equal the frozen RC (release_rc.py --check PASS)",
     "rc_freeze": "closure-evidence/v2/release/V2.1.0-RC1-FREEZE.json (wheel 80310413..., sdist 5039c602...)"
    }
+  },
+  {
+   "seq": 8,
+   "id": "AISEF_V2_2_VERSION_FORWARD_QUALIFICATION",
+   "authority": "owner directive 2026-11-07 (chat) 'OWNER DIRECTIVE — AISEF v2.2 VERSION-FORWARD QUALIFICATION AUTHORIZATION', operationalizing the owner's 2026-11-07 'VERSION-FORWARD QUALIFICATION (Option C APPROVED)' and 'C2 DAG RESOLUTION' directives",
+   "approver": "human:owner",
+   "decision": {
+    "VERSION_FORWARD_QUALIFICATION": "V2.2",
+    "VERDICT": "AUTHORIZED",
+    "NUMBERED_APPEND_SUPERSESSION": "generalized to the qualification records; no overwrite or change of historical evidence",
+    "CROSS_RECORD_DAG": "version-aware dependency resolution by explicit release round + kernel digest + release context; checked in topological order; fail-closed on missing / wrong-version / wrong-digest / tampered / ambiguous / cyclic; no global-newest selection, no implicit fallback",
+    "P5_REVERIFICATION_AND_ORCH": "v2.2 may reference v2.2 upstream records that are validly verified, correct dependency, correct context",
+    "HISTORICAL_PRESERVED": "all historical records, historical verdicts and the v2.1/cycle2 verification mechanism unchanged",
+    "SCOPE": "an approved evidence version-management change, NOT a change of acceptance semantics",
+    "NOT_PERMITTED": "no loosened invariant; no changed acceptance criteria; no changed historical authority; no automatic migration of gated tests onto new records",
+    "C4_SEPARATE": "C4 gated-test wiring still requires separate owner approval",
+    "NOT_FULL_SEALING_NOR_RELEASE": "approving this authority is not a full sealing PASS and not approval to publish v2.2",
+    "EFFECTIVE": "takes effect only when this seq-8 entry is approved and validly committed; no retroactive effect",
+    "NO_TAG_PUBLISH_DOT3": "no tag, publish or start of Đợt 3 without a separate owner decision"
+   },
+   "constraints": [
+    "no overwrite or alteration of historical evidence, records or verdicts (v2.1 / cycle2 / 2.0 preserved byte-for-byte)",
+    "cross-record resolution is fail-closed: missing / wrong-version / wrong-digest / tampered / ambiguous / cyclic refused; no global-newest, no implicit fallback, no mixing v2.1/v2.2 records",
+    "no loosened invariant, no changed acceptance criteria, no changed historical authority",
+    "no automatic migration of gated tests onto new records; C4 gated-test wiring requires a separate owner decision",
+    "this authority is not a full sealing PASS and not approval to release v2.2",
+    "effective only on valid commit of this entry; no retroactive effect",
+    "no tag, publish or Đợt 3 without a separate owner decision"
+   ],
+   "owner_text": "OWNER DIRECTIVE — AISEF v2.2 VERSION-FORWARD QUALIFICATION AUTHORIZATION\n\nOwner phê duyệt thực hiện cơ chế Version-Forward Qualification (Option C) cho AISEF v2.2, bao gồm:\n\n1. Numbered-append supersession cho qualification records, bảo đảm không ghi đè hoặc thay đổi historical evidence.\n2. Cross-record dependency resolution theo DAG, với explicit binding theo release round, kernel digest và release context.\n3. Cho phép P5-REVERIFICATION và ORCH v2.2 tham chiếu các upstream records v2.2 đã được xác minh hợp lệ, đúng dependency và đúng context.\n4. Giữ nguyên toàn bộ historical records, historical verdicts và cơ chế verification của v2.1/cycle2.\n5. Bắt buộc fail-closed khi dependency bị thiếu, sai version, sai digest, tampered, ambiguous hoặc có dependency cycle. Không global-newest selection, không implicit fallback.\n\nĐây là thay đổi được phê duyệt về cơ chế quản lý phiên bản evidence, không phải thay đổi acceptance semantics.\n\nQuyết định này không cho phép nới invariant, sửa acceptance criteria, thay đổi historical authority hoặc tự động chuyển gated tests sang records mới.\n\nC4 gated-test wiring vẫn phải được Owner phê duyệt riêng.\n\nViệc phê duyệt authority này không đồng nghĩa với full sealing PASS hoặc chấp thuận phát hành v2.2.\n\nAuthorization có hiệu lực từ khi bản ghi seq-8 được phê duyệt và commit hợp lệ, không có hiệu lực hồi tố.\n\nKhông tag, publish hoặc khởi công Đợt 3 khi chưa có quyết định Owner riêng.",
+   "recorded_by": "transcribed verbatim by engineering (Claude Code session 845c9f11) from the owner's 2026-11-07 chat directive; DRAFT presented for owner approval and committed only by the owner's act; the v2.2 re-verification (p5_acceptance.reverify round='v2.2') cites this entry (V22_REF seq 8, V22_AUTHORITY quoted verbatim in owner_text); no record is accepted on an uncommitted authority",
+   "basis": {
+    "mechanism": "validation/v2/version_forward.py (toposort, resolve_upstream); validation/v2/currency_dag.py",
+    "c2_package": "closure-evidence/v2/v2.2/V2.2-C2-COMPLETION.md; closure-evidence/v2/v2.2/V2.2-C2-DAG.json",
+    "prior_directives": "owner 2026-11-07 VERSION-FORWARD QUALIFICATION (Option C) + C2 DAG RESOLUTION (5 decisions)"
+   }
   }
  ]
 }

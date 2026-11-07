@@ -114,6 +114,14 @@ V22 = "closure-evidence/v2/v2.2"
 V22_PROPOSAL_REL = f"{V22}/P5-PLAN-V2.2-PROPOSAL.json"
 V22_OUT_REL = f"{V22}/C2-P5-ACCEPTANCE-REVERIFICATION.json"
 V22_VERDICT = "C2-P5 ACCEPTANCE BOUNDARY RE-VERIFIED ON V2.2 — NO NEW OWNER ACCEPTANCE"
+#: the committed owner authority a v2.2 re-verification cites, by its decision-ledger entry (as v2.1 cites B-03a).
+#: The entry is drafted for owner approval and committed by the owner's act — the record is never accepted on an
+#: uncommitted authority; until the entry exists, reverify(round="v2.2") reports a single, specific authority problem.
+V22_ID = "AISEF_V2_2_VERSION_FORWARD_QUALIFICATION"
+V22_REF = {"path": DECISIONS_REL, "seq": 8, "id": V22_ID, "part": "C2"}
+#: the owner's words the entry must quote verbatim (owner VERSION-FORWARD QUALIFICATION directive)
+V22_AUTHORITY = ("Đây là thay đổi được phê duyệt về cơ chế quản lý phiên bản evidence, không phải thay đổi acceptance "
+                 "semantics.")
 
 
 def _sha(data: bytes) -> str:
@@ -889,16 +897,19 @@ def reverify(run_guards: bool = True, round: str = "v2.1") -> dict:
                     "newest_release_record": _file(rc.RECORD_REL) if (ROOT / rc.RECORD_REL).is_file() else None}
     checks.append((calibrations["newest_release_record"] is not None, f"{rc.RECORD_REL} is missing"))
     if is_v22:
-        # a v2.2 re-verification round must cite a COMMITTED owner decision-ledger entry, as v2.1 cites B-03a. The owner's
-        # Option C / version-forward authorization is a directive, not (yet) an entry in RELEASE-DECISIONS.json; this record
-        # is never accepted on a fabricated authority, so without that entry it reports a single, specific problem.
-        authority = {"round": "v2.2", "mechanism": "owner VERSION-FORWARD QUALIFICATION (Option C)", "decision_ledger_entry": None,
-                     "rule": f"the owner records the v2.2 qualification authorization in {DECISIONS_REL} (as v2.1 cites B-03a, "
-                             f"seq {B03_REF['seq']}), or rules how the v2.2 re-verification cites it; the record is not accepted "
-                             "on an uncommitted authority"}
-        checks.append((False, f"no committed owner authority entry for the v2.2 qualification round in {DECISIONS_REL} "
-                              "(owner decision required — the version-forward mechanism resolves the behaviour evidence, but the "
-                              "round's authorization must be a committed ledger entry, not a fabricated one)"))
+        # a v2.2 re-verification cites a COMMITTED owner decision-ledger entry (as v2.1 cites B-03a). The entry is drafted
+        # for owner approval; the record is never accepted on an uncommitted/fabricated authority, so until the owner's
+        # entry is committed both checks below fail with a specific authority problem.
+        v22_entry = next((e for e in json.loads((ROOT / DECISIONS_REL).read_text(encoding="utf-8"))["entries"]
+                          if e.get("id") == V22_ID), {})
+        authority = {"quote": V22_AUTHORITY, "decision": {"path": DECISIONS_REL, "id": V22_ID, "seq": v22_entry.get("seq"),
+                                                          "approver": v22_entry.get("approver")},
+                     "quoted_verbatim": V22_AUTHORITY in v22_entry.get("owner_text", ""),
+                     "entry_is_the_reference": v22_entry.get("seq") == V22_REF["seq"] and "VERSION_FORWARD" in str(v22_entry.get("decision", {})),
+                     "mechanism": "owner VERSION-FORWARD QUALIFICATION (Option C); version_forward resolves the behaviour evidence"}
+        checks += [(authority["quoted_verbatim"], f"the v2.2 authorization text is not in {DECISIONS_REL} entry {V22_ID} "
+                                                  "(owner records the v2.2 qualification authority; never fabricated)"),
+                   (authority["entry_is_the_reference"], f"{DECISIONS_REL} entry {V22_ID} is not {V22_REF}")]
     else:
         authority = {"quote": V21_AUTHORITY, "decision": {"path": DECISIONS_REL, "id": B03_ID, "seq": entry.get("seq"),
                                                           "approver": entry.get("approver")},
