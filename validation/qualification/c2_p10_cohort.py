@@ -37,6 +37,9 @@ from aisef2.cohort.preregistration import CohortRefused  # noqa: E402
 from tests.v2 import test_c2_p10_cohort as T  # noqa: E402  — the synthetic preregistrations of the kill tests
 
 OUT_REL = "closure-evidence/v2/cycle2/P10-COHORT-MACHINERY.json"
+#: version-forward (owner Option C): the v2.2 round's supersession of OUT_REL. Legacy OUT_REL/check()/--write below
+#: are byte-identical (the v2.1 path); this is a SEPARATE API.
+V22_REL = "closure-evidence/v2/v2.2/P10-COHORT-MACHINERY.json"
 MUTATION_REL = "closure-evidence/v2/cycle2/P10-MUTATION.json"
 BASE = {"commit": "9bd16fa9c578bb91a0a6c0047d2ceb6e6ab3b414", "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
         "note": "the C2-P6 closure (QP-2.6 requalified GREEN on candidate 37dc0dc, R3)"}
@@ -251,8 +254,37 @@ def check() -> list[str]:
     return out
 
 
+def write_v22() -> int:
+    """Append the v2.2 supersession of OUT_REL via the shared version-forward API (legacy record untouched)."""
+    from validation.v2 import version_forward as vf
+    body = build()
+    problems = problems_of(body)
+    if problems:
+        for p in problems:
+            print(f"FAIL  {p}")
+        return 1
+    rc, msg = vf.write_supersession(ROOT, OUT_REL, V22_REL, body, render=render)
+    print(msg, file=sys.stderr if rc else sys.stdout)
+    return rc
+
+
+def check_version_forward() -> list[str]:
+    """Context-bound currency check for the current round (separate version-forward API). Same verdict logic as
+    check() — problems_of + exact re-derivation; only record selection differs. Legacy check()/OUT_REL unchanged."""
+    from validation.v2 import version_forward as vf
+    return vf.check_supersession(ROOT, OUT_REL, V22_REL, derive_body=build, problems=problems_of, render=render)
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if "--write-v22" in argv:
+        return write_v22()
+    if "--check-v22" in argv:
+        problems = check_version_forward()
+        for p in problems:
+            print(f"FAIL  {p}")
+        print(f"c2_p10_cohort --check-v22: {'FAIL' if problems else 'PASS'}")
+        return 1 if problems else 0
     if "--write" in argv:
         rec = build()
         problems = problems_of(rec)
