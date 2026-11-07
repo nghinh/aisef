@@ -1,0 +1,162 @@
+{
+ "kernel_digest": "ac7c170531fc3db1698f062d0bac6d921651d962",
+ "topological_order": [
+  "CONFORMANCE-RULING",
+  "P10-COHORT",
+  "P10-PROFILE",
+  "P5-PROPOSAL",
+  "Q5",
+  "P5-FALSIFIABILITY",
+  "P5-REVERIFICATION",
+  "PLAN",
+  "K-NOWORK",
+  "ORCH"
+ ],
+ "nodes": {
+  "CONFORMANCE-RULING": {
+   "owner": "validation/qualification/v21_conformance_ruling.py (--write/-check-v22)",
+   "deps": [],
+   "gated_tests": [
+    "tests/v2/test_v21_conformance_ruling.py::CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json",
+   "v22": "closure-evidence/v2/v2.2/CONFORMANCE-RULING.json",
+   "status": "current",
+   "bound_kernel": "ac7c170531fc3db1698f062d0bac6d921651d962"
+  },
+  "P10-COHORT": {
+   "owner": "validation/qualification/c2_p10_cohort.py (--write/-check-v22)",
+   "deps": [],
+   "gated_tests": [
+    "tests/v2/test_c2_p10_cohort_static.py::Record.test_the_evidence_record_re_derives_from_the_tree"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/cycle2/P10-COHORT-MACHINERY.json",
+   "v22": "closure-evidence/v2/v2.2/P10-COHORT-MACHINERY.json",
+   "status": "current",
+   "bound_kernel": "ac7c170531fc3db1698f062d0bac6d921651d962"
+  },
+  "P10-PROFILE": {
+   "owner": "validation/qualification/c2_p10_profile.py (--write/-check-v22)",
+   "deps": [],
+   "gated_tests": [
+    "tests/v2/test_c2_p10_profile_freeze.py::Checker.test_the_evidence_record_re_derives"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/cycle2/P10-PROFILE-FREEZE.json",
+   "v22": "closure-evidence/v2/v2.2/P10-PROFILE-FREEZE.json",
+   "status": "current",
+   "bound_kernel": "ac7c170531fc3db1698f062d0bac6d921651d962"
+  },
+  "P5-PROPOSAL": {
+   "owner": "validation/qualification/p5_acceptance.py (--write/-check-v22-proposal)",
+   "deps": [],
+   "gated_tests": [
+    "tests/v2/test_p5_plan_v22_proposal.py::Record.test_P5_8_committed_record_is_current",
+    "tests/v2/test_c2_p5_acceptance.py::KernelProvenance.test_on_this_tree_the_committed_proposal_is_current"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/v2.1/P5-PLAN-V2.2-PROPOSAL.json",
+   "v22": "closure-evidence/v2/v2.2/P5-PLAN-V2.2-PROPOSAL.json",
+   "status": "current",
+   "bound_kernel": "ac7c170531fc3db1698f062d0bac6d921651d962"
+  },
+  "Q5": {
+   "owner": "validation/qualification/v21_q5_compare.py (--write/-check-v22)",
+   "deps": [],
+   "gated_tests": [
+    "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_18_check_binds_the_record_to_q5_both_kernels_the_corpus_and_the_ruling_s_data",
+    "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
+   "v22": "closure-evidence/v2/v2.2/Q5-KERNEL-COMPARISON.json",
+   "status": "missing",
+   "detail": "no record declared for round 'v2.2' binds this tree (kernel_digest ac7c170531fc); missing supersession — refusing to fall back"
+  },
+  "P5-FALSIFIABILITY": {
+   "owner": "validation/qualification/p5_falsifiability.py (--write/-check-v22)",
+   "deps": [
+    "P5-PROPOSAL"
+   ],
+   "gated_tests": [],
+   "note": "upstream behaviour evidence; no gated test of its own — PLAN/P5-REVERIFICATION read it",
+   "legacy": "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json",
+   "v22": "closure-evidence/v2/v2.2/P5-FALSIFIABILITY.json",
+   "status": "current",
+   "bound_kernel": "ac7c170531fc3db1698f062d0bac6d921651d962"
+  },
+  "P5-REVERIFICATION": {
+   "owner": "validation/qualification/p5_acceptance.py (--write/-check-v22)",
+   "deps": [
+    "P5-FALSIFIABILITY",
+    "P5-PROPOSAL"
+   ],
+   "gated_tests": [
+    "tests/v2/test_c2_p5_acceptance.py::Acceptance.test_the_acceptance_re_derives_on_this_tree"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/v2.1/C2-P5-ACCEPTANCE-REVERIFICATION.json",
+   "v22": "closure-evidence/v2/v2.2/C2-P5-ACCEPTANCE-REVERIFICATION.json",
+   "status": "missing",
+   "detail": "no record declared for round 'v2.2' binds this tree (kernel_digest ac7c170531fc); missing supersession — refusing to fall back"
+  },
+  "PLAN": {
+   "owner": "validation/qualification/c2_plan_correction.py (--write/-check-v22)",
+   "deps": [
+    "P5-FALSIFIABILITY"
+   ],
+   "gated_tests": [
+    "tests/v2/test_c2_delivery_experiment.py::PlanCorrection.test_the_committed_record_is_what_this_tree_derives"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json",
+   "v22": "closure-evidence/v2/v2.2/PLAN-V2.2-CORRECTION-1.json",
+   "status": "current",
+   "bound_kernel": "ac7c170531fc3db1698f062d0bac6d921651d962"
+  },
+  "K-NOWORK": {
+   "owner": "validation/qualification/c2_k_nowork_001.py (--write/-check-v22)",
+   "deps": [
+    "PLAN"
+   ],
+   "gated_tests": [
+    "tests/v2/test_c2_k_nowork_001.py::Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after"
+   ],
+   "note": "",
+   "legacy": "closure-evidence/v2/v2.1/K-NOWORK-001-REHEARSAL.json",
+   "v22": "closure-evidence/v2/v2.2/K-NOWORK-001-REHEARSAL.json",
+   "status": "missing",
+   "detail": "no record declared for round 'v2.2' binds this tree (kernel_digest ac7c170531fc); missing supersession — refusing to fall back"
+  },
+  "ORCH": {
+   "owner": "validation/qualification/c2_orchestration_repair.py (release_differences_v22)",
+   "deps": [
+    "CONFORMANCE-RULING",
+    "P5-REVERIFICATION"
+   ],
+   "gated_tests": [
+    "tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story",
+    "tests/v2/test_c2_orchestration_conformance.py::Record.test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds"
+   ],
+   "note": "frozen cycle-2 history (never re-derived); its release_differences checker resolves the v2.2 ruling and P5 reverification",
+   "legacy": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+   "v22": null,
+   "status": "checker-only (frozen history)",
+   "unresolved_dependencies": [
+    "P5-REVERIFICATION (no record declared for round 'v2.2' binds this tree (kernel_digest ac7c170531fc); missing supersession — refusing to fall back)"
+   ]
+  }
+ },
+ "owner_gated": {
+  "Q0-CHECKER-CALIBRATION": "tests/v2/p0/test_checker_calibration.py — C3 interlock (owner holds C3)",
+  "DESTRUCTIVE-AUTHORITY": "tests/v2/p0/test_destructive_authority.py — the C3 ledger (7 approved rows; owner holds C3)",
+  "INV-MUTATION-AUTHORITY": "tests/v2/p5/test_invariants.py::MutationAuthority — destructive sites ledgered (C3)",
+  "FREEZE-MANIFEST / V2-007": "tests/v2/p0/test_freeze_manifest.py + tests/v2/test_cycle2_wp201.py — C10/V2-007 ruling",
+  "MUTATION-HISTORICAL": "tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before — P1..V2.0-S2 read against each record's OWN original binding; a post-seal kernel edit flags 're-run the target' (the owner's re-run, not a version-forward). V2.1 MUTATION-SUMMARY FAIL (7 survivors) audited separately: 0 REAL_DEFECT."
+ },
+ "problems": [
+  "ORCH: upstream not resolvable for this round: [\"P5-REVERIFICATION (no record declared for round 'v2.2' binds this tree (kernel_digest ac7c170531fc); missing supersession — refusing to fall back)\"]"
+ ]
+}
