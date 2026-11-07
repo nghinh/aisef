@@ -31,6 +31,11 @@ import subprocess
 #: the key the binding block lives under, inside the record body
 BLOCK = "version_forward"
 
+#: the qualification round this tree is being verified for (owner's "declared release context"). The pyproject
+#: version is the RELEASE (2.1.0, patch lane); the ROUND is the re-qualification identity after a wave divergence.
+#: A checker verifies the record DECLARED for this round, bound to this tree — never a global "newest".
+CURRENT_ROUND = "v2.2"
+
 
 def _lf(b: bytes) -> bytes:
     return b.replace(b"\r\n", b"\n")
@@ -92,8 +97,7 @@ def validate_chain(series: list[tuple[str, dict, bytes]]) -> list[str]:
     base_path, base_doc, _ = series[0]
     if _binding(base_doc) is not None:
         problems.append(f"{base_path}: the base record must not carry a {BLOCK} block")
-    seen_ctx: set[tuple[str, str]] = set()
-    seen_kernel: list[str] = []
+    seen_pair: set[tuple[str, str]] = set()
     for i in range(1, len(series)):
         path, doc, _ = series[i]
         b = _binding(doc)
@@ -106,44 +110,44 @@ def validate_chain(series: list[tuple[str, dict, bytes]]) -> list[str]:
         sup = b.get("supersedes") or {}
         if sup.get("record_digest") != digest_bytes(prev_bytes):
             problems.append(f"{path}: supersedes a digest that is not its predecessor {prev_path} (broken chain)")
-        ctx = (b.get("version_context"), b.get("source_commit"))
-        if ctx in seen_ctx:
-            problems.append(f"{path}: duplicate (version_context, source_commit) {ctx} (replay/fork)")
-        seen_ctx.add(ctx)
-        k = b.get("kernel_digest")
-        if k in seen_kernel:
-            problems.append(f"{path}: kernel_digest {k} is already bound earlier in the chain — two records "
-                            f"bind one tree (ambiguous head / rollback)")
-        seen_kernel.append(k)
+        # one record per (declared round, tree): a repeated pair is a duplicate head — the ambiguity, replay and
+        # rollback-onto-a-sealed-(round,tree) cases all reduce to this, and the linear supersede link above stops an
+        # old record being re-spliced as head.
+        pair = (b.get("version_context"), b.get("kernel_digest"))
+        if pair in seen_pair:
+            problems.append(f"{path}: duplicate (version_context, kernel_digest) {pair} — two records bind one "
+                            f"(round, tree) (ambiguous head / replay / rollback)")
+        seen_pair.add(pair)
     return problems
 
 
-def select_for_tree(series: list[tuple[str, dict, bytes]], *, source_commit: str, kernel_digest: str,
+def select_for_tree(series: list[tuple[str, dict, bytes]], *, version_context: str, kernel_digest: str,
                     legacy_binding: tuple[str, str] | None = None) -> tuple[str, dict]:
-    """Return the ONE record bound to the given tree context, or raise LookupError. `legacy_binding` is the
-    (source_commit, kernel_digest) the base record is valid for, supplied by the caller (the base predates the
-    block); omit it when the base is not a candidate for this tree. Never falls back to another record: a context
+    """Return the ONE record DECLARED for `version_context` and bound to `kernel_digest` (the tree being verified),
+    or raise LookupError. Selection is by the declared round + tree, never a global "newest". `legacy_binding` is
+    the (version_context, kernel_digest) the base record stands for, supplied by the caller (the base predates the
+    block); omit it when the base is not a candidate for this round. Never falls back to another record: a context
     with no record, or more than one, is an error naming the case. Validates the chain first; a broken chain is
     never selected from."""
     chain_problems = validate_chain(series)
     if chain_problems:
         raise LookupError("chain invalid: " + "; ".join(chain_problems))
-    want = (source_commit, kernel_digest)
+    want = (version_context, kernel_digest)
     matches: list[tuple[str, dict]] = []
     for path, doc, _ in series:
         b = _binding(doc)
         if b is None:
             if legacy_binding is not None and legacy_binding == want:
                 matches.append((path, doc))
-        elif (b.get("source_commit"), b.get("kernel_digest")) == want:
+        elif (b.get("version_context"), b.get("kernel_digest")) == want:
             if b.get("record_digest") != body_digest(doc):
                 raise LookupError(f"{path}: record_digest does not recompute (tampered)")
             matches.append((path, doc))
     if not matches:
-        raise LookupError(f"no record binds this tree (source_commit {source_commit[:12]}, "
-                          f"kernel_digest {kernel_digest[:12]}); missing supersession — refusing to fall back")
+        raise LookupError(f"no record declared for round {version_context!r} binds this tree "
+                          f"(kernel_digest {kernel_digest[:12]}); missing supersession — refusing to fall back")
     if len(matches) > 1:
-        raise LookupError("ambiguous head: " + ", ".join(p for p, _ in matches) + " all bind this tree")
+        raise LookupError("ambiguous head: " + ", ".join(p for p, _ in matches) + " all bind this (round, tree)")
     return matches[0]
 
 
@@ -162,9 +166,9 @@ if __name__ == "__main__":   # pragma: no cover — a runnable self-check of the
                kernel_digest="k1" * 20, predecessor_path="base.json", predecessor_bytes=base_b)
     ser = [("base.json", base, base_b), ("v22.json", one, _canon(one))]
     assert validate_chain(ser) == [], validate_chain(ser)
-    assert select_for_tree(ser, source_commit="c1" * 20, kernel_digest="k1" * 20)[1]["record"] == "V2.2"
+    assert select_for_tree(ser, version_context="2.2.0", kernel_digest="k1" * 20)[1]["record"] == "V2.2"
     try:
-        select_for_tree(ser, source_commit="zz" * 20, kernel_digest="k1" * 20)
+        select_for_tree(ser, version_context="9.9.9", kernel_digest="k1" * 20)
         raise SystemExit("wrong-version should have refused")
     except LookupError:
         pass
