@@ -196,14 +196,9 @@ class Checker(unittest.TestCase):
 
     @sealing
     def test_the_evidence_record_re_derives(self):
-        # version-forward (owner Option C): the record for the DECLARED current round, bound to this tree, re-derives.
-        # On a v2.1 tree the selector picks the legacy record, so v2.1 verification is unchanged; the legacy check()
-        # path (B.check()/B.OUT_REL) is still present and byte-identical. Same assertions, same strictness.
         from validation.qualification import c2_p10_profile as B
-        from validation.v2 import version_forward as vf
-        self.assertEqual(B.check_version_forward(), [])
-        _, rec = vf.select_for_tree(B._series(), version_context=vf.CURRENT_ROUND,
-                                    kernel_digest=vf.current_context(ROOT)[1])
+        self.assertEqual(B.check(), [])
+        rec = json.loads((ROOT / B.OUT_REL).read_text(encoding="utf-8"))
         self.assertEqual((rec["verdict"], rec["live_provider_calls"]), ("attestation qualified", 0))
         self.assertEqual({c["id"]: c["grade"] for c in rec["classifications"] if c["id"].startswith("FIX-")}, {
             "FIX-FIXED": "ATTESTED", "FIX-COMBO": "OPAQUE", "FIX-ALIAS": "OPAQUE", "FIX-ROTATING": "OPAQUE",
