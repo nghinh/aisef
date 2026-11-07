@@ -16,7 +16,9 @@ from __future__ import annotations
 import json
 import pathlib
 import sys
+import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -166,6 +168,48 @@ class PilotProfileFreeze(unittest.TestCase):
         self.assertEqual((b["version_context"], b["kernel_digest"]), (vf.CURRENT_ROUND, self.tree))
         self.assertEqual(b["source_commit"], self.commit)
         self.assertEqual(b["supersedes"]["record_digest"], vf.digest_bytes(self.legacy_bytes))
+
+
+def _render(doc: dict) -> str:
+    return json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
+
+
+class HelperAPI(unittest.TestCase):
+    """The shared write_supersession / check_supersession every group wires in (current_context stubbed so the
+    helper runs hermetically in a tempdir, not a git repo)."""
+
+    def test_write_then_check_round_trips_append_only_and_leaves_legacy_untouched(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(vf, "current_context", return_value=(COMMIT, K1)):
+            root = pathlib.Path(d)
+            legacy_rel, v22_rel = "legacy.json", "sub/v22.json"
+            body0 = {"record": "X", "n": 1}
+            (root / legacy_rel).write_text(json.dumps(body0), encoding="utf-8")
+            body = {"record": "X", "n": 2}      # this tree's derivation
+            rc, msg = vf.write_supersession(root, legacy_rel, v22_rel, body, render=_render)
+            self.assertEqual(rc, 0, msg)
+            rc2, msg2 = vf.write_supersession(root, legacy_rel, v22_rel, body, render=_render)
+            self.assertEqual((rc2, "nothing written" in msg2), (0, True))          # idempotent
+            rc3, _ = vf.write_supersession(root, legacy_rel, v22_rel, {"record": "X", "n": 3}, render=_render)
+            self.assertEqual(rc3, 1)                                               # append-only: other bytes refused
+            self.assertEqual(vf.check_supersession(root, legacy_rel, v22_rel, derive_body=lambda: dict(body),
+                                                   problems=lambda b: [], render=_render), [])
+            stale = vf.check_supersession(root, legacy_rel, v22_rel, derive_body=lambda: {"record": "X", "n": 99},
+                                          problems=lambda b: [], render=_render)
+            self.assertTrue(any("does not re-derive" in p for p in stale))
+            self.assertEqual(json.loads((root / legacy_rel).read_text(encoding="utf-8")), body0)   # legacy untouched
+
+    def test_missing_base_record_is_reported(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(vf, "current_context", return_value=(COMMIT, K1)):
+            rc, msg = vf.write_supersession(pathlib.Path(d), "nope.json", "v22.json", {"a": 1}, render=_render)
+            self.assertEqual((rc, "missing" in msg), (1, True))
+
+    def test_check_with_no_supersession_refuses_with_no_fallback(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(vf, "current_context", return_value=(COMMIT, K1)):
+            root = pathlib.Path(d)
+            (root / "legacy.json").write_text(json.dumps({"a": 1}), encoding="utf-8")
+            out = vf.check_supersession(root, "legacy.json", "v22.json", derive_body=lambda: {"a": 1},
+                                        problems=lambda b: [], render=_render)
+            self.assertTrue(any("no record declared for round" in p for p in out))
 
 
 if __name__ == "__main__":

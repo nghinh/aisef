@@ -210,66 +210,34 @@ def check() -> list[str]:
     return out
 
 
-def _series() -> list[tuple[str, dict, bytes]]:
-    """The record series for this logical id, base-first: the legacy cycle-2 record then the v2.2 supersession."""
-    out = []
-    for rel in (OUT_REL, V22_REL):
-        p = ROOT / rel
-        if p.exists():
-            b = p.read_bytes()
-            out.append((rel, json.loads(b), b))
-    return out
+def _v22_body() -> dict:
+    """The record body for the v2.2 supersession: build() on this tree, carrying the legacy record's
+    observed_at_write (the operator's config is read only at the original --write, never re-read by --check)."""
+    base = ROOT / OUT_REL
+    obs = json.loads(base.read_bytes()).get("observed_at_write") if base.exists() else None
+    return {**build(), "observed_at_write": obs}
 
 
 def write_v22() -> int:
-    """Append the v2.2 supersession of OUT_REL under V22_REL (never over the legacy record), bound to this round
-    and tree. Refuses to rewrite an existing v2.2 record with other bytes (append-only)."""
+    """Append the v2.2 supersession of OUT_REL (never over the legacy record), via the shared version-forward API."""
     from validation.v2 import version_forward as vf
-    base = ROOT / OUT_REL
-    if not base.exists():
-        print(f"FAIL  {OUT_REL} (the base record) is missing")
-        return 1
-    base_bytes = base.read_bytes()
-    body = {**build(), "observed_at_write": json.loads(base_bytes).get("observed_at_write")}
+    body = _v22_body()
     problems = problems_of(body)
     if problems:
         for p in problems:
             print(f"FAIL  {p}")
         return 1
-    out = ROOT / V22_REL
-    if out.exists():
-        existing = {k: v for k, v in json.loads(out.read_text(encoding="utf-8")).items() if k != vf.BLOCK}
-        if existing == body:
-            print(f"{V22_REL} already records this derivation: nothing written")
-            return 0
-        print(f"refused: {V22_REL} exists with other bytes — a record is never rewritten", file=sys.stderr)
-        return 1
-    commit, tree = vf.current_context(ROOT)
-    rec = vf.bind(body, version_context=vf.CURRENT_ROUND, source_commit=commit, kernel_digest=tree,
-                  predecessor_path=OUT_REL, predecessor_bytes=base_bytes)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render(rec), encoding="utf-8")
-    print(f"wrote {V22_REL}: {rec['verdict']}")
-    return 0
+    rc, msg = vf.write_supersession(ROOT, OUT_REL, V22_REL, body, render=render)
+    print(msg, file=sys.stderr if rc else sys.stdout)
+    return rc
 
 
 def check_version_forward() -> list[str]:
-    """Context-bound currency check for the current round: select the record DECLARED for CURRENT_ROUND and bound
-    to this tree (never a global newest, never a silent fallback), then apply the SAME verdict logic as check() —
-    problems_of + exact re-derivation. The v2.1 path stays check()/OUT_REL, unchanged: this is the separate
-    version-forward API, so v2.1 verification is byte-for-byte the legacy code."""
+    """Context-bound currency check for the current round — the separate version-forward API. Same verdict logic
+    as check() (problems_of + exact re-derivation); only record selection differs. The legacy check()/OUT_REL path
+    is unchanged, so v2.1 verification is byte-for-byte the legacy code."""
     from validation.v2 import version_forward as vf
-    _, tree = vf.current_context(ROOT)
-    try:
-        path, rec = vf.select_for_tree(_series(), version_context=vf.CURRENT_ROUND, kernel_digest=tree)
-    except LookupError as e:
-        return [str(e)]
-    body = {k: v for k, v in rec.items() if k != vf.BLOCK}
-    fresh = {**build(), "observed_at_write": body.get("observed_at_write")}
-    out = problems_of(fresh)
-    if render(body) != render(fresh):
-        out.append(f"{path} does not re-derive from the tree")
-    return out
+    return vf.check_supersession(ROOT, OUT_REL, V22_REL, derive_body=_v22_body, problems=problems_of, render=render)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -159,6 +159,64 @@ def current_context(root) -> tuple[str, str]:
     return git("rev-parse", "HEAD"), git("rev-parse", "HEAD:aisef2")
 
 
+# --- the shared generator/checker API every currency group wires in (one audited copy of the selection and
+#     provenance logic, so "no global newest / explicit binding / provenance integrity" is not re-implemented
+#     per group). A group supplies only its own build/problems/render and its two record paths. ---
+
+def load_series(root, legacy_rel: str, v22_rel: str) -> list[tuple[str, dict, bytes]]:
+    """The record series for one logical id, base-first: the legacy record then its v2.2 supersession (each only
+    if present)."""
+    out = []
+    for rel in (legacy_rel, v22_rel):
+        p = root / rel
+        if p.exists():
+            b = p.read_bytes()
+            out.append((rel, json.loads(b), b))
+    return out
+
+
+def write_supersession(root, legacy_rel: str, v22_rel: str, body: dict, *, render) -> tuple[int, str]:
+    """Append the CURRENT_ROUND supersession of `legacy_rel` at `v22_rel`, bound to this round + tree, superseding
+    the legacy record by digest. `body` is the already-built record body (no block). Append-only: refuses to
+    rewrite an existing v2.2 record with other bytes; a no-op if it already records this derivation. The legacy
+    record is never touched. Returns (rc, message)."""
+    base = root / legacy_rel
+    if not base.exists():
+        return 1, f"{legacy_rel} (the base record) is missing"
+    base_bytes = base.read_bytes()
+    out = root / v22_rel
+    if out.exists():
+        existing = {k: v for k, v in json.loads(out.read_text(encoding="utf-8")).items() if k != BLOCK}
+        if existing == body:
+            return 0, f"{v22_rel} already records this derivation: nothing written"
+        return 1, f"refused: {v22_rel} exists with other bytes — a record is never rewritten"
+    commit, tree = current_context(root)
+    rec = bind(body, version_context=CURRENT_ROUND, source_commit=commit, kernel_digest=tree,
+               predecessor_path=legacy_rel, predecessor_bytes=base_bytes)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render(rec), encoding="utf-8")
+    return 0, f"wrote {v22_rel}: round {CURRENT_ROUND}, kernel {tree[:12]}"
+
+
+def check_supersession(root, legacy_rel: str, v22_rel: str, *, derive_body, problems, render) -> list[str]:
+    """Context-bound currency check for CURRENT_ROUND: select the record declared for this round and bound to this
+    tree (never a global newest, never a silent fallback), then apply the group's OWN verdict logic — `problems`
+    on the freshly-derived body and an exact `render` equality against the selected record. Same strictness as the
+    legacy check; only selection differs. The legacy check stays the v2.1 path, unchanged."""
+    _, tree = current_context(root)
+    try:
+        path, rec = select_for_tree(load_series(root, legacy_rel, v22_rel), version_context=CURRENT_ROUND,
+                                    kernel_digest=tree)
+    except LookupError as e:
+        return [str(e)]
+    recorded = {k: v for k, v in rec.items() if k != BLOCK}
+    fresh = derive_body()
+    out = list(problems(fresh))
+    if render(recorded) != render(fresh):
+        out.append(f"{path} does not re-derive from the tree")
+    return out
+
+
 if __name__ == "__main__":   # pragma: no cover — a runnable self-check of the mechanism on synthetic records
     base = {"record": "BASE", "n": 1}
     base_b = _canon(base)
