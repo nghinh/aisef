@@ -11,16 +11,21 @@ live kernel, the four properties the owner required:
   4. access-denied / protected / ambiguous outcomes still fail CLOSED to alive.
 
 It introduces NO new destructive site: children self-terminate (short sleep or immediate exit) and are reaped
-with wait(); the test source calls no kill()/terminate()/unlink(). Skipped on POSIX.
+with wait(); the test source calls no kill()/terminate()/unlink(). The native class is skipped on POSIX;
+B1SurvivorKills below is platform-independent (pure `_win_liveness` calls plus patched os/ctypes seams, no real
+probe) and runs everywhere.
 """
 import ctypes
 import os
 import subprocess
 import sys
 import unittest
+from unittest import mock
 
+from aisef2.runtime import process_range
 from aisef2.runtime.process_range import (
     _WIN_PROCESS_QUERY_LIMITED_INFORMATION,
+    _win_liveness,
     pid_alive,
 )
 
@@ -90,6 +95,73 @@ class WinNativeLiveness(unittest.TestCase):
         else:
             print("win-native: no access-denied handle reachable on this runner; "
                   "fail-closed-on-denied remains pinned by WinLivenessDecision (pure + mutation-proven)")
+
+
+class B1SurvivorKills(unittest.TestCase):
+    """B1 release-gate mutation-survivor kills — UNGUARDED: runs on POSIX now and on the Windows re-measure.
+    `_win_liveness` is pure; the `pid_alive` branches are driven through patched os/ctypes seams so no real
+    probe (and no real signal) is ever issued on either platform. assertIs throughout: a verdict of None must
+    never pass for False or True."""
+
+    # --- _win_liveness fail-closed guards (process_range.py L141/L143) ---
+
+    def test_win_liveness_open_failed_decides_by_invalid_parameter_only(self):
+        # L141: `last_error != 87`. Error 87 (no such pid) is the ONLY reliable gone; every other open
+        # failure fails closed to alive.
+        self.assertIs(_win_liveness(False, 87, False, 0), False, "ERROR_INVALID_PARAMETER is provably gone")
+        self.assertIs(_win_liveness(False, 5, False, 0), True, "ACCESS_DENIED must fail closed to alive")
+        self.assertIs(_win_liveness(False, 1450, False, 0), True, "resource exhaustion must fail closed to alive")
+
+    def test_win_liveness_unreadable_exit_code_fails_closed_to_alive(self):
+        # L143: handle opened but GetExitCodeProcess failed -> cannot prove gone -> alive.
+        self.assertIs(_win_liveness(True, 0, False, 0), True)
+
+    def test_win_liveness_read_exit_code_decides_by_still_active(self):
+        self.assertIs(_win_liveness(True, 0, True, 259), True, "STILL_ACTIVE reads alive")
+        self.assertIs(_win_liveness(True, 0, True, 0), False, "a real exit code is provably gone")
+
+    # --- pid_alive guard (L156-L157) ---
+
+    def test_pid_alive_rejects_non_positive_pids_with_False_not_None(self):
+        self.assertIs(pid_alive(0), False)
+        self.assertIs(pid_alive(-5), False)
+
+    # --- pid_alive Windows branch (L158-L168), driven off-Windows through the ctypes seam ---
+
+    def test_nt_branch_open_failed_probe_contract(self):
+        # Replaces WinDLL with a fake kernel32 whose OpenProcess fails with ERROR_INVALID_PARAMETER (87).
+        # Pins, besides the verdict:
+        #   L161: WinDLL("kernel32", use_last_error=True) — without it get_last_error reads garbage;
+        #   L166: OpenProcess(QUERY_LIMITED, False, pid) — inherit-handle must stay False;
+        #   L168: the failure handed to _win_liveness as exactly (False, 87, False, 0), its verdict returned.
+        k = mock.Mock()
+        k.OpenProcess = mock.Mock(return_value=0)  # open failed
+        decide = mock.Mock(wraps=process_range._win_liveness)
+        with mock.patch.object(process_range.os, "name", "nt"), \
+                mock.patch.object(ctypes, "WinDLL", mock.Mock(return_value=k), create=True) as windll, \
+                mock.patch.object(ctypes, "get_last_error", lambda: 87, create=True), \
+                mock.patch.object(process_range, "_win_liveness", decide):
+            self.assertIs(pid_alive(12345), False, "OpenProcess error 87 is the one reliable gone")
+        self.assertEqual(windll.call_args, mock.call("kernel32", use_last_error=True))
+        self.assertIs(windll.call_args.kwargs["use_last_error"], True)
+        self.assertEqual(k.OpenProcess.call_args,
+                         mock.call(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, 12345))
+        self.assertIs(k.OpenProcess.call_args.args[1], False, "the probe handle must not be inheritable")
+        self.assertEqual(decide.call_args, mock.call(False, 87, False, 0))
+
+    # --- pid_alive POSIX branch (L175-L181), driven on any platform with a fake os.kill (never signals) ---
+
+    def test_posix_branch_esrch_is_gone_eperm_and_an_answer_are_alive(self):
+        with mock.patch.object(process_range.os, "name", "posix"), \
+                mock.patch.object(process_range.os, "kill", mock.Mock(side_effect=ProcessLookupError)):
+            self.assertIs(pid_alive(12345), False, "ESRCH is provably gone")
+        with mock.patch.object(process_range.os, "name", "posix"), \
+                mock.patch.object(process_range.os, "kill", mock.Mock(side_effect=PermissionError)):
+            self.assertIs(pid_alive(12345), True, "EPERM must read alive (exists, not ours)")
+        with mock.patch.object(process_range.os, "name", "posix"), \
+                mock.patch.object(process_range.os, "kill", mock.Mock(return_value=None)) as kill:
+            self.assertIs(pid_alive(12345), True, "an answered probe is alive")
+        self.assertEqual(kill.call_args, mock.call(12345, 0), "the probe must only ever ask with signal 0")
 
 
 if __name__ == "__main__":

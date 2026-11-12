@@ -24,7 +24,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.app import adapters as ad  # noqa: E402
-from aisef2.app import bundle, cli, client, preflight, settings  # noqa: E402
+from aisef2.app import bundle, cli, client, feedback, preflight, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.app.verify import verify  # noqa: E402
 from aisef2.arch.enums import ControlProjection, Enforcement, Owner  # noqa: E402
@@ -758,6 +758,79 @@ class Command(Temp):
         code, _, err = self.cli("--verify", "--project", str(self.tmp / "p.json"), "--out", str(self.tmp))
         self.assertEqual(code, 2)
         self.assertIn("aisef run: refused: not a project bundle", err)
+
+
+# --------------------------------------------------------------------------------------------- B1 survivor kills
+
+class B1SurvivorKills(Temp):
+    """Release gate B1: exact-value assertions on paths the surviving mutants corrupt — the dollar ceiling
+    (client.Budget.reached), the fence declaration client.session persists, and the no-progress note's own line
+    in the developer retry prompt."""
+
+    def test_the_dollar_ceiling_is_reached_at_its_value_with_the_exact_reason(self):
+        (self.tmp / "s.jsonl").write_text(step(100, 10) + "\n", encoding="utf-8")
+        prices = {"input_per_mtok": 1e6, "cache_read_per_mtok": 0, "cache_write_per_mtok": 0, "output_per_mtok": 0}
+        # cost = session input 100 + (base 10 + inherited 0) input, priced at 1 per token = 110.0
+        at = client.Budget(BUDGET, dict(BASE), self.tmp, lambda: 1, prices=prices, max_cost=110.0)
+        self.assertEqual(at.reached(), "max_cost: 110.0 of 110.0")
+        under = client.Budget(BUDGET, dict(BASE), self.tmp, lambda: 1, prices=prices, max_cost=110.000001)
+        self.assertIsNone(under.reached())
+
+    def test_the_fence_declaration_and_the_permission_json_are_exact(self):
+        exe = self.tmp / "opencode"
+        exe.write_bytes(b"#!/bin/sh\nexit 0\n")
+        budget = client.Budget({k: 9 for k in client.Budget.KEYS}, {k: 0 for k in client.Budget.KEYS}, self.tmp / "logs")
+        seen = {}
+
+        class Range:        # the stand-in process range of tests/v2/test_v22_client_pin_fence.py, reproduced here
+            def __init__(self, name, argv, cwd, env, output):
+                seen["env"] = env
+
+            def start(self):
+                pass
+
+            def wait(self, timeout):
+                return 0
+        wt = str(self.tmp / "wt")
+        with mock.patch.object(client, "ProcessRange", Range), \
+                mock.patch.object(client, "_release_session", return_value=[]):
+            s = client.session("s", "p", wt, self.tmp / "logs" / "s.jsonl", 5.0,
+                               model="prov/m", env={"PATH": "/nowhere"}, budget=budget, turn_cap=3, exe=str(exe),
+                               fence={"external_directory": "workspace-only", "xdg": "run-scoped",
+                                      "output_token_max": 64000, "allow": ("/out/repo",)})
+        self.assertEqual(s["fence"],
+                         "external_directory=workspace-only xdg=run-scoped output_token_max=64000 "
+                         "(declared to the client via its environment; enforcement is the client's own and is "
+                         "NOT measured by this run)")
+        self.assertEqual(seen["env"]["OPENCODE_PERMISSION"],
+                         json.dumps({"external_directory": {"*": "deny", wt: "allow", f"{wt}/**": "allow",
+                                                            "/out/repo": "allow", "/out/repo/**": "allow"}},
+                                    sort_keys=True))
+
+    def test_the_no_progress_note_ends_its_own_line_in_the_retry_prompt(self):
+        e2e.make_repo(self.tmp / "repo")
+        project = bundle.load(e2e.project_bundle("a" * 40))
+        events = [types.SimpleNamespace(seq=q, type=t, data=d) for q, t, d in (
+            (1, "story/begin", {"story_id": "S1"}),
+            (2, "failure/observed", {"story_id": "S1", "code": "X", "owner": "DEVELOPER", "detail": "same"}),
+            (3, "story/retry", {"story_id": "S1"}),
+            (4, "story/begin", {"story_id": "S1"}),
+            (5, "failure/observed", {"story_id": "S1", "code": "X", "owner": "DEVELOPER", "detail": "same"}),
+            (6, "story/retry", {"story_id": "S1"}))]
+        run = types.SimpleNamespace(events=events, state=lambda proj: {"S1": {"attempt": 2}}
+                                    if proj is ControlProjection.STORY_STATE else None)
+        prompts = []
+
+        def fake(name, prompt, cwd, log, timeout_s, **kw):
+            prompts.append(prompt)
+            return {"exit": 0, "timed_out": False, "stopped": None, "started": True, "error": None, "text": "",
+                    "turns": 1, "tokens": {"input": 1, "output": 1}, "seconds": 0.0, "log": log.name}
+        dev = ad.Developer(run, project, self.tmp / "logs", {}, 5)
+        with mock.patch.object(client, "session", fake):
+            dev.implement("S1", ("C-ADD",), str(self.tmp / "repo"))
+        note = feedback.no_progress_note([(e.seq, e.type, e.data) for e in events], "S1")
+        self.assertTrue(note)
+        self.assertTrue(prompts[0].endswith(f"{note}\nFix the implementation."))
 
 
 if __name__ == "__main__":

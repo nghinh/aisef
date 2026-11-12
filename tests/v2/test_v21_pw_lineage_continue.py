@@ -572,5 +572,36 @@ class WhatTheLineageHolds(Continuation):
         self.assertEqual(report["already_continued_by"], {"run": str(self.tmp / "never-began"), "state": "UNBEGUN"})
 
 
+class B1SurvivorKills(Continuation):
+    """B1 mutation survivors: the operator-facing text of `_record`'s refusals is part of the contract — the diagnosis
+    and the what-to-do tail, not only the typed code (mutants emptied these strings with no assertion noticing)."""
+
+    def test_the_missing_record_refusal_tells_the_operator_what_to_do(self):
+        # neither RUN.json nor RUN.started.json: the tail after the record names is pinned (bundle_cli L871)
+        run = self.run_dir(self.delivered(), record=False)
+        (run / R.STARTED).unlink()
+        err = self.refused(run)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MISSING", str(err))
+        self.assertIn(" is there) — nothing identifies the run; run the bundle itself again", str(err))
+
+    def test_the_cut_record_refusal_names_the_diagnosis_and_what_to_do(self):
+        # only a cut RUN.started.json: the diagnosis and the same tail are pinned (bundle_cli L869)
+        run = self.run_dir(self.delivered(), record=False)
+        (run / R.STARTED).write_text('{"format": "aisef-v2-run-rec', encoding="utf-8")
+        err = self.refused(run)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MALFORMED", str(err))
+        self.assertIn(" cut: not JSON) — nothing identifies the run; run the bundle itself again", str(err))
+
+    def test_the_unreadable_record_refusal_says_it_cannot_be_read(self):
+        # a directory in RUN.json's place (no permission mode needed, so as root too): the phrase naming what the
+        # record is — unreadable — is pinned (bundle_cli L855)
+        run = self.run_dir(self.delivered())
+        (run / "RUN.json").unlink()
+        (run / "RUN.json").mkdir()
+        err = self.refused(run)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_UNREADABLE", str(err))
+        self.assertIn(" cannot be read (", str(err))
+
+
 if __name__ == "__main__":
     unittest.main()

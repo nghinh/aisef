@@ -159,6 +159,46 @@ class Refusals(Tool):
         self.assertIn("HEAD", str(c.exception))
 
 
+class B1SurvivorKills(Tool):
+    """B1 mutation survivors in `seal`'s G7 problem lines: the except tuple of the requirements loop and the locator and
+    separator literals of each problem line (`<path>[<i>] (id ...): <Cause>: <detail>`) in the requirements, contracts
+    and approvals loops. Pins aisef2/app/bundle_cli.py::seal [553, 554, 567, 614]."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.d = self.example("calc-1-story")
+
+    def authoring(self) -> dict:
+        return json.loads((self.d / "authoring.json").read_text(encoding="utf-8"))
+
+    def refused(self, a, **kw) -> str:
+        with self.assertRaises(bundle.BundleError) as c:
+            bundle_cli.seal(a, repo=self.d / "repo", **kw)
+        return str(c.exception)
+
+    def test_a_requirement_the_kernel_refuses_is_still_a_bundle_error(self):
+        a = self.authoring()
+        a["requirements"][0]["text"] = 5          # Requirement.create: ContractError, a ValueError, never re-raised bare
+        self.assertIn("ContractError", self.refused(a))
+
+    def test_a_requirement_problem_line_is_locator_then_cause_then_detail(self):
+        a = self.authoring()
+        a["requirements"][0]["extra"] = 1                   # Requirement.create(**r): TypeError
+        self.assertRegex(self.refused(a), r"\$\.requirements\[0\][^:]*: TypeError: ")
+
+    def test_a_contract_problem_line_is_locator_then_cause_then_detail(self):
+        a = self.authoring()
+        a["contracts"][0]["subject"] = {"locator": "app.calc:add"}      # KeyError: 'kind'
+        self.assertRegex(self.refused(a), r"\$\.contracts\[0\][^:]*: KeyError: ")
+
+    def test_an_approval_problem_line_closes_its_locator_before_the_detail(self):
+        doc, _ = bundle_cli.seal(self.authoring(), repo=self.d / "repo")
+        old = bundle_cli.approve(doc, "BC-ADD", "human:t", 1.0)
+        message = self.refused(self.authoring(), approvals=[{**old["approvals"][0], "approved_at": "x"}],
+                               exposed=bundle_cli.exposure_of(old))
+        self.assertIn("($.approvals[0]): ", message)
+
+
 class Schema(unittest.TestCase):
     """docs/v2.1/bundle-authoring.schema.json names exactly the keys the tool accepts (it documents; the tool decides)."""
 

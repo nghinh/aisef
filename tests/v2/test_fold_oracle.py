@@ -286,5 +286,31 @@ class Authority(unittest.TestCase):
             again.writer.close()
 
 
+class B1SurvivorKills(unittest.TestCase):
+    def test_an_unarmed_append_refusal_names_invariant_VI(self):
+        """B1 survivors fold.py L148 InvariantId.VI->{I..V,VII..IX}: the unarmed refusal decision is the same for
+        any id, so the kill pins the typed InvariantError.invariant carried by Authority.append's refusal. The test
+        tier arms this process, so the unarmed path only exists in a fresh interpreter."""
+        code = (
+            "import sys; sys.path.insert(0, sys.argv[1])\n"
+            "import pathlib, tempfile\n"
+            "from aisef2.arch.enums import EventType as T\n"
+            "from aisef2.errors import InvariantError\n"
+            "from aisef2.journal.fold import Authority\n"
+            "from aisef2.journal.projections import PROJECTIONS\n"
+            "from aisef2.journal.writer import JournalWriter\n"
+            "d = pathlib.Path(tempfile.mkdtemp(prefix='aisef2-unarmed-'))\n"
+            "a = Authority(JournalWriter(d / 'j.jsonl', clock=lambda: 0.0), PROJECTIONS.values())\n"
+            "try:\n"
+            "    a.append(T.RUN_BEGIN, {'journal_format': 'aisef-v2-journal/2', 'run_id': 'x'})\n"
+            "    print('APPENDED')\n"
+            "except InvariantError as e:\n"
+            "    print('REFUSED', e.invariant)\n"
+        )
+        p = subprocess.run([sys.executable, "-c", code, str(ROOT)], capture_output=True, encoding="utf-8",
+                           cwd=str(ROOT), timeout=120)
+        self.assertEqual((p.returncode, p.stdout.strip()), (0, "REFUSED VI"), p.stderr[-2000:])
+
+
 if __name__ == "__main__":
     unittest.main()

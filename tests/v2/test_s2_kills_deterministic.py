@@ -126,5 +126,31 @@ class BudgetSpend(unittest.TestCase):
         self.assertTrue(entry[:entry.index(raw)].strip())   # that prepended reason is non-empty text, not just spacing
 
 
+class B1SurvivorKills(unittest.TestCase):
+    """B1 survivors on aisef2.app.client.Budget.spend L170 (`out["cost"], out["max_cost"] = self._cost(logs, live),
+    self.max_cost`): with an operator dollar ceiling set, the spend carries the run's cost and the ceiling under
+    exactly those keys. One case kills all six — the four element drops (ValueError/TypeError when the branch runs),
+    'cost' emptied (KeyError on spent['cost']) and 'max_cost' emptied (KeyError on spent['max_cost']). Deterministic
+    like the rest of the file: an in-memory listing, the session readings given, not read from disk."""
+
+    PRICES = {"currency": "USD", "input_per_mtok": 1.0, "cache_read_per_mtok": 0.1, "cache_write_per_mtok": 1.25,
+              "output_per_mtok": 5.0, "source": "test", "effective_date": "2026-11-04"}
+    LIMITS = {"provider_requests": 9, "turns": 99, "input_tokens": 10 ** 9, "output_tokens": 10 ** 9}
+
+    def test_cost_and_the_ceiling_land_under_their_own_keys(self):
+        from aisef2.app import usage
+        # 2,000,000 input @ $1/Mtok + 100,000 output @ $5/Mtok = $2.50
+        tokens = {"input": 2_000_000, "cache_read": 0, "cache_write": 0, "output": 100_000, "reasoning": 0}
+        b = client.Budget(self.LIMITS, dict.fromkeys(self.LIMITS, 0), Listing(("s.jsonl",)), lambda: 1,
+                          prices=self.PRICES, max_cost=10.0)
+        with mock.patch.object(client, "read_session", lambda p: reading(1, 2_000_000, 100_000, 0)), \
+                mock.patch.object(usage, "session_tokens",
+                                  lambda p: {"tokens": dict(tokens), "steps": 1, "steps_without_tokens": 0}):
+            spent = b.spend()
+        self.assertEqual(spent["unaccounted"], [])   # the premise: a clean reading, so the cost is a number
+        self.assertEqual(spent["cost"], 2.5)
+        self.assertEqual(spent["max_cost"], 10.0)
+
+
 if __name__ == "__main__":
     unittest.main()

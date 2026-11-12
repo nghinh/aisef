@@ -650,9 +650,13 @@ class FailClosed(unittest.TestCase):
     def test_an_undeclared_change_is_said_in_the_report_as_such(self):
         with with_entry(capability_changes={2: fa.CAPABILITY_CHANGES[2]}):
             _, report = bundle_cli.migrate(era_bundle())
-        [change] = next(c for c in report["semantic_changes"] if c["contract"] == "BC-EXISTS-REQ")["changes"]
+        row = next(c for c in report["semantic_changes"] if c["contract"] == "BC-EXISTS-REQ")
+        [change] = row["changes"]
         self.assertEqual(change["version"], 3)
-        self.assertIn("no well formed record", change["summary"])
+        self.assertEqual(change["summary"], f"{fa.PROBE_ID} capability 3 declares no well formed record of what it "
+                                            "changed (CAPABILITY_CHANGES)")
+        # the consulted record of the undeclared version keeps its exact shape: every key, each explicitly null
+        self.assertEqual(row["consulted"][-1], {"version": 3, "summary": None, "selectors": None})
 
     def test_a_probe_that_is_not_the_one_the_release_used_cannot_be_compared(self):
         release = release_with(1, probe_id="probe.file_artifact_of_the_past", digest="cd" * 32)
@@ -660,7 +664,9 @@ class FailClosed(unittest.TestCase):
             _, report = bundle_cli.migrate(era_bundle("r"))
         self.assertEqual({r["contract"] for r in report["approvals_withheld"]}, self.FILE_ARTIFACT)
         [change] = next(c for c in report["semantic_changes"] if c["contract"] == "BC-EXISTS-REQ")["changes"]
-        self.assertIn("not comparable", change["summary"])
+        self.assertEqual(change["summary"],
+                         "the release evaluated this contract with probe.file_artifact_of_the_past and this one with "
+                         f"{fa.PROBE_ID}: their capabilities are not comparable")
 
     def test_each_fail_closed_change_row_is_the_whole_report_structure(self):
         """A fail-closed row is what the report hands the owner to justify a withheld approval (semantic_changes, and
@@ -910,6 +916,53 @@ class TheOldBundleMustBeOne(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertIn("refused", err)
             self.assertFalse((t / "new.json").exists())
+
+
+class B1SurvivorKills(unittest.TestCase):
+    """Kill tests for B1 mutation survivors: list-typed declarations are taken, and kept-grounds rows split by the
+    release each approval was read from."""
+
+    def test_affects_and_selector_sequences_may_be_lists_not_only_tuples(self):
+        """`_declared` documents `affects` and the selector sequences as tuple-or-list; every other fixture uses
+        tuples, so the list half of each isinstance is pinned here."""
+        e = next(x for x in catalog.CATALOG if x.probe_id == fa.PROBE_ID)
+        sel = {"classes": ("grep_count",), "when": "w", "before": "b", "after": "a"}
+        self.assertIsNotNone(bundle_cli._declared(dataclasses.replace(
+            e, capability_changes={3: {"summary": "s", "affects": [sel]}}), 3))     # affects as a list is accepted
+        self.assertIsNotNone(bundle_cli._declared(dataclasses.replace(
+            e, capability_changes={3: {"summary": "s", "affects": ({**sel, "classes": ["grep_count"]},)}}), 3))
+
+    def test_kept_grounds_split_by_the_release_the_approval_was_read_from(self):
+        """Two kept contracts of the same probe, class and subject_absence whose approvals were read from DIFFERENT
+        releases get one grounds row each, each naming its own release — never merged under the first's."""
+        def exists_contract(cid: str, locator: str) -> BehaviorContract:
+            return BehaviorContract.create(id=cid, requirement_ids=(REQ.id,), subject=Subject(FA, locator),
+                                           stimulus={}, observable={"condition": "exists", "within_s": 30},
+                                           polarity=Polarity.MUST_HOLD, subject_absence=REQUIRES, rationale=f"fixture {cid}")
+        a = exists_contract("BC-EXISTS-OF-2000", "path:pkg/mod.py")
+        b = exists_contract("BC-EXISTS-OF-R", "path:pkg/other.py")
+        with mock.patch.dict(bundle_cli.RELEASES, {"r": release_with(1)}):
+            refs = {k: bundle_cli.ProbeRef(e.probe_id, e.probe_digest) for k, e in catalog.active().items()}
+            obligations, facts = [], {}
+            for c, release in ((a, "2.0.0"), (b, "r")):
+                sid = bundle_cli._earlier(bundle_cli._mint(c, refs[FA]), bundle_cli.RELEASES[release])
+                crit = f"C-{c.id[3:]}"
+                obligations.append(PlanObligation(crit, sid, "S1", ObligationRole.INTRODUCE,
+                                                  EXPECTED_AT_PARENT[ObligationRole.INTRODUCE], (), f"S1 introduces {crit}"))
+                facts[crit] = {"requirement": REQ.id, "section": "1", "clause": "1.1", "clause_text": REQ.text,
+                               "subject": c.subject.locator}
+            plan = Plan.create(id="PLAN-FIXTURE", baseline="a" * 40, obligations=tuple(obligations),
+                               plan_quality_policy=NOT_PREREGISTERED)
+            approvals = [ContractApproval(REQ.id, REQ.requirement_hash, c.id, c.contract_hash, "human:fixture-owner",
+                                          100.0 + n, ()) for n, c in enumerate((a, b))]
+            doc = B.dump(name="fixture", description="a bundle approved under two releases",
+                         requirements_path="docs/requirements.md", requirements_sha256=HEX, product_roots=("pkg",),
+                         requirements=(REQ,), contracts=(a, b), approvals=approvals, plan=plan, facts=facts,
+                         stories={"S1": {"depends_on": [], "tests": ["tests/test_pkg.py"]}})
+            _, report = bundle_cli.migrate(doc)
+        rows = [r for r in report["approvals_kept_grounds"] if set(r["contracts"]) & {a.id, b.id}]
+        self.assertEqual({(r["from"]["release"], tuple(r["contracts"])) for r in rows},
+                         {("2.0.0", (a.id,)), ("r", (b.id,))})
 
 
 if __name__ == "__main__":

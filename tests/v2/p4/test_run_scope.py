@@ -20,6 +20,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.arch.enums import Enforcement, EventType as T  # noqa: E402
+from aisef2.errors import InvariantError  # noqa: E402
+from aisef2.invariants import registry  # noqa: E402
 from aisef2.journal.format2 import ResourceKind as K  # noqa: E402
 from aisef2.journal.format3 import reconstruct  # noqa: E402 — every format, each read as written
 from aisef2.runtime import run_scope as rs, sentinel  # noqa: E402
@@ -334,6 +336,19 @@ class Lifetime(unittest.TestCase):
         self.assertEqual(sentinel.residuals(text + '{"torn'), (
             f"torn tail after seq {len(r.events) - 1}", "S1: SESSION s FAILED: OSError: gone",
             f"S1: provider/request at seq {req.seq} has no result"))
+
+
+class B1SurvivorKills(unittest.TestCase):
+    """ROADMAP-2.2 B1: kill tests for mutation survivors (run_scope.py L112, the require_armed guard of begin)."""
+
+    def test_an_unarmed_begin_refuses_and_attributes_the_refusal_to_invariant_II(self):
+        with tempfile.TemporaryDirectory(prefix="aisef2-run-") as d:
+            r = RunScope(pathlib.Path(d), "run-unarmed", spec=spec, clock=lambda: 1.0)
+            with mock.patch.object(registry, "_ARMED", {}), mock.patch.object(registry, "_RUNTIME_ARMED", None):
+                with self.assertRaises(InvariantError) as cm:
+                    r.begin()
+            self.assertEqual(cm.exception.invariant, "II")  # Semantic Determinism, not any sibling invariant
+            self.assertEqual(r.trace, [])  # refused before the lease: nothing read, nothing written
 
 
 if __name__ == "__main__":
