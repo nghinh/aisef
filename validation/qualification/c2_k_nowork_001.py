@@ -291,18 +291,12 @@ def measured_before_the_ruling() -> dict:
             "ended": [e["type"] for e in mine if e["type"] in ("story/commit", "story/rollback")]}
 
 
-def write() -> dict:
-    """Measures and writes the v2.1 record to a new file; an existing file, the 2.0 path or a bound file missing from this
-    tree (the v2.1 plan correction comes first) is refused before anything runs."""
+def _derive() -> dict:
+    """The record body measured FRESH on this tree — the BEFORE kernel materialised and measured, this tree measured —
+    with problems and verdict derived; no seconds, no file I/O. Shared by write() (v2.1, refusals first) and
+    record_v22() (the version-forward round), so both rounds are ONE derivation with one strictness."""
     from validation.qualification import c2_plan_correction as pc
-    path = ROOT / V21_OUT_REL
-    if path.resolve() == (ROOT / OUT_REL).resolve() or path.exists():
-        raise SystemExit(f"refused: {V21_OUT_REL} exists or is the 2.0 record")
-    missing = _missing(_bound())
-    if missing:
-        raise SystemExit(f"refused: bound but not on this tree: {missing}")
     rp = _rp()
-    started = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="aisef2-kernel-before-k-nowork-") as t:
         old_root = pathlib.Path(t)
         old = rp.materialise(BEFORE, old_root)
@@ -365,6 +359,20 @@ def write() -> dict:
     }
     rec["problems"] = problems(rec)
     rec["verdict"] = "REPRODUCED AND CORRECTED" if not rec["problems"] else "PROBLEMS"
+    return rec
+
+
+def write() -> dict:
+    """Measures and writes the v2.1 record to a new file; an existing file, the 2.0 path or a bound file missing from this
+    tree (the v2.1 plan correction comes first) is refused before anything runs."""
+    path = ROOT / V21_OUT_REL
+    if path.resolve() == (ROOT / OUT_REL).resolve() or path.exists():
+        raise SystemExit(f"refused: {V21_OUT_REL} exists or is the 2.0 record")
+    missing = _missing(_bound())
+    if missing:
+        raise SystemExit(f"refused: bound but not on this tree: {missing}")
+    started = time.monotonic()
+    rec = _derive()
     rec["seconds"] = round(time.monotonic() - started, 1)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x", encoding="utf-8", newline="\n") as f:
@@ -474,10 +482,12 @@ def _record_problems(rec: dict) -> list[str]:
 
 
 def record_v22() -> dict:
-    """The v2.2 supersession body: the v2.1 record's tree-derivation (it is current on this tree — check() verifies it),
-    forwarded to the v2.2 round with volatile fields dropped so the record is a function of the tree alone."""
-    rec = json.loads((ROOT / V21_OUT_REL).read_text(encoding="utf-8"))
-    return {k: v for k, v in rec.items() if k not in ("seconds", "platform")}
+    """The v2.2 record body measured FRESH on this tree via _derive() (owner F3: the stale v2.1 record is never reused,
+    rewritten or overwritten); the volatile platform field dropped so the record is a function of the tree alone."""
+    missing = _missing(_bound())
+    if missing:
+        raise SystemExit(f"refused: bound but not on this tree: {missing}")
+    return {k: v for k, v in _derive().items() if k != "platform"}
 
 
 def write_v22() -> tuple[int, str]:

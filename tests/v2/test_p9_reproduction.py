@@ -469,5 +469,25 @@ class KernelComparison(unittest.TestCase):
         self.assertEqual(self.M.check_v22(), [])
 
 
+class ArmRuntimeCompat(unittest.TestCase):
+    """Owner VERSION-FORWARD QUALIFICATION #4 harness-defect fix at q5._arm (F2): re-executing a frozen pre-A1 kernel —
+    the materialised v2.0.0 registry has no arm_runtime — must run it unarmed as it ran historically, not die at the
+    import that measured every Q5 item's v2.0.0 side empty; a kernel WITH arming is still armed exactly once."""
+
+    def test_a_pre_A1_kernel_without_arm_runtime_runs_unarmed_not_crashed(self):
+        import types
+        stub = types.ModuleType("aisef2.invariants.registry")   # the v2.0.0 registry: no arm_runtime attribute
+        with mock.patch.dict(sys.modules, {"aisef2.invariants.registry": stub}):
+            q5._arm()   # must not raise — the pre-A1 kernel ran historically unarmed
+
+    def test_a_kernel_with_arming_is_armed_exactly_once(self):
+        import types
+        stub = types.ModuleType("aisef2.invariants.registry")
+        stub.arm_runtime = mock.Mock(name="arm_runtime")
+        with mock.patch.dict(sys.modules, {"aisef2.invariants.registry": stub}):
+            q5._arm()
+        stub.arm_runtime.assert_called_once_with()
+
+
 if __name__ == "__main__":
     unittest.main()

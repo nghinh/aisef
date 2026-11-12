@@ -657,6 +657,18 @@ def pinned_git_dates():
                 os.environ[k] = v
 
 
+def _arm() -> None:
+    """Arm the IMPORTED kernel's runtime when it has arming — owner VERSION-FORWARD QUALIFICATION #4: harness-defect
+    fix (proven for K-NOWORK's BEFORE rehearsal, c2_k_nowork_001; the same defect here). The materialised v2.0.0
+    kernel predates wave-1 A1 runtime arming (arm_runtime added be7b1700) and ran historically unarmed with no
+    unarmed-process guard, so re-executing it must not assume arm_runtime; the current kernel is armed as before."""
+    try:
+        from aisef2.invariants.registry import arm_runtime
+    except ImportError:
+        return
+    arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process (current kernel)
+
+
 def execute(item: Item, mode: str, *, ledger: list[dict] | None = None, variant: str | None = None, keep_dir: pathlib.Path | None = None) -> dict:
     """One real execution of an item: `record` answers the model requests from the item's script and records them;
     `replay` answers them from `ledger`. Everything else executes for real either way. Returns the observation:
@@ -707,8 +719,7 @@ def execute(item: Item, mode: str, *, ledger: list[dict] | None = None, variant:
             limits = {o: item.limits.get(o.value, 1) for o in Owner}
             spec_fn = lambda: resolve(caps, {"limits": {"value": {o.value: n for o, n in limits.items()}, "layer": "item"},   # noqa: E731
                                             "corpus_item": {"value": item.id, "layer": "corpus"}}, base)
-            from aisef2.invariants.registry import arm_runtime
-            arm_runtime()   # ROADMAP-2.2 A1: a run begins only in an armed process
+            _arm()   # ROADMAP-2.2 A1: a run begins only in an armed process (a pre-A1 kernel ran unarmed; see _arm)
             run = RunScope(tmp / "run", f"q5-{item.id}", spec=spec_fn)          # the real clock
             run.begin()
             cap_id = {"name": "model-stream", "grade": "VERIFIED", "developer": next(c.tuple_["digest"] for c in caps if c.name == "developer"),
