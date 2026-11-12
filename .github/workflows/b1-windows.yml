@@ -10,6 +10,9 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 150
     steps:
+      - name: force LF checkout (byte-identical tree; the manifest binds raw LF bytes)
+        shell: bash
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
