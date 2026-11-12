@@ -166,7 +166,7 @@ class CommittedRuling(unittest.TestCase):
     def test_the_committed_ruling_is_what_this_tree_derives(self):
         """Red until the ruling is generated on the final 2.1 tree and committed (the lead's step); then any change to a
         file it names, to its reasons or to the Q5 data it carries makes it stale."""
-        self.assertEqual(R.check(), [])
+        self.assertEqual(R.check_version_forward(), [])
         self.assertTrue(R.tolerated(), f"{R.OUT_REL} is not committed as it is")
 
 

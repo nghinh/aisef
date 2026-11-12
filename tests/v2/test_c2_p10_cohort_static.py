@@ -101,7 +101,7 @@ class Record(unittest.TestCase):
     @sealing
     def test_the_evidence_record_re_derives_from_the_tree(self):
         from validation.qualification import c2_p10_cohort as B
-        self.assertEqual(B.check(), [])
+        self.assertEqual(B.check_version_forward(), [])
         rec = json.loads((ROOT / B.OUT_REL).read_text(encoding="utf-8"))
         self.assertEqual((rec["verdict"], rec["census"]["cohort_count"], rec["census"]["cohort_records"]),
                          ("machinery qualified; cohort count = 0", 0, []))

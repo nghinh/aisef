@@ -59,7 +59,7 @@ class PlanCorrection(unittest.TestCase):
     def test_the_committed_record_is_what_this_tree_derives(self):
         """B-03a: the committed v2.1 record is what this tree derives, exactly; the 2.0 record (made on the 2.0 kernel)
         is history — its blob is tag v2.0.0's, its verdict the recorded one."""
-        self.assertEqual(pc.check(), [])
+        self.assertEqual(pc.check_v22(), [])
         self.assertEqual(pc.record_v21(self.b)["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")
         self.assertEqual(pc.history_problems(), [])
         self.assertEqual(json.loads((ROOT / pc.OUT_REL).read_text(encoding="utf-8"))["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")

@@ -197,7 +197,7 @@ class Checker(unittest.TestCase):
     @sealing
     def test_the_evidence_record_re_derives(self):
         from validation.qualification import c2_p10_profile as B
-        self.assertEqual(B.check(), [])
+        self.assertEqual(B.check_version_forward(), [])
         rec = json.loads((ROOT / B.OUT_REL).read_text(encoding="utf-8"))
         self.assertEqual((rec["verdict"], rec["live_provider_calls"]), ("attestation qualified", 0))
         self.assertEqual({c["id"]: c["grade"] for c in rec["classifications"] if c["id"].startswith("FIX-")}, {

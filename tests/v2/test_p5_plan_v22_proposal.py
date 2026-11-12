@@ -144,9 +144,7 @@ class Record(unittest.TestCase):
         # 2.0 record and its document are history: their v2.0.0 blobs, as recorded (p5_acceptance.proposal_history_problems)
         from validation.qualification import p5_acceptance as PA
         self.assertEqual(PA.proposal_history_problems(), [])
-        currency = PA.v21_proposal_currency()
-        self.assertTrue(currency["current"], currency)
-        self.assertEqual(currency["differing_paths"], [])
+        self.assertEqual(PA.check_v22_proposal(), [])
         # both facts hold, so the 2.0 record and document are stale on this tree as history is: those two messages only
         stale = {f"{rel} is not what the authoring aid derives from this tree" for rel in (A.OUT_REL, A.DOC_REL)}
         found = [p for p in A.check() if p not in stale]

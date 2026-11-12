@@ -258,7 +258,7 @@ class Record(unittest.TestCase):
         """B-03a: the v2.1 record binds this tree (and the v2.1 plan correction); the 2.0 record is history — its blob
         is tag v2.0.0's, its verdict and problems the recorded ones."""
         from validation.qualification import c2_k_nowork_001 as kn
-        self.assertEqual(kn.check(), [])
+        self.assertEqual(kn.check_v22(), [])
         self.assertIn("closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json", kn.BOUND)
         self.assertEqual(kn.history_problems(), [])
 

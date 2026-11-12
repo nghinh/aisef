@@ -448,12 +448,76 @@ def check() -> list[str]:
     return out + history_problems()
 
 
+# --- v2.2 version-forward adapter (C4). The legacy check()/write() / V21_OUT_REL path above is byte-for-byte unchanged,
+#     so v2.1 historical verification is untouched; only record SELECTION (round) differs for the v2.2 round. ---
+V22_OUT_REL = "closure-evidence/v2/v2.2/K-NOWORK-001-REHEARSAL.json"
+
+
+def _record_problems(rec: dict) -> list[str]:
+    """The exact validity checks check() runs on V21_OUT_REL, factored so check_v22() applies the SAME strictness to the
+    version-forward record. (check() itself is left unchanged.)"""
+    from validation.qualification import c2_plan_correction as pc
+    out = [] if rec.get("verdict") == "REPRODUCED AND CORRECTED" and not rec.get("problems") else [f"the record's verdict is {rec.get('verdict')}"]
+    out += problems(rec)
+    bound = _bound()
+    out += [f"{rel} changed since the record" for rel, sha in bound.items() if rec["bound"].get(rel) != sha]
+    out += [f"{rel} is bound but not on this tree" for rel in _missing(bound)]
+    if rec["measured_before_the_ruling"] != measured_before_the_ruling():
+        out.append("the real run's rows differ from the record")
+    if rec.get("history") != _history():
+        out.append(f"the 2.0 record it names as history is not {OUT_REL} on this tree")
+    if rec.get("kernel", {}).get("after", {}).get("kernel_digest") != _rp().kernel_digest(ROOT / "aisef2"):
+        out.append("the kernel changed since the record: kernel.after.kernel_digest is not this tree's aisef2")
+    if rec.get("requalification") != pc.V21_AUTHORITY:
+        out.append("the record's requalification is not the B-03a authority")
+    return out
+
+
+def record_v22() -> dict:
+    """The v2.2 supersession body: the v2.1 record's tree-derivation (it is current on this tree — check() verifies it),
+    forwarded to the v2.2 round with volatile fields dropped so the record is a function of the tree alone."""
+    rec = json.loads((ROOT / V21_OUT_REL).read_text(encoding="utf-8"))
+    return {k: v for k, v in rec.items() if k not in ("seconds", "platform")}
+
+
+def write_v22() -> tuple[int, str]:
+    """Append the v2.2 supersession of V21_OUT_REL (append-only; the legacy v2.1 record is never rewritten). Refused with
+    a problem unless the v2.1 record is current on this tree."""
+    from validation.v2 import version_forward as vf
+    rec = record_v22()
+    if problems := _record_problems(rec):
+        raise SystemExit("refused: " + "; ".join(problems))
+    return vf.write_supersession(ROOT, V21_OUT_REL, V22_OUT_REL, rec,
+                                 render=lambda r: json.dumps(r, indent=1, ensure_ascii=False) + "\n")
+
+
+def check_v22() -> list[str]:
+    """Context-bound currency check for the current round (v2.2): the SAME validation as check(), applied to the v2.2
+    supersession selected by the version-forward API (no fallback)."""
+    from validation.v2 import version_forward as vf
+    try:
+        _p, rec = vf.resolve_upstream(ROOT, V21_OUT_REL, V22_OUT_REL)
+    except LookupError as e:
+        return [str(e)]
+    return _record_problems(rec) + history_problems()
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
+    g.add_argument("--write-v22", action="store_true")
+    g.add_argument("--check-v22", action="store_true")
     a = ap.parse_args(argv)
+    if a.write_v22:
+        rc, msg = write_v22()
+        print(msg)
+        return rc
+    if a.check_v22:
+        found = check_v22()
+        print("\n".join(f"FAIL  {x}" for x in found) if found else "PASS")
+        return 1 if found else 0
     if a.write:
         rec = write()
         print(f"{V21_OUT_REL}: {rec['verdict']} ({rec['seconds']} s)")

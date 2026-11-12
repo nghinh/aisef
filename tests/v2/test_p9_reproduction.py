@@ -466,7 +466,7 @@ class KernelComparison(unittest.TestCase):
     def test_Q5_19_the_kernel_comparison_record_binds_this_tree(self):
         """Red until the lead writes closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json (v21_q5_compare.py --write) on the
         final 2.1 kernel; then it fails whenever q5.py, the tool, the fixture helpers or the kernel move."""
-        self.assertEqual(self.M.check(), [])
+        self.assertEqual(self.M.check_v22(), [])
 
 
 if __name__ == "__main__":

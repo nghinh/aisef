@@ -67,7 +67,7 @@ class Acceptance(unittest.TestCase):
         # V2.1 (owner B-03a): the owner's 2.0 acceptance is history (its v2.0.0 blob, its verdict, the closed C2-P5 history,
         # the approvals never rewritten); the boundary re-derives on this tree as the v2.1 re-verification, exactly
         self.assertEqual(A.history_problems(), [])
-        self.assertEqual(A.reverification_problems(), [])
+        self.assertEqual(A.reverification_v22_problems(), [])
 
     def test_the_admission_holds_only_under_every_real_approval(self):
         doc = json.loads((A.ROOT / A.OUT_REL).read_text(encoding="utf-8"))
@@ -546,10 +546,8 @@ class KernelProvenance(unittest.TestCase):
         # V2.1 (owner B-03a): the admission engine moved (ProbeIdentityRebinding measures it), so the proposal current on
         # this tree is the v2.1 record — EXACTLY, with no kernel provenance, aid sha or probe-identity re-binding
         # tolerated; the accepted 2.0 proposal and its document are history (their v2.0.0 blobs, as recorded)
-        r = A.v21_proposal_currency()
-        self.assertTrue(r["current"], r)
+        self.assertEqual(A.check_v22_proposal(), [])
         self.assertEqual(A.proposal_history_problems(), [])
-        self.assertEqual(r["differing_paths"], [])
 
 
 class ProbeIdentityRebinding(unittest.TestCase):
