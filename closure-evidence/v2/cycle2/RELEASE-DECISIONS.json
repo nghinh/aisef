@@ -346,6 +346,35 @@
     "c2_package": "closure-evidence/v2/v2.2/V2.2-C2-COMPLETION.md; closure-evidence/v2/v2.2/V2.2-C2-DAG.json",
     "prior_directives": "owner 2026-11-07 VERSION-FORWARD QUALIFICATION (Option C) + C2 DAG RESOLUTION (5 decisions)"
    }
+  },
+  {
+   "seq": 9,
+   "id": "AISEF_V2_2_RELEASE_MUTATION_SCOPE_AMENDMENT",
+   "authority": "owner PARALLEL RELEASE UNBLOCK directive 2026-11-12 (chat), Lane C / B6: owner-approved scoped release policy decision",
+   "approver": "human:owner",
+   "decision": {
+    "RELEASE_MUTATION_GATE": "RISK-BASED (177 targets / 5896 mutants; closure-evidence/v2/v2.2/B1-RISK-MANIFEST.json, kernel ac7c1705 + registry 74eced90)",
+    "REPLACES": "completion of the frozen full 627-target mutation campaign as a release prerequisite",
+    "ORIGINAL_CAMPAIGN": "the 627-target campaign remains FROZEN/INCOMPLETE; all historical results unchanged",
+    "EVERY_TARGET_MEASURED": "every target in the new scope must receive a genuine measured outcome",
+    "NOT_RUN_NEVER_PASS": true,
+    "NO_UNRESOLVED_CRITICAL_HIGH_TRUST_DEFECTS": true,
+    "OTHER_GATES_UNCHANGED": "all other mandatory release gates remain unchanged"
+   },
+   "constraints": [
+    "paid/external execution of the risk-based manifest is separately gated (B1 execution plan)",
+    "the frozen 627-target campaign evidence, results and statuses are preserved unchanged",
+    "historical v2.1/cycle2 evidence remains immutable",
+    "no tag / publish / Đợt-3"
+   ],
+   "owner_text": "For AISEF v2.2, the 177-target / 5,896-mutant risk-based qualification is approved as the release mutation gate, replacing completion of the frozen full mutation campaign as a release prerequisite. The original 627-target campaign remains FROZEN/INCOMPLETE, with all historical results unchanged. Every target in the new scope must receive a genuine measured outcome. NOT_RUN is never PASS. Unresolved critical/high-risk trust defects are not accepted. All other mandatory release gates remain unchanged.",
+   "recorded_by": "engineering (appended on owner B6 approval; isolated RC branch c4-review-v22, not master)",
+   "basis": [
+    "closure-evidence/v2/v2.2/B1-RISK-MANIFEST.json",
+    "closure-evidence/v2/v2.2/B1-MUTATION-EXECUTION-PLAN.json",
+    "closure-evidence/v2/v2.2/RELEASE-MUTATION-SCOPE-AMENDMENT.json",
+    "closure-evidence/v2/v2.2/RELEASE-MUTATION-GATE-EVALUATION.json"
+   ]
   }
  ]
 }
