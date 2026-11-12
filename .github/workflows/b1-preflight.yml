@@ -1,0 +1,73 @@
+# B1 risk-based mutation gate — bounded PREFLIGHT (owner directive 2026-11-12, section B).
+# Measures the ACTUAL runner (CPU/RAM/disk/per-mutant seconds), verifies isolation (no opencode, scratch XDG),
+# baseline-green kill-tests, and whether the mutation runner's machinery works per OS. Nothing full-scale runs here;
+# the full tranche launches only if the projection from THIS job fits the owner's USD 30 cap.
+name: b1-preflight
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: environment facts + isolation guards
+        run: |
+          echo "nproc=$(nproc)"; free -h | sed -n '1,2p'; df -h . | tail -1; python3 -V
+          if command -v opencode; then echo "OPENCODE PRESENT — guard FAIL"; exit 1; fi
+          echo "opencode ABSENT on PATH (guard OK)"
+          git rev-parse HEAD HEAD:aisef2
+      - name: install
+        run: python3 -m pip install -e . --quiet
+      - name: baseline kill-tests green (authority + journal)
+        run: python3 -P -m unittest tests.v2.p4.test_run_scope tests.v2.test_fold_oracle -q
+      - name: bounded mutant sample (~23 mutants, authority+journal tranche)
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+          XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+          XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
+        run: |
+          mkdir -p "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+          t0=$(date +%s)
+          python3 -P validation/v2/mutation.py run \
+            aisef2/runtime/run_scope.py::RunLease.acquire \
+            aisef2/runtime/run_scope.py::RunLease.release \
+            aisef2/runtime/run_scope.py::RunScope._fail \
+            aisef2/journal/fold.py::_frozen \
+            aisef2/journal/fold.py::Folder.peek 2>&1 | tail -40
+          rc=$?
+          t1=$(date +%s)
+          echo "SAMPLE_SECONDS=$((t1-t0)) SAMPLE_MUTANTS=23 rc=$rc"
+          exit $rc
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: environment facts + isolation guards
+        shell: bash
+        run: |
+          python -V; df -h . 2>/dev/null | tail -1 || true
+          if command -v opencode; then echo "OPENCODE PRESENT — guard FAIL"; exit 1; fi
+          echo "opencode ABSENT on PATH (guard OK)"
+          git rev-parse HEAD HEAD:aisef2
+      - name: install
+        shell: bash
+        run: python -m pip install -e . --quiet
+      - name: tranche-C baseline — Win32-native liveness kill-tests must RUN green here
+        shell: bash
+        run: python -P -m unittest tests.v2.test_v22_win_native_liveness tests.v2.test_v22_win_oskill_is_gone -v 2>&1 | tail -12
+      - name: mutation-runner machinery smoke on Windows (t0 only; nothing written)
+        shell: bash
+        run: python -P validation/v2/mutation.py t0 aisef2/runtime/run_scope.py::RunLease.acquire 2>&1 | tail -12
