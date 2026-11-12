@@ -1,0 +1,58 @@
+# B1 INFRA re-measure (owner 2026-11-12, section B). Re-runs explicit targets whose first
+# measurement ended INFRA (SIGINT death on _second_interrupt_abandons L253 mutants; one flaky
+# fresh-tree re-measure on ProcessRange.members L490). Same harness, same guards — if the
+# SIGINT deaths reproduce, that is deterministic mutant-induced crash evidence for the owner
+# ruling, not flaky infrastructure. Minutes-scale job; outcomes never invented.
+name: b1-rerun
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: space-separated target list
+        required: true
+permissions:
+  contents: read
+jobs:
+  mutate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: isolation guards + facts
+        run: |
+          if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi
+          echo "opencode ABSENT (guard OK)"; nproc; df -h . | tail -1
+          git rev-parse HEAD HEAD:aisef2
+      - name: install
+        run: python3 -m pip install -e . --quiet
+      - name: bindings check (fail-closed, frozen manifest)
+        env:
+          TARGETS: ${{ inputs.targets }}
+        run: python3 -P validation/v2/b1_bindings_check.py $TARGETS
+      - name: re-measure
+        env:
+          TARGETS: ${{ inputs.targets }}
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+          XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+          XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
+        run: |
+          set -o pipefail
+          mkdir -p "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+          python3 -P validation/v2/mutation.py run $TARGETS 2>&1 | tee rerun.log | tail -60
+      - name: collect results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b1-rerun
+          if-no-files-found: warn
+          path: |
+            rerun.log
+            closure-evidence/v2/P*-MUTATION.json
+            closure-evidence/v2/cycle2/*-MUTATION.json
+            closure-evidence/v2/release/S2-MUTATION.json
+            closure-evidence/v2/v2.1/MUTATION.json
