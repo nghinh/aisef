@@ -1,0 +1,2064 @@
+{
+ "record": "AISEF v2.2 \u2014 B1 RISK-BASED RELEASE MUTATION MANIFEST (finalized; owner final-closure \u00a72)",
+ "status": "FROZEN SCOPE \u2014 NOT EXECUTED (no mutant run; paid execution separately gated)",
+ "date": "2026-11-12",
+ "frozen_bindings": {
+  "head": "b35ec9d7",
+  "aisef2_kernel_tree": "ac7c170531fc3db1698f062d0bac6d921651d962",
+  "registry_sha256": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
+  "registry_file": "aisef2/invariants/registry.py",
+  "baseline": "v2.1.0 @ 8c7bdb44 (aisef2 5f34a3f3)"
+ },
+ "tranches": {
+  "A_manifested_rc_bound": {
+   "targets": 150,
+   "mutants": 5603
+  },
+  "B_authority_journal_now_included": {
+   "targets": 24,
+   "mutants": 233,
+   "note": "run_scope.py (authority) + fold.py (journal): already in mutation.TARGETS with kill_tests, outside the 627-freeze; now enumerated \u2014 NOT excluded."
+  },
+  "C_h1h2_liveness_core": {
+   "targets": 3,
+   "mutants": 60,
+   "note": "_win_liveness/pid_alive/_is_gone: not previously targets; kill_tests bound to Win32-native liveness tests \u2014 REQUIRE a Windows runner (they skip off-Windows)."
+  }
+ },
+ "totals": {
+  "targets": 177,
+  "mutants": 5896
+ },
+ "targets": {
+  "aisef2/app/adapters.py::Developer.implement": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_context_pack.py"
+   ],
+   "mutants": 54
+  },
+  "aisef2/app/adapters.py::Reviewer.__init__": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_adapters.py",
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py"
+   ],
+   "mutants": 13
+  },
+  "aisef2/app/adapters.py::Reviewer._model": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_adapters.py",
+    "tests/v2/test_v21_r5_review_deep_input.py",
+    "tests/v2/test_v21_r5_linear_text.py"
+   ],
+   "mutants": 25
+  },
+  "aisef2/app/adapters.py::Reviewer._ocr": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_defects_ocr.py",
+    "tests/v2/test_v21_defects_ocrz.py",
+    "tests/v2/test_v21_kills3_A10.py",
+    "tests/v2/test_v21_kills3_T10a.py",
+    "tests/v2/test_v21_kills3_T10b.py",
+    "tests/v2/test_v21_kills3_T10c.py",
+    "tests/v2/test_v21_kills3_T10d.py",
+    "tests/v2/test_v21_kills3_R07.py",
+    "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+    "tests/v2/test_v21_ocr_gate.py",
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 308
+  },
+  "aisef2/app/adapters.py::Reviewer._verify": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_adapters.py",
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/app/adapters.py::Reviewer.review": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_kills_adapters.py",
+    "tests/v2/test_v21_r3_detail_artifact.py",
+    "tests/v2/test_v21_r5_review_deep_input.py",
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py"
+   ],
+   "mutants": 75
+  },
+  "aisef2/app/adapters.py::_bounded": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_TO3.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/app/adapters.py::_braces": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_v21_r5_linear_text.py",
+    "tests/v2/test_v21_kills_adapters.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/app/adapters.py::_declared": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_v21_ocr_gate.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_ocr_identity.py"
+   ],
+   "mutants": 15
+  },
+  "aisef2/app/adapters.py::_unchanged": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_adapters.py"
+   ],
+   "mutants": 16
+  },
+  "aisef2/app/adapters.py::attempt_of": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 15
+  },
+  "aisef2/app/adapters.py::tree_of": {
+   "source": "aisef2/app/adapters.py",
+   "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_adapters.py"
+   ],
+   "mutants": 13
+  },
+  "aisef2/app/bundle.py::Project.order": {
+   "source": "aisef2/app/bundle.py",
+   "source_sha256": "fe53fb6cb7ff3c804ce5589024802950afe7025292b2bda5da1d4362508a0a27",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills_k.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/app/bundle.py::_HEX64": {
+   "source": "aisef2/app/bundle.py",
+   "source_sha256": "fe53fb6cb7ff3c804ce5589024802950afe7025292b2bda5da1d4362508a0a27",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/app/bundle.py::_strings": {
+   "source": "aisef2/app/bundle.py",
+   "source_sha256": "fe53fb6cb7ff3c804ce5589024802950afe7025292b2bda5da1d4362508a0a27",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_bundle.py"
+   ],
+   "mutants": 14
+  },
+  "aisef2/app/bundle.py::load": {
+   "source": "aisef2/app/bundle.py",
+   "source_sha256": "fe53fb6cb7ff3c804ce5589024802950afe7025292b2bda5da1d4362508a0a27",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v22_authoring_lint.py"
+   ],
+   "mutants": 101
+  },
+  "aisef2/app/bundle.py::read": {
+   "source": "aisef2/app/bundle.py",
+   "source_sha256": "fe53fb6cb7ff3c804ce5589024802950afe7025292b2bda5da1d4362508a0a27",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_bundle.py"
+   ],
+   "mutants": 9
+  },
+  "aisef2/app/bundle.py::shape_problems": {
+   "source": "aisef2/app/bundle.py",
+   "source_sha256": "fe53fb6cb7ff3c804ce5589024802950afe7025292b2bda5da1d4362508a0a27",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_defects_bundleshape.py",
+    "tests/v2/test_v21_kills3_A24.py",
+    "tests/v2/test_v21_kills3_T24a.py"
+   ],
+   "mutants": 114
+  },
+  "aisef2/app/bundle_cli.py::APPROVAL_KEY": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/app/bundle_cli.py::AUTHORING_KEYS": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 9
+  },
+  "aisef2/app/bundle_cli.py::CONTRACT_KEYS": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 8
+  },
+  "aisef2/app/bundle_cli.py::CRITERION_KEYS": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/app/bundle_cli.py::EXAMPLES": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/app/bundle_cli.py::JournalRefused.__init__": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_pw_lineage_continue.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/app/bundle_cli.py::LIMITS": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/bundle_cli.py::RELEASES": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 46
+  },
+  "aisef2/app/bundle_cli.py::_INTEGRITY": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_pw_lineage_continue.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/app/bundle_cli.py::_assess": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 125
+  },
+  "aisef2/app/bundle_cli.py::_authentic": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_pw_lineage_continue.py"
+   ],
+   "mutants": 39
+  },
+  "aisef2/app/bundle_cli.py::_binds": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 9
+  },
+  "aisef2/app/bundle_cli.py::_closed": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_A04.py",
+    "tests/v2/test_v21_kills3_T04a.py"
+   ],
+   "mutants": 11
+  },
+  "aisef2/app/bundle_cli.py::_create": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/bundle_cli.py::_declared": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 60
+  },
+  "aisef2/app/bundle_cli.py::_earlier": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 7
+  },
+  "aisef2/app/bundle_cli.py::_earliest": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/app/bundle_cli.py::_exposure": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/app/bundle_cli.py::_ground": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 60
+  },
+  "aisef2/app/bundle_cli.py::_grounds": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 7
+  },
+  "aisef2/app/bundle_cli.py::_group": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 19
+  },
+  "aisef2/app/bundle_cli.py::_journal": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_pw_lineage_continue.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_T01b.py"
+   ],
+   "mutants": 48
+  },
+  "aisef2/app/bundle_cli.py::_key": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/app/bundle_cli.py::_known": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 14
+  },
+  "aisef2/app/bundle_cli.py::_mint": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 13
+  },
+  "aisef2/app/bundle_cli.py::_origins": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 8
+  },
+  "aisef2/app/bundle_cli.py::_read": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_T04a.py"
+   ],
+   "mutants": 7
+  },
+  "aisef2/app/bundle_cli.py::_record": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_pw_lineage_continue.py",
+    "tests/v2/test_v21_kills3_T01b.py"
+   ],
+   "mutants": 43
+  },
+  "aisef2/app/bundle_cli.py::_refs": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/bundle_cli.py::_selected": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/app/bundle_cli.py::_shell_word": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_defects_bundlecli.py",
+    "tests/v2/test_v21_kills3_R04.py"
+   ],
+   "mutants": 12
+  },
+  "aisef2/app/bundle_cli.py::_spec_rows": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_T04a.py"
+   ],
+   "mutants": 38
+  },
+  "aisef2/app/bundle_cli.py::_write_new": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_T04a.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/bundle_cli.py::approve": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_A04.py",
+    "tests/v2/test_v21_kills3_T04a.py",
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 27
+  },
+  "aisef2/app/bundle_cli.py::continue_from": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_defects_bundlecli.py",
+    "tests/v2/test_v21_kills3_T01a.py",
+    "tests/v2/test_v21_kills3_T01b.py",
+    "tests/v2/test_v21_kills3_TO1.py",
+    "tests/v2/test_v21_pw_lineage_continue.py",
+    "tests/v2/test_v21_x_lineage_proof.py",
+    "tests/v2/test_v21_x_lineage_gone.py"
+   ],
+   "mutants": 217
+  },
+  "aisef2/app/bundle_cli.py::coverage": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills_bundle_cli.py",
+    "tests/v2/test_v21_defects_bundlecli.py",
+    "tests/v2/test_v21_defects_lint.py"
+   ],
+   "mutants": 48
+  },
+  "aisef2/app/bundle_cli.py::explain": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_defects_bundlecli.py",
+    "tests/v2/test_v21_kills3_T04a.py"
+   ],
+   "mutants": 34
+  },
+  "aisef2/app/bundle_cli.py::exposure_of": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 14
+  },
+  "aisef2/app/bundle_cli.py::init": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills_bundle_cli.py"
+   ],
+   "mutants": 12
+  },
+  "aisef2/app/bundle_cli.py::lint": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_T03a.py",
+    "tests/v2/test_v22_authoring_lint.py"
+   ],
+   "mutants": 59
+  },
+  "aisef2/app/bundle_cli.py::main": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_defects_lint.py",
+    "tests/v2/test_v21_kills3_A00.py",
+    "tests/v2/test_v21_kills3_T00a.py",
+    "tests/v2/test_v21_kills3_T00b.py",
+    "tests/v2/test_v21_pw_lineage_continue.py",
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 169
+  },
+  "aisef2/app/bundle_cli.py::migrate": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_A03.py",
+    "tests/v2/test_v21_kills3_T03a.py",
+    "tests/v2/test_v21_kills3_T03b.py",
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 200
+  },
+  "aisef2/app/bundle_cli.py::seal": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_A02.py",
+    "tests/v2/test_v21_kills3_T02a.py",
+    "tests/v2/test_v21_migrate_semantics.py",
+    "tests/v2/test_v22_authoring_lint.py"
+   ],
+   "mutants": 198
+  },
+  "aisef2/app/bundle_cli.py::unapproved": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_kills3_T04a.py"
+   ],
+   "mutants": 19
+  },
+  "aisef2/app/bundle_cli.py::with_commands": {
+   "source": "aisef2/app/bundle_cli.py",
+   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "kill_tests": [
+    "tests/v2/test_v21_migrate_semantics.py"
+   ],
+   "mutants": 40
+  },
+  "aisef2/app/client.py::Budget.__init__": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_x_lineage_proof.py"
+   ],
+   "mutants": 29
+  },
+  "aisef2/app/client.py::Budget.account": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T28a.py",
+    "tests/v2/test_v21_x_lineage_proof.py"
+   ],
+   "mutants": 19
+  },
+  "aisef2/app/client.py::Budget.reached": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 31
+  },
+  "aisef2/app/client.py::Budget.spend": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_x_lineage_proof.py"
+   ],
+   "mutants": 57
+  },
+  "aisef2/app/client.py::environment": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v22_client_pin_fence.py"
+   ],
+   "mutants": 56
+  },
+  "aisef2/app/client.py::events": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_v21_r3_client_stream.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_r5_review_deep_input.py"
+   ],
+   "mutants": 8
+  },
+  "aisef2/app/client.py::read_session": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_r3_client_stream.py"
+   ],
+   "mutants": 77
+  },
+  "aisef2/app/client.py::redact": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T28a.py"
+   ],
+   "mutants": 8
+  },
+  "aisef2/app/client.py::session": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_confine.py",
+    "tests/v2/test_v22_client_pin_fence.py"
+   ],
+   "mutants": 185
+  },
+  "aisef2/app/client.py::wait_within": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_k.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 23
+  },
+  "aisef2/app/feedback.py::context_pack": {
+   "source": "aisef2/app/feedback.py",
+   "source_sha256": "e33b90b269241e99313e89b7c1ab45f1aa9c7c58c8c651f5648722a1797bc043",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_context_pack.py",
+    "tests/v2/test_v21_kills3_T17a.py"
+   ],
+   "mutants": 205
+  },
+  "aisef2/app/feedback.py::retry_feedback": {
+   "source": "aisef2/app/feedback.py",
+   "source_sha256": "e33b90b269241e99313e89b7c1ab45f1aa9c7c58c8c651f5648722a1797bc043",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_A17.py",
+    "tests/v2/test_v21_kills3_T17a.py",
+    "tests/v2/test_v21_kills3_T17b.py",
+    "tests/v2/test_v21_kills3_T17c.py"
+   ],
+   "mutants": 141
+  },
+  "aisef2/app/run.py::OCR_CHECKS": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_v21_ocr_identity.py"
+   ],
+   "mutants": 19
+  },
+  "aisef2/app/run.py::_close": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/run.py::_content_sha": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T14a.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/app/run.py::admit": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 15
+  },
+  "aisef2/app/run.py::anchor_in": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T14a.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/app/run.py::anchor_of": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T14a.py"
+   ],
+   "mutants": 7
+  },
+  "aisef2/app/run.py::calibrations": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 11
+  },
+  "aisef2/app/run.py::check_git": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 22
+  },
+  "aisef2/app/run.py::check_repository": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_kills3_T14a.py"
+   ],
+   "mutants": 38
+  },
+  "aisef2/app/run.py::client_on_path": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_confine.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/run.py::delivery": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 46
+  },
+  "aisef2/app/run.py::evidence_manifest": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T14a.py",
+    "tests/v2/test_v21_r3_detail_artifact.py",
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py"
+   ],
+   "mutants": 27
+  },
+  "aisef2/app/run.py::execute": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_confine.py",
+    "tests/v2/test_v21_kills3_A13.py",
+    "tests/v2/test_v21_kills3_T13a.py",
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py",
+    "tests/v2/test_v21_pw_lineage_unread.py",
+    "tests/v2/test_v21_x_lineage_proof.py",
+    "tests/v2/test_v21_x_lineage_gone.py",
+    "tests/v2/test_v21_ocr_identity.py",
+    "tests/v2/test_v22_tripwire.py",
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "mutants": 459
+  },
+  "aisef2/app/run.py::kernel_digest": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/run.py::layers_of": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T14b.py"
+   ],
+   "mutants": 79
+  },
+  "aisef2/app/run.py::ocr_identity": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_v21_ocr_identity.py",
+    "tests/v2/test_v21_ocr_preflight.py"
+   ],
+   "mutants": 95
+  },
+  "aisef2/app/run.py::ocr_refusal": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_v21_ocr_identity.py",
+    "tests/v2/test_v21_ocr_preflight.py"
+   ],
+   "mutants": 17
+  },
+  "aisef2/app/run.py::outcomes_from": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 16
+  },
+  "aisef2/app/run.py::probe_factories": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/app/run.py::probe_interpreter": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 21
+  },
+  "aisef2/app/run.py::productproof": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 62
+  },
+  "aisef2/app/run.py::regression_tests": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 14
+  },
+  "aisef2/app/run.py::runspec_of": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 51
+  },
+  "aisef2/app/run.py::story_where": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py"
+   ],
+   "mutants": 45
+  },
+  "aisef2/app/run.py::unfinished": {
+   "source": "aisef2/app/run.py",
+   "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T14b.py"
+   ],
+   "mutants": 18
+  },
+  "aisef2/app/settings.py::FINDERS": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/app/settings.py::LOOPBACK": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/app/settings.py::OCR_KEYS": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/app/settings.py::OPTIONAL": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_confine.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/app/settings.py::REVIEW_ABSENT": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_A26.py",
+    "tests/v2/test_v21_kills3_T26a.py"
+   ],
+   "mutants": 9
+  },
+  "aisef2/app/settings.py::Settings.prices": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/app/settings.py::_count": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 7
+  },
+  "aisef2/app/settings.py::endpoint_problem": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills_settings.py",
+    "tests/v2/test_v21_kills3_A26.py",
+    "tests/v2/test_v21_kills3_T26a.py"
+   ],
+   "mutants": 36
+  },
+  "aisef2/app/settings.py::load": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_confine.py",
+    "tests/v2/test_v21_kills3_T26a.py",
+    "tests/v2/test_v22_client_pin_fence.py"
+   ],
+   "mutants": 348
+  },
+  "aisef2/app/settings.py::read": {
+   "source": "aisef2/app/settings.py",
+   "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_T26a.py"
+   ],
+   "mutants": 9
+  },
+  "aisef2/app/tripwire.py::_bundle_hit": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 23
+  },
+  "aisef2/app/tripwire.py::_canonical": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 7
+  },
+  "aisef2/app/tripwire.py::_fragments": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/app/tripwire.py::_public_text": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/app/tripwire.py::needles_of": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 22
+  },
+  "aisef2/app/tripwire.py::refusal": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 17
+  },
+  "aisef2/app/tripwire.py::scan_repo": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 44
+  },
+  "aisef2/app/tripwire.py::scan_text": {
+   "source": "aisef2/app/tripwire.py",
+   "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
+   "kill_tests": [
+    "tests/v2/test_v22_tripwire.py"
+   ],
+   "mutants": 12
+  },
+  "aisef2/app/verify.py::_invariant_problems": {
+   "source": "aisef2/app/verify.py",
+   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "kill_tests": [
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "mutants": 31
+  },
+  "aisef2/app/verify.py::_projection_refusal": {
+   "source": "aisef2/app/verify.py",
+   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "kill_tests": [
+    "tests/v2/test_v21_r3_usage_boundary.py"
+   ],
+   "mutants": 9
+  },
+  "aisef2/app/verify.py::_runspec_problems": {
+   "source": "aisef2/app/verify.py",
+   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_kills3_A22.py",
+    "tests/v2/test_v21_kills3_T22a.py",
+    "tests/v2/test_v21_kills3_R01.py"
+   ],
+   "mutants": 45
+  },
+  "aisef2/app/verify.py::_spend": {
+   "source": "aisef2/app/verify.py",
+   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_v21_x_lineage_proof.py",
+    "tests/v2/test_v21_x_lineage_gone.py"
+   ],
+   "mutants": 24
+  },
+  "aisef2/app/verify.py::verify": {
+   "source": "aisef2/app/verify.py",
+   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_defects_verify.py",
+    "tests/v2/test_v21_kills3_A22.py",
+    "tests/v2/test_v21_kills3_T22a.py",
+    "tests/v2/test_v21_kills3_T22b.py",
+    "tests/v2/test_v21_kills3_R01.py",
+    "tests/v2/test_v21_r3_usage_boundary.py",
+    "tests/v2/test_v21_r3_usage_review.py",
+    "tests/v2/test_v21_r3_detail_product.py",
+    "tests/v2/test_v21_pm8_diagnostics.py",
+    "tests/v2/test_v21_pm8_diagnostics_run.py",
+    "tests/v2/test_v21_x_lineage_proof.py",
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "mutants": 213
+  },
+  "aisef2/invariants/registry.py::arm_runtime": {
+   "source": "aisef2/invariants/registry.py",
+   "source_sha256": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
+   "kill_tests": [
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/invariants/registry.py::register_runtime": {
+   "source": "aisef2/invariants/registry.py",
+   "source_sha256": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
+   "kill_tests": [
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "mutants": 38
+  },
+  "aisef2/invariants/registry.py::registry_digest": {
+   "source": "aisef2/invariants/registry.py",
+   "source_sha256": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
+   "kill_tests": [
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "mutants": 19
+  },
+  "aisef2/invariants/registry.py::runtime_mechanism_digest": {
+   "source": "aisef2/invariants/registry.py",
+   "source_sha256": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
+   "kill_tests": [
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "mutants": 18
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.__init__": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/test_v21_r3_range_release_contract.py"
+   ],
+   "mutants": 17
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._abort": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._close_pipes": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._ladder": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py",
+    "tests/v2/test_v21_r3_range_release_contract.py"
+   ],
+   "mutants": 15
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._release": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py",
+    "tests/v2/test_v21_r3_range_release_contract.py"
+   ],
+   "mutants": 12
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._signal": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 9
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.escaped": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.members": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.release": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py",
+    "tests/v2/test_v21_r3_range_release_contract.py"
+   ],
+   "mutants": 23
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.start": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 27
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.wait": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 24
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.wait_empty": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/runtime/process_range.py::_Flight.__init__": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/test_v21_r3_range_release_contract.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/runtime/process_range.py::_Flight.__slots__": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/test_v21_r3_range_release_contract.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/runtime/process_range.py::_Job.controller_stopped": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/runtime/process_range.py::_Posix.abort": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py",
+    "tests/v2/test_v21_r3_range_abort.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/runtime/process_range.py::_Posix.escaped": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/runtime/process_range.py::_Posix.members": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/runtime/process_range.py::_linux_table": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/test_v21_r3_range_fu_linux_table.py"
+   ],
+   "mutants": 17
+  },
+  "aisef2/runtime/process_range.py::_ps_table": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_table.py",
+    "tests/v2/test_v21_r3_range_fu_ps_table.py"
+   ],
+   "mutants": 24
+  },
+  "aisef2/runtime/process_range.py::descendants": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_table.py"
+   ],
+   "mutants": 19
+  },
+  "aisef2/runtime/process_range.py::targets": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/p4/test_process_table.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/runtime/run_scope.py::RunLease.acquire": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/runtime/run_scope.py::RunLease.release": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/runtime/run_scope.py::RunScope.begin": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 28
+  },
+  "aisef2/runtime/run_scope.py::RunScope.open_stories": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/runtime/run_scope.py::RunScope.shutdown": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 12
+  },
+  "aisef2/runtime/run_scope.py::RunScope._finish": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/runtime/run_scope.py::RunScope._fail": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/runtime/run_scope.py::RunScope.story": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py"
+   ],
+   "mutants": 6
+  },
+  "aisef2/runtime/run_scope.py::RunScope.append": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_run_scope.py",
+    "tests/v2/p4/test_interruption.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/runtime/run_scope.py::RunScope.retry": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_budgets.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/runtime/run_scope.py::RunScope._now": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_interruption.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/runtime/run_scope.py::RunScope.interrupt": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_interruption.py"
+   ],
+   "mutants": 44
+  },
+  "aisef2/runtime/run_scope.py::RunScope._second_interrupt_abandons": {
+   "source": "aisef2/runtime/run_scope.py",
+   "source_sha256": "f688d1b76a5e71386d56a60a7191760c2e4ea8e5e2658b339bb40a961ce74b66",
+   "kill_tests": [
+    "tests/v2/p4/test_interruption.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/journal/fold.py::fold": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/journal/fold.py::_frozen": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 3
+  },
+  "aisef2/journal/fold.py::Folder.__init__": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 2
+  },
+  "aisef2/journal/fold.py::Folder.peek": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/journal/fold.py::Folder.advance": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 5
+  },
+  "aisef2/journal/fold.py::oracle_problems": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 15
+  },
+  "aisef2/journal/fold.py::cache_row": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 1
+  },
+  "aisef2/journal/fold.py::_seal": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 11
+  },
+  "aisef2/journal/fold.py::resume": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 34
+  },
+  "aisef2/journal/fold.py::Authority.__init__": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 4
+  },
+  "aisef2/journal/fold.py::Authority.append": {
+   "source": "aisef2/journal/fold.py",
+   "source_sha256": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+   "kill_tests": [
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "mutants": 17
+  },
+  "aisef2/runtime/process_range.py::_win_liveness": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/test_v22_win_native_liveness.py",
+    "tests/v2/test_v22_win_oskill_is_gone.py"
+   ],
+   "mutants": 10
+  },
+  "aisef2/runtime/process_range.py::pid_alive": {
+   "source": "aisef2/runtime/process_range.py",
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "kill_tests": [
+    "tests/v2/test_v22_win_native_liveness.py",
+    "tests/v2/test_v22_win_oskill_is_gone.py"
+   ],
+   "mutants": 36
+  },
+  "aisef2/app/client.py::_is_gone": {
+   "source": "aisef2/app/client.py",
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "kill_tests": [
+    "tests/v2/test_v22_win_native_liveness.py",
+    "tests/v2/test_v22_win_oskill_is_gone.py"
+   ],
+   "mutants": 14
+  }
+ }
+}

@@ -1288,13 +1288,27 @@ SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
 for _phase in (P2_TARGETS, P4_TARGETS, P6_TARGETS, C2_P1_TARGETS):
     for _t in [t for t in _phase if t in V21_TARGETS]:
         del _phase[_t]
+# V2.2-B1-LIVENESS is declared BEFORE V2.1 so V2.1 stays last in RECORDS ("readers that walk RECORDS let the newest
+# win" — tests/v2/test_v21_mutation_record.py); the liveness targets live in exactly one phase, so order never
+# selects for them.
+RECORDS["V2.2-B1-LIVENESS"] = "closure-evidence/v2/v2.2/B1-LIVENESS-MUTATION.json"
 RECORDS["V2.1"] = "closure-evidence/v2/v2.1/MUTATION.json"
+# V2.2 B1 RISK GATE (owner 2026-11-12, RELEASE-DECISIONS seq 9): the H1/H2 Windows-liveness DECISION core — never a
+# target before (closure-evidence/v2/v2.2/B1-RISK-MANIFEST.json tranche C). Kill sets exactly as the frozen manifest
+# binds them: the Win32-native liveness tests, so this phase is measured on a WINDOWS worker (their POSIX halves skip).
+_B1_LIVENESS = ["tests/v2/test_v22_win_native_liveness.py", "tests/v2/test_v22_win_oskill_is_gone.py"]
+B1_LIVENESS_TARGETS: dict[str, list[str]] = {
+    "aisef2/runtime/process_range.py::_win_liveness": _B1_LIVENESS,
+    "aisef2/runtime/process_range.py::pid_alive": _B1_LIVENESS,
+    "aisef2/app/client.py::_is_gone": _B1_LIVENESS,
+}
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
                  "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS, "K-PRESAT-001": K_PRESAT_TARGETS,
                  "K-NOWORK-001": K_NOWORK_TARGETS,
                  "V2.0-S2": {t: k for t, k in S2_TARGETS.items() if t not in V21_TARGETS and t not in V21_RETIRED},
-                 "V2.1": V21_TARGETS}
+                 "V2.1": V21_TARGETS,
+                 "V2.2-B1-LIVENESS": B1_LIVENESS_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

@@ -1,0 +1,38 @@
+"""B1 risk-gate bindings check (fail-closed; owner 2026-11-12 section B): every named target's source sha256 equals
+the FROZEN manifest's binding, the aisef2 kernel tree is the frozen one, and the registry is unchanged — or exit 1
+and nothing runs. Arguments: target names (default: every manifest target)."""
+import hashlib
+import json
+import pathlib
+import subprocess
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+MANIFEST_REL = "closure-evidence/v2/v2.2/B1-RISK-MANIFEST.json"
+
+
+def main(argv: list[str] | None = None) -> int:
+    targets = (sys.argv[1:] if argv is None else argv)
+    man = json.loads((ROOT / MANIFEST_REL).read_text(encoding="utf-8"))
+    bad = []
+    kernel = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD:aisef2"],
+                            capture_output=True, text=True).stdout.strip()
+    if kernel != man["frozen_bindings"]["aisef2_kernel_tree"]:
+        bad.append(f"kernel {kernel[:12]} is not the frozen {man['frozen_bindings']['aisef2_kernel_tree'][:12]}")
+    reg = hashlib.sha256((ROOT / man["frozen_bindings"]["registry_file"]).read_bytes()).hexdigest()
+    if reg != man["frozen_bindings"]["registry_sha256"]:
+        bad.append("the registry moved since the manifest froze")
+    for t in (targets or list(man["targets"])):
+        e = man["targets"].get(t)
+        if not e:
+            bad.append(f"{t}: not in the frozen manifest")
+            continue
+        if hashlib.sha256((ROOT / e["source"]).read_bytes()).hexdigest() != e["source_sha256"]:
+            bad.append(f"{t}: {e['source']} moved since the manifest froze")
+    print("\n".join(f"FAIL  {x}" for x in bad) if bad else
+          f"BINDINGS OK: {len(targets or man['targets'])} targets, kernel {kernel[:12]}")
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

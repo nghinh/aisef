@@ -1,0 +1,55 @@
+# B1 risk-based mutation gate — LINUX tranche (owner 2026-11-12, section B; RELEASE-DECISIONS seq 9).
+# 174 targets / 5,836 mutants in 8 priority-ordered, mutant-balanced shards (validation/v2/b1_shards.json).
+# Spend is capped BY CONSTRUCTION: 8 jobs x 345-minute hard timeout; bindings are verified fail-closed before
+# anything runs; the runner has no opencode and the XDG dirs point at runner scratch. Outcomes are whatever
+# mutation.py measures — KILLED/SURVIVED/NOT_RUN/TIMEOUT/INFRA — never invented.
+name: b1-linux
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  mutate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: isolation guards + facts
+        run: |
+          if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi
+          echo "opencode ABSENT (guard OK)"; nproc; df -h . | tail -1
+          git rev-parse HEAD HEAD:aisef2
+      - name: install
+        run: python3 -m pip install -e . --quiet
+      - name: bindings check (fail-closed, frozen manifest)
+        run: |
+          python3 -P validation/v2/b1_bindings_check.py $(python3 -c "import json;print(' '.join(json.load(open('validation/v2/b1_shards.json'))['shards'][${{ matrix.shard }}]))")
+      - name: mutate shard ${{ matrix.shard }}
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+          XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+          XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
+        run: |
+          set -o pipefail
+          mkdir -p "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+          python3 -P validation/v2/mutation.py run $(python3 -c "import json;print(' '.join(json.load(open('validation/v2/b1_shards.json'))['shards'][${{ matrix.shard }}]))") 2>&1 | tee "shard-${{ matrix.shard }}.log" | tail -40
+      - name: collect results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b1-linux-shard-${{ matrix.shard }}
+          if-no-files-found: warn
+          path: |
+            shard-${{ matrix.shard }}.log
+            closure-evidence/v2/P*-MUTATION.json
+            closure-evidence/v2/cycle2/*-MUTATION.json
+            closure-evidence/v2/release/S2-MUTATION.json
+            closure-evidence/v2/v2.1/MUTATION.json

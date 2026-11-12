@@ -1,0 +1,61 @@
+# B1 risk-based mutation gate — WINDOWS tranche C (owner 2026-11-12, section B; RELEASE-DECISIONS seq 9).
+# The 3 H1/H2 liveness decision-core targets / 60 mutants (phase V2.2-B1-LIVENESS), measured on windows-latest
+# because their kill tests are Win32-native. Hard 150-minute timeout; bindings fail-closed; no opencode.
+name: b1-windows
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  mutate:
+    runs-on: windows-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: isolation guards + facts
+        shell: bash
+        run: |
+          if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi
+          echo "opencode ABSENT (guard OK)"; python -V
+          git rev-parse HEAD HEAD:aisef2
+      - name: install
+        shell: bash
+        run: python -m pip install -e . --quiet
+      - name: bindings check (fail-closed, frozen manifest)
+        shell: bash
+        run: |
+          python -P validation/v2/b1_bindings_check.py \
+            "aisef2/runtime/process_range.py::_win_liveness" \
+            "aisef2/runtime/process_range.py::pid_alive" \
+            "aisef2/app/client.py::_is_gone"
+      - name: baseline — the Win32-native kill tests are green here
+        shell: bash
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -P -m unittest tests.v2.test_v22_win_native_liveness tests.v2.test_v22_win_oskill_is_gone -q
+      - name: mutate tranche C (60 mutants)
+        shell: bash
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+          XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+          XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
+        run: |
+          set -o pipefail
+          mkdir -p "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+          python -P validation/v2/mutation.py run \
+            "aisef2/runtime/process_range.py::_win_liveness" \
+            "aisef2/runtime/process_range.py::pid_alive" \
+            "aisef2/app/client.py::_is_gone" 2>&1 | tee tranche-c.log | tail -40
+      - name: collect results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b1-windows-tranche-c
+          if-no-files-found: warn
+          path: |
+            tranche-c.log
+            closure-evidence/v2/v2.2/B1-LIVENESS-MUTATION.json
