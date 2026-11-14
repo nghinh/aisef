@@ -150,6 +150,7 @@
    "source": "aisef2/app/adapters.py",
    "source_sha256": "5dc0330792f286061dab95a23aa9e473b95c96ba3f6f2773a468c4ed21fa066b",
    "kill_tests": [
+    "tests/v2/test_b1gap_adapters__declared.py",
     "tests/v2/test_v21_ocr_gate.py",
     "tests/v2/test_v21_review_chain.py",
     "tests/v2/test_v21_ocr_identity.py"
@@ -401,6 +402,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli__authentic.py",
     "tests/v2/test_v21_pw_lineage_continue.py"
    ],
    "mutants": 39
@@ -487,6 +489,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli__grounds.py",
     "tests/v2/test_v21_migrate_semantics.py"
    ],
    "mutants": 7
@@ -503,6 +506,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli__journal.py",
     "tests/v2/test_v21_pw_lineage_continue.py",
     "tests/v2/test_v21_continue_integrity.py",
     "tests/v2/test_v21_kills3_T01b.py"
@@ -549,6 +553,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli__read.py",
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
     "tests/v2/test_v21_review.py",
@@ -562,6 +567,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli__record.py",
     "tests/v2/test_v21_pw_lineage_continue.py",
     "tests/v2/test_v21_kills3_T01b.py"
    ],
@@ -618,6 +624,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli__write_new.py",
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
     "tests/v2/test_v21_review.py",
@@ -680,6 +687,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli_explain.py",
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
     "tests/v2/test_v21_review.py",
@@ -694,6 +702,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli_exposure_of.py",
     "tests/v2/test_v21_migrate_semantics.py"
    ],
    "mutants": 14
@@ -715,6 +724,7 @@
    "source": "aisef2/app/bundle_cli.py",
    "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
    "kill_tests": [
+    "tests/v2/test_b1gap_bundle_cli_lint.py",
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
     "tests/v2/test_v21_review.py",
@@ -893,6 +903,7 @@
    "source": "aisef2/app/client.py",
    "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
    "kill_tests": [
+    "tests/v2/test_b1gap_client_session.py",
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_transport.py",
     "tests/v2/test_app_run.py",
@@ -944,6 +955,7 @@
    "source": "aisef2/app/run.py",
    "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
    "kill_tests": [
+    "tests/v2/test_b1gap_run_ocr_checks.py",
     "tests/v2/test_v21_ocr_identity.py"
    ],
    "mutants": 19
@@ -1111,6 +1123,7 @@
    "source": "aisef2/app/run.py",
    "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
    "kill_tests": [
+    "tests/v2/test_b1gap_run_evidence_manifest.py",
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_inputs.py",
     "tests/v2/test_v21_identity.py",
@@ -1197,6 +1210,7 @@
    "source": "aisef2/app/run.py",
    "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
    "kill_tests": [
+    "tests/v2/test_b1gap_run_ocr_refusal.py",
     "tests/v2/test_v21_ocr_identity.py",
     "tests/v2/test_v21_ocr_preflight.py"
    ],
@@ -1366,6 +1380,7 @@
    "source": "aisef2/app/settings.py",
    "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
    "kill_tests": [
+    "tests/v2/test_b1gap_settings_optional.py",
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_inputs.py",
     "tests/v2/test_v21_identity.py",
@@ -1490,6 +1505,7 @@
    "source": "aisef2/app/tripwire.py",
    "source_sha256": "60e31a561e15ce5c04ff14fcbfa5479807b9ab35341a7c7fc0e3afff8dc55e62",
    "kill_tests": [
+    "tests/v2/test_b1gap_tripwire__bundle_hit.py",
     "tests/v2/test_v22_tripwire.py"
    ],
    "mutants": 23
@@ -2067,6 +2083,12 @@
    "record": "B1-BINDING-AMENDMENT-1",
    "date": "2026-11-14",
    "summary": "verify.py fail-closed fix: 5 verify.py targets rebound d5952f2bd05e->c1c0c661b495; kernel tree amended at commit"
+  },
+  {
+   "record": "B1-BINDING-AMENDMENT-2",
+   "date": "2026-11-14",
+   "cause": "owner directive 2026-11-14 CONTINUE item 4: resolve genuine gaps and remeasure targets invalidated by fixes",
+   "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-2.json"
   }
  ]
 }

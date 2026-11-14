@@ -1309,6 +1309,33 @@ PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_
                  "V2.0-S2": {t: k for t, k in S2_TARGETS.items() if t not in V21_TARGETS and t not in V21_RETIRED},
                  "V2.1": V21_TARGETS,
                  "V2.2-B1-LIVENESS": B1_LIVENESS_TARGETS}
+# V2.2 B1 GAP FIXES (owner directive 2026-11-14 CONTINUE, item 4: resolve genuine gaps and remeasure targets
+# invalidated by fixes). Every audited REAL_GAP/WEAK_ASSERT survivor of the B1 risk campaign is killed by a case in a
+# file of its own, named only in the kill set of the target it was written for (B1-BINDING-AMENDMENT-2); the fixed
+# targets are re-measured, every other target's kill set is byte-identical. The new file runs first: it is the
+# cheapest in each set.
+_B1_GAP_KILLS = {
+    "aisef2/app/adapters.py::_declared": "tests/v2/test_b1gap_adapters__declared.py",
+    "aisef2/app/bundle_cli.py::_authentic": "tests/v2/test_b1gap_bundle_cli__authentic.py",
+    "aisef2/app/bundle_cli.py::_grounds": "tests/v2/test_b1gap_bundle_cli__grounds.py",
+    "aisef2/app/bundle_cli.py::_journal": "tests/v2/test_b1gap_bundle_cli__journal.py",
+    "aisef2/app/bundle_cli.py::_read": "tests/v2/test_b1gap_bundle_cli__read.py",
+    "aisef2/app/bundle_cli.py::_record": "tests/v2/test_b1gap_bundle_cli__record.py",
+    "aisef2/app/bundle_cli.py::_write_new": "tests/v2/test_b1gap_bundle_cli__write_new.py",
+    "aisef2/app/bundle_cli.py::explain": "tests/v2/test_b1gap_bundle_cli_explain.py",
+    "aisef2/app/bundle_cli.py::exposure_of": "tests/v2/test_b1gap_bundle_cli_exposure_of.py",
+    "aisef2/app/bundle_cli.py::lint": "tests/v2/test_b1gap_bundle_cli_lint.py",
+    "aisef2/app/client.py::session": "tests/v2/test_b1gap_client_session.py",
+    "aisef2/app/run.py::OCR_CHECKS": "tests/v2/test_b1gap_run_ocr_checks.py",
+    "aisef2/app/run.py::evidence_manifest": "tests/v2/test_b1gap_run_evidence_manifest.py",
+    "aisef2/app/run.py::ocr_refusal": "tests/v2/test_b1gap_run_ocr_refusal.py",
+    "aisef2/app/settings.py::OPTIONAL": "tests/v2/test_b1gap_settings_optional.py",
+    "aisef2/app/tripwire.py::_bundle_hit": "tests/v2/test_b1gap_tripwire__bundle_hit.py",
+}
+for _t, _f in _B1_GAP_KILLS.items():
+    for _targets in PHASE_TARGETS.values():
+        if _t in _targets and _f not in _targets[_t]:
+            _targets[_t] = [_f, *_targets[_t]]
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
