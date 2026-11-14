@@ -108,6 +108,27 @@ class VerifyRederives(unittest.TestCase):
             self.assertIn("is not this kernel's", problems[0])
             self.assertEqual(said, [])
 
+    def test_a_malformed_digest_fails_closed_on_any_kernel(self):
+        # Lane B-A: a digest that is not a 64-hex sha256 is malformed provenance — a problem even when the
+        # verifying kernel is NOT the run's (the old code excused it as "not compared"), and never a mere note.
+        for bad in (None, "", "a" * 63, "A" * 64, 123):
+            for field in ("registry_digest", "code_mechanism_digest"):
+                for kernel in (R.kernel_digest(), "f" * 64):
+                    rec = {**self.rec, "kernel_digest": kernel,
+                           "invariants": {**self.rec["invariants"], field: bad}}
+                    problems, said = _invariant_problems(rec)
+                    self.assertEqual(len(problems), 1, (field, bad, kernel, problems))
+                    self.assertIn("is not a 64-hex sha256", problems[0])
+                    self.assertEqual(said, [])
+
+    def test_an_invariants_object_missing_a_digest_field_is_malformed(self):
+        rec = {**self.rec, "invariants": {k: v for k, v in self.rec["invariants"].items()
+                                          if k != "registry_digest"}}
+        problems, said = _invariant_problems(rec)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("registry_digest is not a 64-hex sha256: None", problems[0])
+        self.assertEqual(said, [])
+
     def test_an_absent_field_is_an_earlier_release_and_another_kernel_is_not_compared(self):
         problems, said = _invariant_problems({"kernel_digest": R.kernel_digest()})
         self.assertEqual(problems, [])

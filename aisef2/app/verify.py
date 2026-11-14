@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import json
 import pathlib
+import re
 
 from aisef2.app import client, diagnostics, preflight, review_verify, settings, usage
 from aisef2.app import run as R
@@ -95,19 +96,31 @@ def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict], rec: dic
     return b.spend(), None if cannot else b.exceeded(), cannot
 
 
+_HEX64 = re.compile(r"[0-9a-f]{64}")
+
+
 def _invariant_problems(rec: dict) -> tuple[list[str], list[str]]:
-    """ROADMAP-2.2 A1: the record's invariant arming against what THIS process re-derives — comparable only when the
-    verifying kernel is the run's (the run's enforcement bytes are not in the run directory; what a verifier can
-    recompute is its own). An absent field is a run of an earlier release (the EVIDENCE.json precedent): a note,
-    never a problem. Nothing here can raise a verdict."""
+    """ROADMAP-2.2 A1: the record's invariant arming against what THIS process re-derives — the VALUES are comparable
+    only when the verifying kernel is the run's (the run's enforcement bytes are not in the run directory; what a
+    verifier can recompute is its own), but the SHAPE of a recorded digest is checkable under any kernel: a digest
+    that is not a 64-hex sha256 (None, "", truncated) is malformed provenance and fails closed — a defective kernel
+    must not verify its own garbage (B1: 18/19 registry_digest mutants survived the self-referential comparison).
+    An absent invariants field is a run of an earlier release (the EVIDENCE.json precedent): a note, never a
+    problem. Nothing here can raise a verdict."""
     inv = rec.get("invariants")
     if inv is None:
         return [], ["no invariants field: a run of a release before runtime invariant arming was recorded"]
     if not isinstance(inv, dict):
         return ["RUN.json's invariants field is not an object"], []
+    problems = []
+    for field in ("registry_digest", "code_mechanism_digest"):
+        d = inv.get(field)
+        if not (isinstance(d, str) and _HEX64.fullmatch(d)):
+            problems.append(f"the record's invariant {field} is not a 64-hex sha256: {d!r}")
+    if problems:
+        return problems, []
     if rec.get("kernel_digest") != R.kernel_digest():
         return [], ["invariant digests not compared: the verifying kernel is not the run's (kernel_digest differs)"]
-    problems = []
     if inv.get("registry_digest") != invariants.registry_digest():
         problems.append("the record's invariant registry digest is not this kernel's (same kernel_digest)")
     if inv.get("code_mechanism_digest") != invariants.runtime_mechanism_digest():

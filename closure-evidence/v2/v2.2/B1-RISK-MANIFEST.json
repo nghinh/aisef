@@ -4,10 +4,11 @@
  "date": "2026-11-12",
  "frozen_bindings": {
   "head": "b35ec9d7",
-  "aisef2_kernel_tree": "ac7c170531fc3db1698f062d0bac6d921651d962",
+  "aisef2_kernel_tree": "55d378bfa6d4617aea574c6f80a1e8dca3fe803e",
   "registry_sha256": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
   "registry_file": "aisef2/invariants/registry.py",
-  "baseline": "v2.1.0 @ 8c7bdb44 (aisef2 5f34a3f3)"
+  "baseline": "v2.1.0 @ 8c7bdb44 (aisef2 5f34a3f3)",
+  "amended_by": "B1-BINDING-AMENDMENT-1 (was ac7c170531fc3db1698f062d0bac6d921651d962)"
  },
  "tranches": {
   "A_manifested_rc_bound": {
@@ -1551,7 +1552,7 @@
   },
   "aisef2/app/verify.py::_invariant_problems": {
    "source": "aisef2/app/verify.py",
-   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "source_sha256": "c1c0c661b4950808072d818ce70328853515064a4d1411e6e368e85df5135537",
    "kill_tests": [
     "tests/v2/p0/test_invariants_runtime.py"
    ],
@@ -1559,7 +1560,7 @@
   },
   "aisef2/app/verify.py::_projection_refusal": {
    "source": "aisef2/app/verify.py",
-   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "source_sha256": "c1c0c661b4950808072d818ce70328853515064a4d1411e6e368e85df5135537",
    "kill_tests": [
     "tests/v2/test_v21_r3_usage_boundary.py"
    ],
@@ -1567,7 +1568,7 @@
   },
   "aisef2/app/verify.py::_runspec_problems": {
    "source": "aisef2/app/verify.py",
-   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "source_sha256": "c1c0c661b4950808072d818ce70328853515064a4d1411e6e368e85df5135537",
    "kill_tests": [
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_verify.py",
@@ -1582,7 +1583,7 @@
   },
   "aisef2/app/verify.py::_spend": {
    "source": "aisef2/app/verify.py",
-   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "source_sha256": "c1c0c661b4950808072d818ce70328853515064a4d1411e6e368e85df5135537",
    "kill_tests": [
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_verify.py",
@@ -1596,7 +1597,7 @@
   },
   "aisef2/app/verify.py::verify": {
    "source": "aisef2/app/verify.py",
-   "source_sha256": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "source_sha256": "c1c0c661b4950808072d818ce70328853515064a4d1411e6e368e85df5135537",
    "kill_tests": [
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_verify.py",
@@ -2060,5 +2061,12 @@
    ],
    "mutants": 14
   }
- }
+ },
+ "amendments": [
+  {
+   "record": "B1-BINDING-AMENDMENT-1",
+   "date": "2026-11-14",
+   "summary": "verify.py fail-closed fix: 5 verify.py targets rebound d5952f2bd05e->c1c0c661b495; kernel tree amended at commit"
+  }
+ ]
 }

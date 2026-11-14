@@ -1,0 +1,25 @@
+{
+ "record": "B1-BINDING-AMENDMENT-1",
+ "date": "2026-11-14",
+ "cause": "Lane B-A product fix (owner directive, Lane B): registry_digest/code_mechanism_digest malformed-shape fail-closed in aisef2/app/verify.py::_invariant_problems; regression tests added to tests/v2/p0/test_invariants_runtime.py (the target's frozen kill file).",
+ "determination": "scratchpad laneB-registry-digest/DETERMINATION-AND-PATCH.md; mutation evidence: 18/19 registry_digest mutants survived the self-referential comparison at the pre-fix tree",
+ "bindings_changed": {
+  "aisef2/app/verify.py": {
+   "from": "d5952f2bd05e82ada44b748ba39a30e673ac9612d1727f9f2cb7907fde07966b",
+   "to": "c1c0c661b4950808072d818ce70328853515064a4d1411e6e368e85df5135537"
+  },
+  "aisef2_kernel_tree": {
+   "from": "ac7c170531fc3db1698f062d0bac6d921651d962",
+   "to": "55d378bfa6d4617aea574c6f80a1e8dca3fe803e"
+  }
+ },
+ "must_remeasure": [
+  "aisef2/app/verify.py::_invariant_problems",
+  "aisef2/app/verify.py::_projection_refusal",
+  "aisef2/app/verify.py::_runspec_problems",
+  "aisef2/app/verify.py::_spend",
+  "aisef2/app/verify.py::verify"
+ ],
+ "remeasure_plan": "all five verify.py targets measured on the RC2 tree (server, worker w7); verify.py::verify was never measured at the campaign pin (deferred, queue/DEFERRED-057-to-RC2.txt) so it is measured once, here",
+ "unchanged": "every other target's per-source binding (per-target source sha) is unaffected; their campaign rows at pin 3a357570 remain current under the record-currency rule"
+}
