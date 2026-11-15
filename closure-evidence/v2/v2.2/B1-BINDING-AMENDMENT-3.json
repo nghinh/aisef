@@ -1,0 +1,66 @@
+{
+ "record": "B1-BINDING-AMENDMENT-3",
+ "date": "2026-11-15",
+ "authority": "owner directive 2026-11-14 CONTINUE, item 4 (resolve genuine gaps and remeasure targets invalidated by fixes); seq-9 B1 risk-based mutation gate",
+ "cause": "wave-2 survivor audit of the 116 NEW long-tail pin survivors (wf_61075b06-eff) + adversarial refuters + adjudication (b1-audit-adjudication-wave2.json): 45 REAL_GAP + 26 WEAK_ASSERT, plus the known RC2-audit gap verify.py::_invariant_problems L119",
+ "fix_kind": "test-only: 7 new files tests/v2/test_b1gap2_*.py (one per target, one test per gap mutant); no pre-existing kill-test file edited; aisef2/ kernel tree unchanged; plus one kill-set extension (migrate += tests/v2/test_v21_authority_limits.py, an existing file, to kill the runtime-equivalent source-anchor mutant L378 tuple() -> list())",
+ "verification": "serialized per-mutant check on the RC3 tree (b1_gap_verify_wave2.py): for each of the 72 mutants, apply mutant -> its test FAILS, revert -> its test PASSES; one mutant applied at a time. Result 72/72 KILLS, 0 IMPOSSIBLE, 0 BAD_SPEC. All 7 files together pass clean; ruff clean.",
+ "bindings_changed": {
+  "aisef2/app/adapters.py::Reviewer._ocr": {
+   "adds": [
+    "tests/v2/test_b1gap2_adapters_reviewer__ocr.py"
+   ]
+  },
+  "aisef2/app/bundle.py::load": {
+   "adds": [
+    "tests/v2/test_b1gap2_bundle_load.py"
+   ]
+  },
+  "aisef2/app/bundle_cli.py::continue_from": {
+   "adds": [
+    "tests/v2/test_b1gap2_bundle_cli_continue_from.py"
+   ]
+  },
+  "aisef2/app/bundle_cli.py::main": {
+   "adds": [
+    "tests/v2/test_b1gap2_bundle_cli_main.py"
+   ]
+  },
+  "aisef2/app/bundle_cli.py::migrate": {
+   "adds": [
+    "tests/v2/test_b1gap2_bundle_cli_migrate.py",
+    "tests/v2/test_v21_authority_limits.py"
+   ]
+  },
+  "aisef2/app/settings.py::load": {
+   "adds": [
+    "tests/v2/test_b1gap2_settings_load.py"
+   ]
+  },
+  "aisef2/app/verify.py::_invariant_problems": {
+   "adds": [
+    "tests/v2/test_b1gap2_verify__invariant_problems.py"
+   ]
+  }
+ },
+ "must_remeasure": [
+  "aisef2/app/adapters.py::Reviewer._ocr",
+  "aisef2/app/bundle.py::load",
+  "aisef2/app/bundle_cli.py::continue_from",
+  "aisef2/app/bundle_cli.py::main",
+  "aisef2/app/bundle_cli.py::migrate",
+  "aisef2/app/settings.py::load",
+  "aisef2/app/verify.py::_invariant_problems"
+ ],
+ "must_remeasure_mutants_total": 1387,
+ "must_remeasure_mutants": {
+  "aisef2/app/adapters.py::Reviewer._ocr": 308,
+  "aisef2/app/bundle.py::load": 101,
+  "aisef2/app/bundle_cli.py::continue_from": 217,
+  "aisef2/app/bundle_cli.py::main": 169,
+  "aisef2/app/bundle_cli.py::migrate": 200,
+  "aisef2/app/settings.py::load": 348,
+  "aisef2/app/verify.py::_invariant_problems": 44
+ },
+ "note": "Pin rows (and the rc2 row for _invariant_problems) for these 7 targets become stale once this amendment lands: only an rc4 re-measurement at the RC4 commit is acceptable for the gate table. The other 3 wave-2-audited targets (bundle.py::shape_problems, bundle_cli.py::seal, feedback.py::context_pack) carry 0 genuine gaps, their bindings are untouched and their pin rows stay valid. Batch stays extensible: if the still-running pin targets (run.py::execute, run.py::layers_of) or the last 2 rc3 targets produce new genuine gaps, they join via a further amendment with their own new files; nothing here re-measures a valid completed measurement."
+}

@@ -1336,6 +1336,26 @@ for _t, _f in _B1_GAP_KILLS.items():
     for _targets in PHASE_TARGETS.values():
         if _t in _targets and _f not in _targets[_t]:
             _targets[_t] = [_f, *_targets[_t]]
+# B1-BINDING-AMENDMENT-3 (wave-2): one new kill file per audited long-tail target, 72 verified kills.
+_B1_GAP_KILLS_W2 = {
+    "aisef2/app/adapters.py::Reviewer._ocr": "tests/v2/test_b1gap2_adapters_reviewer__ocr.py",
+    "aisef2/app/bundle.py::load": "tests/v2/test_b1gap2_bundle_load.py",
+    "aisef2/app/bundle_cli.py::continue_from": "tests/v2/test_b1gap2_bundle_cli_continue_from.py",
+    "aisef2/app/bundle_cli.py::main": "tests/v2/test_b1gap2_bundle_cli_main.py",
+    "aisef2/app/bundle_cli.py::migrate": "tests/v2/test_b1gap2_bundle_cli_migrate.py",
+    "aisef2/app/settings.py::load": "tests/v2/test_b1gap2_settings_load.py",
+    "aisef2/app/verify.py::_invariant_problems": "tests/v2/test_b1gap2_verify__invariant_problems.py",
+}
+for _t, _f in _B1_GAP_KILLS_W2.items():
+    for _targets in PHASE_TARGETS.values():
+        if _t in _targets and _f not in _targets[_t]:
+            _targets[_t] = [_f, *_targets[_t]]
+# B1-BINDING-AMENDMENT-3: migrate additionally binds the source-anchor test that kills "L378 tuple() -> list()"
+# (runtime-equivalent mutant; the anchor test fails deterministically when the anchored line changes).
+for _targets in PHASE_TARGETS.values():
+    _mig = "aisef2/app/bundle_cli.py::migrate"
+    if _mig in _targets and "tests/v2/test_v21_authority_limits.py" not in _targets[_mig]:
+        _targets[_mig] = [*_targets[_mig], "tests/v2/test_v21_authority_limits.py"]
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
