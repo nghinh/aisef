@@ -1350,12 +1350,14 @@ for _t, _f in _B1_GAP_KILLS_W2.items():
     for _targets in PHASE_TARGETS.values():
         if _t in _targets and _f not in _targets[_t]:
             _targets[_t] = [_f, *_targets[_t]]
-# B1-BINDING-AMENDMENT-3: migrate additionally binds the source-anchor test that kills "L378 tuple() -> list()"
-# (runtime-equivalent mutant; the anchor test fails deterministically when the anchored line changes).
+# B1-BINDING-AMENDMENT-4 (supersedes amendment-3's migrate extension): the source-anchor kill for
+# "L378 tuple() -> list()" lives in its own hermetic file. test_v21_authority_limits.py imports
+# validation.qualification, which is not in COPY, so it cannot run at T0 inside a mutant tree.
 for _targets in PHASE_TARGETS.values():
     _mig = "aisef2/app/bundle_cli.py::migrate"
-    if _mig in _targets and "tests/v2/test_v21_authority_limits.py" not in _targets[_mig]:
-        _targets[_mig] = [*_targets[_mig], "tests/v2/test_v21_authority_limits.py"]
+    _anchor = "tests/v2/test_b1gap3_bundle_cli_migrate.py"
+    if _mig in _targets and _anchor not in _targets[_mig]:
+        _targets[_mig] = [_anchor, *_targets[_mig]]
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

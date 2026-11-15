@@ -1,0 +1,27 @@
+{
+ "record": "B1-BINDING-AMENDMENT-4",
+ "date": "2026-11-15",
+ "authority": "owner directive 2026-11-14 CONTINUE, item 4 (resolve genuine gaps and remeasure targets invalidated by fixes); seq-9 B1 risk-based mutation gate",
+ "cause": "rc4 claim 973 (bundle_cli.py::migrate) failed T0 fail-closed on the server: tests/v2/test_v21_authority_limits.py \u2014 bound by amendment-3 as the source-anchor kill for the runtime-equivalent mutant 'L378 tuple() -> list()' \u2014 imports validation.qualification, which mutation.py's COPY tree does not carry, so the file cannot even be loaded inside a mutant tree (ModuleNotFoundError at the unittest loader). 0/200 mutants measured; the worker correctly refused to classify with a red baseline. Defect in amendment-3's kill-set extension choice, not in the harness.",
+ "fix_kind": "test-only: one new hermetic file tests/v2/test_b1gap3_bundle_cli_migrate.py (stdlib-only; asserts via AST that migrate loads approvals as a tuple \u2014 the immutability invariant the mutant erases) replaces tests/v2/test_v21_authority_limits.py in migrate's kill set. Same kill vector the wave-2 adjudication accepted (source anchor on the mutated construct), now runnable at T0 inside the COPY tree. aisef2/ kernel tree unchanged; no pre-existing kill-test file edited.",
+ "verification": "(1) kill property on the RC4 worktree: clean run PASS, apply 'L378 tuple() -> list()' -> test FAILS, revert -> PASSES. (2) T0 parity: a faithful COPY-tree simulation (mutation.py COPY tuple, __pycache__/*.pyc ignored) built from the RC5 tree; all 11 files of migrate's amended kill set pass under the harness invocation `python3 -m unittest discover -s tests/v2 -t tests -p <file>` with cwd at the tree root. (3) ruff clean.",
+ "import_hardening": "b1_import.py now refuses any row whose claim log holds the T0FAIL marker ('kill tests fail on the unmutated tree') or whose record entry holds 0 measured classes (all NOT_RUN): a T0-failed run wrote a fresh record listing all mutants as survivors/NOT_RUN and was briefly accepted as MEASURED before this rule; nothing from that row entered any gate decision.",
+ "bindings_changed": {
+  "aisef2/app/bundle_cli.py::migrate": {
+   "adds": [
+    "tests/v2/test_b1gap3_bundle_cli_migrate.py"
+   ],
+   "removes": [
+    "tests/v2/test_v21_authority_limits.py"
+   ]
+  }
+ },
+ "must_remeasure": [
+  "aisef2/app/bundle_cli.py::migrate"
+ ],
+ "must_remeasure_mutants_total": 200,
+ "must_remeasure_mutants": {
+  "aisef2/app/bundle_cli.py::migrate": 200
+ },
+ "note": "Only migrate's binding changes; the other six amendment-3 targets measured (or are measuring) at RC4 with valid T0 and keep their rc4 rows. Batch stays extensible: new genuine gaps from run.py::execute join via a further amendment with their own new files; nothing here re-measures a valid completed measurement (migrate's rc4 attempt measured nothing)."
+}
