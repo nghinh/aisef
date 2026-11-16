@@ -1,0 +1,18 @@
+{
+ "record": "B1-BINDING-AMENDMENT-5",
+ "date": "2026-11-16",
+ "authority": "owner directive 2026-11-14 CONTINUE, item 4 (audit all newly produced survivors, resolve genuine gaps and remeasure targets invalidated by fixes); seq-9 B1 risk-based mutation gate",
+ "cause": "The pin-lane measurement of aisef2/app/run.py::execute (claim 053, 459 mutants at 3a357570) left 79 survivors. The wave-3 audit (workflow wf_2866cff0: per-survivor auditor, independent adversarial refuter, and a second independent gap verification for every REAL_GAP/WEAK_ASSERT claim; 0 contested verdicts) confirmed 71 as genuine coverage gaps: 63 REAL_GAP, 8 WEAK_ASSERT. Two root causes. (1) tests/v2/test_v22_hardening_p1_run_pin_fence.py — written in wave-2 hardening specifically to pin execute's client_pin/client_fence wiring and present in the pin tree — was mapped to NO target when the B1 kill sets were assembled, so the mutants it pins (the getattr names, the xdg mkdir block, the fence/pin_sha256 session-kw entries, L602's pinned-exe selection) all survived. (2) No test anywhere asserted the record blocks execute writes into RUN.json and the STARTED file (rec['invariants'], rec['client_pin'] with its status/statement, rec['stimulus_tripwire'] and its stage/refusal text, the STARTED file's sorted-keys+newline form, the refusal-message structure recorded in failure.detail) nor the remaining session/budget wiring (needles kw, run-scoped XDG environment values, Budget max_cost/prices).",
+ "fix_kind": "test-only: (a) tests/v2/test_v22_hardening_p1_run_pin_fence.py (pre-existing, unchanged) is added to execute's kill set; (b) one new hermetic file tests/v2/test_b1gap4_run_execute.py anchors the record blocks and remaining wiring (demo harness: fake shebang developer, loopback provider, no network, no credentials; 8 tests, ~5 s). aisef2/ kernel tree unchanged; no pre-existing kill-test file edited.",
+ "verification": "(1) kill property on the RC6 worktree: clean tree 8/8 PASS; six representative mutants applied one at a time (L537 client_pin dict entry 0 dropped; L541 refusal prefix emptied; L590 stage string emptied; L657 needles kw entry dropped; L638 max_cost getattr name emptied; L500 sort_keys True->False) each FAIL the matching test; source restored byte-identical. (2) T0 parity: a faithful COPY-tree simulation (mutation.py _pristine, the campaign's own COPY tuple) built from the RC6 tree; both kill files pass under python3 -P -m unittest with cwd at the tree root. (3) The 8 verdicts not confirmed as gaps (3 MESSAGE_ONLY, 5 EQUIVALENT) are dispositioned in b1-audit-verdicts-wave3.json and need no kill.",
+ "bindings_changed": {
+  "aisef2/app/run.py::execute": {
+   "adds": ["tests/v2/test_b1gap4_run_execute.py", "tests/v2/test_v22_hardening_p1_run_pin_fence.py"],
+   "removes": [],
+   "obligation": "full re-measurement of the target (459 mutants) on the RC6 tree; the pin-lane row for execute is superseded by the RC6 re-measurement row for gate purposes once measured"
+  }
+ },
+ "audit_evidence": "scratchpad b1-audit-verdicts-wave3.json (79 rows: cls, justification, refuter_why, gap_verify with kill_vector); workflow wf_2866cff0 (91 agents, 0 errors)",
+ "supersedes": null,
+ "note": "the amendments array in B1-RISK-MANIFEST.json gains an entry for this amendment (amendments 3 and 4 were recorded as standalone files only)"
+}

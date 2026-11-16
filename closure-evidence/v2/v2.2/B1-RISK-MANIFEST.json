@@ -1149,6 +1149,8 @@
    "source": "aisef2/app/run.py",
    "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
    "kill_tests": [
+    "tests/v2/test_b1gap4_run_execute.py",
+    "tests/v2/test_v22_hardening_p1_run_pin_fence.py",
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_inputs.py",
     "tests/v2/test_v21_identity.py",
@@ -2097,6 +2099,12 @@
    "date": "2026-11-14",
    "cause": "owner directive 2026-11-14 CONTINUE item 4: resolve genuine gaps and remeasure targets invalidated by fixes",
    "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-2.json"
+  },
+  {
+   "record": "B1-BINDING-AMENDMENT-5",
+   "date": "2026-11-16",
+   "cause": "wave-3 survivor audit (79 execute survivors; 71 confirmed coverage gaps)",
+   "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-5.json"
   }
  ]
 }

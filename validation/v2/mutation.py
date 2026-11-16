@@ -1358,6 +1358,16 @@ for _targets in PHASE_TARGETS.values():
     _anchor = "tests/v2/test_b1gap3_bundle_cli_migrate.py"
     if _mig in _targets and _anchor not in _targets[_mig]:
         _targets[_mig] = [_anchor, *_targets[_mig]]
+# B1-BINDING-AMENDMENT-5: the wave-3 audit of execute's 79 survivors confirmed 71 coverage gaps — the frozen
+# kill set carried neither test_v22_hardening_p1_run_pin_fence.py (written for exactly these wiring gaps,
+# mapped to no target at manifest assembly) nor any anchor on the record blocks execute writes. Both are
+# hermetic (demo harness: fake developer, loopback provider) and pass T0 inside the COPY tree.
+for _targets in PHASE_TARGETS.values():
+    _exe = "aisef2/app/run.py::execute"
+    if _exe in _targets:
+        for _f in ("tests/v2/test_v22_hardening_p1_run_pin_fence.py", "tests/v2/test_b1gap4_run_execute.py"):
+            if _f not in _targets[_exe]:
+                _targets[_exe] = [_f, *_targets[_exe]]
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
