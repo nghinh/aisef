@@ -1,0 +1,12 @@
+{
+ "record": "B1-BINDING-AMENDMENT-7",
+ "date": "2026-11-17",
+ "authority": "owner final directive 2026-11-17 (RELEASE-DECISIONS seq 10), lanes A and C: L253 resolution; native Windows tranche; rerun only measurements invalidated by changes",
+ "parts": {
+  "L253": "tests/v2/p4/test_interruption.py gains SecondInterruptGuard: the thread-context guard asserted hermetically via signal.getsignal (install on the main thread, nothing off it, restore on exit) — a plain unittest FAIL the runner can confirm, so the two L253 mutants become killable without converting any INFRA row by fiat. Companion behavioural evidence: V2.2-L253-DISPOSITION.json (controlled comparison re-executed on RC7). Kill property proven: both mutants FAIL (failures=2); source restored.",
+  "WINDOWS": "the three Windows-only targets were re-measured natively on the owner's Windows 10 Pro server (60/60 KILLED, 0 SURVIVED/INFRA/NOT_RUN; T0 3/3 PASS with native tests executing; src digests equal this tree's; environment fingerprint and log in the evidence workspace). They are taken over into V2.1 like the C2/S2/P3/P4 takeovers; v2.2/B1-LIVENESS-MUTATION.json now holds the native run's record.",
+  "STALE_23": "the 23 out-of-scope stale targets (7 aisef2/invariants/registry.py + 16 validation/v2/cleanup_authority.py) were invalidated by v2.2 source changes; per the directive ('preserve existing valid measurements and rerun only those invalidated by changes') they are re-measured on this tree so the record-currency check closes honestly instead of by waiver."
+ },
+ "obligations": "re-measure on this tree: aisef2/runtime/run_scope.py::RunScope._second_interrupt_abandons (kill file changed) and the 23 stale targets; the rc7 obligations (execute, _attempt, destructive_authority x6) continue unchanged at their measured HEAD since none of their bound sources changed here",
+ "recorded_by": "engineering (Claude Code session 845c9f11); the owner did not sign this file"
+}

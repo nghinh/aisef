@@ -1380,6 +1380,13 @@ for _t in _B1_TAKEOVER:
         if _t in PHASE_TARGETS[_ph]:
             V21_TARGETS[_t] = list(PHASE_TARGETS[_ph].pop(_t))
     SUPERSEDED[_t] = "V2.1"
+# Windows-tranche takeover (owner final directive 2026-11-17, lane A2): the three Windows-only targets were
+# re-measured natively on the owner's Windows server against this tree's bindings (60/60 mutants, runner 2).
+# Fresh runner-2 rows live only in the V2.1 record; the V2.2-B1-LIVENESS phase empties (its record file stays as
+# the native run's artifact), exactly like the C2/S2/P3/P4 takeovers.
+for _t in list(B1_LIVENESS_TARGETS):
+    V21_TARGETS[_t] = list(B1_LIVENESS_TARGETS.pop(_t))
+    SUPERSEDED[_t] = "V2.1"
 # B1-BINDING-AMENDMENT-6 (owner final directive 2026-11-17, lanes A/B): the six residual REAL_GAPs get anchors —
 # execute's fence/stage anchors live in test_b1gap4_run_execute.py (extended in place), _attempt's journal-name
 # anchor in its own hermetic file. Appended; order carries no class semantics (ORD-4).

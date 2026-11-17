@@ -5,11 +5,11 @@
  "status": "RE-EXECUTION on v2.2 (owner Option C) — no approval and no acceptance claimed",
  "supersedes": null,
  "identities": {
-  "head": "b35ec9d7fbc250ae296d2846f454dc39c62b4f94",
-  "aisef2_tree": "ac7c170531fc3db1698f062d0bac6d921651d962",
+  "head": "467f62524c01bc8d0a708319758ab2e69b9f93e4",
+  "aisef2_tree": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
   "proposal": {
    "path": "closure-evidence/v2/v2.2/P5-PLAN-V2.2-PROPOSAL.json",
-   "sha256": "34a79bdd8a7c6107bf9d352a747ab84ead3e044d2cdc1acf0d226d10af549d57"
+   "sha256": "e378d2c3c0fe17e6a78422c51ced2439210fcbde66045a8cb7efe95d26939a28"
   },
   "proposal_digest": "9226f1aa4fe094dadfef87bbe4e34ee6934f7cd39fee81841828587e9fb9aceb",
   "plan_hash": "a915ed94dc60658bd419040f7031be2dfc15ebf364cfa170d428b8c0a6e6197d",
@@ -3601,7 +3601,7 @@
  "tests": {
   "tests.v2.test_p5_falsifiability.Falsifiability": {
    "command": [
-    "/Users/nghinh/Downloads/projects/ai-sdlc/validation/v2/owned_run.py",
+    "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/rc6-worktree/validation/v2/owned_run.py",
     "--",
     "/opt/homebrew/opt/python@3.14/bin/python3.14",
     "-m",
@@ -3610,7 +3610,7 @@
    ],
    "exit": 0,
    "ran": 4,
-   "seconds": 4.225,
+   "seconds": 4.148,
    "status": "OK",
    "status_detail": "",
    "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 5s)",
@@ -3618,7 +3618,7 @@
   },
   "tests.v2.test_p5_plan_v22_proposal": {
    "command": [
-    "/Users/nghinh/Downloads/projects/ai-sdlc/validation/v2/owned_run.py",
+    "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/rc6-worktree/validation/v2/owned_run.py",
     "--",
     "/opt/homebrew/opt/python@3.14/bin/python3.14",
     "-m",
@@ -3627,10 +3627,10 @@
    ],
    "exit": 0,
    "ran": 10,
-   "seconds": 0.081,
+   "seconds": 0.06,
    "status": "OK",
    "status_detail": "skipped=1",
-   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1s)",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 0s)",
    "residual": 0
   }
  },
@@ -3642,12 +3642,12 @@
  },
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "b35ec9d7fbc250ae296d2846f454dc39c62b4f94",
-  "kernel_digest": "ac7c170531fc3db1698f062d0bac6d921651d962",
+  "source_commit": "467f62524c01bc8d0a708319758ab2e69b9f93e4",
+  "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json",
    "record_digest": "5e465c1577b299dac7f6d0ddf5b847f64c62dec790e072f8fb0497794684cc26"
   },
-  "record_digest": "6ebdc466ba0dd6474ac93084f6820800074b740b8bd15a304c2351f73c534948"
+  "record_digest": "98d73bc5d889702a58ef6a7a755207756290a5c831d68373bdbe3804bef62f6f"
  }
 }
