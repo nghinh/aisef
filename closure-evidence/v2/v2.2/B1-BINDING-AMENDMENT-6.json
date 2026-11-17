@@ -1,0 +1,31 @@
+{
+ "record": "B1-BINDING-AMENDMENT-6",
+ "date": "2026-11-17",
+ "authority": "owner final directive 2026-11-17 (ENGINEERING GO — RELEASE HOLD), lanes A and B: resolve the six remaining REAL_GAP findings, implement the approved cls. fixture-validator correction, add destructive-authority enforcement tests, remeasure affected targets",
+ "cause": "Six audited REAL_GAPs survived the amendment-5 re-measurement: run.py::execute L515 (the stage VALUE 'invariants' is observable only via failure.stage) and L655 x3 (the composed fence dict — **fence spread, the allow entry, the key names — reaches client.session unasserted); story_runner.py::_attempt L249 x2 (the PL-7 escaped-range resource name 'developer {sid} range' is machine-read journal evidence; no kill test drove the except RangeEscaped arm). Separately, the destructive-authority validator could not derive cls.-bound classmethod fixtures (owner approved the correction).",
+ "fix_kind": "test-and-validator, kernel tree unchanged: (a) tests/v2/test_b1gap4_run_execute.py extended in place with the fence-exact and invariants-stage anchors (10 tests, ~5s) and its fixture moved to TemporaryDirectory (no destructive site); (b) new hermetic file tests/v2/test_b1gap5_story_runner_attempt.py drives the RangeEscaped arm on the p6 orchestration harness and pins the exact journaled resource name; (c) validation/v2/destructive_authority.py _root now derives cls.<attr> like self.<attr> (owner-approved), with positive/negative enforcement tests H/H2 in tests/v2/p0/test_destructive_authority.py; (d) mutation.py COPY gains validation/v21 (the destructive kill set scans and pins its shell scripts; amendment-4 class of defect, fixed at the tuple).",
+ "verification": "(1) kill property: all six REAL_GAP mutants simulated one at a time FAIL their anchor (execute L515, L655 inner-spread/allow-entry/allow-key/outer-entry; _attempt L249 x2); sources restored byte-identical. (2) T0 parity: COPY-tree simulation (mutation.py _pristine) passes all three changed/new kill files. (3) H/H2 prove the validator says yes to a setUpClass-created cls fixture and no to an uncreated one. (4) ruff clean.",
+ "bindings_changed": {
+  "aisef2/app/run.py::execute": {
+   "adds": [],
+   "removes": [],
+   "note": "kill file test_b1gap4_run_execute.py extended in place",
+   "obligation": "full re-measurement (459 mutants) on this tree; the rc6 row is superseded once measured"
+  },
+  "aisef2/orchestrate/story_runner.py::_attempt": {
+   "adds": [
+    "tests/v2/test_b1gap5_story_runner_attempt.py"
+   ],
+   "removes": [],
+   "obligation": "full re-measurement on this tree (V2.1 takeover target; out of the B1 gate scope but a release blocker by owner directive)"
+  },
+  "validation/v2/destructive_authority.py::*": {
+   "adds": [],
+   "removes": [],
+   "note": "source and kill file changed (cls correction + H/H2)",
+   "obligation": "re-measure all six destructive_authority targets on this tree"
+  }
+ },
+ "supersedes": null,
+ "note": "the owner final directive of 2026-11-17 is the authority for the six-gap remediation and the cls correction; no acceptance semantics weakened"
+}

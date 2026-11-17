@@ -2105,6 +2105,12 @@
    "date": "2026-11-16",
    "cause": "wave-3 survivor audit (79 execute survivors; 71 confirmed coverage gaps)",
    "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-5.json"
+  },
+  {
+   "record": "B1-BINDING-AMENDMENT-6",
+   "date": "2026-11-17",
+   "cause": "owner final directive 2026-11-17: six REAL_GAP anchors + cls fixture-validator correction",
+   "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-6.json"
   }
  ]
 }

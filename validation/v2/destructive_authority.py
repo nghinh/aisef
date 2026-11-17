@@ -248,8 +248,8 @@ def _root(expr: str) -> str:
     except SyntaxError:
         return expr
     for n in ast.walk(tree):
-        if isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id == "self":
-            return f"self.{n.attr}"
+        if isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id in ("self", "cls"):
+            return f"{n.value.id}.{n.attr}"   # cls.x: a classmethod fixture (owner-approved correction, 2026-11-17)
     for n in ast.walk(tree):
         if isinstance(n, ast.Name) and n.id not in ("sorted", "list", "str", "pathlib", "os", "shutil", "signal"):
             return n.id

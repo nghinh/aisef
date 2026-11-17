@@ -1380,6 +1380,14 @@ for _t in _B1_TAKEOVER:
         if _t in PHASE_TARGETS[_ph]:
             V21_TARGETS[_t] = list(PHASE_TARGETS[_ph].pop(_t))
     SUPERSEDED[_t] = "V2.1"
+# B1-BINDING-AMENDMENT-6 (owner final directive 2026-11-17, lanes A/B): the six residual REAL_GAPs get anchors —
+# execute's fence/stage anchors live in test_b1gap4_run_execute.py (extended in place), _attempt's journal-name
+# anchor in its own hermetic file. Appended; order carries no class semantics (ORD-4).
+for _targets in PHASE_TARGETS.values():
+    _att = "aisef2/orchestrate/story_runner.py::_attempt"
+    _f6 = "tests/v2/test_b1gap5_story_runner_attempt.py"
+    if _att in _targets and _f6 not in _targets[_att]:
+        _targets[_att] = [*_targets[_att], _f6]
 # B1-BINDING-AMENDMENT-5: the wave-3 audit of execute's 79 survivors confirmed 71 coverage gaps — the frozen
 # kill set carried neither test_v22_hardening_p1_run_pin_fence.py (written for exactly these wiring gaps,
 # mapped to no target at manifest assembly) nor any anchor on the record blocks execute writes. Both are
@@ -1494,6 +1502,7 @@ def audit_of(root: pathlib.Path, target: str, index: int, mutant: str, source_sh
 
 #: What a run copies into its scratch tree.
 COPY = ("aisef2", "tests/v2", "validation/v2", "docs/architecture", "docs/implementation/v2", "closure-evidence/v2",
+        "validation/v21",   # the destructive-authority kill set scans every validation .sh and pins v21's
         "docs/v2.1",   # the bundle-authoring schema and the S-10-a drafts two V2.1 kill files read
         "aisef",   # the frozen V1 tree, read by the WIN-PID red-before reproducers; never a target
         "pyproject.toml")  # the console-script table the old-path audit inventories (tests/v2/test_no_dual_authority.py)

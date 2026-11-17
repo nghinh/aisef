@@ -93,6 +93,31 @@ class Checker(unittest.TestCase):
         problems = da.check(tree({"tests/v2/t.py": shell}, [row]))
         self.assertTrue(any("fail closed" in p for p in problems), problems)
 
+    def test_H_a_classmethod_fixture_bound_in_setUpClass_validates(self):
+        # owner-approved cls. correction (2026-11-17): a tearDownClass rmtree of a path setUpClass created from a
+        # temporary directory derives TEST_CREATED_PATH exactly like the self. form.
+        src = ("import pathlib\nimport shutil\nimport tempfile\nimport unittest\n\n\n"
+               "class T(unittest.TestCase):\n"
+               "    @classmethod\n    def setUpClass(cls):\n"
+               "        cls.t = pathlib.Path(tempfile.mkdtemp(prefix='x-'))\n\n"
+               "    @classmethod\n    def tearDownClass(cls):\n        shutil.rmtree(cls.t, ignore_errors=True)\n")
+        row = {"path": "tests/v2/t.py", "scope": "T.tearDownClass", "callable": "shutil.rmtree", "target": "cls.t",
+               "target_kind": "path", "authority_source": "TEST_CREATED_PATH",
+               "justification": "cls.t bound in setUpClass from tempfile.mkdtemp", "enforcement": "static"}
+        self.assertEqual(da.check(tree({"tests/v2/t.py": src}, [row])), [])
+
+    def test_H2_a_classmethod_fixture_with_no_creator_is_refused(self):
+        src = ("import pathlib\nimport shutil\nimport unittest\n\n\n"
+               "class T(unittest.TestCase):\n"
+               "    @classmethod\n    def setUpClass(cls):\n"
+               "        cls.t = pathlib.Path('/somewhere/else')\n\n"
+               "    @classmethod\n    def tearDownClass(cls):\n        shutil.rmtree(cls.t, ignore_errors=True)\n")
+        row = {"path": "tests/v2/t.py", "scope": "T.tearDownClass", "callable": "shutil.rmtree", "target": "cls.t",
+               "target_kind": "path", "authority_source": "TEST_CREATED_PATH",
+               "justification": "wrong: not a fixture the class created", "enforcement": "static"}
+        problems = da.check(tree({"tests/v2/t.py": src}, [row]))
+        self.assertTrue(any("is not a path this test created" in p for p in problems), problems)
+
     def test_A2_every_direct_shape_names_its_target_and_sites_come_in_one_order(self):
         text = ("import os\nimport pathlib\nimport shutil\nimport signal\nimport subprocess\nimport sys\n\n\ndef f(d, tid):\n"
                 "    c = subprocess.Popen([sys.executable])\n    if d:\n        c.kill()  # nested: the walk reaches it after the next line\n"

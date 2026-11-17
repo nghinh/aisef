@@ -13,7 +13,6 @@ import hashlib
 import json
 import os
 import pathlib
-import shutil
 import sys
 import tempfile
 import unittest
@@ -33,7 +32,8 @@ class RunExecuteRecordAnchors(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.t = pathlib.Path(tempfile.mkdtemp(prefix="aisef-b1gap4-"))
+        cls._td = tempfile.TemporaryDirectory(prefix="aisef-b1gap4-")
+        cls.t = pathlib.Path(cls._td.name)
         (cls.t / "xdg" / "opencode").mkdir(parents=True)
         (cls.t / "xdg" / "opencode" / "opencode.json").write_text(json.dumps(
             {"provider": {"fakeprov": {"options": {"baseURL": demo.SETTINGS["provider"]["endpoint"],
@@ -75,7 +75,7 @@ class RunExecuteRecordAnchors(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(cls.t, ignore_errors=True)
+        cls._td.cleanup()
 
     def _execute(self, out, extra=None, **kw):
         s = settings.load({**demo.SETTINGS, **(extra or {})})
@@ -151,6 +151,28 @@ class RunExecuteRecordAnchors(unittest.TestCase):
         self.assertTrue(self.budget_kws, "the good run built no budget")
         self.assertEqual(self.budget_kws[-1].get("max_cost"), 1.0)
         self.assertEqual(self.budget_kws[-1].get("prices"), PRICES)
+
+    def test_the_declared_fence_reaches_the_session_exactly(self):
+        # B1 amendment-6: the whole composed fence — the declared fields AND the run's repo in "allow" — must reach
+        # the session kw verbatim; a dropped **fence spread, a dropped allow entry or an emptied key is a real change.
+        expect = {"external_directory": "workspace-only", "xdg": "run-scoped", "output_token_max": 64000,
+                  "allow": (str(self.ok / "repo"),)}
+        fences = [kw.get("fence") for kw in self.session_kws if "fence" in kw]
+        self.assertTrue(fences, "no session carried a fence kw at all")
+        for f in fences:
+            self.assertEqual(f, expect)
+
+    def test_a_registry_that_cannot_arm_is_recorded_at_its_stage(self):
+        # B1 amendment-6: a failure inside the arming window must be recorded at stage "invariants" (the stage VALUE
+        # is machine-read from failure.stage; emptying it loses where the run died).
+        out = self.t / "inv-fail"
+        with mock.patch.object(R.invariants, "arm_runtime",
+                               side_effect=R.invariants.RegistrationError("calibration: the registry refused")):
+            with self.assertRaises(R.invariants.RegistrationError):
+                self._execute(out)
+        rec = json.loads((out / "RUN.json").read_text(encoding="utf-8"))
+        self.assertEqual(rec["failure"]["stage"], "invariants")
+        self.assertEqual(rec["failure"]["type"], "RegistrationError")
 
     def test_an_unreadable_lineage_is_refused_naming_the_lineage(self):
         streams = sorted((self.ok / "sessions").glob("*.jsonl"))
