@@ -468,8 +468,12 @@
    {
     "path": "validation/v2/mutation.py",
     "sha256_v2_0_0": "8449cbbc536896ca8af03efc5468eec962317aba665344c15f82d78d69a18077",
-    "sha256_2_1": "7fc8441210ae41e712b9833a4d58832a4b0241b85cb0463ce2835c6ef2d4c984",
+    "sha256_2_1": "18e379da1f23d8cd00113f8827047cee0d8529fde1c09651ff95d28d61b916e1",
     "commits_2_1": [
+     {
+      "commit": "a60137b147c5d96aa34f9ac45f5a113379cff5a0",
+      "subject": "v2.2 records: V2.1 takeover of the B1-measured P3/P4 targets; sealed kill-set order restored"
+     },
      {
       "commit": "48fbe66911da8e0d8d780b1c674eee73c40e4c54",
       "subject": "v2.2 B1 amendment-5: execute kill-set completion after wave-3 survivor audit"
@@ -1069,16 +1073,16 @@
   "no new owner acceptance of the C2-P5 boundary"
  ],
  "written_at": {
-  "head": "579d5c28020ba9f8d3c31e5f6e184aa69d01a84c"
+  "head": "a60137b147c5d96aa34f9ac45f5a113379cff5a0"
  },
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "579d5c28020ba9f8d3c31e5f6e184aa69d01a84c",
+  "source_commit": "a60137b147c5d96aa34f9ac45f5a113379cff5a0",
   "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json",
    "record_digest": "3766b62a086d38d895cbe0a6231c093f42b938bfa2e24094abb6264f62e60648"
   },
-  "record_digest": "395304f13a78a15d7e7a4b539cc32ad376d51a524c1adc638aea2f1cccc1b783"
+  "record_digest": "f039caf92d05eaa13fd282fc2514b2c19c7b701911106fa56849ee9cfd3f9ca7"
  }
 }
