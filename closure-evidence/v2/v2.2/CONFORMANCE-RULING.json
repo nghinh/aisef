@@ -468,8 +468,28 @@
    {
     "path": "validation/v2/mutation.py",
     "sha256_v2_0_0": "8449cbbc536896ca8af03efc5468eec962317aba665344c15f82d78d69a18077",
-    "sha256_2_1": "006a0683771d28ce502a86f4d8aae0fd90243b3db01474e6c576894c9496fd86",
+    "sha256_2_1": "7fc8441210ae41e712b9833a4d58832a4b0241b85cb0463ce2835c6ef2d4c984",
     "commits_2_1": [
+     {
+      "commit": "48fbe66911da8e0d8d780b1c674eee73c40e4c54",
+      "subject": "v2.2 B1 amendment-5: execute kill-set completion after wave-3 survivor audit"
+     },
+     {
+      "commit": "cfcb46ede9ca976cd89ad5aba4c81b1da9871f15",
+      "subject": "v2.2 B1 migrate kill-set fix: hermetic source-anchor kill for L378, replacing authority_limits"
+     },
+     {
+      "commit": "26995fb51ad7bbd70c91df521febeada03808ac3",
+      "subject": "v2.2 B1 gap fixes wave-2: 72 kill tests for the adjudicated REAL_GAP/WEAK_ASSERT survivors (7 targets)"
+     },
+     {
+      "commit": "ef8bc1e3a9d5257001a29061e58895b17a86a381",
+      "subject": "v2.2 B1 gap fixes: 33 kill tests for the audited REAL_GAP/WEAK_ASSERT survivors (16 targets)"
+     },
+     {
+      "commit": "19d1e0dd2ca6ab0b9b5b43b6258edd3756ee2838",
+      "subject": "B1 risk-gate execution package (owner 2026-11-12 section B; RELEASE-DECISIONS seq 9)"
+     },
      {
       "commit": "89de468550d1c2f53a2957f64ef911ebec0a1090",
       "subject": "wave2 lane M: register the wave-1 kill tests (owner directive 2026-11-04)"
@@ -757,7 +777,7 @@
   "behaviour_evidence": {
    "p5_falsifiability": "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json",
    "c2_p5_reverification": "closure-evidence/v2/v2.1/C2-P5-ACCEPTANCE-REVERIFICATION.json",
-   "probe_calibrations": "closure-evidence/v2/release/V2.1.0-PROBE-CALIBRATIONS-3.json",
+   "probe_calibrations": "closure-evidence/v2/release/V2.2.0-PROBE-CALIBRATIONS.json",
    "rule": "every retained spec re-executed under this tree's probes (pristine and witness), compared literally inside B-03a's re-verification; the shipped calibrations at the bytes that run (admission check 9)"
   },
   "engine_digest": "NOT tolerated here: no rule accepts the static admission engine digest (a33f2aee… -> this tree's); the (e) gate is p5_acceptance.history_problems() == [] and reverification_problems() == [] (B-03a: the 2.0 acceptance is its v2.0.0 blob, the boundary re-verified literally on 2.1), never p5_acceptance.check",
@@ -1049,16 +1069,16 @@
   "no new owner acceptance of the C2-P5 boundary"
  ],
  "written_at": {
-  "head": "671a0875f28131485000cdde4681852a96ff51b4"
+  "head": "579d5c28020ba9f8d3c31e5f6e184aa69d01a84c"
  },
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "671a0875f28131485000cdde4681852a96ff51b4",
-  "kernel_digest": "ac7c170531fc3db1698f062d0bac6d921651d962",
+  "source_commit": "579d5c28020ba9f8d3c31e5f6e184aa69d01a84c",
+  "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json",
    "record_digest": "3766b62a086d38d895cbe0a6231c093f42b938bfa2e24094abb6264f62e60648"
   },
-  "record_digest": "4ad787f3adf1baef07a697f38e88aaaacf7db5dddb282a9e96828b01f3cd268c"
+  "record_digest": "395304f13a78a15d7e7a4b539cc32ad376d51a524c1adc638aea2f1cccc1b783"
  }
 }
