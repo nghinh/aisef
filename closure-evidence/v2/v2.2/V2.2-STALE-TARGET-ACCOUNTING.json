@@ -1,0 +1,38 @@
+{
+ "record": "B1 release-scope STALE-TARGET ACCOUNTING — the 23 record-currency entries outside the approved risk scope",
+ "id": "V2.2-STALE-TARGET-ACCOUNTING",
+ "date": "2026-11-17",
+ "authority": "owner final directive 2026-11-17 (RELEASE-DECISIONS seq 10): explicitly account for the 23 stale targets outside the approved risk scope; RELEASE-DECISIONS seq 9: the risk-based gate replaces completion of the frozen full campaign as a release prerequisite",
+ "basis": "v2.2 changed aisef2/invariants/registry.py and validation/v2/cleanup_authority.py; their historical mutation rows therefore fail record currency ('target changed since the mutation run'). None of these targets is in the seq-9 approved 177-target risk scope, so no fresh measurement exists or is required for this release; NOT_RUN is never reported as PASS and these rows stay honestly red in mutation.py check().",
+ "targets": {
+  "aisef2/invariants/registry.py (7, phase P5)": [
+   "_arms",
+   "_load_script",
+   "arm",
+   "register",
+   "require_armed",
+   "resolve",
+   "test_directories"
+  ],
+  "validation/v2/cleanup_authority.py (16, phase V2.1)": [
+   "_PS_ENV_ROW",
+   "_PS_ROW",
+   "_WIN_ROW",
+   "_env_rows",
+   "_lines",
+   "_lsof_cwds",
+   "_not_a_row",
+   "_ps_env",
+   "_ps_rows",
+   "_read",
+   "_twice",
+   "_win_rows",
+   "_windows_table",
+   "carriers",
+   "cwd_under",
+   "host_table"
+  ]
+ },
+ "note": "registry.py::register_runtime IS in the risk scope and carries a fresh B1 measurement; the seven registry entries above are the remaining out-of-scope functions. Re-measuring the 23 is the owner's separate act (seq-9 constraints); until then every release report carries them as open record-currency lines.",
+ "recorded_by": "engineering (Claude Code session 845c9f11); the owner did not sign this file"
+}

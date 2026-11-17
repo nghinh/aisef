@@ -1,0 +1,39 @@
+{
+ "record": "L253 INFRA DISPOSITION — controlled original-vs-mutant comparison re-executed on the final RC",
+ "id": "V2.2-L253-DISPOSITION",
+ "date": "2026-11-17",
+ "authority": "owner final directive 2026-11-17 (RELEASE-DECISIONS seq 10): resolve the L253 SIGINT findings through controlled comparisons; do not convert INFRA to KILLED without valid evidence",
+ "target": "aisef2/runtime/run_scope.py::RunScope._second_interrupt_abandons",
+ "mutants": [
+  "L253 condition negated",
+  "L253 IsNot->Is"
+ ],
+ "runner_class": "INFRA — the mutants end the kill test with no unittest summary (the process dies to KeyboardInterrupt); the runner correctly refuses to classify that as KILLED (fail-closed), and this record does NOT reclassify it",
+ "controlled_comparison": {
+  "harness": "setsid timeout 10m env PYTHONPATH=. python3 -P -m unittest tests.v2.p4.test_interruption -q",
+  "rc7": {
+   "tree": "eb4d73937a715310a23bbb32c976af928c94e82d",
+   "host": "owner Linux server (Ubuntu), clone w15",
+   "baseline": {
+    "exit": 0,
+    "tail_sha256_16": "88d69727a2dd97ea",
+    "last_line": "OK"
+   },
+   "mutant_is": {
+    "exit": 130,
+    "tail_sha256_16": "4814fc343648aaf7",
+    "last_line": "KeyboardInterrupt"
+   },
+   "mutant_negated": {
+    "exit": 130,
+    "tail_sha256_16": "4814fc343648aaf7",
+    "last_line": "KeyboardInterrupt"
+   },
+   "tree_restored": "git status clean after both runs"
+  },
+  "prior": "L253-CONTROLLED-COMPARISON.json (2026-11-13, pin 3a357570 + two GitHub runners): identical shape — baseline 20/20 OK, both mutants exit 130, byte-identical tails"
+ },
+ "determination": "Both L253 mutants are BEHAVIORALLY LETHAL, not equivalent and not an infrastructure fault: the mutated guard skips installing the SIGINT->interrupt() handler on the main thread, and the identical test input then kills the whole process (exit 130) while the unmutated tree passes. The product's guard is therefore exercised and load-bearing. The mutants stay INFRA in the measured record because the unittest harness cannot produce a confirming summary for a process killed by its own signal path; the controlled comparison is the ruling-grade evidence that the behaviour is covered. No kill-test gap: a test that survives the signal to report would have to neuter the very behaviour under test.",
+ "disposition": "accept the two INFRA rows with this record as the controlled-comparison ruling evidence (owner final directive, lane A); never counted as KILLED in the runner ledger; never reported as PASS",
+ "recorded_by": "engineering (Claude Code session 845c9f11); the owner did not sign this file"
+}

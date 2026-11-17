@@ -375,6 +375,33 @@
     "closure-evidence/v2/v2.2/RELEASE-MUTATION-SCOPE-AMENDMENT.json",
     "closure-evidence/v2/v2.2/RELEASE-MUTATION-GATE-EVALUATION.json"
    ]
+  },
+  {
+   "seq": 10,
+   "id": "AISEF_V2_2_FINAL_CLOSE_BLOCKERS_PARALLEL_EXECUTION",
+   "authority": "owner chat directive 2026-11-17 'OWNER FINAL DIRECTIVE — AISEF v2.2 / CLOSE REMAINING RELEASE BLOCKERS — LINUX & WINDOWS PARALLEL EXECUTION'",
+   "approver": "human:owner",
+   "decision": {
+    "VERDICT": "ENGINEERING GO — RELEASE HOLD",
+    "WINDOWS_EXECUTION": "the owner-provided Windows server (Administrator@192.168.1.245) is an authorized testing environment; the three Windows-only B1 targets (60 mutants) are re-run natively there against the final RC binding; prior Windows results stay INVALIDATED and are never reused as PASS without proven binding equivalence",
+    "LINUX_EXECUTION": "resolve and remeasure the six remaining REAL_GAP findings (execute L515, L655 x3; _attempt L249 x2); L253 is dispositioned through controlled comparison, never converted INFRA->KILLED without valid evidence",
+    "DESTRUCTIVE_AUTHORITY": "the cls. fixture-validator correction is approved; positive and negative enforcement tests are added; the six affected checker targets are remeasured",
+    "RELEASE_GOVERNANCE": "seq-9 verified; the 23 stale out-of-scope targets are explicitly accounted; V2_007 dossier re-promotion against the approved documentation SHA; only valid, verified v2.2 C2 records are committed (owner-reserved cycle-2 records are not); Q0, P5-REVERIFICATION and ORCH are completed; sealing DAG and provenance validated",
+    "NO_FALSE_PASS": "no full-suite or CI PASS claim while any mandatory gate is FAIL, NOT_RUN or unverified",
+    "COST": "paid GitHub usage: USD 0 — mandatory",
+    "RELEASE_BOUNDARY": "no master merge, release tag, PyPI publication or Dot-3 without separate final owner authorization"
+   },
+   "constraints": [
+    "verify server identity and SSH host keys; no firewall changes, no internet exposure, no system-wide reconfiguration",
+    "although the Windows account is Administrator, no system-wide settings, persistent services, disabled security controls or stops of unrelated processes",
+    "preserve unrelated services, user files and backup configurations",
+    "do not delete server workspaces or evidence mirrors until all final remeasurements and evidence-integrity checks are complete",
+    "historical v2.1 and cycle-2 evidence preserved byte-identical",
+    "never use an allowlist to hide unresolved trust defects or missing required measurements"
+   ],
+   "owner_text": "Decision: ENGINEERING GO — RELEASE HOLD. Objective: Complete the remaining AISEF v2.2 qualification blockers as quickly as safely possible, using the Owner-provided Linux and Windows servers. [...] IMPORTANT: Previous Windows results were INVALIDATED for the final RC. Do not reuse them as PASS without proving exact source/test/registry binding equivalence. Run the complete required Windows tranche again. [...] Primary objective: FINISH AISEF v2.2 QUALIFICATION — ZERO PAID GITHUB, NO FALSE PASS, NO UNNECESSARY LOOPS. (full directive of 2026-11-17 transcribed from owner chat; abridged here to its decision-bearing sentences)",
+   "recorded_by": "engineering (Claude Code session 845c9f11) transcribing the owner's 2026-11-17 chat directive; the owner did not sign this file",
+   "date": "2026-11-17"
   }
  ]
 }

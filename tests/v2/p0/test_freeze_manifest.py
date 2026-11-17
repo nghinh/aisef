@@ -211,7 +211,19 @@ class FreezeManifest(unittest.TestCase):
         self.assertEqual(exc["owner_approval"], amendment["owner_approval"])
         self.assertEqual(exc["owner_approval"]["decision"], exc["owner_decision"]["decision"])
         dossier = exc["promoted_from"]["path"]
-        self.assertEqual(exc["promoted_from"]["sha256"], fm._lf_sha(ROOT / dossier))
+        live = fm._lf_sha(ROOT / dossier)
+        if exc["promoted_from"]["sha256"] != live:
+            # owner-approved doc edits may re-promote the dossier (RELEASE-DECISIONS seq 10): the v2.2 re-promotion
+            # record must then bind the original digest, the live digest AND this exception file — else fail closed.
+            rp_path = ROOT / "closure-evidence/v2/v2.2/V2-007-DOSSIER-REPROMOTION.json"
+            self.assertTrue(rp_path.exists(),
+                            f"dossier {dossier} drifted from the promoted digest and no re-promotion record exists")
+            rp = json.loads(rp_path.read_text(encoding="utf-8"))
+            self.assertEqual(rp["dossier"]["path"], dossier)
+            self.assertEqual(rp["dossier"]["original_sha256"], exc["promoted_from"]["sha256"])
+            self.assertEqual(rp["dossier"]["approved_sha256"], live)
+            self.assertEqual(rp["exception"]["sha256"], fm._lf_sha(ROOT / rp["exception"]["path"]))
+            self.assertIn("seq 10", rp["authority"])
         # applied before the approval: each commit exists at its recorded time and precedes the commit that wrote seq 4
         approval_commit = git("log", "--format=%H", "-S", entry["id"], "--", ledger_rel).splitlines()[-1]
         applied = exc["applied_before_approval"]["commits"]

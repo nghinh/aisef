@@ -1,0 +1,23 @@
+{
+ "record": "V2-007 DOSSIER RE-PROMOTION (v2.2)",
+ "id": "V2-007-DOSSIER-REPROMOTION",
+ "date": "2026-11-17",
+ "authority": "owner final directive 2026-11-17 (RELEASE-DECISIONS seq 10): complete V2_007 dossier re-promotion against the approved documentation SHA",
+ "exception": {
+  "path": "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json",
+  "sha256": "69aa3ff677ec347e3816de639ec104101fac21ae137c57f5e9643ed1aea0a97c",
+  "note": "the v2.1 exception record is historical evidence and stays byte-identical; this record supersedes only its dossier digest"
+ },
+ "dossier": {
+  "path": "docs/v2.1/decisions/B-01-V2-007-THREE-IDENTITIES.md",
+  "original_sha256": "e0324223dce132eee549d752d8f8bfb09c96e07c25bcf563748461e9ed5d8989",
+  "approved_sha256": "7ca122323933122da104d768a88bd4ce2fea4beea95c4845b454a807b5bab203",
+  "approving_commits": [
+   "089bda4c",
+   "ae42552c",
+   "a57742bb"
+  ],
+  "cause": "owner-approved v2.1 documentation edits changed the dossier after the original promotion froze its digest; the text at a57742bb is the approved content"
+ },
+ "recorded_by": "engineering (Claude Code session 845c9f11); the owner did not sign this file"
+}
