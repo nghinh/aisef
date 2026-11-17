@@ -1,0 +1,33 @@
+{
+ "checker": "version_forward",
+ "package": "v2.2 version-forward binding (owner seq-8)",
+ "kind": "chain",
+ "expect": "record_digest does not recompute (tampered)",
+ "note": "a supersession whose self-digest was rewritten after binding: provenance verification must name the tamper",
+ "series": [
+  {
+   "path": "VF-CALIBRATION-BASE.json",
+   "doc": {
+    "record": "VF-CALIBRATION-BASE",
+    "payload": "legacy"
+   }
+  },
+  {
+   "path": "VF-CALIBRATION-SUP.json",
+   "doc": {
+    "record": "VF-CALIBRATION-SUP",
+    "payload": "v2.2",
+    "version_forward": {
+     "version_context": "v2.2",
+     "source_commit": "cccccccccccccccccccccccccccccccccccccccc",
+     "kernel_digest": "dddddddddddddddddddddddddddddddddddddddd",
+     "supersedes": {
+      "path": "VF-CALIBRATION-BASE.json",
+      "record_digest": "8feb7a14a3af4f3e1ff807f7af5a7046bed15fce3250b3e22f51a8b0dc89fcf0"
+     },
+     "record_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+   }
+  }
+ ]
+}

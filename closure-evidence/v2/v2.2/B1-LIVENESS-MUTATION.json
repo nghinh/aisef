@@ -1,0 +1,3271 @@
+{
+ "record": "AISEF V2 — V2.2-B1-LIVENESS MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/client.py::_is_gone",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_v22_win_native_liveness.py",
+    "tests/v2/test_v22_win_oskill_is_gone.py"
+   ],
+   "source_sha256": "0e6146e952c362c43efeea12a124b3e43d98fe2bff9e9c4766151601d89b9bfc",
+   "tree_sha256": "a036093d7cb19c2aea81b878a89f7e7d8cd2d0595a2475f5d353e8604f2531d6",
+   "mutants": 14,
+   "results": [
+    {
+     "mutant": "L45 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.72,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 1,
+       "seconds": 0.66,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 3,
+       "failures": 1,
+       "first": "FAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) | AssertionError",
+       "tail_sha256": "63e61169b3ec8a5bb4217da150b04cedafa04af76e9a4385822694246773d129",
+       "tail": "test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... ok\ntest_any_subprocess_error_is_caught (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_any_subprocess_error_is_caught) ... ok\ntest_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) ... FAIL\n\n======================================================================\nFAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 78, in test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not\n    self.assertIs(client._is_gone(child.pid, _Proc()), True, \"a reaped escapee is provably gone\")\nAssertionError: False is not True : a reaped escapee is provably gone\n\n----------------------------------------------------------------------\nRan 3 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.52
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not",
+       "exit": 0,
+       "seconds": 0.69,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "bfec49a90efc626a83d98b4ea8559f1c5d6a794294bcc1e2910b0ddc70c79424",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not",
+       "exit": 0,
+       "seconds": 0.66,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "bfec49a90efc626a83d98b4ea8559f1c5d6a794294bcc1e2910b0ddc70c79424",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not",
+       "exit": 1,
+       "seconds": 0.64,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) | AssertionError",
+       "tail_sha256": "9c168f69ee93efe2f4603bf1e53c0616c7655f646ed6c14a9f3b5052cdbac214",
+       "tail": "test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) ... FAIL\n\n======================================================================\nFAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 78, in test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not\n    self.assertIs(client._is_gone(child.pid, _Proc()), True, \"a reaped escapee is provably gone\")\nAssertionError: False is not True : a reaped escapee is provably gone\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+      "first": "FAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) | AssertionError",
+      "seconds": 0.66
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L48 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | AssertionError",
+       "tail_sha256": "03e6bfe227edafebf8f7998dd5d10da16c629f25403a459774983b6371f4f1bf",
+       "tail": "test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... FAIL\n\n======================================================================\nFAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 47, in test_a_ps_that_exits_non_zero_is_caught_not_raised\n    self.assertIs(client._is_gone(child.pid, _Proc()), False,\nAssertionError: None is not False : a failed `ps` must not raise, and a live escapee must not read as gone\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "d6999e023f815df24901a4225189862f6bc952cd150a20c658fe39b1bb73601a",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 0,
+       "seconds": 0.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "d6999e023f815df24901a4225189862f6bc952cd150a20c658fe39b1bb73601a",
+       "overhead_s": 0.45
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | AssertionError",
+       "tail_sha256": "03e6bfe227edafebf8f7998dd5d10da16c629f25403a459774983b6371f4f1bf",
+       "tail": "test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... FAIL\n\n======================================================================\nFAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 47, in test_a_ps_that_exits_non_zero_is_caught_not_raised\n    self.assertIs(client._is_gone(child.pid, _Proc()), False,\nAssertionError: None is not False : a failed `ps` must not raise, and a live escapee must not read as gone\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.5
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+      "first": "FAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | AssertionError",
+      "seconds": 0.58
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L45 IsNot->Is",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 1,
+       "seconds": 0.66,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 3,
+       "failures": 1,
+       "first": "FAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) | AssertionError",
+       "tail_sha256": "63e61169b3ec8a5bb4217da150b04cedafa04af76e9a4385822694246773d129",
+       "tail": "test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... ok\ntest_any_subprocess_error_is_caught (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_any_subprocess_error_is_caught) ... ok\ntest_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) ... FAIL\n\n======================================================================\nFAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 78, in test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not\n    self.assertIs(client._is_gone(child.pid, _Proc()), True, \"a reaped escapee is provably gone\")\nAssertionError: False is not True : a reaped escapee is provably gone\n\n----------------------------------------------------------------------\nRan 3 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not",
+       "exit": 0,
+       "seconds": 0.66,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "bfec49a90efc626a83d98b4ea8559f1c5d6a794294bcc1e2910b0ddc70c79424",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not",
+       "exit": 0,
+       "seconds": 0.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "bfec49a90efc626a83d98b4ea8559f1c5d6a794294bcc1e2910b0ddc70c79424",
+       "overhead_s": 0.45
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not",
+       "exit": 1,
+       "seconds": 0.64,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) | AssertionError",
+       "tail_sha256": "9c168f69ee93efe2f4603bf1e53c0616c7655f646ed6c14a9f3b5052cdbac214",
+       "tail": "test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) ... FAIL\n\n======================================================================\nFAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 78, in test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not\n    self.assertIs(client._is_gone(child.pid, _Proc()), True, \"a reaped escapee is provably gone\")\nAssertionError: False is not True : a reaped escapee is provably gone\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+      "first": "FAIL: test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) | AssertionError",
+      "seconds": 0.66
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L47 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L48 not removed",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | AssertionError",
+       "tail_sha256": "cc201ea107a16f5bd2be9a1fcda973c761e7d978d7830f470f19c87c8361a931",
+       "tail": "test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... FAIL\n\n======================================================================\nFAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 47, in test_a_ps_that_exits_non_zero_is_caught_not_raised\n    self.assertIs(client._is_gone(child.pid, _Proc()), False,\nAssertionError: 1 is not False : a failed `ps` must not raise, and a live escapee must not read as gone\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "d6999e023f815df24901a4225189862f6bc952cd150a20c658fe39b1bb73601a",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "d6999e023f815df24901a4225189862f6bc952cd150a20c658fe39b1bb73601a",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | AssertionError",
+       "tail_sha256": "cc201ea107a16f5bd2be9a1fcda973c761e7d978d7830f470f19c87c8361a931",
+       "tail": "test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... FAIL\n\n======================================================================\nFAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 47, in test_a_ps_that_exits_non_zero_is_caught_not_raised\n    self.assertIs(client._is_gone(child.pid, _Proc()), False,\nAssertionError: 1 is not False : a failed `ps` must not raise, and a live escapee must not read as gone\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+      "first": "FAIL: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | AssertionError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.7,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.63
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 1.28,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.8
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L43 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 6.05,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 1.05
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 1.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 1.14
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L43 element 2 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 6.31,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 1.11
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 1.56,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 1.16
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L43 element 3 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 6.14,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 1.42
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 1,
+       "seconds": 2.44,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | subprocess.CalledProcessError",
+       "tail_sha256": "6d0a030e8aa72b67b81175900d5aab83e92cb08c7bde696c8332fff5bb346d9f",
+       "tail": "rExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... ERROR\n\n======================================================================\nERROR: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 47, in test_a_ps_that_exits_non_zero_is_caught_not_raised\n    self.assertIs(client._is_gone(child.pid, _Proc()), False,\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\app\\client.py\", line 34, in _is_gone\n    present = process_table().get(pid)\n              ^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\unittest\\mock.py\", line 1139, in __call__\n    return self._mock_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\unittest\\mock.py\", line 1143, in _mock_call\n    return self._execute_mock_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\unittest\\mock.py\", line 1198, in _execute_mock_call\n    raise effect\nsubprocess.CalledProcessError: Command '['ps', '-A']' returned non-zero exit status 1.\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 1.19
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 0,
+       "seconds": 1.09,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "d6999e023f815df24901a4225189862f6bc952cd150a20c658fe39b1bb73601a",
+       "overhead_s": 1.08
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 0,
+       "seconds": 1.17,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "d6999e023f815df24901a4225189862f6bc952cd150a20c658fe39b1bb73601a",
+       "overhead_s": 0.92
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+       "exit": 1,
+       "seconds": 1.08,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | subprocess.CalledProcessError",
+       "tail_sha256": "6d0a030e8aa72b67b81175900d5aab83e92cb08c7bde696c8332fff5bb346d9f",
+       "tail": "rExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... ERROR\n\n======================================================================\nERROR: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 47, in test_a_ps_that_exits_non_zero_is_caught_not_raised\n    self.assertIs(client._is_gone(child.pid, _Proc()), False,\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\app\\client.py\", line 34, in _is_gone\n    present = process_table().get(pid)\n              ^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\unittest\\mock.py\", line 1139, in __call__\n    return self._mock_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\unittest\\mock.py\", line 1143, in _mock_call\n    return self._execute_mock_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\unittest\\mock.py\", line 1198, in _execute_mock_call\n    raise effect\nsubprocess.CalledProcessError: Command '['ps', '-A']' returned non-zero exit status 1.\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.89
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+      "first": "ERROR: test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) | subprocess.CalledProcessError",
+      "seconds": 2.44
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L47 not removed",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 6.06,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.53
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.94,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.49
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L47 Or swapped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.94,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L47 Is->IsNot",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.97,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.45
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L47 Is->IsNot",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.91,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.52
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L47 Eq->NotEq",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.94,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    }
+   ],
+   "t0": [
+    {
+     "file": "tests/v2/test_v22_win_native_liveness.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 5.98,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 4,
+     "first_test": "v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+     "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+     "overhead_s": 0.5
+    },
+    {
+     "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.02,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 7,
+     "skipped": 1,
+     "skipped_tests": [
+      "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+     ],
+     "first_test": "v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+     "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+     "overhead_s": 0.53
+    }
+   ],
+   "killed": 5,
+   "survivors": [
+    "L47 returns None",
+    "L43 element 0 dropped",
+    "L43 element 1 dropped",
+    "L43 element 2 dropped",
+    "L47 not removed",
+    "L47 Or swapped",
+    "L47 Is->IsNot",
+    "L47 Is->IsNot",
+    "L47 Eq->NotEq"
+   ],
+   "classes": {
+    "KILLED": 5,
+    "SURVIVED": 9,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::_win_liveness",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_v22_win_native_liveness.py",
+    "tests/v2/test_v22_win_oskill_is_gone.py"
+   ],
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "tree_sha256": "a036093d7cb19c2aea81b878a89f7e7d8cd2d0595a2475f5d353e8604f2531d6",
+   "mutants": 10,
+   "results": [
+    {
+     "mutant": "L140 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.58
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L142 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.58
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L144 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 5.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 2,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "e60cea9c22f1afc8b4a54a22473e036ef3466f494a1f191ad2785c04cb0311eb",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ok\ntest_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: None is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 2 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 1,
+       "seconds": 5.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "2da7f317376a9de52bf4bd7a71273d1de6f1398b19dc7461525157af26d3a0fb",
+       "tail": "test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: None is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.5
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+      "seconds": 5.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L140 not removed",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.62,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.62
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L141 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.99,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.47
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L142 not removed",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.91,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L144 Eq->NotEq",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L141 NotEq->Eq",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.97,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L143 True->False",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    }
+   ],
+   "t0": [
+    {
+     "file": "tests/v2/test_v22_win_native_liveness.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 5.86,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 4,
+     "first_test": "v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+     "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+     "overhead_s": 0.52
+    },
+    {
+     "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.19,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 7,
+     "skipped": 1,
+     "skipped_tests": [
+      "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+     ],
+     "first_test": "v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+     "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+     "overhead_s": 0.47
+    }
+   ],
+   "killed": 6,
+   "survivors": [
+    "L141 returns None",
+    "L143 returns None",
+    "L141 NotEq->Eq",
+    "L143 True->False"
+   ],
+   "classes": {
+    "KILLED": 6,
+    "SURVIVED": 4,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::pid_alive",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_v22_win_native_liveness.py",
+    "tests/v2/test_v22_win_oskill_is_gone.py"
+   ],
+   "source_sha256": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+   "tree_sha256": "a036093d7cb19c2aea81b878a89f7e7d8cd2d0595a2475f5d353e8604f2531d6",
+   "mutants": 36,
+   "results": [
+    {
+     "mutant": "L156 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 5.78,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 2,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "ae7abe0e07dd6317cd7794e34614b6059d9f2cf22f712df03d9178dc4cba5312",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ok\ntest_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: False is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 2 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.61
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.83,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.92
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.83,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.88
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 1,
+       "seconds": 5.64,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "8059af9f204bbf6be44fe65ac0b531b578d348ad915f8cdaae09ef5c3ce10971",
+       "tail": "test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: False is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.51
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+      "seconds": 5.78
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L158 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.58
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.52
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.7,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.55
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.66,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.52
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.58
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L181 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.69,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.91,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.5
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L156 LtE->Gt",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 5.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 2,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "ae7abe0e07dd6317cd7794e34614b6059d9f2cf22f712df03d9178dc4cba5312",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ok\ntest_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: False is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 2 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 1,
+       "seconds": 5.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "8059af9f204bbf6be44fe65ac0b531b578d348ad915f8cdaae09ef5c3ce10971",
+       "tail": "test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: False is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+      "seconds": 5.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L157 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.94,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.49
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L158 Eq->NotEq",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L167 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L181 True->False",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.94,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.5
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L157 False->True",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 1,
+       "seconds": 0.67,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 4,
+       "failures": 1,
+       "first": "FAIL: test_pid_alive_rejects_non_positive_pids (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids) | AssertionError",
+       "tail_sha256": "310cc1e93c6b12c73adef72546cb72eb41b0ea1914577dc5cbdf89a99178adaa",
+       "tail": "test_a_ps_that_exits_non_zero_is_caught_not_raised (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised) ... ok\ntest_any_subprocess_error_is_caught (v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_any_subprocess_error_is_caught) ... ok\ntest_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_is_gone_uses_the_probe_a_reaped_pid_is_gone_a_live_one_is_not) ... ok\ntest_pid_alive_rejects_non_positive_pids (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids) ... FAIL\n\n======================================================================\nFAIL: test_pid_alive_rejects_non_positive_pids (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 67, in test_pid_alive_rejects_non_positive_pids\n    self.assertFalse(pid_alive(0))\nAssertionError: True is not false\n\n----------------------------------------------------------------------\nRan 4 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids",
+       "exit": 0,
+       "seconds": 0.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5bbac6686c4ef1bbed3c0fb084d7dbccfc3e4b45c4018dc6305e3884f43726a5",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5bbac6686c4ef1bbed3c0fb084d7dbccfc3e4b45c4018dc6305e3884f43726a5",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_pid_alive_rejects_non_positive_pids (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids) | AssertionError",
+       "tail_sha256": "7e6703ba5f74ea56130228a0ab3c9259c23e18bc913c788a2f47afe40018f253",
+       "tail": "test_pid_alive_rejects_non_positive_pids (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids) ... FAIL\n\n======================================================================\nFAIL: test_pid_alive_rejects_non_positive_pids (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_oskill_is_gone.py\", line 67, in test_pid_alive_rejects_non_positive_pids\n    self.assertFalse(pid_alive(0))\nAssertionError: True is not false\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+      "first": "FAIL: test_pid_alive_rejects_non_positive_pids (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_pid_alive_rejects_non_positive_pids) | AssertionError",
+      "seconds": 0.67
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string 'nt' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.49
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "8d4627890f013795faa7922c9956c402af2a413b2385919321d9494e7d6333e9",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.argtypes, = (wintypes.HANDLE, [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD])\n    ^^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "8d4627890f013795faa7922c9956c402af2a413b2385919321d9494e7d6333e9",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.argtypes, = (wintypes.HANDLE, [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD])\n    ^^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.49
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "5d787842979e765cb3264fc5fcf0036c4698112e52c64c577eb74c679bd11253",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.restype, = (wintypes.HANDLE, [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD])\n    ^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.45
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "5d787842979e765cb3264fc5fcf0036c4698112e52c64c577eb74c679bd11253",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.restype, = (wintypes.HANDLE, [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD])\n    ^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.5
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "4dc1cf2c2de87cfa78bcb49f4f078c5480c4abfabf8216d15b0809c3c9e6d8ee",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.restype, k.OpenProcess.argtypes = ([wintypes.DWORD, wintypes.BOOL, wintypes.DWORD],)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.62,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "4dc1cf2c2de87cfa78bcb49f4f078c5480c4abfabf8216d15b0809c3c9e6d8ee",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.restype, k.OpenProcess.argtypes = ([wintypes.DWORD, wintypes.BOOL, wintypes.DWORD],)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.51
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "9ef974d0f2e4f4c00b2294515333cd78965dd809fdfdbe2de699fa6270b4f4e7",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.restype, k.OpenProcess.argtypes = (wintypes.HANDLE,)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "9ef974d0f2e4f4c00b2294515333cd78965dd809fdfdbe2de699fa6270b4f4e7",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 137, in pid_alive\n    k.OpenProcess.restype, k.OpenProcess.argtypes = (wintypes.HANDLE,)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.5
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L164 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "13b7ec87aef70d209901f760e600bceed4dacc02c9c09aba7ad35aa587ca4529",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 146, in pid_alive\n    got = bool(k.GetExitCodeProcess(h, ctypes.byref(code)))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 1 argument (2 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "13b7ec87aef70d209901f760e600bceed4dacc02c9c09aba7ad35aa587ca4529",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 146, in pid_alive\n    got = bool(k.GetExitCodeProcess(h, ctypes.byref(code)))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 1 argument (2 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L164 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "13b7ec87aef70d209901f760e600bceed4dacc02c9c09aba7ad35aa587ca4529",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 146, in pid_alive\n    got = bool(k.GetExitCodeProcess(h, ctypes.byref(code)))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 1 argument (2 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "13b7ec87aef70d209901f760e600bceed4dacc02c9c09aba7ad35aa587ca4529",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 146, in pid_alive\n    got = bool(k.GetExitCodeProcess(h, ctypes.byref(code)))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 1 argument (2 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.49
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+      "seconds": 0.58
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L165 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "89dc2fbaa88cf1792dd85518d0506ae13093566c5a3856d15d9a3327d2c61898",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.argtypes, = (wintypes.BOOL, [wintypes.HANDLE])\n    ^^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "89dc2fbaa88cf1792dd85518d0506ae13093566c5a3856d15d9a3327d2c61898",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.argtypes, = (wintypes.BOOL, [wintypes.HANDLE])\n    ^^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.5
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L165 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "fca24245df9e5b047d526ccf7cd022f75150f25eb2528515dd314e2b72908c73",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.restype, = (wintypes.BOOL, [wintypes.HANDLE])\n    ^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "fca24245df9e5b047d526ccf7cd022f75150f25eb2528515dd314e2b72908c73",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.restype, = (wintypes.BOOL, [wintypes.HANDLE])\n    ^^^^^^^^^^^^^^^^^^^^^^\nValueError: too many values to unpack (expected 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L165 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "a5b117e3fdfa195daf9c0c77cf015f25f0c337b19b2cb1987b23391cef975cf5",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.restype, k.CloseHandle.argtypes = ([wintypes.HANDLE],)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "a5b117e3fdfa195daf9c0c77cf015f25f0c337b19b2cb1987b23391cef975cf5",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.restype, k.CloseHandle.argtypes = ([wintypes.HANDLE],)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L165 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "f1bbf5aff903a7ff0157ee3c8541bc6d54396440bed3d106c0413d48ca8095c0",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.restype, k.CloseHandle.argtypes = (wintypes.BOOL,)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.52
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+       "tail_sha256": "f1bbf5aff903a7ff0157ee3c8541bc6d54396440bed3d106c0413d48ca8095c0",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 140, in pid_alive\n    k.CloseHandle.restype, k.CloseHandle.argtypes = (wintypes.BOOL,)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | ValueError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L167 not removed",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L168 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L172 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 5.62,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 2,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "e60cea9c22f1afc8b4a54a22473e036ef3466f494a1f191ad2785c04cb0311eb",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ok\ntest_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: None is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 2 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.49
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.45
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 0,
+       "seconds": 5.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "e3ac0d07949fb53e5447c80e4482f543960e536e13751429e13a7f11905fdf38",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it",
+       "exit": 1,
+       "seconds": 5.62,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+       "tail_sha256": "2da7f317376a9de52bf4bd7a71273d1de6f1398b19dc7461525157af26d3a0fb",
+       "tail": "test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) ... FAIL\n\n======================================================================\nFAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 41, in test_a_live_process_is_alive_and_the_probe_does_not_terminate_it\n    self.assertTrue(pid_alive(p.pid), \"a live process read as gone (native OpenProcess/STILL_ACTIVE)\")\nAssertionError: None is not true : a live process read as gone (native OpenProcess/STILL_ACTIVE)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_live_process_is_alive_and_the_probe_does_not_terminate_it (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_live_process_is_alive_and_the_probe_does_not_terminate_it) | AssertionError",
+      "seconds": 5.62
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L178 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.91,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.5
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L180 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L161 string 'kernel32' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | OSError",
+       "tail_sha256": "ea8824747cc5929a1ae050327bdccf49010a1b5a33942e4bdf414a24f5edfd00",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 136, in pid_alive\n    k = ctypes.WinDLL('', use_last_error=True)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\ctypes\\__init__.py\", line 379, in __init__\n    self._handle = _dlopen(self._name, mode)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [WinError 87] The parameter is incorrect\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | OSError",
+       "tail_sha256": "ea8824747cc5929a1ae050327bdccf49010a1b5a33942e4bdf414a24f5edfd00",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 136, in pid_alive\n    k = ctypes.WinDLL('', use_last_error=True)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\ctypes\\__init__.py\", line 379, in __init__\n    self._handle = _dlopen(self._name, mode)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [WinError 87] The parameter is incorrect\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.49
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | OSError",
+      "seconds": 0.61
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "5407309c23fd5744857ea7481c62f4dce362f77aba937f11ece6e3beb24ecd82",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 141, in pid_alive\n    h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 2 arguments (3 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "5407309c23fd5744857ea7481c62f4dce362f77aba937f11ece6e3beb24ecd82",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 141, in pid_alive\n    h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 2 arguments (3 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "5407309c23fd5744857ea7481c62f4dce362f77aba937f11ece6e3beb24ecd82",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 141, in pid_alive\n    h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 2 arguments (3 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.61,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "5407309c23fd5744857ea7481c62f4dce362f77aba937f11ece6e3beb24ecd82",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 141, in pid_alive\n    h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 2 arguments (3 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.47
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 2 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "5407309c23fd5744857ea7481c62f4dce362f77aba937f11ece6e3beb24ecd82",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 141, in pid_alive\n    h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 2 arguments (3 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.5
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+       "tail_sha256": "5407309c23fd5744857ea7481c62f4dce362f77aba937f11ece6e3beb24ecd82",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... ERROR\n\n======================================================================\nERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\n                     ^^^^^^^^^^^^^^^^\n  File \"<tree>\\aisef2\\runtime\\process_range.py\", line 141, in pid_alive\n    h = k.OpenProcess(_WIN_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: this function takes 2 arguments (3 given)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.52
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "ERROR: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | TypeError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L166 False->True",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.94,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.49
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L178 False->True",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.49
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L180 True->False",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.95,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.47
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L161 True->False",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L168 False->True",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.94,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.47
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L168 False->True",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 0,
+       "seconds": 5.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 4,
+       "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+       "exit": 0,
+       "seconds": 0.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 7,
+       "skipped": 1,
+       "skipped_tests": [
+        "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+       ],
+       "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L172 True->False",
+     "files": [
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.48
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "control",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 0,
+       "seconds": 0.59,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "5302e1b090bbd208be9f5ddf34c6226cd4201fa62ab9a78050e253250ceb8c43",
+       "overhead_s": 0.52
+      },
+      {
+       "file": "tests/v2/test_v22_win_native_liveness.py",
+       "role": "rerun",
+       "select": "*v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+       "exit": 1,
+       "seconds": 0.58,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+       "tail_sha256": "722bcec7847f1e06f9f5d104c823e762471deceec4ee0479ee83649975ef187a",
+       "tail": "test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) ... FAIL\n\n======================================================================\nFAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>\\tests\\v2\\test_v22_win_native_liveness.py\", line 55, in test_a_genuinely_ended_process_is_detected_as_gone\n    self.assertFalse(pid_alive(p.pid), \"an exited process still read as alive (native exit-code path)\")\nAssertionError: True is not false : an exited process still read as alive (native exit-code path)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.5
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v22_win_native_liveness.py",
+      "first": "FAIL: test_a_genuinely_ended_process_is_detected_as_gone (v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone) | AssertionError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    }
+   ],
+   "t0": [
+    {
+     "file": "tests/v2/test_v22_win_native_liveness.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.0,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 4,
+     "first_test": "v2.test_v22_win_native_liveness.WinNativeLiveness.test_a_genuinely_ended_process_is_detected_as_gone",
+     "tail_sha256": "a15210e630966c3780c2183d93045a0669564f6345455242c7289c50952a09c6",
+     "overhead_s": 0.48
+    },
+    {
+     "file": "tests/v2/test_v22_win_oskill_is_gone.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.69,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 7,
+     "skipped": 1,
+     "skipped_tests": [
+      "test_the_probe_does_not_signal_on_posix (v2.test_v22_win_oskill_is_gone.H2ProbeIsReadOnly.test_the_probe_does_not_signal_on_posix)"
+     ],
+     "first_test": "v2.test_v22_win_oskill_is_gone.H1TableReadFailureIsNeverTakenForExit.test_a_ps_that_exits_non_zero_is_caught_not_raised",
+     "tail_sha256": "afbe3e52ba157983be9ff3140df44413afc85832355720d9d3bf56eb72340807",
+     "overhead_s": 0.7
+    }
+   ],
+   "killed": 24,
+   "survivors": [
+    "L181 returns None",
+    "L157 returns None",
+    "L181 True->False",
+    "L168 returns None",
+    "L178 returns None",
+    "L180 returns None",
+    "L166 False->True",
+    "L178 False->True",
+    "L180 True->False",
+    "L161 True->False",
+    "L168 False->True",
+    "L168 False->True"
+   ],
+   "classes": {
+    "KILLED": 24,
+    "SURVIVED": 12,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0
+  }
+ ]
+}

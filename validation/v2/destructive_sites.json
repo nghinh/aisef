@@ -582,6 +582,110 @@
    "authority_source": "TEST_CREATED_HANDLE",
    "justification": "the live child the test started, torn down only if it survived the probe",
    "enforcement": "static: child bound to subprocess.Popen( in the function"
+  },
+  {
+   "path": "tests/v2/test_b1gap_bundle_cli__record.py",
+   "scope": "RecordRefusalText.setUp",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "self.tmp",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "self.tmp = pathlib.Path(tempfile.mkdtemp()) on the line above the cleanup registration",
+   "enforcement": "static: bound from tempfile.mkdtemp in the same setUp"
+  },
+  {
+   "path": "tests/v2/test_v21_pl7_session_teardown.py",
+   "scope": "PL7SessionTeardown.test_a_process_that_stays_alive_refuses_the_session",
+   "callable": "p.kill",
+   "target": "p",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "p is the subprocess.Popen([sys.executable, '-c', 'time.sleep(30)']) this test starts two lines above; the addCleanup kill+wait reaps the test's own child",
+   "enforcement": "static: p bound from subprocess.Popen( in the same method"
+  },
+  {
+   "path": "tests/v2/test_v21_pl7_session_teardown.py",
+   "scope": "IsGoneConfirmation.test_a_table_read_error_never_reads_a_live_escapee_as_gone",
+   "callable": "p.kill",
+   "target": "p",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "p is the subprocess.Popen([sys.executable, '-c', 'time.sleep(30)']) this test starts in the same method; the addCleanup kill+wait reaps the test's own child",
+   "enforcement": "static: p bound from subprocess.Popen( in the same method"
+  },
+  {
+   "path": "tests/v2/test_v21_pw_lineage_continue.py",
+   "scope": "TheRecordItself.test_the_refusal_text_says_what_the_record_is_and_that_nothing_was_written",
+   "callable": "(run / 'RUN.json').unlink",
+   "target": "run / 'RUN.json'",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "run = self.run_dir(self.delivered()): the test class's own delivered-run fixture under its TemporaryDirectory; the unlink swaps RUN.json for a directory to force EVIDENCE_UNREADABLE",
+   "enforcement": "static: run bound from self.run_dir(self.delivered()), the class fixture under the test tmp",
+   "derivation_via": "run_dir"
+  },
+  {
+   "path": "tests/v2/test_v21_pw_lineage_continue.py",
+   "scope": "TheOperatorAsksForAnAnchor.test_the_mismatch_names_the_evidence_file_that_no_longer_matches",
+   "callable": "(run / R.STARTED).unlink",
+   "target": "run / R.STARTED",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "run = self.run_dir(...): the test class's own delivered-run fixture under its tmp; the unlink forges an anchor mismatch on the test's own evidence",
+   "enforcement": "static: bound from the class's own run fixture under its TemporaryDirectory",
+   "derivation_via": "run_dir"
+  },
+  {
+   "path": "tests/v2/test_v21_pw_lineage_continue.py",
+   "scope": "B1SurvivorKills.test_the_missing_record_refusal_tells_the_operator_what_to_do",
+   "callable": "(run / R.STARTED).unlink",
+   "target": "run / R.STARTED",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "run = self.run_dir(...): the class's own delivered-run fixture under its tmp; removing the STARTED file stages the no-record refusal on the test's own evidence",
+   "enforcement": "static: bound from the class's own run fixture under its TemporaryDirectory",
+   "derivation_via": "run_dir"
+  },
+  {
+   "path": "tests/v2/test_v21_pw_lineage_continue.py",
+   "scope": "B1SurvivorKills.test_the_unreadable_record_refusal_says_it_cannot_be_read",
+   "callable": "(run / 'RUN.json').unlink",
+   "target": "run / 'RUN.json'",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "run = self.run_dir(...): the class's own delivered-run fixture under its tmp; the unlink+mkdir swap forces EVIDENCE_UNREADABLE on the test's own evidence",
+   "enforcement": "static: bound from the class's own run fixture under its TemporaryDirectory",
+   "derivation_via": "run_dir"
+  },
+  {
+   "path": "tests/v2/test_v22_client_pin_fence.py",
+   "scope": "SessionFence.test_the_fence_is_composed_per_worktree_and_said_to_be_declared_only",
+   "callable": "(self.tmp / 'logs' / 's.jsonl').unlink",
+   "target": "self.tmp / 'logs' / 's.jsonl'",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "self.tmp = pathlib.Path(tempfile.mkdtemp(prefix='aisef-fence-')) in setUp; the unlinked session log is the one _run just wrote under it",
+   "enforcement": "static: self.tmp bound from tempfile.mkdtemp in setUp of the same class"
+  },
+  {
+   "path": "tests/v2/test_v22_client_pin_fence.py",
+   "scope": "SessionFence.test_the_pin_is_rechecked_at_the_moment_of_use",
+   "callable": "(self.tmp / 'logs' / 's.jsonl').unlink",
+   "target": "self.tmp / 'logs' / 's.jsonl'",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "self.tmp = pathlib.Path(tempfile.mkdtemp(prefix='aisef-fence-')) in setUp; the unlinked session log is the one _run just wrote under it",
+   "enforcement": "static: self.tmp bound from tempfile.mkdtemp in setUp of the same class"
+  },
+  {
+   "path": "tests/v2/test_v22_hardening_p1_run_pin_fence.py",
+   "scope": "RunExecutePinFence.setUp",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "self.t",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "self.t = pathlib.Path(tempfile.mkdtemp(prefix='aisef-p1-')) one line above the cleanup registration",
+   "enforcement": "static: bound from tempfile.mkdtemp in the same setUp"
   }
  ]
 }

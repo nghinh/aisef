@@ -1,0 +1,8 @@
+{
+ "checker": "currency_dag",
+ "package": "v2.2 cross-record currency (owner v2.2 #1)",
+ "kind": "context",
+ "expect": "upstream not resolvable for this round",
+ "note": "the DAG validated against a kernel tree no v2.2 record binds: every declared edge must refuse to resolve rather than fall back",
+ "kernel_digest": "ffffffffffffffffffffffffffffffffffffffff"
+}

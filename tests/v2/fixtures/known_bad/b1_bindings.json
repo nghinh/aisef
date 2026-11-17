@@ -1,0 +1,20 @@
+{
+ "checker": "b1_bindings",
+ "package": "B1 risk gate (owner 2026-11-12 section B)",
+ "kind": "manifest",
+ "expect": "moved since the manifest froze",
+ "note": "a frozen manifest whose single target binds aisef2/app/run.py to an impossible digest: the fail-closed preflight must refuse to run anything on it",
+ "manifest": {
+  "frozen_bindings": {
+   "aisef2_kernel_tree": "0000000000000000000000000000000000000000",
+   "registry_file": "aisef2/invariants/registry.py",
+   "registry_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "targets": {
+   "aisef2/app/run.py::execute": {
+    "source": "aisef2/app/run.py",
+    "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+   }
+  }
+ }
+}

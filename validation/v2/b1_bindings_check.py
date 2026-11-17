@@ -11,12 +11,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 MANIFEST_REL = "closure-evidence/v2/v2.2/B1-RISK-MANIFEST.json"
 
 
-def main(argv: list[str] | None = None) -> int:
-    targets = (sys.argv[1:] if argv is None else argv)
-    man = json.loads((ROOT / MANIFEST_REL).read_text(encoding="utf-8"))
+def problems(man: dict, targets: list[str] | None = None) -> list[str]:
+    """Every binding problem of `man` against this tree (the decision main() prints)."""
     bad = []
     kernel = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD:aisef2"],
-                            capture_output=True, text=True).stdout.strip()
+                            capture_output=True, text=True, encoding="utf-8").stdout.strip()
     if kernel != man["frozen_bindings"]["aisef2_kernel_tree"]:
         bad.append(f"kernel {kernel[:12]} is not the frozen {man['frozen_bindings']['aisef2_kernel_tree'][:12]}")
     reg = hashlib.sha256((ROOT / man["frozen_bindings"]["registry_file"]).read_bytes()).hexdigest()
@@ -29,6 +28,14 @@ def main(argv: list[str] | None = None) -> int:
             continue
         if hashlib.sha256((ROOT / e["source"]).read_bytes()).hexdigest() != e["source_sha256"]:
             bad.append(f"{t}: {e['source']} moved since the manifest froze")
+    return bad
+
+
+def main(argv: list[str] | None = None) -> int:
+    targets = (sys.argv[1:] if argv is None else argv)
+    man = json.loads((ROOT / MANIFEST_REL).read_text(encoding="utf-8"))
+    bad = problems(man, targets)
+    kernel = man["frozen_bindings"]["aisef2_kernel_tree"]
     print("\n".join(f"FAIL  {x}" for x in bad) if bad else
           f"BINDINGS OK: {len(targets or man['targets'])} targets, kernel {kernel[:12]}")
     return 1 if bad else 0

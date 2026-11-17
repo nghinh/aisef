@@ -171,6 +171,41 @@ def _state_model_prover() -> Checker:
                    ("validation/v2/prove_state_model_fix.py",))
 
 
+def _b1_bindings() -> Checker:
+    bc = _load("_b1_bindings_check", ROOT / "validation" / "v2" / "b1_bindings_check.py")
+    man = json.loads((ROOT / bc.MANIFEST_REL).read_text(encoding="utf-8"))
+    return Checker("b1_bindings", "B1 risk gate (owner 2026-11-12 section B)",
+                   lambda: bc.problems(man), lambda fx: bc.problems(fx["manifest"]),
+                   ("validation/v2/b1_bindings_check.py",))
+
+
+def _currency_dag() -> Checker:
+    cd = _load("_currency_dag", ROOT / "validation" / "v2" / "currency_dag.py")
+    return Checker("currency_dag", "v2.2 cross-record currency (owner v2.2 #1)",
+                   lambda: cd.validate(ROOT)["problems"],
+                   lambda fx: cd.validate(ROOT, kernel_digest=fx["kernel_digest"])["problems"],
+                   ("validation/v2/currency_dag.py",))
+
+
+def _version_forward() -> Checker:
+    vf = _load("_version_forward", ROOT / "validation" / "v2" / "version_forward.py")
+
+    def series_of(fx):
+        return [(e["path"], e["doc"], vf._canon(e["doc"])) for e in fx["series"]]
+
+    def clean():
+        base = {"record": "VF-CALIBRATION-BASE", "payload": "legacy"}
+        base_bytes = vf._canon(base)
+        sup = vf.bind({"record": "VF-CALIBRATION-SUP", "payload": "v2.2"},
+                      version_context=vf.CURRENT_ROUND, source_commit="c" * 40, kernel_digest="d" * 40,
+                      predecessor_path="VF-CALIBRATION-BASE.json", predecessor_bytes=base_bytes)
+        return vf.validate_chain([("VF-CALIBRATION-BASE.json", base, base_bytes),
+                                  ("VF-CALIBRATION-SUP.json", sup, vf._canon(sup))])
+    return Checker("version_forward", "v2.2 version-forward binding (owner seq-8)",
+                   clean, lambda fx: vf.validate_chain(series_of(fx)),
+                   ("validation/v2/version_forward.py",))
+
+
 def _v2_encoding_scanner() -> Checker:
     tm = _load("_v1_test_meta_scanner", ROOT / "tests" / "test_meta.py")
     scan = tm.TestKhongDocDauRaBangBangMaCuaMay("test_phep_quet_that_su_thay_duoc_loi")._thieu
@@ -532,6 +567,7 @@ def _profile_freeze() -> Checker:
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
+    _b1_bindings, _currency_dag, _version_forward,
     _kernel_rule("no_prose_control", "NO_PROSE_CONTROL", "WP-1.1"),
     _kernel_rule("no_raw_verdict_routing", "NO_RAW_VERDICT_ROUTING", "WP-1.3"),
     _kernel_rule("retryable_only_in_taxonomy", "RETRYABLE_ONLY_IN_TAXONOMY", "WP-1.4"),
