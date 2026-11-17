@@ -2123,6 +2123,12 @@
    "date": "2026-11-18",
    "cause": "L253 hermetic kill in its own appended file; kill-file byte-fidelity restored for 11 co-bound targets",
    "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-8.json"
+  },
+  {
+   "record": "B1-BINDING-AMENDMENT-9",
+   "date": "2026-11-18",
+   "cause": "rc8 stale-target survivors: require_armed + _read killed, _win_rows EQUIVALENT audited",
+   "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-9.json"
   }
  ]
 }

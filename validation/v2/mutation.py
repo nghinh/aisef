@@ -1380,6 +1380,17 @@ for _t in _B1_TAKEOVER:
         if _t in PHASE_TARGETS[_ph]:
             V21_TARGETS[_t] = list(PHASE_TARGETS[_ph].pop(_t))
     SUPERSEDED[_t] = "V2.1"
+# B1-BINDING-AMENDMENT-9: the rc8 re-measurement of out-of-scope stale targets left 3 audited survivors (wf_fea06eec,
+# auditor+refuter agreed). Two are REAL_GAP/WEAK_ASSERT the owner directive forbids bulk-accepting — killed by
+# appending an existing sibling (require_armed) and one new argv anchor (_read); the third (_win_rows validate
+# True->False) is EQUIVALENT and gets a positional audit, not a test.
+for _targets in PHASE_TARGETS.values():
+    _ra = "aisef2/invariants/registry.py::require_armed"
+    if _ra in _targets and "tests/v2/p0/test_invariants_runtime.py" not in _targets[_ra]:
+        _targets[_ra] = [*_targets[_ra], "tests/v2/p0/test_invariants_runtime.py"]
+    _rd = "validation/v2/cleanup_authority.py::_read"
+    if _rd in _targets and "tests/v2/test_b1gap8_cleanup_authority_read.py" not in _targets[_rd]:
+        _targets[_rd] = [*_targets[_rd], "tests/v2/test_b1gap8_cleanup_authority_read.py"]
 # B1-BINDING-AMENDMENT-8: the L253 hermetic guard kill lives in its own appended file — the in-place edit of
 # test_interruption.py (amendment-7) is reverted to keep that kill file byte-identical for the 11 other targets
 # measured against it; the runner walks past the signal-killed INFRA file to this clean, confirmable FAIL.

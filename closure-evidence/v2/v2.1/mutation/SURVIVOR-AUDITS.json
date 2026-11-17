@@ -11408,6 +11408,25 @@
    "exceptions_checked": [
     "raise/except paths named in grounds"
    ]
+  },
+  {
+   "target": "validation/v2/cleanup_authority.py::_win_rows",
+   "index": 17,
+   "mutant": "L187 True->False",
+   "class": "EQUIVALENT",
+   "group": "B1 v2.2 survivor audit (waves 1-3, adversarially refereed)",
+   "grounds": "[EQUIVALENT, wf_fea06eec auditor+refuter agreed] `validate` only governs how non-base64-alphabet characters are treated, and two independent guards make that irrelevant on every reachable input. (1) Regex pre-constraint: `command` is group 4 of `_WIN_ROW` (cleanup_authority.py:112 `([A-Za-z0-9+/]*={0,2})`) and reaches L187 only after `_WIN_ROW.fullmatch` succeeded (L182-184, else `_not_a_row`), so it is always pure base64-alphabet + 0-2 trailing `=` — there are no non-alphabet chars for `validate` to reject or discard. (Pre-3.11, `validate=True`'s internal `re.fullmatch(b'[A-Za-z0-9+/]*={0,2}', s)` is the same pattern `command` already satisfied, so it never fires.) (2) Round-trip backstop at L190-191: `if base64.b64encode(blob).decode(\"ascii\") != command: raise _not_a_row(...)`; since `b64encode` always emits canonical base64, a row is accepted only when `command` is canonical, and for canonical input both `validate` values decode to identical bytes. For non-canonical input (the only place strict/lenient could diverge — leading/excess padding) the row is refused either way: `validate=True` either raises at L187 (caught L188) or, for the 3.11-swallowed excess-padding case `QUJD=`, fails the L190 round-trip, and `validate=False` fails that same round-trip. Kill tests confirm no observation point: test_v21_r3_auth_other_readers.py::WindowsTable encodes every good row canonically (L79); its not-a-row cases are caught identically under both values — `QUJD=` (L126) by the L190 round-trip, `QUJ` (L127) by a padding-length binascii.Error, `QU JD` (L125) by the regex at L183 before L187. test_v21_r3_auth_rv_digits.py uses canonical base64 (L39) and tests digit length; test_v21_r3_auth_ps_table.py is POSIX-only and never enters `_win_rows`. No reachable input yields a different `_win_rows` result, so this is EQUIVALENT (not WEAK_ASSERT: there is no observable difference to assert on). | independent refuter: Re-derived independently; EQUIVALENT confirmed, though the universal guarantor is the L190-191 round-trip backstop, not the regex pre-constraint (that guard only describes the pre-3.11 regex form of `validate`; on 3.11+ `validate=True` == `strict_mode=True` in a2b_base64, which also rejects leading/excess padding — the first auditor's guard-1 framing \"validate only governs non-alphabet chars\" is too narrow, but harmless because guard-2 covers those cases). Proof: (1) reachable `command` at L187 already passed `_WIN_ROW.fullmatch` (cleanup_authority.py:112 group 4 `[A-Za-z0-9+/]*={0,2}`, checked L182-184), so it is pure base64-alphabet + 0-2 trailing `=`. (2) lenient (validate=False) accepts a superset of strict and, on the common accept-set, runs the same conversion producing byte-identical `blob` — so no accept-with-different-bytes case exists; divergence is only accept-vs-reject. (3) The L190-191 backstop accepts a row only when `base64.b64encode(blob).decode('ascii') == command`; since b64encode emits canonical base64, acceptance forces `command` canonical, and strict never rejects canonical base64. Hence the sole region where decode differs (strict raises at L187->L188 `_not_a_row`, lenient decodes) can never round-trip, so lenient also fails L190 and raises `_not_a_row` with the identical TableUnreadable message (L123-124) — the two raise sites are observationally indistinguishable. By symmetry, original-accept implies mutant-accept with the same blob. So `_win_rows` yields the same result on every input. Cases match the code/tests: `QUJD=` (test_v21_r3_auth_other_readers.py:126) decodes `b'ABC'` under both, both fail the L190 round-trip; `QUJ` (:127) raises binascii.Error under both, caught at L188; leading-pad cannot occur because `=` only appears trailing. `_win_rows` is consumed only by `_windows_table` (L211); decoded `text` is stored only for accepted (canonical) rows where both validate values decode identically, so no downstream divergence. Not WEAK_ASSERT: no reachable input produces a differing `_win_rows` result, so no test could observe a difference to assert on; _rv_digits (:39) and WindowsTable (:79/:91) use canonical base64, and _ps_table is POSIX-only and never enters `_win_rows`.",
+   "source_sha256": "181048fb81bcd9d9c7d1b4514c4f31d36a6dc1ef6b4c3a45f5f204be5d1b4f56",
+   "consumers_checked": [
+    "cleanup_authority.py:112",
+    "test_v21_r3_auth_other_readers.py",
+    "test_v21_r3_auth_other_readers.py:126",
+    "test_v21_r3_auth_ps_table.py",
+    "test_v21_r3_auth_rv_digits.py"
+   ],
+   "exceptions_checked": [
+    "base64 binascii.Error path named in grounds"
+   ]
   }
  ]
 }

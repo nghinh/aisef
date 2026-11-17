@@ -1,0 +1,30 @@
+{
+ "record": "B1-BINDING-AMENDMENT-9",
+ "date": "2026-11-18",
+ "authority": "owner final directive 2026-11-17 (RELEASE-DECISIONS seq 10): audit all newly produced survivors; do not bulk-accept REAL_GAP or WEAK_ASSERT",
+ "cause": "The rc8 re-measurement of the 23 out-of-scope stale targets left 3 audited survivors (wf_fea06eec; auditor and adversarial refuter agreed, uncontested): registry.py::require_armed 'L373 In->NotIn' (REAL_GAP — the named p5 kill test never calls arm_runtime, so it never enters the runtime-armed fast path the mutant breaks), cleanup_authority.py::_read 'L167 element 1 dropped' (WEAK_ASSERT — the real-ps test observed the smaller no-'-A' table but asserted too weakly), and cleanup_authority.py::_win_rows 'L187 True->False' (EQUIVALENT — the L190-191 canonical base64 round-trip backstop rejects exactly what validate=True would).",
+ "fix_kind": "test-only, kernel tree unchanged: require_armed gains tests/v2/p0/test_invariants_runtime.py (an existing sibling that already kills the mutant via a real arm_runtime subprocess) appended to its kill set; _read gains a new hermetic file tests/v2/test_b1gap8_cleanup_authority_read.py that pins its exact ps argv (the '-A' drop is a deterministic kill); _win_rows gets a positional EQUIVALENT audit (SURVIVOR-AUDITS.json, index 17, source 181048fb), not a test.",
+ "verification": "both REAL_GAP/WEAK_ASSERT mutants KILLED in simulation by the appended/new files; COPY-tree T0 parity PASS; ruff clean. The EQUIVALENT audit's source_sha256 equals the measured row's.",
+ "bindings_changed": {
+  "aisef2/invariants/registry.py::require_armed": {
+   "adds": [
+    "tests/v2/p0/test_invariants_runtime.py"
+   ],
+   "removes": [],
+   "obligation": "re-measure on this tree; the rc8 row is superseded"
+  },
+  "validation/v2/cleanup_authority.py::_read": {
+   "adds": [
+    "tests/v2/test_b1gap8_cleanup_authority_read.py"
+   ],
+   "removes": [],
+   "obligation": "re-measure on this tree; the rc8 row is superseded"
+  },
+  "validation/v2/cleanup_authority.py::_win_rows": {
+   "adds": [],
+   "removes": [],
+   "note": "EQUIVALENT survivor audited positionally; the rc8 row stays (source unchanged)"
+  }
+ },
+ "recorded_by": "engineering (Claude Code session 845c9f11); the owner did not sign this file"
+}
