@@ -76,6 +76,35 @@ CHANGES = {
                                              "(2.0 reviews and merges S2's candidate)",
         },
     },
+    "file-artifact-prohibition": {
+        "item": "file-artifact-prohibition",
+        "scenario": "the 2.0 corpus case unchanged: a file-artifact contract whose prohibition the candidate honours; COMMIT both sides",
+        "expectation_2_0": "S1 COMMIT, 53 events, replay GREEN",
+        "expectation_2_1": "S1 COMMIT — same outcomes, calls, failures and gate rows — 63 events: the review-limits window is "
+                           "journaled (the verdict is decided after the subject's range is released, and the worker's request, "
+                           "result and output are files of a directory made by mkdtemp at that moment), and the subprocess "
+                           "evidence carries the worktree field",
+        "cause_commit": "3e26945c (merged 3bd2e7d8): v2.1 review limits — the regex search is out of the subject's reach; "
+                        "the edge of file_artifact's window is pinned where the published definition and the code agree",
+        "requirement": ("review-limits F1/F2/F7: a lingering subject cannot rewrite the worker's request or result, and no "
+                        "in-process search is left to fall back to; the window's extra journal rows are that isolation, recorded",),
+        "decision": ("owner v2.1 review-limits lane (B-03 lane merge); 21 red-before/green-after cases in "
+                     "tests/v2/test_v21_r5_regex_isolation.py",),
+        "behaviour_tests": (
+            "tests.v2.test_v21_r5_regex_isolation.ALingeringSubjectCannotChangeTheSearch."
+            "test_rewriting_the_workers_request_or_result_changes_nothing",
+            "tests.v2.test_v21_r5_regex_isolation.ALingeringSubjectCannotChangeTheSearch."
+            "test_a_link_planted_where_the_harness_would_write_is_not_followed",
+            "tests.v2.test_v21_r5_regex_isolation.TheSearchStartsOnlyWhenNothingOfTheSubjectIsAlive."
+            "test_the_verdict_is_decided_after_the_release_and_not_before",
+        ),
+        "measured": {
+            "evidence": MEASUREMENT,
+            "this item under aisef2 v2.0.0": "S1 COMMIT, 2 calls, 53 events, no failures; replay GREEN",
+            "this item under this tree": "S1 COMMIT, 2 calls, 63 events, no failures; replay GREEN; other_fields journal + "
+                                          "subprocesses.worktree",
+        },
+    },
     "post-merge-integration-regression": {
         "item": "post-merge-integration-regression", "keeps_coverage_of": "post-merge-regression",
         "scenario": "two stories as above; S2's candidate is clean (mul only) and, right after S2's developer answer, main moves under "
@@ -118,21 +147,25 @@ UNCHANGED = {
     "identical_up_to_kernel_identity": ("normal-completion", "retry-then-commit", "review-finding-rollback", "pre-satisfied",
                                         "security-finding-rollback", "developer-outage-rollback"),
     "identity_only": {
-        "items": ("cli-proved-story", "cli-refuted-then-commit", "file-artifact-prohibition", "scenario-proved-story",
+        "items": ("cli-proved-story", "cli-refuted-then-commit", "scenario-proved-story",
                   "bytes-returning-python-callable"),
         "differing": "every request hash; plan/frozen plan_hash; probe/evaluated probe_digest, spec_id, semantic_hash, record_digest; "
                      "proof/verified spec_id, semantic_hash; the probe process-range names, which carry the spec id",
         #: v2.0.0 -> 2.1, measured: COMPARISON_REL records each side's probe digests, v21_q5_compare.check requires these
-        "probe_digests_by_kind": {"cli_invocation": ("d42449fd8e3a", "330ae4a88cc8"), "file_artifact": ("31465b73cbe2", "be1485d12a4d"),
+        "probe_digests_by_kind": {"cli_invocation": ("d42449fd8e3a", "330ae4a88cc8"),
                                   "process_effect": ("815e4c865274", "409c41aea16f"), "python_callable": ("b1f25878d350", "0821c14651a9")},
-        "probe_ids_by_kind": {"cli_invocation": "probe.cli_invocation", "file_artifact": "probe.file_artifact",
+        "probe_ids_by_kind": {"cli_invocation": "probe.cli_invocation",
                               "process_effect": "probe.process_effect", "python_callable": "probe.python_callable_v2"},
+        #: file_artifact moved to CHANGES["file-artifact-prohibition"] (review-limits window): its digests
+        #: 31465b73cbe2 -> ba12a5d24463 are stated there and in cause_commits; no identity-only item exercises it now
         "probe_digests_evidence": MEASUREMENT + " (each side's probe digests; v21_q5_compare.check compares them with these)",
         "cause_commits_evidence": "the lane's scratch measurement only, in no record (COMPARISON_REL measures v2.0.0 and this tree, "
                                   "never 919a271: the file_artifact step 46737ca1c479 is not in it)",
         "cause_commits": {V2_007: "V2-007: a probe's digest is its capability digest (all four; file_artifact 31465b73cbe2 -> 46737ca1c479)",
                           V21_37: "V21-37 (engineering change, not owner-approved): file_artifact python_imports, capability version 2 "
-                                  "(46737ca1c479 -> be1485d12a4d)"},
+                                  "(46737ca1c479 -> be1485d12a4d)",
+                          "V21-RL": "v2.1 review-limits lane (3e26945c, merged 3bd2e7d8): the file_artifact window edge pinned where "
+                                    "the published definition and the code agree (be1485d12a4d -> ba12a5d24463)"},
         "decision": ("ARCHITECTURE-EXCEPTION-V2-007 approved: RELEASE-DECISIONS seq 4 (AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007)",
                      "V21-37: engineering change (ADR-5, 06d4e62), not owner-approved; no Q5 expectation depends on it (identity only)"),
     },
