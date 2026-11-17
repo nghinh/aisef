@@ -1,0 +1,18 @@
+{
+ "record": "B1-BINDING-AMENDMENT-8",
+ "date": "2026-11-18",
+ "authority": "owner final directive 2026-11-17 (RELEASE-DECISIONS seq 10), lane A: L253 resolution; byte-fidelity of measured kill files",
+ "cause": "Amendment-7 added the hermetic L253 guard class INSIDE tests/v2/p4/test_interruption.py. Two defects: (1) under a mutated guard the file's real-signal cases kill the process before the hermetic class runs (unittest orders classes alphabetically), so the rc8 re-measurement still classified both L253 mutants INFRA; (2) the in-place edit changed the bytes of a kill file that 11 other measured targets bind (tool.py x5, repair.py x3, run_scope _now/append/interrupt), which the Windows-invalidation standard reads as invalidating their rows.",
+ "fix_kind": "test-only: tests/v2/p4/test_interruption.py reverted to its pin bytes (the 11 co-bound rows stay valid); the hermetic assertions move to their own file tests/v2/p4/test_b1gap7_second_interrupt_guard.py, APPENDED to the one target's kill set — the runner walks past the signal-killed INFRA file to a clean, confirmable FAIL ('an infrastructure fault never hides a later valid kill').",
+ "verification": "worktree test_interruption.py byte-identical to pin (git diff empty); both L253 mutants KILLED by the new file in simulation; COPY-tree T0 parity PASS for both files; ruff clean.",
+ "bindings_changed": {
+  "aisef2/runtime/run_scope.py::RunScope._second_interrupt_abandons": {
+   "adds": [
+    "tests/v2/p4/test_b1gap7_second_interrupt_guard.py"
+   ],
+   "removes": [],
+   "obligation": "re-measure this one target on this tree; the rc8 row (measured with amendment-7's in-place bytes) is superseded; no other target's binding changes"
+  }
+ },
+ "recorded_by": "engineering (Claude Code session 845c9f11); the owner did not sign this file"
+}

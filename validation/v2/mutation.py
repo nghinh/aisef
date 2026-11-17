@@ -1380,6 +1380,14 @@ for _t in _B1_TAKEOVER:
         if _t in PHASE_TARGETS[_ph]:
             V21_TARGETS[_t] = list(PHASE_TARGETS[_ph].pop(_t))
     SUPERSEDED[_t] = "V2.1"
+# B1-BINDING-AMENDMENT-8: the L253 hermetic guard kill lives in its own appended file — the in-place edit of
+# test_interruption.py (amendment-7) is reverted to keep that kill file byte-identical for the 11 other targets
+# measured against it; the runner walks past the signal-killed INFRA file to this clean, confirmable FAIL.
+for _targets in PHASE_TARGETS.values():
+    _rs = "aisef2/runtime/run_scope.py::RunScope._second_interrupt_abandons"
+    _f8 = "tests/v2/p4/test_b1gap7_second_interrupt_guard.py"
+    if _rs in _targets and _f8 not in _targets[_rs]:
+        _targets[_rs] = [*_targets[_rs], _f8]
 # Windows-tranche takeover (owner final directive 2026-11-17, lane A2): the three Windows-only targets were
 # re-measured natively on the owner's Windows server against this tree's bindings (60/60 mutants, runner 2).
 # Fresh runner-2 rows live only in the V2.1 record; the V2.2-B1-LIVENESS phase empties (its record file stays as

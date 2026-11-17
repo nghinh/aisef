@@ -2117,6 +2117,12 @@
    "date": "2026-11-17",
    "cause": "owner final directive 2026-11-17: L253 hermetic guard kill, native Windows takeover, invalidated-stale re-measure",
    "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-7.json"
+  },
+  {
+   "record": "B1-BINDING-AMENDMENT-8",
+   "date": "2026-11-18",
+   "cause": "L253 hermetic kill in its own appended file; kill-file byte-fidelity restored for 11 co-bound targets",
+   "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-8.json"
   }
  ]
 }
