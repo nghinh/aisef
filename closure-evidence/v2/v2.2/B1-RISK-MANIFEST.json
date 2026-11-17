@@ -1149,8 +1149,6 @@
    "source": "aisef2/app/run.py",
    "source_sha256": "cfb2fb7ac9678cdacf5e6ad41a962996691a9eddbd873e3c0c49d53a1469e033",
    "kill_tests": [
-    "tests/v2/test_b1gap4_run_execute.py",
-    "tests/v2/test_v22_hardening_p1_run_pin_fence.py",
     "tests/v2/test_app_units.py",
     "tests/v2/test_v21_inputs.py",
     "tests/v2/test_v21_identity.py",
@@ -1170,7 +1168,9 @@
     "tests/v2/test_v21_x_lineage_gone.py",
     "tests/v2/test_v21_ocr_identity.py",
     "tests/v2/test_v22_tripwire.py",
-    "tests/v2/p0/test_invariants_runtime.py"
+    "tests/v2/p0/test_invariants_runtime.py",
+    "tests/v2/test_v22_hardening_p1_run_pin_fence.py",
+    "tests/v2/test_b1gap4_run_execute.py"
    ],
    "mutants": 459
   },

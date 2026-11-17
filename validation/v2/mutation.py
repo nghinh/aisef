@@ -1335,7 +1335,7 @@ _B1_GAP_KILLS = {
 for _t, _f in _B1_GAP_KILLS.items():
     for _targets in PHASE_TARGETS.values():
         if _t in _targets and _f not in _targets[_t]:
-            _targets[_t] = [_f, *_targets[_t]]
+            _targets[_t] = [*_targets[_t], _f]   # appended: an S2 target keeps its sealed kill set first
 # B1-BINDING-AMENDMENT-3 (wave-2): one new kill file per audited long-tail target, 72 verified kills.
 _B1_GAP_KILLS_W2 = {
     "aisef2/app/adapters.py::Reviewer._ocr": "tests/v2/test_b1gap2_adapters_reviewer__ocr.py",
@@ -1349,7 +1349,7 @@ _B1_GAP_KILLS_W2 = {
 for _t, _f in _B1_GAP_KILLS_W2.items():
     for _targets in PHASE_TARGETS.values():
         if _t in _targets and _f not in _targets[_t]:
-            _targets[_t] = [_f, *_targets[_t]]
+            _targets[_t] = [*_targets[_t], _f]   # appended: an S2 target keeps its sealed kill set first
 # B1-BINDING-AMENDMENT-4 (supersedes amendment-3's migrate extension): the source-anchor kill for
 # "L378 tuple() -> list()" lives in its own hermetic file. test_v21_authority_limits.py imports
 # validation.qualification, which is not in COPY, so it cannot run at T0 inside a mutant tree.
@@ -1357,7 +1357,29 @@ for _targets in PHASE_TARGETS.values():
     _mig = "aisef2/app/bundle_cli.py::migrate"
     _anchor = "tests/v2/test_b1gap3_bundle_cli_migrate.py"
     if _mig in _targets and _anchor not in _targets[_mig]:
-        _targets[_mig] = [_anchor, *_targets[_mig]]
+        _targets[_mig] = [*_targets[_mig], _anchor]   # appended: order carries no class semantics (ORD-4)
+# B1 v2.2 takeover (same pattern as the C2/S2 takeovers): the B1 campaign re-measured 24 P3/P4 targets with
+# runner 2. Fresh runner-2 rows live only in the V2.1 record ("historical records read as before", runner sweep);
+# V2.1 takes these targets over — their kill sets unchanged — and their P3/P4 rows stay as frozen history.
+_B1_TAKEOVER = (
+    "aisef2/journal/fold.py::Authority.__init__", "aisef2/journal/fold.py::Authority.append",
+    "aisef2/journal/fold.py::Folder.__init__", "aisef2/journal/fold.py::Folder.advance",
+    "aisef2/journal/fold.py::Folder.peek", "aisef2/journal/fold.py::_frozen", "aisef2/journal/fold.py::_seal",
+    "aisef2/journal/fold.py::cache_row", "aisef2/journal/fold.py::fold", "aisef2/journal/fold.py::oracle_problems",
+    "aisef2/journal/fold.py::resume",
+    "aisef2/runtime/run_scope.py::RunLease.acquire", "aisef2/runtime/run_scope.py::RunLease.release",
+    "aisef2/runtime/run_scope.py::RunScope._fail", "aisef2/runtime/run_scope.py::RunScope._finish",
+    "aisef2/runtime/run_scope.py::RunScope._now", "aisef2/runtime/run_scope.py::RunScope._second_interrupt_abandons",
+    "aisef2/runtime/run_scope.py::RunScope.append", "aisef2/runtime/run_scope.py::RunScope.begin",
+    "aisef2/runtime/run_scope.py::RunScope.interrupt", "aisef2/runtime/run_scope.py::RunScope.open_stories",
+    "aisef2/runtime/run_scope.py::RunScope.retry", "aisef2/runtime/run_scope.py::RunScope.shutdown",
+    "aisef2/runtime/run_scope.py::RunScope.story",
+)
+for _t in _B1_TAKEOVER:
+    for _ph in ("P3", "P4"):
+        if _t in PHASE_TARGETS[_ph]:
+            V21_TARGETS[_t] = list(PHASE_TARGETS[_ph].pop(_t))
+    SUPERSEDED[_t] = "V2.1"
 # B1-BINDING-AMENDMENT-5: the wave-3 audit of execute's 79 survivors confirmed 71 coverage gaps — the frozen
 # kill set carried neither test_v22_hardening_p1_run_pin_fence.py (written for exactly these wiring gaps,
 # mapped to no target at manifest assembly) nor any anchor on the record blocks execute writes. Both are
@@ -1367,7 +1389,7 @@ for _targets in PHASE_TARGETS.values():
     if _exe in _targets:
         for _f in ("tests/v2/test_v22_hardening_p1_run_pin_fence.py", "tests/v2/test_b1gap4_run_execute.py"):
             if _f not in _targets[_exe]:
-                _targets[_exe] = [_f, *_targets[_exe]]
+                _targets[_exe] = [*_targets[_exe], _f]   # appended: an S2 target keeps its sealed kill set first
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
