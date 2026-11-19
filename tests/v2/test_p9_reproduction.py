@@ -221,11 +221,19 @@ class MultiStory(unittest.TestCase):
         self.assertNotIn(quote["item"], by_id)                                  # its meaning changed: the id is not reused
         self.assertEqual(set(corpus["items"]) - {quote["item"]} | set(X.CHANGES), set(by_id))
         self.assertEqual(set(X.UNCHANGED["identical_up_to_kernel_identity"]) | set(X.UNCHANGED["identity_only"]["items"]),
-                         set(corpus["items"]) - {quote["item"]})
+                         set(corpus["items"]) - {quote["item"]} - set(X.CHANGES))   # file-artifact-prohibition moved to CHANGES (32c9983f)
         for item_id, change in X.CHANGES.items():
-            self.assertEqual(change["expectation_2_1"]["outcomes"], by_id[item_id].expected_outcomes, item_id)
-            self.assertEqual(len(change["expectation_2_1"]["model_calls"]), len(by_id[item_id].developer) + len(by_id[item_id].reviewer))
-            self.assertTrue(change["requirement"] and change["decision"] and change["cause_commit"] == X.V21_38, item_id)
+            self.assertIn(item_id, by_id, item_id)                                   # every changed item is still a current corpus item
+            self.assertTrue(change["requirement"] and change["decision"] and change["cause_commit"], item_id)
+            exp = change["expectation_2_1"]
+            if isinstance(exp, dict):   # the two kernel-identity regressions: exact outcomes + model calls, caused by the V21-38 fix
+                self.assertEqual(exp["outcomes"], by_id[item_id].expected_outcomes, item_id)
+                self.assertEqual(len(exp["model_calls"]), len(by_id[item_id].developer) + len(by_id[item_id].reviewer))
+                self.assertEqual(change["cause_commit"], X.V21_38, item_id)
+            else:                       # file-artifact-prohibition: review-limits window, a string expectation, a different cause
+                self.assertIsInstance(exp, str)
+                self.assertTrue(exp, item_id)
+                self.assertNotEqual(change["cause_commit"], X.V21_38, item_id)
             for name in change["behaviour_tests"]:
                 module, cls, method = name.rsplit(".", 2)
                 self.assertTrue(callable(getattr(getattr(importlib.import_module(module), cls), method, None)), name)
@@ -403,8 +411,9 @@ class KernelComparison(unittest.TestCase):
         rec["items"][q["item"]]["v2.0.0"] = {"outcomes": q["outcomes"], "model_calls": ["call"] * q["model_calls"], "tool_calls": q["tool_calls"],
                                             "events": q["events"], "failures": [q["failure"]]}
         ident = X.UNCHANGED["identity_only"]
-        for n, (kind, pid) in enumerate(ident["probe_ids_by_kind"].items()):   # one probe per identity-only item, both sides
-            item = rec["items"][ident["items"][n]]
+        probed = (0, 1, 3)   # 3 probe kinds over 4 identity-only items; scenario-proved-story (item 2) carries no probe
+        for n, (kind, pid) in enumerate(ident["probe_ids_by_kind"].items()):   # one probe per probed item, both sides
+            item = rec["items"][ident["items"][probed[n]]]
             old, new = ident["probe_digests_by_kind"][kind]
             item["v2.0.0"] = {"probe_digests": {pid: [old + "0" * 52]}}
             item["2.1"]["probe_digests"] = {pid: [new + "0" * 52]}
@@ -454,7 +463,7 @@ class KernelComparison(unittest.TestCase):
                              [f"probe.cli_invocation: measured {['0' * 64]} -> {cli['2.1']['probe_digests']['probe.cli_invocation']}, "
                               "v21_q5_changes states d42449fd8e3a -> 330ae4a88cc8"])   # the v2.0.0 side's own prefix is checked
             self.assertEqual(len(check(lambda r: r["items"][ident["items"][0]]["v2.0.0"]["probe_digests"]["probe.cli_invocation"].append("d42449fd8e3a" + "1" * 52))), 1)
-            self.assertEqual(len(check(lambda r: r["items"][ident["items"][1]]["2.1"]["probe_digests"].update({"probe.file_artifact": []}))), 1)
+            self.assertEqual(len(check(lambda r: r["items"][ident["items"][1]]["2.1"]["probe_digests"].update({"probe.process_effect": []}))), 1)
             self.assertEqual(check(lambda r: [r["items"][ident["items"][3]][side].pop("probe_digests") for side in ("v2.0.0", "2.1")]),
                              [f"probes measured {sorted(set(ident['probe_ids_by_kind'].values()) - {'probe.python_callable_v2'})}, "
                               f"v21_q5_changes states {sorted(ident['probe_ids_by_kind'].values())}"])

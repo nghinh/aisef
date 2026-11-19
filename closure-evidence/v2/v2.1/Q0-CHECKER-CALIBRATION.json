@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 54,
+ "checker_count": 57,
  "uncovered_checker_modules": [],
- "calibrated_count": 54,
- "always_pass_mutants_rejected": 54,
+ "calibrated_count": 57,
+ "always_pass_mutants_rejected": 57,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -160,6 +160,57 @@
    "expected": "does not extend",
    "observed": [
     "history version 2 does not extend version 1: attempts removed or rewritten [1]"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "b1_bindings",
+   "package": "B1 risk gate (owner 2026-11-12 section B)",
+   "fixture": "tests/v2/fixtures/known_bad/b1_bindings.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "moved since the manifest froze",
+   "observed": [
+    "kernel 0efc2d272cb9 is not the frozen 000000000000",
+    "the registry moved since the manifest froze",
+    "aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "currency_dag",
+   "package": "v2.2 cross-record currency (owner v2.2 #1)",
+   "fixture": "tests/v2/fixtures/known_bad/currency_dag.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "upstream not resolvable for this round",
+   "observed": [
+    "P5-FALSIFIABILITY: upstream not resolvable for this round: [\"P5-PROPOSAL (no record declared for round 'v2.2' binds this tree (kernel_digest ffffffffffff); missing supersession — refusing to fall back)\"]",
+    "P5-REVERIFICATION: upstream not resolvable for this round: [\"P5-FALSIFIABILITY (no record declared for round 'v2.2' binds this tree (kernel_digest ffffffffffff); missing supersession — refusing to fall back)\", \"P5-PROPOSAL (no record declared for round 'v2.2' binds this tree (kernel_digest ffffffffffff); missing supersession — refusing to fall back)\"]",
+    "PLAN: upstream not resolvable for this round: [\"P5-FALSIFIABILITY (no record declared for round 'v2.2' binds this tree (kernel_digest ffffffffffff); missing supersession — refusing to fall back)\"]",
+    "K-NOWORK: upstream not resolvable for this round: [\"PLAN (no record declared for round 'v2.2' binds this tree (kernel_digest ffffffffffff); missing supersession — refusing to fall back)\"]",
+    "ORCH: upstream not resolvable for this round: [\"CONFORMANCE-RULING (no record declared for round 'v2.2' binds this tree (kernel_digest ffffffffffff); missing supersession — refusing to fall back)\", \"P5-REVERIFICATION (no record declared for round 'v2.2' binds this tree (kernel_digest ffffffffffff); missing supersession — refusing to fall back)\"]"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "version_forward",
+   "package": "v2.2 version-forward binding (owner seq-8)",
+   "fixture": "tests/v2/fixtures/known_bad/version_forward.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "record_digest does not recompute (tampered)",
+   "observed": [
+    "VF-CALIBRATION-SUP.json: record_digest does not recompute (tampered)"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true
@@ -639,10 +690,10 @@
    "rejects_for_the_expected_reason": true,
    "expected": "bundle_cli.migrate writes an 'approvals' key: what migrate reaches re-binds the plan and never approves",
    "observed": [
-    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:284 bundle_cli.approve creates a ContractApproval (a migration only re-loads the input's: ContractApproval(**a)): what migrate reaches re-binds the plan and never approves",
-    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:287 bundle_cli.approve writes an 'approvals' key: what migrate reaches re-binds the plan and never approves",
-    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:130 bundle_cli.migrate writes an 'approvals' key: what migrate reaches re-binds the plan and never approves",
-    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:130 bundle_cli.migrate calls bundle_cli.approve: what migrate reaches re-binds the plan and never approves"
+    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:669 bundle_cli.approve creates a ContractApproval (a migration only re-loads the input's: ContractApproval(**a)): what migrate reaches re-binds the plan and never approves",
+    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:672 bundle_cli.approve writes an 'approvals' key: what migrate reaches re-binds the plan and never approves",
+    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:404 bundle_cli.migrate writes an 'approvals' key: what migrate reaches re-binds the plan and never approves",
+    "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:404 bundle_cli.migrate calls bundle_cli.approve: what migrate reaches re-binds the plan and never approves"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

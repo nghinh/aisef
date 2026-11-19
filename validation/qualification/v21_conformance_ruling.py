@@ -286,6 +286,17 @@ def tolerated() -> dict[str, str]:
     return {row["path"]: row["sha256_2_1"] for row in json.loads(p.read_text(encoding="utf-8"))["conformance"]["rows"]}
 
 
+def tolerated_v22() -> dict[str, str]:
+    """Version-forward (owner Option C / seq 8): like tolerated(), but from the COMMITTED v2.2 CONFORMANCE-RULING
+    (V22_REL) that supersedes OUT_REL on this tree — each row's path -> its sha256_2_1; {} when there is none or the
+    file is not committed as it is. The frozen v2.1 ruling (OUT_REL) is never rewritten."""
+    p = ROOT / V22_REL
+    r = subprocess.run(["git", "-C", str(ROOT), "show", f"HEAD:{V22_REL}"], capture_output=True)
+    if r.returncode != 0 or not p.is_file() or rp._lf(r.stdout) != rp._lf(p.read_bytes()):
+        return {}
+    return {row["path"]: row["sha256_2_1"] for row in json.loads(p.read_text(encoding="utf-8"))["conformance"]["rows"]}
+
+
 def missing_tests(ids) -> list[str]:
     """The ids (module.Class.method) with no such method defined in that class of that file."""
     out = []

@@ -729,7 +729,7 @@ class Record(unittest.TestCase):
         record stays that history; 2.1's changes are those the committed ruling closure-evidence/v2/v2.1/
         CONFORMANCE-RULING.json names (owner B-03d; validation/qualification/v21_conformance_ruling.py), each by content."""
         from validation.qualification import c2_orchestration_repair as rp
-        self.assertEqual(rp.release_differences(), [])
+        self.assertEqual(rp.release_differences_v22(), [])   # version-forward: ORCH current on the v2.2 release tree
         rec = json.loads((ROOT / rp.OUT_REL).read_text(encoding="utf-8"))
         eq = rec["single_probe_equivalence"]
         staged = eq["identical_but_the_adequacy_stage_of_a_fully_pre_satisfied_story"]
@@ -764,18 +764,20 @@ class Record(unittest.TestCase):
         stray = {"a file the release did not name": "(d) aisef2/orchestrate/proof.py changed since the record",
                  "a verdict problem of the record": "(c) the test matrix: exit 1"}
 
-        # story_runner.py is a V2.0 change that 2.1 changed again: on this tree it is accepted only through the ruling
+        # story_runner.py (a V2.0 change 2.1 changed again) and catalog.py (the one row the v2.2 ruling adds over v2.1)
+        # are accepted on this tree only through the ruling.
         sr = "aisef2/orchestrate/story_runner.py"
-        at21 = {sr: rp._lf((ROOT / sr).read_bytes())}
+        cat = "aisef2/probe/catalog.py"
+        at21 = {sr: rp._lf((ROOT / sr).read_bytes()), cat: rp._lf((ROOT / cat).read_bytes())}
 
         def left(found, now=rec, history=(), reverification=(), mutation=(), named=at21):
             with mock.patch.object(rp, "identities", return_value=now), mock.patch.object(rp, "check", return_value=found), \
                     mock.patch.object(pa, "history_problems", return_value=list(history)), \
-                    mock.patch.object(pa, "reverification_problems", return_value=list(reverification)), \
+                    mock.patch.object(pa, "reverification_v22_problems", return_value=list(reverification)), \
                     mock.patch.object(pa, "check", side_effect=AssertionError("p5_acceptance.check is not the (e) gate")), \
                     mock.patch.object(mu, "check", return_value=list(mutation)), \
-                    mock.patch.object(ruling, "tolerated", return_value=dict(named)):
-                return rp.release_differences()
+                    mock.patch.object(ruling, "tolerated_v22", return_value=dict(named)):
+                return rp.release_differences_v22()
         self.assertEqual(left(released), [])
         for name, x in stray.items():
             with self.subTest(name):
@@ -799,10 +801,10 @@ class Record(unittest.TestCase):
             self.assertEqual(left(released + list(v21.values()), named={k: v for k, v in named.items() if k != review}), [v21[review]])
         with self.subTest("a named file whose bytes are not the ruling's"):
             self.assertEqual(left(released + list(v21.values()), named={**named, review: "0" * 64}), [v21[review]])
-        with self.subTest("a missing ruling tolerates nothing new"):     # not even a V2.0 file 2.1 changed again
-            self.assertEqual(left(released + list(v21.values()), named={}), [released[1], *v21.values()])
-        with self.subTest("a V2.0 change 2.1 changed again, the ruling naming it at other bytes"):
-            self.assertEqual(left(released, named={sr: "0" * 64}), [released[1]])
+        with self.subTest("a missing ruling tolerates nothing new"):     # not even a V2.0 file 2.1 changed again, nor catalog
+            self.assertEqual(left(released + list(v21.values()), named={}), [released[0], released[1], *v21.values()])
+        with self.subTest("a V2.0 change 2.1 changed again, the ruling naming it at other bytes"):   # catalog stays correctly named
+            self.assertEqual(left(released, named={sr: "0" * 64, cat: rp._lf((ROOT / cat).read_bytes())}), [released[1]])
         with self.subTest("a C2-P5 acceptance boundary not re-verified on 2.1"):
             self.assertEqual(len(left(released, reverification=["x"], named=named)), 1)
         moves = {**rec["probe_sources_vs_6311254"], **{rel: {"6311254": "a", "now": "b"} for rel in (cal, fa)}}

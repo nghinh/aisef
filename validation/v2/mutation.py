@@ -1358,9 +1358,14 @@ for _targets in PHASE_TARGETS.values():
     _anchor = "tests/v2/test_b1gap3_bundle_cli_migrate.py"
     if _mig in _targets and _anchor not in _targets[_mig]:
         _targets[_mig] = [*_targets[_mig], _anchor]   # appended: order carries no class semantics (ORD-4)
-# B1 v2.2 takeover (same pattern as the C2/S2 takeovers): the B1 campaign re-measured 24 P3/P4 targets with
+# B1 v2.2 takeover (same pattern as the C2/S2 takeovers): the B1 campaign re-measured 37 P3/P4/P5 targets with
 # runner 2. Fresh runner-2 rows live only in the V2.1 record ("historical records read as before", runner sweep);
-# V2.1 takes these targets over — their kill sets unchanged — and their P3/P4 rows stay as frozen history.
+# V2.1 takes these targets over — their kill sets unchanged — and their P3/P4/P5 rows stay as frozen history.
+# B1-BINDING-CORRECTION (session 845c9f11): the 13 registry.py + destructive_authority.py targets (re-measured by the
+# B1 risk campaign under seq-9, destructive_authority checker fixes under seq-10) were mistakenly written as runner-2
+# rows into the HISTORICAL P5-MUTATION.json by b1fb8580 — a §8 violation. They are re-homed here exactly like the
+# P3/P4 takeovers: V2.1 takes them over (their current measurement lives in the V2.1 record), P5-MUTATION.json is
+# restored to its frozen bytes, and their P5 rows stay as frozen history.
 _B1_TAKEOVER = (
     "aisef2/journal/fold.py::Authority.__init__", "aisef2/journal/fold.py::Authority.append",
     "aisef2/journal/fold.py::Folder.__init__", "aisef2/journal/fold.py::Folder.advance",
@@ -1374,9 +1379,17 @@ _B1_TAKEOVER = (
     "aisef2/runtime/run_scope.py::RunScope.interrupt", "aisef2/runtime/run_scope.py::RunScope.open_stories",
     "aisef2/runtime/run_scope.py::RunScope.retry", "aisef2/runtime/run_scope.py::RunScope.shutdown",
     "aisef2/runtime/run_scope.py::RunScope.story",
+    # P5 re-home (B1-BINDING-CORRECTION): registry.py x7 + destructive_authority.py x6
+    "aisef2/invariants/registry.py::_arms", "aisef2/invariants/registry.py::_load_script",
+    "aisef2/invariants/registry.py::arm", "aisef2/invariants/registry.py::register",
+    "aisef2/invariants/registry.py::require_armed", "aisef2/invariants/registry.py::resolve",
+    "aisef2/invariants/registry.py::test_directories",
+    "validation/v2/destructive_authority.py::_alias", "validation/v2/destructive_authority.py::_aliases",
+    "validation/v2/destructive_authority.py::_destructive_ref", "validation/v2/destructive_authority.py::_references",
+    "validation/v2/destructive_authority.py::check", "validation/v2/destructive_authority.py::discover",
 )
 for _t in _B1_TAKEOVER:
-    for _ph in ("P3", "P4"):
+    for _ph in ("P3", "P4", "P5"):
         if _t in PHASE_TARGETS[_ph]:
             V21_TARGETS[_t] = list(PHASE_TARGETS[_ph].pop(_t))
     SUPERSEDED[_t] = "V2.1"

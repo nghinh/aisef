@@ -656,7 +656,7 @@ def check(now: dict | None = None) -> list[str]:
     return out
 
 
-def release_differences() -> list[str]:
+def release_differences(round: str = "v2.1") -> list[str]:   # noqa: A002 — the qualification round (mirrors p5_acceptance.reverify)
     """On the V2.0 release tree this cycle-2 record is HISTORICAL — cycle 2's measurement, byte-identical. The release
     (docs/v2/V2-STABLE-RELEASE-CHARTER.md, S2 fix window) changed files it binds or that changed since its base, each
     for a named blocker (`changed`). Returns `check`'s findings that are NOT such a change whose own gate holds ([] =
@@ -680,7 +680,8 @@ def release_differences() -> list[str]:
                "aisef2/probe/cli_invocation.py": "B1, B1-BLOCKS-STOP-001", "aisef2/probe/process_effect.py": "B1, B1-BLOCKS-STOP-001",
                "aisef2/probe/python_callable_v2.py": "B1, B1-BLOCKS-STOP-001", "validation/v2/mutation.py": "S2 mutation phase",
                "tests/v2/test_c2_orchestration_conformance.py": "probe-identity re-binding; this rule"}
-    named = ruling.tolerated()   # V2.1: path -> its sha256 at 2.1, from the committed ruling ({} without one)
+    v22 = round == "v2.2"
+    named = ruling.tolerated_v22() if v22 else ruling.tolerated()   # the round's ruling: path -> its recorded sha256 (committed)
 
     def ruled(rel: str) -> bool:   # content-bound: the ruling names the file at the bytes it has now
         f = ROOT / rel
@@ -705,7 +706,7 @@ def release_differences() -> list[str]:
             continue
         if x == "(e) the identities differ from the record":
             stray = [k for k in moved if k not in probe_moved] + [r for r in sources if not kept(r)]
-            if not stray and not pa.history_problems() and not pa.reverification_problems():
+            if not stray and not pa.history_problems() and not (pa.reverification_v22_problems() if v22 else pa.reverification_problems()):
                 continue
             x += (f": beyond the V2.0 release's and the 2.1 ruling's probe changes {stray}, or the C2-P5 acceptance is not "
                   "its v2.0.0 history or not re-verified on 2.1")
@@ -713,6 +714,15 @@ def release_differences() -> list[str]:
             continue
         out.append(x)
     return out
+
+
+def release_differences_v22() -> list[str]:
+    """The ORCH node's v2.2 currency checker (validation/v2/currency_dag.py NODES["ORCH"]). Version-forward (owner
+    Option C / RELEASE-DECISIONS seq 8, 10): every difference from the historical cycle-2 record is accepted when it is
+    named by the COMMITTED v2.2 CONFORMANCE-RULING at its current bytes (or kept at its v2.0.0 bytes) and the C2-P5
+    acceptance re-derives on the v2.2 round. The frozen v2.1 ruling is never rewritten; the v2.2 ruling supersedes it.
+    [] when ORCH is current on this tree for the v2.2 release."""
+    return release_differences(round="v2.2")
 
 
 def main(argv: list[str] | None = None) -> int:
