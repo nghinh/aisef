@@ -11427,6 +11427,69 @@
    "exceptions_checked": [
     "base64 binascii.Error path named in grounds"
    ]
+  },
+  {
+   "target": "validation/v2/destructive_authority.py::discover",
+   "index": 41,
+   "mutant": "L224 Eq->NotEq",
+   "class": "AUDITED",
+   "group": "B1 v2.2 destructive-authority discover survivor (session 845c9f11)",
+   "grounds": "discover L224-225 special-cases in-memory list[x].remove to kind='collection'. The three survivors (L224 Eq->NotEq, L225 'collection' emptied, L224 'remove' emptied) are unobservable on the scanned corpus (zero subscript-receiver destructive sites, grep-verified) so check()'s problem list is byte-identical; and defense-in-depth (L433-434 re-validation + L474 target_kind) bounds any future site fail-closed. No fail-open, no live authority hole. Killable only by a synthetic list[i].remove() fixture -> kill-set coverage gap (P2/v2.2.1), not an authority defect. Audited individually, not bulk-accepted (session 845c9f11).",
+   "consumers_checked": [
+    "validation/v2/destructive_authority.py:222-233 discover() site classification; L224-225 the `name=='remove' and isinstance(f.value, ast.Subscript)` special case -> kind='collection'",
+    "validation/v2/destructive_authority.py:433-434 the collection re-validation (callable must end '.remove' on a Subscript, else a problem is appended) — fail-closed on any mismatch",
+    "validation/v2/destructive_authority.py:474-476 check(): `row['target_kind'] != s.kind` cross-check",
+    "grep of aisef2/ + validation/ for `]<ws>.(unlink|rmdir|remove|rmtree|kill|terminate|killpg)(`: zero subscript-receiver destructive sites in the scanned corpus"
+   ],
+   "exceptions_checked": [
+    "a subscript-receiver destructive call in shipped code the Eq->NotEq mutant would misclassify as 'collection': none exists (grep empty); and any future one is re-flagged by the L433-434 re-validation",
+    "a list[i].remove() in shipped code that the 'remove'/'collection' emptied mutants would reclassify: none exists; the emptied mutants are strictly more conservative (fail-closed), never fail-open",
+    "a consumer that reads kind without the downstream re-validation: check() L433-434/L474 re-derive the invariant for every collection site before any authority decision"
+   ],
+   "source_sha256": "304633b1fdf96f0cdd14be41d9d306b0aa63894bdde53dfff595159be26a852d",
+   "provenance": "rc7:102 remeasure + static corpus grep"
+  },
+  {
+   "target": "validation/v2/destructive_authority.py::discover",
+   "index": 42,
+   "mutant": "L225 string 'collection' emptied",
+   "class": "AUDITED",
+   "group": "B1 v2.2 destructive-authority discover survivor (session 845c9f11)",
+   "grounds": "discover L224-225 special-cases in-memory list[x].remove to kind='collection'. The three survivors (L224 Eq->NotEq, L225 'collection' emptied, L224 'remove' emptied) are unobservable on the scanned corpus (zero subscript-receiver destructive sites, grep-verified) so check()'s problem list is byte-identical; and defense-in-depth (L433-434 re-validation + L474 target_kind) bounds any future site fail-closed. No fail-open, no live authority hole. Killable only by a synthetic list[i].remove() fixture -> kill-set coverage gap (P2/v2.2.1), not an authority defect. Audited individually, not bulk-accepted (session 845c9f11).",
+   "consumers_checked": [
+    "validation/v2/destructive_authority.py:222-233 discover() site classification; L224-225 the `name=='remove' and isinstance(f.value, ast.Subscript)` special case -> kind='collection'",
+    "validation/v2/destructive_authority.py:433-434 the collection re-validation (callable must end '.remove' on a Subscript, else a problem is appended) — fail-closed on any mismatch",
+    "validation/v2/destructive_authority.py:474-476 check(): `row['target_kind'] != s.kind` cross-check",
+    "grep of aisef2/ + validation/ for `]<ws>.(unlink|rmdir|remove|rmtree|kill|terminate|killpg)(`: zero subscript-receiver destructive sites in the scanned corpus"
+   ],
+   "exceptions_checked": [
+    "a subscript-receiver destructive call in shipped code the Eq->NotEq mutant would misclassify as 'collection': none exists (grep empty); and any future one is re-flagged by the L433-434 re-validation",
+    "a list[i].remove() in shipped code that the 'remove'/'collection' emptied mutants would reclassify: none exists; the emptied mutants are strictly more conservative (fail-closed), never fail-open",
+    "a consumer that reads kind without the downstream re-validation: check() L433-434/L474 re-derive the invariant for every collection site before any authority decision"
+   ],
+   "source_sha256": "304633b1fdf96f0cdd14be41d9d306b0aa63894bdde53dfff595159be26a852d",
+   "provenance": "rc7:102 remeasure + static corpus grep"
+  },
+  {
+   "target": "validation/v2/destructive_authority.py::discover",
+   "index": 48,
+   "mutant": "L224 string 'remove' emptied",
+   "class": "AUDITED",
+   "group": "B1 v2.2 destructive-authority discover survivor (session 845c9f11)",
+   "grounds": "discover L224-225 special-cases in-memory list[x].remove to kind='collection'. The three survivors (L224 Eq->NotEq, L225 'collection' emptied, L224 'remove' emptied) are unobservable on the scanned corpus (zero subscript-receiver destructive sites, grep-verified) so check()'s problem list is byte-identical; and defense-in-depth (L433-434 re-validation + L474 target_kind) bounds any future site fail-closed. No fail-open, no live authority hole. Killable only by a synthetic list[i].remove() fixture -> kill-set coverage gap (P2/v2.2.1), not an authority defect. Audited individually, not bulk-accepted (session 845c9f11).",
+   "consumers_checked": [
+    "validation/v2/destructive_authority.py:222-233 discover() site classification; L224-225 the `name=='remove' and isinstance(f.value, ast.Subscript)` special case -> kind='collection'",
+    "validation/v2/destructive_authority.py:433-434 the collection re-validation (callable must end '.remove' on a Subscript, else a problem is appended) — fail-closed on any mismatch",
+    "validation/v2/destructive_authority.py:474-476 check(): `row['target_kind'] != s.kind` cross-check",
+    "grep of aisef2/ + validation/ for `]<ws>.(unlink|rmdir|remove|rmtree|kill|terminate|killpg)(`: zero subscript-receiver destructive sites in the scanned corpus"
+   ],
+   "exceptions_checked": [
+    "a subscript-receiver destructive call in shipped code the Eq->NotEq mutant would misclassify as 'collection': none exists (grep empty); and any future one is re-flagged by the L433-434 re-validation",
+    "a list[i].remove() in shipped code that the 'remove'/'collection' emptied mutants would reclassify: none exists; the emptied mutants are strictly more conservative (fail-closed), never fail-open",
+    "a consumer that reads kind without the downstream re-validation: check() L433-434/L474 re-derive the invariant for every collection site before any authority decision"
+   ],
+   "source_sha256": "304633b1fdf96f0cdd14be41d9d306b0aa63894bdde53dfff595159be26a852d",
+   "provenance": "rc7:102 remeasure + static corpus grep"
   }
  ]
 }
