@@ -468,8 +468,24 @@
    {
     "path": "validation/v2/mutation.py",
     "sha256_v2_0_0": "8449cbbc536896ca8af03efc5468eec962317aba665344c15f82d78d69a18077",
-    "sha256_2_1": "18e379da1f23d8cd00113f8827047cee0d8529fde1c09651ff95d28d61b916e1",
+    "sha256_2_1": "5ceb9bbf5c09f7cce918efb9b9508b4f73bca946bfc44c29b1261d9dd640c47c",
     "commits_2_1": [
+     {
+      "commit": "bd2053b9fc8188ccff54b757c60728345dde44c8",
+      "subject": "v2.2 B1 amendment-9: rc8 stale-target survivors resolved (no bulk-accept)"
+     },
+     {
+      "commit": "3e7df71c64346112bebad32d5b1cb62900932e42",
+      "subject": "v2.2 B1 amendment-8: L253 hermetic kill in its own file; kill-file byte-fidelity restored"
+     },
+     {
+      "commit": "132d9a69dd1afd8348e32461bfc3a731a05ce97f",
+      "subject": "v2.2 B1 amendment-7: hermetic L253 guard kill, native Windows takeover, stale re-measure"
+     },
+     {
+      "commit": "eb4d73937a715310a23bbb32c976af928c94e82d",
+      "subject": "v2.2 B1 amendment-6: six REAL_GAP anchors, cls fixture-validator correction"
+     },
      {
       "commit": "a60137b147c5d96aa34f9ac45f5a113379cff5a0",
       "subject": "v2.2 records: V2.1 takeover of the B1-measured P3/P4 targets; sealed kill-set order restored"
@@ -901,6 +917,29 @@
      "this item under aisef2 v2.0.0": "S0 COMMIT, then EXTRA_MODEL_CALL: the script has no REVIEWER_REVIEW answer for request 4 (2.0 reviews and merges S2's candidate)"
     }
    },
+   "file-artifact-prohibition": {
+    "item": "file-artifact-prohibition",
+    "scenario": "the 2.0 corpus case unchanged: a file-artifact contract whose prohibition the candidate honours; COMMIT both sides",
+    "expectation_2_0": "S1 COMMIT, 53 events, replay GREEN",
+    "expectation_2_1": "S1 COMMIT — same outcomes, calls, failures and gate rows — 63 events: the review-limits window is journaled (the verdict is decided after the subject's range is released, and the worker's request, result and output are files of a directory made by mkdtemp at that moment), and the subprocess evidence carries the worktree field",
+    "cause_commit": "3e26945c (merged 3bd2e7d8): v2.1 review limits — the regex search is out of the subject's reach; the edge of file_artifact's window is pinned where the published definition and the code agree",
+    "requirement": [
+     "review-limits F1/F2/F7: a lingering subject cannot rewrite the worker's request or result, and no in-process search is left to fall back to; the window's extra journal rows are that isolation, recorded"
+    ],
+    "decision": [
+     "owner v2.1 review-limits lane (B-03 lane merge); 21 red-before/green-after cases in tests/v2/test_v21_r5_regex_isolation.py"
+    ],
+    "behaviour_tests": [
+     "tests.v2.test_v21_r5_regex_isolation.ALingeringSubjectCannotChangeTheSearch.test_rewriting_the_workers_request_or_result_changes_nothing",
+     "tests.v2.test_v21_r5_regex_isolation.ALingeringSubjectCannotChangeTheSearch.test_a_link_planted_where_the_harness_would_write_is_not_followed",
+     "tests.v2.test_v21_r5_regex_isolation.TheSearchStartsOnlyWhenNothingOfTheSubjectIsAlive.test_the_verdict_is_decided_after_the_release_and_not_before"
+    ],
+    "measured": {
+     "evidence": "engineering measurement, record: closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
+     "this item under aisef2 v2.0.0": "S1 COMMIT, 2 calls, 53 events, no failures; replay GREEN",
+     "this item under this tree": "S1 COMMIT, 2 calls, 63 events, no failures; replay GREEN; other_fields journal + subprocesses.worktree"
+    }
+   },
    "post-merge-integration-regression": {
     "item": "post-merge-integration-regression",
     "keeps_coverage_of": "post-merge-regression",
@@ -998,7 +1037,6 @@
     "items": [
      "cli-proved-story",
      "cli-refuted-then-commit",
-     "file-artifact-prohibition",
      "scenario-proved-story",
      "bytes-returning-python-callable"
     ],
@@ -1007,10 +1045,6 @@
      "cli_invocation": [
       "d42449fd8e3a",
       "330ae4a88cc8"
-     ],
-     "file_artifact": [
-      "31465b73cbe2",
-      "be1485d12a4d"
      ],
      "process_effect": [
       "815e4c865274",
@@ -1023,7 +1057,6 @@
     },
     "probe_ids_by_kind": {
      "cli_invocation": "probe.cli_invocation",
-     "file_artifact": "probe.file_artifact",
      "process_effect": "probe.process_effect",
      "python_callable": "probe.python_callable_v2"
     },
@@ -1031,7 +1064,8 @@
     "cause_commits_evidence": "the lane's scratch measurement only, in no record (COMPARISON_REL measures v2.0.0 and this tree, never 919a271: the file_artifact step 46737ca1c479 is not in it)",
     "cause_commits": {
      "919a271ecfca246381b1de036a874f3b6935c0be": "V2-007: a probe's digest is its capability digest (all four; file_artifact 31465b73cbe2 -> 46737ca1c479)",
-     "06d4e62c0b0666506cd95d663dfa8d3300e060a4": "V21-37 (engineering change, not owner-approved): file_artifact python_imports, capability version 2 (46737ca1c479 -> be1485d12a4d)"
+     "06d4e62c0b0666506cd95d663dfa8d3300e060a4": "V21-37 (engineering change, not owner-approved): file_artifact python_imports, capability version 2 (46737ca1c479 -> be1485d12a4d)",
+     "V21-RL": "v2.1 review-limits lane (3e26945c, merged 3bd2e7d8): the file_artifact window edge pinned where the published definition and the code agree (be1485d12a4d -> ba12a5d24463)"
     },
     "decision": [
      "ARCHITECTURE-EXCEPTION-V2-007 approved: RELEASE-DECISIONS seq 4 (AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007)",
@@ -1073,16 +1107,16 @@
   "no new owner acceptance of the C2-P5 boundary"
  ],
  "written_at": {
-  "head": "a60137b147c5d96aa34f9ac45f5a113379cff5a0"
+  "head": "b1fb858085f82c3692cd73e352b43b51c553c4b4"
  },
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "a60137b147c5d96aa34f9ac45f5a113379cff5a0",
+  "source_commit": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
   "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json",
    "record_digest": "3766b62a086d38d895cbe0a6231c093f42b938bfa2e24094abb6264f62e60648"
   },
-  "record_digest": "f039caf92d05eaa13fd282fc2514b2c19c7b701911106fa56849ee9cfd3f9ca7"
+  "record_digest": "4b19535a23436c4dbb42fc91f4eee54de81a552565e06bb2c8dd57954db910b6"
  }
 }
