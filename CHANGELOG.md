@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.2.0 — 2026-11-20
+
+**AISEF 2.2.0 — the V2.2 version-forward requalification round, on the same `aisef run` V2 runtime.** The product
+kernel (`aisef2`) advances from 2.1.0; `aisef run`, the controller/agent split, the hash-chained journal and
+`aisef run --verify` are unchanged in shape. Behaviour-facing hardening (B1):
+
+- Process liveness/termination is hardened for **native Windows**: `pid_alive` / `_win_liveness` query process
+  state through the Win32 API (QUERY_LIMITED, no unintended terminate), a protected process fails closed to alive,
+  and `aisef2/app/client._is_gone` falls back safely when a `ps` enumeration is unavailable — proven on a real
+  Win32 runner (60/60 mutants killed natively).
+- The invariant verifier **fails closed** on a malformed invariant digest (`aisef2/app/verify.py`); the checker
+  calibrations are regenerated accordingly.
+
+Internally this round re-qualifies the committed evidence against the current tree: a cross-record **currency DAG /
+version-forward** mechanism lets qualification records re-derive on the tree that ships them, and the release
+mutation gate is **risk-based** (177 targets / 5896 mutants, every target measured; `closure-evidence/v2/v2.2/`,
+`closure-evidence/v2/release/V2.2.0-STATUS.json`). Release mechanics and the owner decisions that bound this round
+are in `docs/v2/RELEASE-PROCESS.md`, `docs/ROADMAP-2.2-CHECKLIST.md` and
+`closure-evidence/v2/cycle2/RELEASE-DECISIONS.json` (seq 8–11).
+
 ## 2.1.0 — 2026-11-01
 
 **AISEF 2.1.0 — the V2.1 requalification round, on the same `aisef run` V2 runtime.** The product kernel

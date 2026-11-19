@@ -402,6 +402,24 @@
    "owner_text": "Decision: ENGINEERING GO — RELEASE HOLD. Objective: Complete the remaining AISEF v2.2 qualification blockers as quickly as safely possible, using the Owner-provided Linux and Windows servers. [...] IMPORTANT: Previous Windows results were INVALIDATED for the final RC. Do not reuse them as PASS without proving exact source/test/registry binding equivalence. Run the complete required Windows tranche again. [...] Primary objective: FINISH AISEF v2.2 QUALIFICATION — ZERO PAID GITHUB, NO FALSE PASS, NO UNNECESSARY LOOPS. (full directive of 2026-11-17 transcribed from owner chat; abridged here to its decision-bearing sentences)",
    "recorded_by": "engineering (Claude Code session 845c9f11) transcribing the owner's 2026-11-17 chat directive; the owner did not sign this file",
    "date": "2026-11-17"
+  },
+  {
+   "seq": 11,
+   "id": "AISEF_V2_2_0_PRODUCTION_PUBLISH_AUTHORIZED",
+   "authority": "owner directive 2026-11-20 (chat) 'FINAL OWNER AUTHORIZATION — RELEASE AISEF v2.2.0', accepting the measured technical GO and the independent adversarial verification on frozen RC 2258235c; concludes the bounded release-acceptance process (owner directives 2026-11-19).",
+   "approver": "human:owner",
+   "decision": {
+    "PRODUCTION_PUBLISH": "AUTHORIZED",
+    "VERSION": "2.2.0",
+    "RC_SOURCE_SHA": "2258235c1f3b7b0e6b4df5a0f780efeeef58fd09",
+    "RC_WHEEL_DIGEST": "81bc061b3718caa707ac5ff346833db02934a50b95e4e3b3c465efabf9cdb7b9",
+    "RC_SDIST_DIGEST": "05d6855691400b38fde5a48c89c8bba7b626798a241c6a0d8d41d8b90d543f71",
+    "RELEASE_POLICY": "NO qualification allowlist for 2.2.0 (owner: do not introduce a v2.2 allowlist). The gate is whole-suite-green: the raw sealed suite is OK (8282 tests, 0 failures) on the RC; no verdict reworded to PASS.",
+    "KERNEL_SIGN_OFF": "Owner accepts the qualified v2.2.0 kernel incl. the B1 hardening (aisef2/app/verify.py fail-closed on malformed invariant digests; aisef2/app/calibrations.py regen). Kernel tree 0efc2d272cb9 / kernel digest 1c605db4. The release kernel differs from master b35ec9d7 by design (release branch); no further kernel change.",
+    "MUTATION_GATE": "RISK-BASED seq 9: 177/177 targets measured, 0 NOT_RUN, 5782 killed + 127 survived(audited); Windows 60/60 native; survivors EQUIVALENT/MESSAGE_ONLY; NO_UNRESOLVED_CRITICAL_HIGH_TRUST_DEFECTS."
+   },
+   "subject_to": "a successful release.yml run on the tagged commit (the `tests` gate incl. the AISEF_SEALING=1 sealing job, `staging`, and `v2-gate`) AND the protected `pypi` environment approval by a human reviewer — the owner; engineering cannot approve it. Either control failing withholds publication.",
+   "cost": "paid GitHub usage: USD 0 — mandatory; all CI on the public repository nghinh/aisef."
   }
  ]
 }

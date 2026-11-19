@@ -1,0 +1,54 @@
+{
+ "record": "AISEF 2.2.0 — release phase checkpoints (charter §22 analogue for the 2.2 version-forward lane). Read by validation/v2_release_gate.py for VERSION 2.2.0 (FINAL_RELEASE_READY, OPEN_BLOCKERS).",
+ "version": "2.2.0",
+ "authority": "owner directive 2026-11-20 (chat) 'FINAL OWNER AUTHORIZATION — RELEASE AISEF v2.2.0'; closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 11; the bounded release-acceptance process (owner directives 2026-11-19).",
+ "candidate": {
+  "RC": "V2.2.0-RC1",
+  "RC_SOURCE_SHA": "2258235c1f3b7b0e6b4df5a0f780efeeef58fd09",
+  "RC_KERNEL_TREE": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "RC_KERNEL_DIGEST": "1c605db4cf72cbe42dc1e9909433f64c2feac0bce765ec9df0d58130086ddb9f",
+  "RC_WHEEL_DIGEST": "81bc061b3718caa707ac5ff346833db02934a50b95e4e3b3c465efabf9cdb7b9",
+  "RC_SDIST_DIGEST": "05d6855691400b38fde5a48c89c8bba7b626798a241c6a0d8d41d8b90d543f71",
+  "SOURCE_DATE_EPOCH": 1795094506,
+  "freeze_record": "closure-evidence/v2/release/V2.2.0-RC1-FREEZE.json",
+  "staging_build": "CI run 44628683949 (release/v2.2.0, event push): build + Linux/Windows clean-install smokes SUCCESS"
+ },
+ "FINAL_RELEASE_READY": "PASS",
+ "FINAL_RELEASE_READY_MEANING": "RELEASE_GO for V2.2.0-RC1 2258235c; held only for the owner's production confirmation (charter §19): the protected `pypi` environment approval on the tag's release.yml run.",
+ "OPEN_BLOCKERS": [],
+ "OPEN_BLOCKERS_MEANING": "No open mandatory release blocker. The 10 raw-suite failures measured at 6f998657 were closed by one controlled corrective batch (7546401d + 2258235c) and independently verified; the full sealed suite is green on 2258235c.",
+ "GATE_VERDICTS": {
+  "RAW_SEALED_SUITE": "OK (skipped=94) — 8282 tests, 0 failures / 0 errors on 2258235c (AISEF_SEALING=1 owned_run unittest discover); the v2.2.0 gate is the whole-suite-green with NO qualification allowlist (owner: no v2.2 allowlist).",
+  "CHECKER_CALIBRATION": "OK — calibrated 57/57; always-PASS mutants rejected 57/57 (validation/v2/checker_calibration.py --check)",
+  "MUTATION_RECORD_CHECK": "PASS (validation/v2/mutation.py --check)",
+  "CURRENCY_DAG": "problems: [] (validation/v2/currency_dag.py --json)",
+  "CONFORMANCE_RULING_V22": "PASS (validation/qualification/v21_conformance_ruling.py --check-v22)",
+  "LEGACY_V21_CONFORMANCE_CHECK": "FAIL — pre-existing, by-design: the frozen v2.1 ruling is superseded on any v2.2-cycle tree (FAILS identically at the pre-batch baseline b35ec9d7); replaced by the passing --check-v22; NOT a release blocker and NOT relabelled PASS.",
+  "STAGING": "SUCCESS (build + Linux/Windows clean-install smokes, CI run 44628683949)",
+  "PLATFORM_TESTS": "tests.yml on the tagged commit (unit ubuntu 3.11-3.14 + windows 3.11 + macos 3.12, lint, wheel, and the AISEF_SEALING=1 sealing job) is the release.yml `tests` gate; the staging run's platform build/install passed."
+ },
+ "MUTATION": {
+  "GATE": "RISK-BASED (seq 9): 177 targets / 5896 mutants (closure-evidence/v2/v2.2/B1-RISK-MANIFEST.json); EVERY_TARGET_MEASURED, NOT_RUN_NEVER_PASS.",
+  "RECONCILIATION_177": "177/177 targets measured, 0 MISSING, 0 NOT_RUN / 0 INFRA / 0 TIMEOUT; 5909 mutants = 5782 KILLED + 127 SURVIVED(audited); 147 targets all-killed, 30 with audited survivors. Reconciled from committed records (B1-RISK-MANIFEST.json × closure-evidence/v2/v2.1/MUTATION.json), independently recomputed and cross-checked. (5909 vs manifest 5896 = +13 from the verify.py fail-closed rebind, B1-BINDING-AMENDMENT-1.)",
+  "WINDOWS_NATIVE": "60/60 KILLED on the 3 Windows-only targets (closure-evidence/v2/v2.2/B1-LIVENESS-MUTATION.json; native Win10, B1-BINDING-AMENDMENT-7).",
+  "SURVIVOR_DISPOSITIONS": "closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json (557 entries, classes {AUDITED, EQUIVALENT}); all 127 in-scope survivors covered at the current source_sha256, 0 uncovered, 0 REAL_GAP/WEAK_ASSERT/unaudited-INFRA remaining.",
+  "L253": "closure-evidence/v2/v2.2/V2.2-L253-DISPOSITION.json; final record shows 2/2 KILLED via a hermetic kill test (test_b1gap7_second_interrupt_guard.py) — NOT converted INFRA->KILLED without evidence.",
+  "STALE_OUT_OF_SCOPE": "closure-evidence/v2/v2.2/V2.2-STALE-TARGET-ACCOUNTING.json (23 targets, none in the 177; re-measured via B1-BINDING-AMENDMENT-7/-9).",
+  "CHECK": "validation/v2/mutation.py --check PASS"
+ },
+ "ACCEPTED_RESIDUALS": {
+  "benign_survivors": "The 127 in-scope survivors are EQUIVALENT or MESSAGE_ONLY (independently audited noncritical); accepted under seq 9 (NO_UNRESOLVED_CRITICAL_HIGH_TRUST_DEFECTS).",
+  "destructive_authority_discover": "aisef2 destructive-authority `discover` has 3 audited survivors (kill-set coverage), proven SAFE by defense-in-depth with zero live destructive sites; a kill-set coverage improvement is deferred to v2.2.1.",
+  "no_security_authority_correctness_trust_defect": true
+ },
+ "KERNEL_NOTE": "The v2.2.0 kernel is NOT byte-identical to master b35ec9d7: the release branch carries the B1-campaign kernel hardening — aisef2/app/verify.py (fail-closed on malformed invariant digests) and aisef2/app/calibrations.py (calibration regen), exercised by the passing sealed suite and the mutation gate. Owner accepted this explicitly (seq 11). The final corrective batch (6f998657→2258235c) made NO aisef2 change (kernel tree 0efc2d272cb9 invariant across the batch).",
+ "PRODUCTION_PUBLISH": "AUTHORIZED (RELEASE-DECISIONS seq 11, owner 2026-11-20), subject to (a) the release.yml gates passing on the tagged commit (tests incl. sealing, staging, v2-gate) and (b) the protected `pypi` environment approval by a human reviewer (the owner). Either control failing withholds publication.",
+ "GOVERNANCE_NOTE_PYPI_ENVIRONMENT": "The `pypi` environment is protected with the owner as required reviewer; that approval is the human hold of charter §19, on top of the RELEASE-DECISIONS seq 11 entry the v2-gate reads. Engineering cannot approve it.",
+ "COST": "paid GitHub usage: USD 0 — all CI on the public repository nghinh/aisef.",
+ "history": [
+  {"phase": "BOUNDED_RELEASE_ACCEPTANCE", "status": "PASS", "on": "2258235c", "what": "scope frozen; one blocker register; one controlled corrective batch (WS-A bootstrap, WS-B P5 restore, WS-C sealed tests, WS-D ORCH version-forward); independent adversarial verification GO; single final sealed qualification OK (8282/0)."},
+  {"phase": "S3_EVIDENCE_INVENTORY", "status": "PASS", "on": "2258235c", "what": "owner §3 read-only inventory: 177-target mutation execution complete+committed (0 NOT_RUN), Windows 60/60, survivors audited, L253 + 23 stale accounted, seq-9/amendments integral, historical immutability held, package/source binding frozen (V2.2.0-RC1)."},
+  {"phase": "S4_RC_FROZEN", "status": "PASS", "on": "2258235c", "what": "V2.2.0-RC1 frozen (V2.2.0-RC1-FREEZE.json): wheel 81bc061b, sdist 05d68556, kernel tree 0efc2d272cb9, from staging run 44628683949 of exactly the RC."},
+  {"phase": "FINAL_RELEASE_READY", "status": "PASS", "on": "2258235c", "what": "RELEASE_GO; held for the owner's production confirmation (pypi environment approval, charter §19)."}
+ ]
+}
