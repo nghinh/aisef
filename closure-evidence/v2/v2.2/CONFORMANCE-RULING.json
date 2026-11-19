@@ -414,6 +414,10 @@
     "sha256_2_1": "19e9da22eaca190f9d90a655ba656cec37e8e5101d94c21e8f051d334524367b",
     "commits_2_1": [
      {
+      "commit": "7546401dd5e6db8ee9f89999fd6769c41d318262",
+      "subject": "v2.2 C2: close the final 10 release blockers (one controlled batch; seq-9/seq-10)"
+     },
+     {
       "commit": "9a3d1377ad2f8a4293050f4b9f99cfdf152d32cf",
       "subject": "wave1 F3+F1: cross-platform test fixes (fix-over-skip) and the sealing tier out of the product signal"
      },
@@ -446,6 +450,10 @@
     "sha256_2_1": "5ed0044b76e1c19aa0abc7faa7d42bfbfcde426d5ea8e9addcfc1c1e6ba6d2d8",
     "commits_2_1": [
      {
+      "commit": "7546401dd5e6db8ee9f89999fd6769c41d318262",
+      "subject": "v2.2 C2: close the final 10 release blockers (one controlled batch; seq-9/seq-10)"
+     },
+     {
       "commit": "cd36de8cbb6674b8f68a814ff33661d41a291b33",
       "subject": "v2.1(B-03d): a V2.0-named change is accepted by name only at its v2.0.0 bytes; one 2.1 changed again needs the ruling"
      },
@@ -470,6 +478,10 @@
     "sha256_v2_0_0": "8449cbbc536896ca8af03efc5468eec962317aba665344c15f82d78d69a18077",
     "sha256_2_1": "6dbc7547bb2f9b2f5fbdb9468e002f45b9ffb37ed402b4eae580d225280601cc",
     "commits_2_1": [
+     {
+      "commit": "7546401dd5e6db8ee9f89999fd6769c41d318262",
+      "subject": "v2.2 C2: close the final 10 release blockers (one controlled batch; seq-9/seq-10)"
+     },
      {
       "commit": "bd2053b9fc8188ccff54b757c60728345dde44c8",
       "subject": "v2.2 B1 amendment-9: rc8 stale-target survivors resolved (no bulk-accept)"
@@ -1107,16 +1119,16 @@
   "no new owner acceptance of the C2-P5 boundary"
  ],
  "written_at": {
-  "head": "6f99865747fbfd7d828a1d2ce399510937f66761"
+  "head": "7546401dd5e6db8ee9f89999fd6769c41d318262"
  },
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "6f99865747fbfd7d828a1d2ce399510937f66761",
+  "source_commit": "7546401dd5e6db8ee9f89999fd6769c41d318262",
   "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json",
    "record_digest": "3766b62a086d38d895cbe0a6231c093f42b938bfa2e24094abb6264f62e60648"
   },
-  "record_digest": "118867191677902fd8315577908ee26643a8e431493faa28137a5b507605f3b1"
+  "record_digest": "f3a8708b7a3825d341fce0941d76fcd25d0661c0fa7f36fd13fbfc58dba40e98"
  }
 }
