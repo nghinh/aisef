@@ -3,7 +3,7 @@
  "authority": "owner ruling 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL' (2026-10-02), decisions 1-4",
  "status": "PLAN REGENERATED AND STATICALLY ADMITTED; not executed — no probe ran, no model was called, LedgerLock not run",
  "identities": {
-  "aisef2_tree": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "aisef2_tree": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "admission_engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
   "generator": {
    "path": "validation/qualification/c2_plan_correction.py",
@@ -1991,7 +1991,7 @@
   "behaviour": {
    "path": "closure-evidence/v2/v2.2/P5-FALSIFIABILITY.json",
    "round": "v2.2",
-   "sha256": "5d255c22203d040e1b525177a0d95b4eef571a37f6721056629ca20fffe8a3fd",
+   "sha256": "b5397d1d083b1611882bc39558b741d3e9aebb9de75b6d2470380db89526902e",
    "verdict": "COMPLETE — EVERY RETAINED SPEC QUALIFIED",
    "qualified_at_this_tree_s_semantic_hash": 59,
    "rule": "every spec QUALIFIED in the v2.2 falsifiability record (resolved by version_forward for this round+tree, provenance-verified, no fallback) at this tree's semantic hash, verdict 'COMPLETE — EVERY RETAINED SPEC QUALIFIED'"
@@ -2007,12 +2007,12 @@
  "verdict": "PLAN CORRECTION ADMITTED STATICALLY",
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "467f62524c01bc8d0a708319758ab2e69b9f93e4",
-  "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "source_commit": "abbd88b5931b1436914a0e739f6f02aea001f297",
+  "kernel_digest": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json",
    "record_digest": "d62ba0de0204d3d6740b25b15c2e1eb015c8e4309df18f2e4052be8498ae341f"
   },
-  "record_digest": "d7150150b23fbeecc2c9503adba4db5d4dde61338bb2ce83c96f3a45edb1ab0e"
+  "record_digest": "15b6e675560728ff4b261e5b604fcb9b65411b765fe3de3f1cc06eafa4b9f55f"
  }
 }

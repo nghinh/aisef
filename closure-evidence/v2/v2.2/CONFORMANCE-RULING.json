@@ -476,8 +476,12 @@
    {
     "path": "validation/v2/mutation.py",
     "sha256_v2_0_0": "8449cbbc536896ca8af03efc5468eec962317aba665344c15f82d78d69a18077",
-    "sha256_2_1": "6dbc7547bb2f9b2f5fbdb9468e002f45b9ffb37ed402b4eae580d225280601cc",
+    "sha256_2_1": "07812c4fdf236e5ab8db00f8d2470ae80257fdea2d6ab33c3a1bef95667dc8e2",
     "commits_2_1": [
+     {
+      "commit": "abbd88b5931b1436914a0e739f6f02aea001f297",
+      "subject": "v2.2 Option C: VERIFIED_REUSE mechanism + B1 re-freeze + execution_order + init"
+     },
      {
       "commit": "7546401dd5e6db8ee9f89999fd6769c41d318262",
       "subject": "v2.2 C2: close the final 10 release blockers (one controlled batch; seq-9/seq-10)"
@@ -1119,16 +1123,16 @@
   "no new owner acceptance of the C2-P5 boundary"
  ],
  "written_at": {
-  "head": "7546401dd5e6db8ee9f89999fd6769c41d318262"
+  "head": "abbd88b5931b1436914a0e739f6f02aea001f297"
  },
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "7546401dd5e6db8ee9f89999fd6769c41d318262",
-  "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "source_commit": "abbd88b5931b1436914a0e739f6f02aea001f297",
+  "kernel_digest": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json",
    "record_digest": "3766b62a086d38d895cbe0a6231c093f42b938bfa2e24094abb6264f62e60648"
   },
-  "record_digest": "f3a8708b7a3825d341fce0941d76fcd25d0661c0fa7f36fd13fbfc58dba40e98"
+  "record_digest": "cac7a9482c66c53de29374621da7d1ea1c5adaa9ba35efbb190c1fb8cae487fa"
  }
 }

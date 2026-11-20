@@ -275,12 +275,12 @@
  ],
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "132d9a69dd1afd8348e32461bfc3a731a05ce97f",
-  "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "source_commit": "abbd88b5931b1436914a0e739f6f02aea001f297",
+  "kernel_digest": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "supersedes": {
    "path": "closure-evidence/v2/cycle2/P10-COHORT-MACHINERY.json",
    "record_digest": "72e21dffaa3c6fd401344b01d65b7c15a78488451b481cc0c45322044d33e561"
   },
-  "record_digest": "5ba54b83a0dca2eb54dfec365751d87553d50ea4951a0e5c5f22c23913be914a"
+  "record_digest": "6b3ab3acf2f96dcb8b85f368e60d116fe7b02d4d7a478947b2a655522dcbd0e2"
  }
 }

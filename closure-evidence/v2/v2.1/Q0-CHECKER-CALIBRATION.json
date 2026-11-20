@@ -174,7 +174,7 @@
    "rejects_for_the_expected_reason": true,
    "expected": "moved since the manifest froze",
    "observed": [
-    "kernel 0efc2d272cb9 is not the frozen 000000000000",
+    "kernel e865d65c80e2 is not the frozen 000000000000",
     "the registry moved since the manifest froze",
     "aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze"
    ],

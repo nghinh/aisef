@@ -793,12 +793,12 @@
  },
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "132d9a69dd1afd8348e32461bfc3a731a05ce97f",
-  "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "source_commit": "abbd88b5931b1436914a0e739f6f02aea001f297",
+  "kernel_digest": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "supersedes": {
    "path": "closure-evidence/v2/cycle2/P10-PROFILE-FREEZE.json",
    "record_digest": "90526a282093d3a8ba1499c3e1d43bfab649f245350739fff4d0d345b56d89de"
   },
-  "record_digest": "d0e16da6e6ef8914a574b5927bc57835cd88c15bbac740d7d4ab933ef0006617"
+  "record_digest": "6dc24d1fc494dc15aea03c73308d1d0c3d29cffa25e48b45a6d187518c134b49"
  }
 }

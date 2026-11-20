@@ -766,7 +766,7 @@
   "v2_1": {
    "record": {
     "path": "closure-evidence/v2/v2.2/P5-PLAN-V2.2-PROPOSAL.json",
-    "sha256": "e378d2c3c0fe17e6a78422c51ced2439210fcbde66045a8cb7efe95d26939a28"
+    "sha256": "a29dd9adb8a9f1d59a470558d6a5782fb846799ba15c2e21892851d3347ff88f"
    },
    "proposal_digest": "9226f1aa4fe094dadfef87bbe4e34ee6934f7cd39fee81841828587e9fb9aceb",
    "verdict": "PROPOSAL ADMITTED STATICALLY (synthetic, non-authoritative approvals); OWNER REVIEW PENDING",
@@ -1496,7 +1496,7 @@
  "p5_falsifiability": {
   "record": {
    "path": "closure-evidence/v2/v2.2/P5-FALSIFIABILITY.json",
-   "sha256": "5d255c22203d040e1b525177a0d95b4eef571a37f6721056629ca20fffe8a3fd"
+   "sha256": "b5397d1d083b1611882bc39558b741d3e9aebb9de75b6d2470380db89526902e"
   },
   "verdict": "COMPLETE — EVERY RETAINED SPEC QUALIFIED",
   "summary": {
@@ -2091,7 +2091,7 @@
   "rule": "the behaviour evidence for the 2.1 identities: p5_falsifiability.run() re-executed every retained spec, compiled under this tree's probes, against the pristine reference and its own witness; a spec's semantic hash binds the probe's capability (V2-007), so the record is current only with this tree's kernel, runner, authoring aid, corpus and probe execution digests, compared literally"
  },
  "kernel": {
-  "aisef2_tree": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "aisef2_tree": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "uncommitted": [],
   "kernel_is_committed": true,
   "rule": "the kernel every fact above was derived with is HEAD:aisef2 only while `git status --porcelain -- aisef2` is empty; an uncommitted kernel change is never re-verified as HEAD's"
@@ -2826,7 +2826,7 @@
    "tail": [
     "cycle-2 baseline guard: PASS"
    ],
-   "seconds": 0.456
+   "seconds": 0.44
   },
   "checker_calibration": {
    "command": "python -P validation/v2/checker_calibration.py --check",
@@ -2836,7 +2836,7 @@
     "OK   profile_freeze         clean=True rejects=True always-pass-mutant-caught=True",
     "calibrated 57/57; always-PASS mutants rejected 57/57"
    ],
-   "seconds": 226.867
+   "seconds": 225.463
   },
   "f1_f11": {
    "command": "python -P validation/v2/freeze_conformance.py --check",
@@ -2846,7 +2846,7 @@
     "PASS     F11 ",
     "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
    ],
-   "seconds": 10.415
+   "seconds": 10.399
   },
   "v1_guard": {
    "command": "python -P validation/v2/v1_evidence_guard.py --check",
@@ -2854,7 +2854,7 @@
    "tail": [
     "V1 evidence guard (DETECTIVE): PASS"
    ],
-   "seconds": 0.184
+   "seconds": 0.164
   },
   "run_history": {
    "command": "python -P validation/v2/run_history.py check",
@@ -2862,19 +2862,19 @@
    "tail": [
     "run history: PASS"
    ],
-   "seconds": 2.204
+   "seconds": 2.099
   }
  },
  "problems": [],
  "verdict": "C2-P5 ACCEPTANCE BOUNDARY RE-VERIFIED ON V2.2 — NO NEW OWNER ACCEPTANCE",
  "version_forward": {
   "version_context": "v2.2",
-  "source_commit": "6f99865747fbfd7d828a1d2ce399510937f66761",
-  "kernel_digest": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
+  "source_commit": "abbd88b5931b1436914a0e739f6f02aea001f297",
+  "kernel_digest": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "supersedes": {
    "path": "closure-evidence/v2/v2.1/C2-P5-ACCEPTANCE-REVERIFICATION.json",
    "record_digest": "86eff5ed36235211a101f31aa9318dc3d7c7c55c447defac0d7e4f516f9bb3dd"
   },
-  "record_digest": "e74be029896395885342f7d3b5e53e60e428f9b9db4dd6332667b3fcb18dbaf8"
+  "record_digest": "d8c23dd69368c636f54d465793a6290962af3f27aeedcdc7516775959a9584bc"
  }
 }
