@@ -1067,7 +1067,7 @@ def _create(path: pathlib.Path, text: str) -> None:
     """`text` to a NEW file, created exclusively (O_EXCL): every output of the bundle tools goes through here, so none
     ever writes over a file — not even one created between a check and the write."""
     try:
-        with path.open("x", encoding="utf-8") as fh:
+        with path.open("x", encoding="utf-8", newline="") as fh:   # newline="": deterministic LF on every platform (no \n->\r\n on Windows)
             fh.write(text)
     except FileExistsError:
         raise B.BundleError(f"{path} exists: the bundle tools write a new file and never overwrite one") from None

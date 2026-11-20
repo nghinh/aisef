@@ -56,7 +56,7 @@ class JournalGapKills(unittest.TestCase):
         self.run_dir = pathlib.Path(os.path.realpath(t.name))
 
     def with_journal(self, text: str) -> dict:
-        (self.run_dir / JOURNAL).write_text(text, encoding="utf-8")
+        (self.run_dir / JOURNAL).write_bytes(text.encode("utf-8"))   # exact bytes: no platform newline translation (LF stays LF on Windows)
         return {"journal": {"path": JOURNAL}}
 
     def refused(self, rec: dict, recorded: bool = False) -> bundle_cli.JournalRefused:

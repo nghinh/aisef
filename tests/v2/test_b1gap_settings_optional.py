@@ -26,7 +26,8 @@ class OptionalKeys(unittest.TestCase):
 
     # kills: L56 string 'client_pin' emptied
     def test_client_pin_is_an_accepted_optional_key_and_binds_settings_client_pin(self):
-        pin = {"exe": "/opt/aisef/opencode", "sha256": "a" * 64}
+        exe = "C:\\opt\\aisef\\opencode.exe" if sys.platform == "win32" else "/opt/aisef/opencode"
+        pin = {"exe": exe, "sha256": "a" * 64}  # a platform-native ABSOLUTE path (settings.py requires PurePath(exe).is_absolute())
         s = self.load(client_pin=dict(pin))
         self.assertIsInstance(s, settings.Settings)
         self.assertEqual(s.client_pin, pin)
