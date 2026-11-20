@@ -1,10 +1,10 @@
 # Documentation map
 
-AISEF 2.1 ships two surfaces: the V2 runtime (`aisef run`) and the 1.x framework, whose planning pipeline and tools
+AISEF 2.2 ships two surfaces: the V2 runtime (`aisef run`) and the 1.x framework, whose planning pipeline and tools
 are unchanged and whose execution runs behind `aisef legacy run` / `aisef legacy improve`. Pages describe the
 version they were written for; a dated record is never rewritten to match a later release.
 
-## AISEF 2.1 — current
+## AISEF 2.2 — current
 
 | page | what it is |
 |---|---|
@@ -14,7 +14,7 @@ version they were written for; a dated record is never rewritten to match a late
 | [../closure-evidence/v2/v2.1/V2.1-EXECUTIVE-HANDOVER.md](../closure-evidence/v2/v2.1/V2.1-EXECUTIVE-HANDOVER.md) · [../closure-evidence/v2/v2.1/GO-NO-GO.md](../closure-evidence/v2/v2.1/GO-NO-GO.md) | the 2.1 qualification and release evidence |
 | [v2/V2.1-BACKLOG.md](v2/V2.1-BACKLOG.md) | what the V2 runtime does not do yet, each item with a reproducer |
 | [v2/V2-STABLE-RELEASE-CHARTER.md](v2/V2-STABLE-RELEASE-CHARTER.md) · [v2/RELEASE-PROCESS.md](v2/RELEASE-PROCESS.md) | how the V2 runtime is qualified and released |
-| [../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md](../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md) | the 2.0 release evidence (same kernel 2.1 ships) |
+| [../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md](../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md) | the 2.0 release evidence (the 2.0 kernel; 2.1 ships it unchanged, 2.2 advances it by exactly one line) |
 | [SALEKIT.html](SALEKIT.html) | one-page overview for evaluators |
 | [DANH-GIA-360-V2.0-2026-10-06.md](DANH-GIA-360-V2.0-2026-10-06.md) | independent 360° assessment of 2.0 (Vietnamese): eleven dimensions, findings, 2.0.1/2.1 plan |
 
@@ -38,4 +38,4 @@ version they were written for; a dated record is never rewritten to match a late
 - Releases and plans: `RELEASE-*`, `PLAN-v0.4.0.md`, `ROADMAP-POST-1.0.md`, `V1-READINESS.md`, `STABILITY.md`, `EXECUTION-PLAN.md`, `ACTION-PLAN-2026-09-05.md`, `SPIKE-REPORT.md`, `REQUIREMENTS-EVIDENCE.md`.
 - Reviews and status: `DEEP-REVIEW-2026-09-05.md`, `DANH-GIA-360-2026-09-12.md`, `DANH-GIA-360-VA-LO-TRINH.md`, `ASSESSMENT-360-v2.html`, `STATUS-2026-09-05.md`, `CLAIM-AUDIT-1.7.2.md`, `DOGFOOD-*.md`, `handoff/`.
 - External validation of 1.x (G6): `EXTERNAL-VALIDATION-v1.1.0.md`, `EXTERNAL-VALIDATION-QUICKSTART.md`, `TEMPLATE-EXTERNAL-VALIDATION-REPORT.md`, `G6-RETURN-PLAYBOOK.md`.
-- 2.0 / 2.1 working material: `implementation/v2/`, `research/v2/`, `v2.1/`.
+- 2.0 / 2.1 / 2.2 working material: `implementation/v2/`, `research/v2/`, `v2.1/`.

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AISEF — Ship AI-written code with engineering proof</title>
-  <meta name="description" content="AISEF 2.1: deterministic, evidence-bound orchestration and product verification for coding agents. Harness-owned probes decide delivery; every decision lands in a hash-chained journal you can re-verify. Zero dependencies. Python ≥ 3.11.">
+  <meta name="description" content="AISEF 2.2: deterministic, evidence-bound orchestration and product verification for coding agents. Harness-owned probes decide delivery; every decision lands in a hash-chained journal you can re-verify. Zero dependencies. Python ≥ 3.11.">
   <link rel="icon" type="image/png" sizes="32x32" href="icon/aisef-favicon-32.png">
   <link rel="apple-touch-icon" href="icon/aisef-icon-light.png">
   <meta property="og:title" content="AISEF — Ship AI-written code with engineering proof">
@@ -670,11 +670,11 @@ section { padding: 100px 0; }
   <div class="wrap hero-content">
     <div class="hero-badge">
       <span class="dot"></span>
-      v2.1.0 · Open Source · Zero Dependencies
+      v2.2.0 · Open Source · Zero Dependencies
     </div>
     <h1>AI writes code.<br>The harness <span class="accent">proves it works.</span></h1>
     <p class="hero-sub">
-      AISEF 2.1 runs an owner-approved plan on your repository. A coding agent writes each story;
+      AISEF 2.2 runs an owner-approved plan on your repository. A coding agent writes each story;
       harness-owned probes of the product &mdash; never the agent's word &mdash; decide whether it is
       delivered, retried or rolled back. Every decision lands in a hash-chained journal you can re-verify.
     </p>
@@ -828,7 +828,7 @@ section { padding: 100px 0; }
 <section class="diff section-rule" id="capabilities">
   <div class="wrap">
     <div class="eyebrow">Core differentiators</div>
-    <h2>What the 2.0 kernel guarantees</h2>
+    <h2>What the V2 kernel guarantees</h2>
     <p class="diff-sub">
       What each mechanism guarantees &mdash; and where it stops: the limits are listed under Benchmark honesty below.
     </p>
@@ -844,7 +844,7 @@ section { padding: 100px 0; }
         <span class="diff-label">Authenticated verdict channel</span>
         <div class="diff-desc">
           <h3>The code under test cannot forge the verdict, but it can still misreport itself</h3>
-          <p>During a proof, candidate code runs only inside the probe&rsquo;s agent process, and the verdict comes from a controller that never imports it, over an authenticated channel: the code under test cannot forge a verdict the controller accepts, because every line carries an authentication under a key it never holds; at most it can suppress its own observation, which is reported as a harness failure, not as SATISFIED. This holds within an evaluation, and in 2.1 across evaluations too: probe controllers run with <code>-S</code>, so a <code>.pth</code> planted in the venv no longer runs inside a later controller (V21-28, closed at the mechanism level). What the channel does not give is the truth of an answer: the code can misreport its exit code or its returned value, so a candidate written to do that, or one that recognises it is being probed, can turn a broken product into a SATISFIED result.</p>
+          <p>During a proof, candidate code runs only inside the probe&rsquo;s agent process, and the verdict comes from a controller that never imports it, over an authenticated channel: the code under test cannot forge a verdict the controller accepts, because every line carries an authentication under a key it never holds; at most it can suppress its own observation, which is reported as a harness failure, not as SATISFIED. This holds within an evaluation, and in 2.1 across evaluations too: probe controllers run with <code>-I -S</code>, so a <code>.pth</code> planted in the venv no longer runs inside a later controller (V21-28, closed at the mechanism level). What the channel does not give is the truth of an answer: the code can misreport its exit code or its returned value, so a candidate written to do that, or one that recognises it is being probed, can turn a broken product into a SATISFIED result.</p>
         </div>
       </li>
       <li class="diff-item">
@@ -906,8 +906,10 @@ section { padding: 100px 0; }
     <div class="eyebrow">Measured, not claimed</div>
     <h2>Real numbers from the release qualification</h2>
     <p class="evidence-sub">
-      2.1.0 ships the same V2 kernel as 2.0, requalified &mdash; byte-for-byte the kernel 2.0 qualified. The deep
-      rungs below are that 2.0 qualification; 2.1 adds full mutation coverage and a byte-identical published build.
+      2.2.0 is the same V2 runtime as 2.0 and 2.1, requalified &mdash; the kernel advances from 2.1.0 by exactly
+      one line (the native-Windows CRLF <code>_create</code> fix, a byte no-op on POSIX). The deep rungs below are
+      the 2.0 qualification; 2.1 added full mutation coverage and a byte-identical published build, and 2.2 adds
+      native-Windows process-liveness hardening, a fail-closed invariant verifier and a risk-based mutation gate.
       Where something hasn't been measured, the framework says so &mdash; it never defaults to "probably fine".
     </p>
     <div class="evidence-terminal">
@@ -923,11 +925,17 @@ section { padding: 100px 0; }
       <div><span class="label">  Acceptance</span> <span class="val">59/59</span> <span class="ok">✓ the bundle&rsquo;s own specs, 0 false accepts</span></div>
       <div><span class="label">  Dependencies</span> <span class="val">0</span> <span class="ok">✓ stdlib only</span></div>
       <br>
-      <div><span class="cmd">AISEF 2.1.0 &mdash; the same kernel, requalified</span></div>
+      <div><span class="cmd">AISEF 2.2.0 &mdash; the same V2 runtime, requalified</span></div>
       <div><span class="label">  2.1 coverage</span> <span class="val">614/614</span> <span class="ok">✓ mutation targets, 0 MISSING · 97.41% killed</span></div>
       <div><span class="label">  2.1 published</span> <span class="val">byte-identical</span> <span class="ok">✓ wheel + sdist = frozen RC · PyPI 2026-11-01</span></div>
       <div><span class="label">  2.1 mutation gate</span> <span class="val">FAIL</span> <span class="ok" style="color:#F59E0B">✗ 7 survivors, owner-accepted as scoped risks</span></div>
-      <div><span class="label">  Version</span> <span class="val">2.1.0</span> <span class="ok">✓ stable &mdash; kernel unchanged from 2.0</span></div>
+      <br>
+      <div><span class="cmd">AISEF 2.2.0 &mdash; the same runtime, requalified again</span></div>
+      <div><span class="label">  2.2 mutation gate</span> <span class="val">177/177</span> <span class="ok">✓ targets measured, 0 MISSING · 5,782 killed + 127 audited-benign survivors</span></div>
+      <div><span class="label">  2.2 Windows liveness</span> <span class="val">60/60</span> <span class="ok">✓ mutants killed on a real Win32 runner</span></div>
+      <div><span class="label">  2.2 verifier</span> <span class="val">fail-closed</span> <span class="ok">✓ malformed invariant digest · calibrations 57/57</span></div>
+      <div><span class="label">  2.2 published</span> <span class="val">byte-identical</span> <span class="ok">✓ wheel + sdist = frozen RC2 · PyPI 2026-11-20</span></div>
+      <div><span class="label">  Version</span> <span class="val">2.2.0</span> <span class="ok">✓ stable &mdash; kernel +1 line from 2.1.0 (Windows CRLF fix)</span></div>
     </div>
     <p class="evidence-note">
       The live release smoke ran one workload (LedgerLock), 7 stories and 67 proof obligations on one real model route,
@@ -975,7 +983,7 @@ section { padding: 100px 0; }
           <li><strong>2.1:</strong> integrity under an external SIGKILL in the narrow window between sending a provider request and journaling its result is outside the supported envelope (A-03) &mdash; not claimed fixed or verified. (In 2.0, plan criteria could refute correct code (V21-37) and a post-merge regression went to nobody (V21-38); both are fixed in 2.1.)</li>
           <li><strong>2.0:</strong> a live <code>aisef run</code> on Windows (the package installs and the kernel&rsquo;s suite runs there), hostile multi-tenant isolation, and isolation against a malicious process of the same OS user</li>
           <li><strong>2.0:</strong> bundle authoring &mdash; 2.0 runs an approved project bundle; it does not write one, and there is no automatic conversion from a 1.x project</li>
-          <li><strong>2.1:</strong> developer confinement &mdash; the developer client runs as the operator&rsquo;s user, with the operator&rsquo;s home, global client configuration and network, and in the 2.0 release smoke it read outside its worktree (V21-02, still open). 2.1 closed the related <code>.pth</code> verdict-channel gap at the mechanism level &mdash; probe controllers now run with <code>-S</code> (V21-28) &mdash; but OS-level confinement of the developer remains open</li>
+          <li><strong>2.1:</strong> developer confinement &mdash; the developer client runs as the operator&rsquo;s user, with the operator&rsquo;s home, global client configuration and network, and in the 2.0 release smoke it read outside its worktree (V21-02, still open). 2.1 closed the related <code>.pth</code> verdict-channel gap at the mechanism level &mdash; probe controllers now run with <code>-I -S</code> (V21-28) &mdash; but OS-level confinement of the developer remains open</li>
           <li><strong>2.0:</strong> a delivery PASS on a live run &mdash; none of the live V2 runs so far has reached one</li>
           <li>That the harness helps an agent solve more — every cohort so far (v0.3.0, C-1, C-1b, C-2) returned a null or an inconclusive result. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
           <li>No external user has independently adopted the framework — all evidence is internal. The G6 handoff bundle for the public 1.7.2 release is ready and frozen; independent external-human validation is awaited, and until a genuine participant's report is in, this line stands</li>
@@ -1039,7 +1047,7 @@ section { padding: 100px 0; }
         <div class="cli-step-label">Install</div>
         <div><span class="prompt">$ </span><span class="cmd">pip install aisef</span></div>
         <div><span class="prompt">$ </span><span class="cmd">aisef --version</span></div>
-        <div><span class="dim">  aisef 2.1.0</span></div>
+        <div><span class="dim">  aisef 2.2.0</span></div>
       </div>
       <div class="cli-step">
         <div class="cli-step-label">Check</div>
@@ -1091,7 +1099,7 @@ section { padding: 100px 0; }
 <!-- ════════════ Footer ════════════ -->
 <footer class="footer">
   <div class="wrap">
-    AISEF — AI Software Engineering Framework · v2.1.0 · MIT License
+    AISEF — AI Software Engineering Framework · v2.2.0 · MIT License
   </div>
 </footer>
 

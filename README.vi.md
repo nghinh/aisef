@@ -9,22 +9,23 @@ Nguyên tắc nền, xuyên suốt mọi quyết định trong kho này:
 
 > **Cần phán đoán thì giao cho model. Cần đảm bảo thì viết code.**
 
-**AISEF 2.1** biến nguyên tắc đó thành runtime. `aisef run` thực thi một kế hoạch đã được chủ dự án phê duyệt trên một
+**AISEF 2.2** biến nguyên tắc đó thành runtime. `aisef run` thực thi một kế hoạch đã được chủ dự án phê duyệt trên một
 repository git: với mỗi story, một phiên developer sửa code, và kernel V2 quyết định — dựa trên các probe độc lập kiểm
 tra sản phẩm, không bao giờ dựa trên lời của developer hay test do chính developer viết — story được giao, chạy lại
 hay rollback. Mọi quyết định được ghi vào một journal chuỗi băm, và `aisef run --verify` kiểm một lần chạy đã xong
-đối chiếu với journal đó. 2.1 là cùng runtime V2 như 2.0, được kiểm định lại — xem [Có gì mới trong 2.1](#có-gì-mới-trong-21).
+đối chiếu với journal đó. 2.2 là cùng runtime V2 như 2.0 và 2.1, được kiểm định lại một lần nữa — nay thêm gia cố
+liveness tiến trình trên Windows gốc — xem [Có gì mới trong 2.2](#có-gì-mới-trong-22).
 
 ```bash
-pip install aisef==2.1.0
+pip install aisef==2.2.0
 ```
 
 - [Hướng dẫn dùng AISEF](docs/v2/USAGE.vi.md) · [English](docs/v2/USAGE.md)
-- [Có gì mới trong 2.1](#có-gì-mới-trong-21) · [Thay đổi theo từng bản phát hành](CHANGELOG.md) · [Giới hạn đã biết](#giới-hạn-đã-biết-của-21)
+- [Có gì mới trong 2.2](#có-gì-mới-trong-22) · [Thay đổi theo từng bản phát hành](CHANGELOG.md) · [Giới hạn đã biết](#giới-hạn-đã-biết-của-22)
 - [RFC kiến trúc](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) · [Quy trình phát hành](docs/v2/RELEASE-PROCESS.md)
 - [Framework 1.x (bề mặt legacy và công cụ lập kế hoạch)](#framework-v1-bề-mặt-legacy-và-công-cụ-lập-kế-hoạch)
 
-## AISEF 2.1 làm gì
+## AISEF 2.2 làm gì
 
 `aisef run` là đường thực thi có thẩm quyền. Một lần chạy, theo thứ tự:
 
@@ -38,7 +39,7 @@ pip install aisef==2.1.0
    khác là *identity stop*: không phiên nào được mở.
 4. **Story chạy theo thứ tự phụ thuộc.** Với mỗi story, phiên developer (OpenCode, trên đúng route đã chứng thực) sửa
    code trong git worktree riêng — một workspace, không phải sandbox: client chạy dưới user hệ điều hành của người vận
-   hành (xem [Giới hạn đã biết](#giới-hạn-đã-biết-của-21)). Sau đó kernel chứng minh candidate:
+   hành (xem [Giới hạn đã biết](#giới-hạn-đã-biết-của-22)). Sau đó kernel chứng minh candidate:
    - **ProductProof** — các probe do harness sở hữu (gọi hàm Python, gọi CLI, hiệu ứng tiến trình, file artifact) kiểm
      từng behaviour contract trên candidate. Mã candidate chỉ chạy trong tiến trình agent của probe; kết luận do một
      controller không bao giờ import mã đó đưa ra, qua một kênh đã xác thực, nên trong một lần đánh giá mã đang bị
@@ -67,25 +68,30 @@ contract đã duyệt mới định nghĩa sự thật sản phẩm), *Independe
 bằng chứng chứng nhận nó), *Typed Ownership*, *Immutable Provenance* và *No Prose As Control State* (không đầu ra nào
 của model trở thành mã điều khiển). Xem [RFC kiến trúc](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) §4.
 
-## Có gì mới trong 2.1
+## Có gì mới trong 2.2
 
-2.1 là một vòng kiểm định lại trên cùng runtime V2 của `aisef run` — tách controller/agent, journal chuỗi băm và
-`aisef run --verify` không đổi về hình dạng; kernel sản phẩm `aisef2` tiến từ 2.0.0 mà không đổi diện mạo một lần chạy.
-Từng thay đổi hành vi được truy vết trong [`docs/v2.1/REPORT.md`](docs/v2.1/REPORT.md) và
-[`docs/v2.1/TRACEABILITY.md`](docs/v2.1/TRACEABILITY.md):
+2.2 là một vòng kiểm định lại tiến-theo-phiên-bản trên cùng runtime V2 của `aisef run` — tách controller/agent, journal
+chuỗi băm và `aisef run --verify` không đổi về hình dạng; kernel sản phẩm `aisef2` tiến từ 2.1.0 mà không đổi diện mạo
+một lần chạy. Tập đầy đủ, có truy vết, nằm trong [`CHANGELOG.md`](CHANGELOG.md) và
+[`closure-evidence/v2/v2.2/`](closure-evidence/v2/v2.2/):
 
-- **Criterion kế hoạch nhận biết cú pháp (V21-37).** Một criterion đọc mã Python không còn nhầm một dòng docstring bắt
-  đầu bằng `from …` là import — lớp rollback-sai của 2.0 đã đóng. Một hồi quy phát hiện sau merge nay được trả về cho
-  developer khi chính sách chạy lại cho phép, thay vì không thuộc về ai (V21-38).
-- **Kênh verdict nay đúng giữa các lần đánh giá (V21-28).** Controller của probe chạy với `-S` cùng `-I`, nên một `.pth`
-  cài vào site-packages không còn chạy bên trong controller sau — đóng ở mức cơ chế (việc giả mạo `.pth` đầu-cuối trong
-  một `aisef run` thật chưa được đo).
-- **Ba danh tính contract tách biệt.** Danh tính ngữ nghĩa của contract, phiên bản capability/API của probe và digest
-  của byte đã chạy nay tách rời, nên `aisef bundle migrate` không còn mang theo một approval chỉ vì contract hash không
-  đổi: nó báo `semantic_changes` / `needs_owner_reapproval`, và duyệt lại là hành động tường minh của chủ dự án. Giới hạn
-  đã đo, chủ dự án chấp nhận (2026-10-18): trên bundle LedgerLock 2.0.0, 50 trong 53 approval được giữ chỉ dựa vào luật
-  phiên bản capability, vì ba probe đổi hành vi mà không nâng phiên bản — là một giới hạn, không phải một khẳng định.
-- **Phủ mutation đầy đủ** — 614/614 target, 0 MISSING (xem phần kiểm định bên dưới).
+- **Liveness và kết thúc tiến trình trên Windows gốc được gia cố (B1).** `pid_alive` / `_win_liveness` truy vấn trạng
+  thái tiến trình qua Win32 API (`QUERY_LIMITED`, không kết thúc ngoài ý muốn), một tiến trình được bảo vệ fail *closed*
+  về còn sống, và `_is_gone` của client lùi về an toàn khi không liệt kê được `ps` — chứng minh trên một runner Win32
+  thật, 60 / 60 mutant bị diệt ở chế độ gốc. Điều này gia cố cách một lần chạy quan sát các tiến trình con của chính nó
+  trên Windows; nó **không** thêm Windows vào các nền tảng chạy-thật được hỗ trợ (vẫn là Linux và macOS — xem
+  [Giới hạn đã biết](#giới-hạn-đã-biết-của-22)).
+- **Trình kiểm bất biến fail closed khi digest bất biến hỏng** (`aisef2/app/verify.py`); các hiệu chỉnh checker được
+  tái tạo tương ứng (57 / 57).
+- **Kiểm định tiến-theo-phiên-bản.** Một *currency DAG* xuyên bản ghi cho phép mỗi bản ghi kiểm định tự dựng lại trên
+  đúng cây ship nó, nên ghi bằng chứng về một bản phát hành không còn nguy cơ làm mất hiệu lực một bản ghi anh em; cổng
+  mutation phát hành là **theo rủi ro** — 177 target / 5.896 mutant, mọi target được đo
+  (xem [2.0, 2.1 và 2.2 đã được kiểm định thế nào](#20-21-và-22-đã-được-kiểm-định-thế-nào)).
+- **Phát hành lên PyPI ngày 2026-11-20** — tag `v2.2.0`, wheel và sdist giống hệt từng byte với release candidate đã
+  đóng băng, kiểm lại sau khi tải lên.
+
+Vòng 2.1 (criterion kế hoạch nhận biết cú pháp, bao đóng `.pth` xuyên đánh giá, ba danh tính contract tách biệt, phủ
+mutation đầy đủ 614 / 614) nằm trong [`CHANGELOG.md`](CHANGELOG.md) và [`docs/v2.1/REPORT.md`](docs/v2.1/REPORT.md).
 
 ## Bắt đầu nhanh
 
@@ -109,7 +115,7 @@ aisef run --verify --project bundle.json --out ./runs/r1                        
 
 Định dạng từng trường, thư mục chạy và mọi lý do từ chối: [docs/v2/USAGE.vi.md](docs/v2/USAGE.vi.md).
 
-## 2.0 và 2.1 đã được kiểm định thế nào
+## 2.0, 2.1 và 2.2 đã được kiểm định thế nào
 
 2.1 là cùng runtime V2 được kiểm định lại — kernel sản phẩm `aisef2` (`5f34a3f3`) giống hệt 2.0 từng byte; không mã sản
 phẩm nào bị đổi để chuẩn bị bản phát hành. Kiểm định riêng của 2.1: **độ phủ mutation 614/614 target, 0 MISSING** (97,41%
@@ -137,7 +143,25 @@ Bản ứng viên RC2 (`1565bcc`) được đóng băng cùng digest wheel và s
 Bằng chứng nằm trong [`closure-evidence/v2/release/`](closure-evidence/v2/release/), bắt đầu từ
 [`V2.0-FINAL-RELEASE-REPORT.md`](closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md).
 
-## 2.1 khẳng định gì, và không khẳng định gì
+**2.2** là cùng runtime V2 được kiểm định lại lần thứ hai — kernel `aisef2` tiến từ 2.1.0 đúng một dòng
+(`bundle_cli.py::_create` ghi với `newline=""`: LF tất định trên mọi nền tảng, bản sửa cho các lỗi unit CRLF trên
+Windows gốc, một no-op về byte trên POSIX). Kiểm định riêng của 2.2:
+
+| phép kiểm | kết quả |
+|---|---|
+| cổng mutation — phạm vi theo rủi ro, mọi target được đo | **177 / 177 target, 0 MISSING, 0 NOT_RUN**; 5.909 mutant = **5.782 bị diệt + 127 sống sót**, mỗi survivor được audit độc lập là EQUIVALENT hoặc chỉ-khác-thông-điệp (0 REAL_GAP, 0 chưa audit) |
+| mutation liveness Windows gốc | **60 / 60 bị diệt** trên ba target chỉ-Windows, trên một runner Win32 thật |
+| hiệu chỉnh checker / currency DAG | 57 / 57 đã hiệu chỉnh; currency DAG xuyên bản ghi dựng lại sạch (0 vấn đề) trên cây đã ship |
+| build tái lập được | hai lần build lại độc lập trùng từng byte với wheel và sdist RC2 đã đóng băng (`SOURCE_DATE_EPOCH` đã ghim, `setuptools==84.0.0`) |
+| artifact đã phát hành | **2.2.0 trên PyPI (2026-11-20)** — tag `v2.2.0`, wheel (`8c94dd6b…c389`) và sdist (`102cda44…1291`) **giống hệt từng byte** với release candidate đã đóng băng, kiểm lại sau khi tải lên |
+| rủi ro tồn dư được chấp nhận | `discover` thẩm quyền phá huỷ của `aisef2` giữ 3 survivor đã audit, chứng minh an toàn bằng phòng thủ nhiều lớp (không có điểm phá huỷ thật nào chạy); cải thiện độ phủ kill-set hoãn sang 2.2.1 |
+
+Bằng chứng 2.2 nằm trong [`closure-evidence/v2/v2.2/`](closure-evidence/v2/v2.2/) và
+[`closure-evidence/v2/release/V2.2.0-STATUS.json`](closure-evidence/v2/release/V2.2.0-STATUS.json); các quyết định của
+chủ dự án ràng buộc vòng này nằm trong [`RELEASE-DECISIONS.json`](closure-evidence/v2/cycle2/RELEASE-DECISIONS.json)
+(seq 8–12) và [`docs/ROADMAP-2.2-CHECKLIST.md`](docs/ROADMAP-2.2-CHECKLIST.md).
+
+## 2.2 khẳng định gì, và không khẳng định gì
 
 **Khẳng định:** điều phối và kiểm chứng sản phẩm tất định, gắn với bằng chứng; trong một lần đánh giá, mã candidate
 không thể điều khiển kênh kết luận (lỗ giữa các lần đánh giá được nêu dưới); bằng chứng thô của lần chạy được giữ lại
@@ -147,42 +171,45 @@ và kiểm lại được.
 
 **Không khẳng định:** tổng quát hoá cho mọi loại workload; chất lượng model; vượt trội so với V1; cô lập đa người thuê
 có tính thù địch; cô lập hoàn toàn trước tiến trình độc hại của cùng người dùng hệ điều hành; bảo vệ trước chủ máy.
-`plan_quality_verdict` luôn là `NOT_CLAIMED` trong 2.1.
+`plan_quality_verdict` luôn là `NOT_CLAIMED` trong 2.2.
 
-### Giới hạn đã biết của 2.1
+### Giới hạn đã biết của 2.2
 
 - **AISEF chạy bundle; nó không soạn bundle.** Project bundle V2 (contract, phê duyệt, kế hoạch) được chuẩn bị và
   phê duyệt bên ngoài `aisef run`; không có chuyển đổi tự động từ dự án 1.x. Một bundle 2.0.0 được buộc lại bằng
-  `aisef bundle migrate`, lệnh này trả về những contract cần chủ dự án duyệt lại (xem [Có gì mới trong 2.1](#có-gì-mới-trong-21)).
+  `aisef bundle migrate`, lệnh này trả về những contract cần chủ dự án duyệt lại (xem [Có gì mới trong 2.2](#có-gì-mới-trong-22)).
 - **Nghiệm thu chỉ tương đối với spec của bundle.** "0 chấp nhận sai" nghĩa là không story nào trượt chính contract
   của nó mà vẫn được giao. Trong smoke phát hành 2.0, review của model tìm ra 5 lỗi tái hiện được nằm ngoài 59 spec
   (crash, sai mã thoát ở những đường không contract nào chạm tới); chúng đã được giao vì review chỉ mang tính tham khảo.
 - **Developer không bị giới hạn (V21-02, vẫn mở).** Client chạy dưới user hệ điều hành của người vận hành, với HOME,
   PATH, thư mục XDG, cấu hình OpenCode toàn cục (plugin, MCP server) và mạng của người đó. Trong smoke phát hành 2.0,
   các phiên developer đã đọc ra ngoài worktree — scratch của probe, journal đang chạy, bundle chứa stimulus, kernel đã
-  cài — trước khi một story commit. 2.1 đã đóng lỗ hổng kênh verdict qua `.pth` ở mức cơ chế (bên dưới), nhưng giới hạn
-  developer ở mức hệ điều hành vẫn mở; hãy giữ `evidence_anchor` của lần chạy ngoài thư mục run, nơi developer không ghi
-  được ([ANCHOR-THREAT-MODEL.md](docs/v2.1/ANCHOR-THREAT-MODEL.md)).
+  cài — trước khi một story commit. 2.1 đã đóng lỗ hổng kênh verdict qua `.pth` ở mức cơ chế (bên dưới) và 2.2 giữ nó
+  đóng, nhưng cô lập developer ở mức hệ điều hành vẫn mở; hãy giữ `evidence_anchor` của lần chạy ngoài thư mục run, nơi
+  developer không ghi được ([ANCHOR-THREAT-MODEL.md](docs/v2.1/ANCHOR-THREAT-MODEL.md)).
 - **Kênh verdict đúng ở mức cơ chế, không ở mức hệ điều hành.** Controller của probe nay chạy venv của lần chạy với
   `-I -S` (V21-28), nên một file `.pth` cài vào site-packages không còn chạy bên trong controller sau — lỗ hổng giữa các
   lần đánh giá của 2.0 đã đóng. AISEF vẫn chạy developer dưới user hệ điều hành của người vận hành, nên không khẳng định
   cách ly trước một tiến trình thù địch của cùng user ấy, và việc giả mạo `.pth` đầu-cuối trong một `aisef run` thật chưa
   được đo.
 - **Toàn vẹn khi bị SIGKILL ngoài là có giới hạn (A-03).** Nếu `aisef run` bị SIGKILL trong cửa sổ hẹp giữa lúc gửi
-  request provider và lúc ghi kết quả vào journal, tính toàn vẹn **nằm ngoài phạm vi được hỗ trợ của 2.1** — không khẳng
+  request provider và lúc ghi kết quả vào journal, tính toàn vẹn **nằm ngoài phạm vi được hỗ trợ của 2.2** — không khẳng
   định đã sửa hay đã kiểm chứng đầy đủ (chủ dự án quyết 2026-10-31). Mọi đường kết thúc bình thường (chạm ngân sách, chạm
   trần lượt, hết giờ, bị ngắt) đều che và giải phóng trong `finally` và được phủ.
 - **`--verify` chứng minh tính nhất quán, không chứng minh tính xác thực.** Chuỗi băm không có khoá và `RUN.json` nằm
   cạnh nó trong cùng thư mục ghi được; viết lại nhất quán cả hai vẫn VERIFIED (V21-30).
 - **Nền tảng.** `aisef run` thật được hỗ trợ trên Linux và macOS; mọi lần chạy thật đến nay đều trên macOS (Linux được
-  kiểm trong CI với client và provider giả). Trên Windows gói cài được và bộ test của kernel chạy được, nhưng chạy thật
-  không thuộc phạm vi khẳng định của 2.1.
+  kiểm trong CI với client và provider giả). Trên Windows gói cài được và bộ test của kernel chạy được, và 2.2 gia cố
+  liveness/kết thúc tiến trình trên Windows gốc ở mức cơ chế (60 / 60 mutant bị diệt trên một runner Win32 thật) — nhưng
+  một lần chạy thật vẫn không thuộc phạm vi khẳng định của 2.2.
 - **Probe** chạy với thư viện chuẩn và chính mã nguồn của candidate (không có phụ thuộc bên thứ ba của dự án). Review
   của model và scanner (`ruff`, nếu đã cài) chỉ mang tính tham khảo, không bao giờ chặn.
-- **Cổng mutation FAIL — 7 survivor được chấp nhận.** Verdict cổng mutation máy giữ nguyên FAIL (7 survivor chưa audit
-  trong `client.py::session` và `story_runner.py::_attempt`); chủ dự án chấp nhận chúng là rủi ro tồn dư có phạm vi — không
-  phải lỗi của một verdict, nghĩa vụ, bí mật, ranh giới truy cập hay toàn vẹn bằng chứng. Chi tiết:
-  [`V2.1-KNOWN-LIMITATIONS.json`](closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json).
+- **Cổng mutation — theo rủi ro, mọi target được đo.** Cổng phát hành 2.2 đo 177 / 177 target (0 MISSING, 0 NOT_RUN);
+  127 trong 5.909 mutant sống sót, mỗi cái được audit độc lập là EQUIVALENT hoặc chỉ-khác-thông-điệp (0 REAL_GAP, 0
+  chưa audit). Một ca được mang tiếp: `discover` thẩm quyền phá huỷ có 3 survivor đã audit, chứng minh an toàn bằng
+  phòng thủ nhiều lớp (không có điểm phá huỷ thật nào chạy), kèm cải thiện độ phủ kill-set hoãn sang 2.2.1. Chi tiết:
+  [`V2.2.0-STATUS.json`](closure-evidence/v2/release/V2.2.0-STATUS.json). Bảy survivor được chủ dự án chấp nhận của
+  vòng 2.1 ghi trong [`V2.1-KNOWN-LIMITATIONS.json`](closure-evidence/v2/v2.1/V2.1-KNOWN-LIMITATIONS.json).
 
 Toàn bộ backlog 2.1, kèm trạng thái tái hiện của từng mục: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md). Đánh
 giá 360° độc lập về 2.0: [docs/DANH-GIA-360-V2.0-2026-10-06.md](docs/DANH-GIA-360-V2.0-2026-10-06.md).
@@ -221,7 +248,7 @@ aisef2/                 kernel và runtime V2
   invariants/           chín bất biến, bật ở mọi tầng test
 aisef/                  framework 1.x: chuỗi lập kế hoạch, cổng, guard, thực thi legacy
 docs/v2/                cách dùng, phát hành và backlog 2.1
-closure-evidence/v2/    mọi bản ghi kiểm định của 2.0
+closure-evidence/v2/    mọi bản ghi kiểm định của 2.0, 2.1 và 2.2
 ```
 
 ---
