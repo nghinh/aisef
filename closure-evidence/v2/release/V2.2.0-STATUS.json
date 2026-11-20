@@ -1,27 +1,28 @@
 {
  "record": "AISEF 2.2.0 — release phase checkpoints (charter §22 analogue for the 2.2 version-forward lane). Read by validation/v2_release_gate.py for VERSION 2.2.0 (FINAL_RELEASE_READY, OPEN_BLOCKERS).",
  "version": "2.2.0",
- "authority": "owner directive 2026-11-20 (chat) 'FINAL OWNER AUTHORIZATION — RELEASE AISEF v2.2.0'; closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 11; the bounded release-acceptance process (owner directives 2026-11-19).",
+ "authority": "owner directive 2026-11-20 (chat) 'OWNER FINAL RULING — APPROVE OPTION C' and 'Option C is ratified. Complete the release.'; RELEASE-DECISIONS seq 12 (supersedes seq 11 / RC1).",
  "candidate": {
-  "RC": "V2.2.0-RC1",
-  "RC_SOURCE_SHA": "2258235c1f3b7b0e6b4df5a0f780efeeef58fd09",
-  "RC_KERNEL_TREE": "0efc2d272cb9eb5122adaf2d20f28212c9bdbb60",
-  "RC_KERNEL_DIGEST": "1c605db4cf72cbe42dc1e9909433f64c2feac0bce765ec9df0d58130086ddb9f",
-  "RC_WHEEL_DIGEST": "81bc061b3718caa707ac5ff346833db02934a50b95e4e3b3c465efabf9cdb7b9",
-  "RC_SDIST_DIGEST": "05d6855691400b38fde5a48c89c8bba7b626798a241c6a0d8d41d8b90d543f71",
-  "SOURCE_DATE_EPOCH": 1795094506,
-  "freeze_record": "closure-evidence/v2/release/V2.2.0-RC1-FREEZE.json",
-  "staging_build": "CI run 44628683949 (release/v2.2.0, event push): build + Linux/Windows clean-install smokes SUCCESS"
+  "RC": "V2.2.0-RC2",
+  "RC_SOURCE_SHA": "ad0630c731865fdf414ff6d74757a254d02f0d8e",
+  "RC_KERNEL_TREE": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
+  "RC_KERNEL_DIGEST": "c2d356b1cb1ed66652a6c1c88a4e7bd0fe962223430f131575de9432d9e334a0",
+  "RC_WHEEL_DIGEST": "8c94dd6bd6acb6b7052a8724a6a19ca99fae370ef57a978004ee05fbcce1c389",
+  "RC_SDIST_DIGEST": "102cda44738a44d84422e4f307163f93ae9d233e082714364e164d796dbd1291",
+  "SOURCE_DATE_EPOCH": 1795183078,
+  "freeze_record": "closure-evidence/v2/release/V2.2.0-RC2-FREEZE.json",
+  "supersedes": "V2.2.0-RC1 (2258235c, kernel 0efc2d27) — obsolete after the Windows-portability _create fix; its freeze record is preserved as history.",
+  "staging_build": "reproducible build at SOURCE_DATE_EPOCH=1795183078, setuptools==84.0.0 (deterministic, verified by two independent builds); the branch-CI wheel job and the release-CI staging+publish digest check (release_rc.py --verify-dist) re-derive and enforce these digests."
  },
  "FINAL_RELEASE_READY": "PASS",
- "FINAL_RELEASE_READY_MEANING": "RELEASE_GO for V2.2.0-RC1 2258235c; held only for the owner's production confirmation (charter §19): the protected `pypi` environment approval on the tag's release.yml run.",
+ "FINAL_RELEASE_READY_MEANING": "RELEASE_GO for V2.2.0-RC2 ad0630c73186; held only for the owner's production confirmation (charter §19): the protected `pypi` environment approval on the tag's release.yml run.",
  "OPEN_BLOCKERS": [],
- "OPEN_BLOCKERS_MEANING": "No open mandatory release blocker. The 10 raw-suite failures measured at 6f998657 were closed by one controlled corrective batch (7546401d + 2258235c) and independently verified; the full sealed suite is green on 2258235c.",
+ "OPEN_BLOCKERS_MEANING": "No open mandatory release blocker. The native-Windows unit failures were fixed by the one-line aisef2/app/bundle_cli.py::_create newline fix; the resulting module-stale mutation targets were dispositioned under owner-ratified Option C (verified evidence reuse): 42 bundle_cli targets retain their POSIX/Linux measured verdicts under a fail-closed applicability binding, with _create/_journal/init re-measured; checker_calibration is 57/57 and the currency DAG is green on the corrected tree.",
  "GATE_VERDICTS": {
-  "RAW_SEALED_SUITE": "OK (skipped=94) — 8282 tests, 0 failures / 0 errors on 2258235c (AISEF_SEALING=1 owned_run unittest discover); the v2.2.0 gate is the whole-suite-green with NO qualification allowlist (owner: no v2.2 allowlist).",
-  "CHECKER_CALIBRATION": "OK — calibrated 57/57; always-PASS mutants rejected 57/57 (validation/v2/checker_calibration.py --check)",
-  "MUTATION_RECORD_CHECK": "PASS (validation/v2/mutation.py --check)",
-  "CURRENCY_DAG": "problems: [] (validation/v2/currency_dag.py --json)",
+  "RAW_SEALED_SUITE": "the AISEF_SEALING=1 sealing job of tests.yml on the tagged commit is the authoritative whole-suite-green gate (NO qualification allowlist); the mutation/currency closure is green locally (checker_calibration 57/57, currency_dag [], mutation --check PASS).",
+  "CHECKER_CALIBRATION": "OK — calibrated 57/57; always-PASS mutants rejected 57/57 (on the corrected tree e865d65c; Q0 record regenerated).",
+  "MUTATION_RECORD_CHECK": "PASS (validation/v2/mutation.py --check): 42 bundle_cli targets VERIFIED_REUSE under the owner ruling, 3 re-measured (_create/_journal/init) + settings OPTIONAL; source_sha256 and survivor audits unchanged.",
+  "CURRENCY_DAG": "problems: [] on the corrected tree e865d65c (validation/v2/currency_dag.py).",
   "CONFORMANCE_RULING_V22": "PASS (validation/qualification/v21_conformance_ruling.py --check-v22)",
   "LEGACY_V21_CONFORMANCE_CHECK": "FAIL — pre-existing, by-design: the frozen v2.1 ruling is superseded on any v2.2-cycle tree (FAILS identically at the pre-batch baseline b35ec9d7); replaced by the passing --check-v22; NOT a release blocker and NOT relabelled PASS.",
   "STAGING": "SUCCESS (build + Linux/Windows clean-install smokes, CI run 44628683949)",
@@ -34,21 +35,66 @@
   "SURVIVOR_DISPOSITIONS": "closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json (557 entries, classes {AUDITED, EQUIVALENT}); all 127 in-scope survivors covered at the current source_sha256, 0 uncovered, 0 REAL_GAP/WEAK_ASSERT/unaudited-INFRA remaining.",
   "L253": "closure-evidence/v2/v2.2/V2.2-L253-DISPOSITION.json; final record shows 2/2 KILLED via a hermetic kill test (test_b1gap7_second_interrupt_guard.py) — NOT converted INFRA->KILLED without evidence.",
   "STALE_OUT_OF_SCOPE": "closure-evidence/v2/v2.2/V2.2-STALE-TARGET-ACCOUNTING.json (23 targets, none in the 177; re-measured via B1-BINDING-AMENDMENT-7/-9).",
-  "CHECK": "validation/v2/mutation.py --check PASS"
+  "CHECK": "validation/v2/mutation.py --check PASS",
+  "OPTION_C_DISPOSITION": "v2.2.0 Windows-portability: the _create newline fix moved bundle_cli.py's module hash (c15d5b10 -> 0fdfc022), leaving its 45 mutation targets module-stale. Owner-ratified Option C (closure-evidence/v2/v2.2/B1-MUTATION-EVIDENCE-REUSE-RULING.json): 3 MEASURED (_create 3/3, _journal 48m/43k/5surv, init 12/12 cross-platform) + settings OPTIONAL 6/6 unchanged + 42 VERIFIED_REUSE (1596 mutants) retaining their original POSIX/Linux verdicts under a fail-closed applicability binding in validation/v2/mutation.py. The POSIX no-op proof (only _create changed; it is a byte no-op on POSIX and not a target), kill-test identity, init before==after corroboration, and an independent adversarial no-refutation support the reuse; 0 UNRESOLVED."
  },
  "ACCEPTED_RESIDUALS": {
   "benign_survivors": "The 127 in-scope survivors are EQUIVALENT or MESSAGE_ONLY (independently audited noncritical); accepted under seq 9 (NO_UNRESOLVED_CRITICAL_HIGH_TRUST_DEFECTS).",
   "destructive_authority_discover": "aisef2 destructive-authority `discover` has 3 audited survivors (kill-set coverage), proven SAFE by defense-in-depth with zero live destructive sites; a kill-set coverage improvement is deferred to v2.2.1.",
   "no_security_authority_correctness_trust_defect": true
  },
- "KERNEL_NOTE": "The v2.2.0 kernel is NOT byte-identical to master b35ec9d7: the release branch carries the B1-campaign kernel hardening — aisef2/app/verify.py (fail-closed on malformed invariant digests) and aisef2/app/calibrations.py (calibration regen), exercised by the passing sealed suite and the mutation gate. Owner accepted this explicitly (seq 11). The final corrective batch (6f998657→2258235c) made NO aisef2 change (kernel tree 0efc2d272cb9 invariant across the batch).",
- "PRODUCTION_PUBLISH": "AUTHORIZED (RELEASE-DECISIONS seq 11, owner 2026-11-20), subject to (a) the release.yml gates passing on the tagged commit (tests incl. sealing, staging, v2-gate) and (b) the protected `pypi` environment approval by a human reviewer (the owner). Either control failing withholds publication.",
+ "KERNEL_NOTE": "The v2.2.0 RC2 kernel is e865d65c (aisef2 tree), kernel_digest c2d356b1. It differs from RC1 (0efc2d27) by exactly one line: aisef2/app/bundle_cli.py::_create `open(..., newline=\"\")` (deterministic LF on every platform; a byte no-op on POSIX, the fix for the native-Windows CRLF unit failures). No other aisef2 change.",
+ "PRODUCTION_PUBLISH": "AUTHORIZED (RELEASE-DECISIONS seq 12, owner 2026-11-20, Option C; supersedes seq 11/RC1), subject to (a) the release.yml gates passing on the tagged commit (tests incl. sealing, staging, v2-gate) and (b) the protected `pypi` environment approval by the owner (charter §19). Either control failing withholds publication.",
  "GOVERNANCE_NOTE_PYPI_ENVIRONMENT": "The `pypi` environment is protected with the owner as required reviewer; that approval is the human hold of charter §19, on top of the RELEASE-DECISIONS seq 11 entry the v2-gate reads. Engineering cannot approve it.",
  "COST": "paid GitHub usage: USD 0 — all CI on the public repository nghinh/aisef.",
  "history": [
-  {"phase": "BOUNDED_RELEASE_ACCEPTANCE", "status": "PASS", "on": "2258235c", "what": "scope frozen; one blocker register; one controlled corrective batch (WS-A bootstrap, WS-B P5 restore, WS-C sealed tests, WS-D ORCH version-forward); independent adversarial verification GO; single final sealed qualification OK (8282/0)."},
-  {"phase": "S3_EVIDENCE_INVENTORY", "status": "PASS", "on": "2258235c", "what": "owner §3 read-only inventory: 177-target mutation execution complete+committed (0 NOT_RUN), Windows 60/60, survivors audited, L253 + 23 stale accounted, seq-9/amendments integral, historical immutability held, package/source binding frozen (V2.2.0-RC1)."},
-  {"phase": "S4_RC_FROZEN", "status": "PASS", "on": "2258235c", "what": "V2.2.0-RC1 frozen (V2.2.0-RC1-FREEZE.json): wheel 81bc061b, sdist 05d68556, kernel tree 0efc2d272cb9, from staging run 44628683949 of exactly the RC."},
-  {"phase": "FINAL_RELEASE_READY", "status": "PASS", "on": "2258235c", "what": "RELEASE_GO; held for the owner's production confirmation (pypi environment approval, charter §19)."}
+  {
+   "phase": "BOUNDED_RELEASE_ACCEPTANCE",
+   "status": "PASS",
+   "on": "2258235c",
+   "what": "scope frozen; one blocker register; one controlled corrective batch (WS-A bootstrap, WS-B P5 restore, WS-C sealed tests, WS-D ORCH version-forward); independent adversarial verification GO; single final sealed qualification OK (8282/0)."
+  },
+  {
+   "phase": "S3_EVIDENCE_INVENTORY",
+   "status": "PASS",
+   "on": "2258235c",
+   "what": "owner §3 read-only inventory: 177-target mutation execution complete+committed (0 NOT_RUN), Windows 60/60, survivors audited, L253 + 23 stale accounted, seq-9/amendments integral, historical immutability held, package/source binding frozen (V2.2.0-RC1)."
+  },
+  {
+   "phase": "S4_RC_FROZEN",
+   "status": "PASS",
+   "on": "2258235c",
+   "what": "V2.2.0-RC1 frozen (V2.2.0-RC1-FREEZE.json): wheel 81bc061b, sdist 05d68556, kernel tree 0efc2d272cb9, from staging run 44628683949 of exactly the RC."
+  },
+  {
+   "phase": "FINAL_RELEASE_READY",
+   "status": "PASS",
+   "on": "2258235c",
+   "what": "RELEASE_GO; held for the owner's production confirmation (pypi environment approval, charter §19)."
+  },
+  {
+   "phase": "WINDOWS_PORTABILITY_FIX",
+   "status": "PASS",
+   "on": "ad0630c7",
+   "what": "aisef2/app/bundle_cli.py::_create newline=\"\" (one line) fixes the native-Windows CRLF unit failures; POSIX no-op. Kernel 0efc2d27 -> e865d65c."
+  },
+  {
+   "phase": "OPTION_C_VERIFIED_REUSE",
+   "status": "PASS",
+   "on": "ad0630c7",
+   "what": "owner-ratified Option C: 42 bundle_cli targets VERIFIED_REUSE (fail-closed mechanism, source_sha256 unchanged) + 3 re-measured + init; B1 re-frozen; execution_order, currency DAG, P5-REVERIFICATION/ORCH, Q0 re-derived on e865d65c; checker_calibration 57/57, currency_dag []."
+  },
+  {
+   "phase": "S4_RC2_FROZEN",
+   "status": "PASS",
+   "on": "ad0630c7",
+   "what": "V2.2.0-RC2 frozen (V2.2.0-RC2-FREEZE.json): wheel 8c94dd6bd6ac, sdist 102cda44738a, kernel tree e865d65c, SOURCE_DATE_EPOCH 1795183078 (reproducible build)."
+  },
+  {
+   "phase": "FINAL_RELEASE_READY",
+   "status": "PASS",
+   "on": "ad0630c7",
+   "what": "RELEASE_GO for RC2; held for the owner's production confirmation (pypi environment approval, charter §19)."
+  }
  ]
 }

@@ -420,6 +420,24 @@
    },
    "subject_to": "a successful release.yml run on the tagged commit (the `tests` gate incl. the AISEF_SEALING=1 sealing job, `staging`, and `v2-gate`) AND the protected `pypi` environment approval by a human reviewer — the owner; engineering cannot approve it. Either control failing withholds publication.",
    "cost": "paid GitHub usage: USD 0 — mandatory; all CI on the public repository nghinh/aisef."
+  },
+  {
+   "seq": 12,
+   "id": "AISEF_V2_2_0_PRODUCTION_PUBLISH_AUTHORIZED_RC2",
+   "authority": "owner directive 2026-11-20 (chat) 'OWNER FINAL RULING — APPROVE OPTION C' and 'Option C is ratified. Complete the release. The next objective is the protected PyPI approval URL.' Supersedes seq 11: the RC1 candidate (2258235c, kernel 0efc2d27) is obsolete — the native-Windows fix aisef2/app/bundle_cli.py::_create (newline=\"\") changed the kernel tree to e865d65c. RC2 (ad0630c7) qualifies under owner-ratified Option C verified evidence reuse (closure-evidence/v2/v2.2/B1-MUTATION-EVIDENCE-REUSE-RULING.json): 42 bundle_cli targets retain their POSIX/Linux measured verdicts under a fail-closed applicability binding (source_sha256 unchanged), _create/_journal/init re-measured, settings OPTIONAL unchanged; checker_calibration 57/57, currency DAG green, B1 bindings re-frozen, independent adversarial no-refutation.",
+   "approver": "human:owner",
+   "decision": {
+    "PRODUCTION_PUBLISH": "AUTHORIZED",
+    "VERSION": "2.2.0",
+    "RC_SOURCE_SHA": "ad0630c731865fdf414ff6d74757a254d02f0d8e",
+    "RC_KERNEL_TREE": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
+    "RC_KERNEL_DIGEST": "c2d356b1cb1ed66652a6c1c88a4e7bd0fe962223430f131575de9432d9e334a0",
+    "RC_WHEEL_DIGEST": "8c94dd6bd6acb6b7052a8724a6a19ca99fae370ef57a978004ee05fbcce1c389",
+    "RC_SDIST_DIGEST": "102cda44738a44d84422e4f307163f93ae9d233e082714364e164d796dbd1291",
+    "SUPERSEDES": "seq 11 (V2.2.0-RC1, 2258235c — obsolete; freeze record preserved as history)"
+   },
+   "subject_to": "(a) the release.yml gates passing on the tagged commit (tests incl. AISEF_SEALING=1 sealing, staging, v2-gate); (b) the protected `pypi` environment approval by the owner (charter §19); (c) the publish job's release_rc.py --verify-dist check that the built files are exactly the frozen RC2 digests. Any one failing withholds publication.",
+   "cost": "paid GitHub usage: USD 0 (public repository nghinh/aisef)."
   }
  ]
 }
