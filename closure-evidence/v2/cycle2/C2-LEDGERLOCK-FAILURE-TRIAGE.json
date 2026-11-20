@@ -1,0 +1,1016 @@
+{
+ "record": "AISEF V2 — CYCLE-2 LEDGERLOCK NON-COMMITTED STORY TRIAGE (QP-2.9 attempt 2)",
+ "authority": "owner ruling 'CYCLE-2 FINAL OWNER CLOSURE AUDIT' §2",
+ "written": "2026-10-01T11:00:28Z",
+ "source": {
+  "journal": {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-2/JOURNAL.json",
+   "sha256": "eda76b7b07ef01596066aab62f15a61443a98607a259fb4d0f453bf5f35250ff"
+  },
+  "regression_record": {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json",
+   "sha256": "b4ad12f52a061d6a1726304416f3809eed7c065a1c962201a341a079bb8f2ff7"
+  }
+ },
+ "preserved": {
+  "delivery_verdict": "FAIL",
+  "plan_quality_verdict": "NOT_CLAIMED",
+  "generalization": "NONE",
+  "workload_class": "DEVELOPMENT_REGRESSION",
+  "attempt_1": {
+   "path": "closure-evidence/v2/cycle2/P10/NO-RECORD.json",
+   "sha256": "98677079fd68c2f21d5d259fba7041c65fde62d4f0c1896396c1482d4fbe529e"
+  },
+  "rule": "nothing rerun, nothing tuned, nothing rewritten"
+ },
+ "classes": {
+  "A": "FRAMEWORK_KERNEL_DEFECT",
+  "B": "DEFAULT_PUBLIC_HARNESS_POLICY_DEFECT",
+  "C": "BENCHMARK_SPECIFIC_HARNESS_CONFIGURATION",
+  "D": "DEVELOPER_OR_MODEL_EXECUTION_FAILURE",
+  "E": "REQUIREMENT_AMBIGUITY_OR_UNSUPPORTED_BEHAVIOR",
+  "F": "OTHER"
+ },
+ "stories": {
+  "STORY-01-01": {
+   "outcomes": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "parent_sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "candidate_sha": "1ff84a73cf0f663f8c4d2759054457d7a3cfcebf",
+   "candidate_note": null,
+   "candidate_proof_result": {
+    "records": 6,
+    "not_satisfied": [
+     "S-10-a: REFUTED"
+    ]
+   },
+   "verified_proof_result": {
+    "proofs": 3,
+    "satisfied": 2,
+    "not_satisfied": [
+     {
+      "criterion": "S-10-a",
+      "agreement": true,
+      "verdict": "REFUTED",
+      "expectation": "SATISFIED"
+     }
+    ]
+   },
+   "product_proof_satisfied_for_every_obligation": false,
+   "test_result": [],
+   "blocking_gate": [
+    {
+     "seq": 126,
+     "code": "CONTRACT_UNSATISFIED",
+     "owner": "DEVELOPER",
+     "retryable": true,
+     "detail": "proof of S-10-a: CONTRACT_UNSATISFIED"
+    }
+   ],
+   "owner_and_failure_taxonomy": [
+    "SUBJECT_ABSENT_AT_CANDIDATE / DEVELOPER",
+    "CONTRACT_UNSATISFIED / DEVELOPER"
+   ],
+   "retryability": [
+    true,
+    true
+   ],
+   "retries_charged": 1,
+   "developer_requests": 2,
+   "attempts": [
+    {
+     "attempt": 1,
+     "parent_sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+     "candidate_sha": "a44f6a27f8bd7a45ac052f26f1f8a32995c825fc",
+     "candidate_is_the_parent": false,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": true,
+      "dispositions": {
+       "READY": 13
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 1,
+     "candidate_proof": {
+      "records": 8,
+      "not_satisfied": [
+       "S-10-b: INDETERMINATE PRECONDITION_ABSENT"
+      ]
+     },
+     "verified_proof": {
+      "proofs": 4,
+      "satisfied": 3,
+      "not_satisfied": [
+       {
+        "criterion": "S-10-b",
+        "agreement": true,
+        "verdict": "INDETERMINATE",
+        "expectation": "SATISFIED"
+       }
+      ]
+     },
+     "test_result": [],
+     "blocking_gate": [
+      {
+       "seq": 68,
+       "code": "SUBJECT_ABSENT_AT_CANDIDATE",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "proof of S-10-b: SUBJECT_ABSENT_AT_CANDIDATE"
+      }
+     ],
+     "retry_charged": true,
+     "terminal": "story/retry"
+    },
+    {
+     "attempt": 2,
+     "parent_sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+     "candidate_sha": "1ff84a73cf0f663f8c4d2759054457d7a3cfcebf",
+     "candidate_is_the_parent": false,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": true,
+      "dispositions": {
+       "READY": 13
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 1,
+     "candidate_proof": {
+      "records": 6,
+      "not_satisfied": [
+       "S-10-a: REFUTED"
+      ]
+     },
+     "verified_proof": {
+      "proofs": 3,
+      "satisfied": 2,
+      "not_satisfied": [
+       {
+        "criterion": "S-10-a",
+        "agreement": true,
+        "verdict": "REFUTED",
+        "expectation": "SATISFIED"
+       }
+      ]
+     },
+     "test_result": [],
+     "blocking_gate": [
+      {
+       "seq": 126,
+       "code": "CONTRACT_UNSATISFIED",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "proof of S-10-a: CONTRACT_UNSATISFIED"
+      }
+     ],
+     "retry_charged": false,
+     "terminal": "story/rollback"
+    }
+   ],
+   "classification": {
+    "class": "D",
+    "name": "DEVELOPER_OR_MODEL_EXECUTION_FAILURE",
+    "primary_cause": "the developer did not create ledgerlock/ledger.py in attempt 1 (S-10-b: SUBJECT_ABSENT_AT_CANDIDATE) and, in attempt 2, wrote `from collections.abc import Iterable, Iterator` in ledgerlock/ledger.py (S-10-a: CONTRACT_UNSATISFIED) — requirement §10 lists the allowed modules and `collections` is not one. The kernel proved each obligation by its own probe, typed both failures DEVELOPER / retryable, retried once within the DEVELOPER limit and rolled back. Contributing, not primary: the epics write_scope of Story 1.1 does not name ledger.py while PLAN-V2.2 places R-10/2 and R-13/1 over it on this story (the prompt carried both)."
+   },
+   "exact_config_involved": "the proof gate (CONTRACT_UNSATISFIED is DEVELOPER by the frozen routing); no configuration decided it",
+   "config_is_a_shipped_or_default_aisef_setting": false,
+   "can_affect_an_ordinary_v2_user": "an ordinary user's developer that violates an approved contract is rolled back the same way: intended behaviour",
+   "release_blocker": false
+  },
+  "STORY-02-01": {
+   "outcomes": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "parent_sha": "800b085d6417d1b6be343534055b91668d789a98",
+   "candidate_sha": "800b085d6417d1b6be343534055b91668d789a98",
+   "candidate_note": "the candidate is the parent: no developer call (fully PRE_SATISFIED)",
+   "candidate_proof_result": {
+    "records": 2,
+    "not_satisfied": []
+   },
+   "verified_proof_result": {
+    "proofs": 1,
+    "satisfied": 1,
+    "not_satisfied": []
+   },
+   "product_proof_satisfied_for_every_obligation": true,
+   "test_result": [
+    {
+     "outcome": "INADEQUATE",
+     "owner": "DEVELOPER",
+     "may_block": true,
+     "developer_chargeable": true,
+     "vacuity": "INDETERMINATE",
+     "relevance": "IRRELEVANT",
+     "selection": "STORY_TESTS_NOT_COLLECTABLE",
+     "execution": "tests/test_story_02_01.py could not be collected: import of 'tests.test_story_02_01' failed: the project's own source tree",
+     "regressions": "7 story-owned test(s) ran; 0 failed"
+    }
+   ],
+   "blocking_gate": [
+    {
+     "seq": 1873,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "retryable": true,
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    }
+   ],
+   "owner_and_failure_taxonomy": [
+    "TESTS_INADEQUATE / DEVELOPER",
+    "TESTS_INADEQUATE / DEVELOPER"
+   ],
+   "retryability": [
+    true,
+    true
+   ],
+   "retries_charged": 1,
+   "developer_requests": 0,
+   "attempts": [
+    {
+     "attempt": 1,
+     "parent_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_is_the_parent": true,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": false,
+      "dispositions": {
+       "PRE_SATISFIED": 1
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 0,
+     "candidate_proof": {
+      "records": 2,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 1,
+      "satisfied": 1,
+      "not_satisfied": []
+     },
+     "test_result": [
+      {
+       "outcome": "INADEQUATE",
+       "owner": "DEVELOPER",
+       "may_block": true,
+       "developer_chargeable": true,
+       "vacuity": "INDETERMINATE",
+       "relevance": "IRRELEVANT",
+       "selection": "STORY_TESTS_NOT_COLLECTABLE",
+       "execution": "tests/test_story_02_01.py could not be collected: import of 'tests.test_story_02_01' failed: the project's own source tree",
+       "regressions": "7 story-owned test(s) ran; 0 failed"
+      }
+     ],
+     "blocking_gate": [
+      {
+       "seq": 1841,
+       "code": "TESTS_INADEQUATE",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "engineering quality: TESTS_INADEQUATE"
+      }
+     ],
+     "retry_charged": true,
+     "terminal": "story/retry"
+    },
+    {
+     "attempt": 2,
+     "parent_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_is_the_parent": true,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": false,
+      "dispositions": {
+       "PRE_SATISFIED": 1
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 0,
+     "candidate_proof": {
+      "records": 2,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 1,
+      "satisfied": 1,
+      "not_satisfied": []
+     },
+     "test_result": [
+      {
+       "outcome": "INADEQUATE",
+       "owner": "DEVELOPER",
+       "may_block": true,
+       "developer_chargeable": true,
+       "vacuity": "INDETERMINATE",
+       "relevance": "IRRELEVANT",
+       "selection": "STORY_TESTS_NOT_COLLECTABLE",
+       "execution": "tests/test_story_02_01.py could not be collected: import of 'tests.test_story_02_01' failed: the project's own source tree",
+       "regressions": "7 story-owned test(s) ran; 0 failed"
+      }
+     ],
+     "blocking_gate": [
+      {
+       "seq": 1873,
+       "code": "TESTS_INADEQUATE",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "engineering quality: TESTS_INADEQUATE"
+      }
+     ],
+     "retry_charged": false,
+     "terminal": "story/rollback"
+    }
+   ],
+   "classification": {
+    "class": "A",
+    "name": "FRAMEWORK_KERNEL_DEFECT",
+    "primary_cause": "admitted fully PRE_SATISFIED (STORY-01-05's developer had implemented `verify`): developer_call_permitted false, no developer request, candidate = parent, plan-drift emitted, the obligation's VerifiedProof SATISFIED with agreement — everything RFC §14 and §17 name for a story that 'ends STORY_ALREADY_SATISFIED'. The engineering-adequacy stage then ran over a story no developer had been asked to work on: the story-owned test file the harness declares (tests/test_<story>.py) does not exist, which the kernel typed STORY_TESTS_NOT_COLLECTABLE, developer-caused, relevance IRRELEVANT -> INADEQUATE, owner DEVELOPER, developer_chargeable true; under the blocking tests policy that is TESTS_INADEQUATE (DEVELOPER, retryable): one retry charged to the DEVELOPER budget — with no developer call possible, so the retry repeated the same events — then ROLLBACK. The reproducer in this record shows the same rollback and the same charged retry when the story's tests DO exist and pass at the parent (VACUOUS and IRRELEVANT, because the product diff is empty), so the harness's test-path convention is not the cause: under TestsPolicy(blocking=True) a fully PRE_SATISFIED story does not commit, whether its tests are absent (LedgerLock) or present and passing (reproducer). RFC §14: a PRE_SATISFIED obligation MUST 'consume no developer budget' and 'MUST NOT require that correct code be made incorrect' (the only way to make the tests non-vacuous here); §17: 'a commit MUST NOT depend on a developer test verdict'; §15.3 lets a project make INADEQUATE block. The blocking stance is the benchmark harness's choice (no shipped default exists); the defect is the kernel's handling of that permitted stance on a story §14 says ends already satisfied. Two other readings exist and are the Owner's to weigh: C (the stance is qualification-profile-specific and a non-blocking stance commits the story) and E (the RFC does not say how §15.3 applies to a story with no developer call). This record takes A because a legal policy value makes the kernel contradict a §14 MUST, and the ruling forbids choosing the convenient class."
+   },
+   "exact_config_involved": "validation/qualification/c2_p9.py: sr.Policy(limits, TestsPolicy(True), tool_timeout_s=120) — a blocking tests policy; DeveloperTests(story, ('tests/test_<story>.py',)); limits DEVELOPER 1, PLAN 0, ENVIRONMENT 1, PROVIDER 1, INTEGRATION 0, REVIEW 1, SECURITY 1",
+   "config_is_a_shipped_or_default_aisef_setting": false,
+   "can_affect_an_ordinary_v2_user": "YES for any integrator who chooses a blocking tests policy: every fully PRE_SATISFIED story rolls back and spends a DEVELOPER retry. With a non-blocking policy the same story commits (reproducer). No V2 code ships today (aisef2 is excluded from the wheel)",
+   "release_blocker": true
+  },
+  "STORY-02-02": {
+   "outcomes": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "parent_sha": "800b085d6417d1b6be343534055b91668d789a98",
+   "candidate_sha": "800b085d6417d1b6be343534055b91668d789a98",
+   "candidate_note": "the candidate is the parent: no developer call (fully PRE_SATISFIED)",
+   "candidate_proof_result": {
+    "records": 2,
+    "not_satisfied": []
+   },
+   "verified_proof_result": {
+    "proofs": 1,
+    "satisfied": 1,
+    "not_satisfied": []
+   },
+   "product_proof_satisfied_for_every_obligation": true,
+   "test_result": [
+    {
+     "outcome": "INADEQUATE",
+     "owner": "DEVELOPER",
+     "may_block": true,
+     "developer_chargeable": true,
+     "vacuity": "INDETERMINATE",
+     "relevance": "IRRELEVANT",
+     "selection": "STORY_TESTS_NOT_COLLECTABLE",
+     "execution": "tests/test_story_02_02.py could not be collected: import of 'tests.test_story_02_02' failed: the project's own source tree",
+     "regressions": "7 story-owned test(s) ran; 0 failed"
+    }
+   ],
+   "blocking_gate": [
+    {
+     "seq": 1937,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "retryable": true,
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    }
+   ],
+   "owner_and_failure_taxonomy": [
+    "TESTS_INADEQUATE / DEVELOPER",
+    "TESTS_INADEQUATE / DEVELOPER"
+   ],
+   "retryability": [
+    true,
+    true
+   ],
+   "retries_charged": 1,
+   "developer_requests": 0,
+   "attempts": [
+    {
+     "attempt": 1,
+     "parent_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_is_the_parent": true,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": false,
+      "dispositions": {
+       "PRE_SATISFIED": 1
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 0,
+     "candidate_proof": {
+      "records": 2,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 1,
+      "satisfied": 1,
+      "not_satisfied": []
+     },
+     "test_result": [
+      {
+       "outcome": "INADEQUATE",
+       "owner": "DEVELOPER",
+       "may_block": true,
+       "developer_chargeable": true,
+       "vacuity": "INDETERMINATE",
+       "relevance": "IRRELEVANT",
+       "selection": "STORY_TESTS_NOT_COLLECTABLE",
+       "execution": "tests/test_story_02_02.py could not be collected: import of 'tests.test_story_02_02' failed: the project's own source tree",
+       "regressions": "7 story-owned test(s) ran; 0 failed"
+      }
+     ],
+     "blocking_gate": [
+      {
+       "seq": 1905,
+       "code": "TESTS_INADEQUATE",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "engineering quality: TESTS_INADEQUATE"
+      }
+     ],
+     "retry_charged": true,
+     "terminal": "story/retry"
+    },
+    {
+     "attempt": 2,
+     "parent_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_sha": "800b085d6417d1b6be343534055b91668d789a98",
+     "candidate_is_the_parent": true,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": false,
+      "dispositions": {
+       "PRE_SATISFIED": 1
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 0,
+     "candidate_proof": {
+      "records": 2,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 1,
+      "satisfied": 1,
+      "not_satisfied": []
+     },
+     "test_result": [
+      {
+       "outcome": "INADEQUATE",
+       "owner": "DEVELOPER",
+       "may_block": true,
+       "developer_chargeable": true,
+       "vacuity": "INDETERMINATE",
+       "relevance": "IRRELEVANT",
+       "selection": "STORY_TESTS_NOT_COLLECTABLE",
+       "execution": "tests/test_story_02_02.py could not be collected: import of 'tests.test_story_02_02' failed: the project's own source tree",
+       "regressions": "7 story-owned test(s) ran; 0 failed"
+      }
+     ],
+     "blocking_gate": [
+      {
+       "seq": 1937,
+       "code": "TESTS_INADEQUATE",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "engineering quality: TESTS_INADEQUATE"
+      }
+     ],
+     "retry_charged": false,
+     "terminal": "story/rollback"
+    }
+   ],
+   "classification": {
+    "class": "A",
+    "name": "FRAMEWORK_KERNEL_DEFECT",
+    "primary_cause": "admitted fully PRE_SATISFIED (STORY-01-05's developer had implemented `snapshot`): developer_call_permitted false, no developer request, candidate = parent, plan-drift emitted, the obligation's VerifiedProof SATISFIED with agreement — everything RFC §14 and §17 name for a story that 'ends STORY_ALREADY_SATISFIED'. The engineering-adequacy stage then ran over a story no developer had been asked to work on: the story-owned test file the harness declares (tests/test_<story>.py) does not exist, which the kernel typed STORY_TESTS_NOT_COLLECTABLE, developer-caused, relevance IRRELEVANT -> INADEQUATE, owner DEVELOPER, developer_chargeable true; under the blocking tests policy that is TESTS_INADEQUATE (DEVELOPER, retryable): one retry charged to the DEVELOPER budget — with no developer call possible, so the retry repeated the same events — then ROLLBACK. The reproducer in this record shows the same rollback and the same charged retry when the story's tests DO exist and pass at the parent (VACUOUS and IRRELEVANT, because the product diff is empty), so the harness's test-path convention is not the cause: under TestsPolicy(blocking=True) a fully PRE_SATISFIED story does not commit, whether its tests are absent (LedgerLock) or present and passing (reproducer). RFC §14: a PRE_SATISFIED obligation MUST 'consume no developer budget' and 'MUST NOT require that correct code be made incorrect' (the only way to make the tests non-vacuous here); §17: 'a commit MUST NOT depend on a developer test verdict'; §15.3 lets a project make INADEQUATE block. The blocking stance is the benchmark harness's choice (no shipped default exists); the defect is the kernel's handling of that permitted stance on a story §14 says ends already satisfied. Two other readings exist and are the Owner's to weigh: C (the stance is qualification-profile-specific and a non-blocking stance commits the story) and E (the RFC does not say how §15.3 applies to a story with no developer call). This record takes A because a legal policy value makes the kernel contradict a §14 MUST, and the ruling forbids choosing the convenient class."
+   },
+   "exact_config_involved": "validation/qualification/c2_p9.py: sr.Policy(limits, TestsPolicy(True), tool_timeout_s=120) — a blocking tests policy; DeveloperTests(story, ('tests/test_<story>.py',)); limits DEVELOPER 1, PLAN 0, ENVIRONMENT 1, PROVIDER 1, INTEGRATION 0, REVIEW 1, SECURITY 1",
+   "config_is_a_shipped_or_default_aisef_setting": false,
+   "can_affect_an_ordinary_v2_user": "YES for any integrator who chooses a blocking tests policy: every fully PRE_SATISFIED story rolls back and spends a DEVELOPER retry. With a non-blocking policy the same story commits (reproducer). No V2 code ships today (aisef2 is excluded from the wheel)",
+   "release_blocker": true
+  },
+  "STORY-04-01": {
+   "outcomes": [
+    "ROLLBACK"
+   ],
+   "parent_sha": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+   "candidate_sha": null,
+   "candidate_note": "no candidate: refused at admission, no developer call",
+   "candidate_proof_result": {
+    "records": 0,
+    "not_satisfied": []
+   },
+   "verified_proof_result": {
+    "proofs": 0,
+    "satisfied": 0,
+    "not_satisfied": []
+   },
+   "product_proof_satisfied_for_every_obligation": false,
+   "test_result": [],
+   "blocking_gate": [
+    {
+     "seq": 4102,
+     "code": "PRECONDITION_BROKEN",
+     "owner": "PLAN",
+     "retryable": false,
+     "detail": "admission: PRECONDITION_BROKEN"
+    }
+   ],
+   "owner_and_failure_taxonomy": [
+    "PRECONDITION_BROKEN / PLAN"
+   ],
+   "retryability": [
+    false
+   ],
+   "retries_charged": 0,
+   "developer_requests": 0,
+   "attempts": [
+    {
+     "attempt": 1,
+     "parent_sha": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "candidate_sha": null,
+     "candidate_is_the_parent": false,
+     "admission": {
+      "admitted": false,
+      "developer_call_permitted": false,
+      "dispositions": {
+       "PRECONDITION_BROKEN": 1,
+       "READY": 7,
+       "PRE_SATISFIED": 1
+      },
+      "not_ready": {
+       "AC-STORY-04-01-2:S-9-b": "PRECONDITION_BROKEN"
+      }
+     },
+     "developer_requests": 0,
+     "candidate_proof": {
+      "records": 0,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 0,
+      "satisfied": 0,
+      "not_satisfied": []
+     },
+     "test_result": [],
+     "blocking_gate": [
+      {
+       "seq": 4102,
+       "code": "PRECONDITION_BROKEN",
+       "owner": "PLAN",
+       "retryable": false,
+       "detail": "admission: PRECONDITION_BROKEN"
+      }
+     ],
+     "retry_charged": false,
+     "terminal": "story/rollback"
+    }
+   ],
+   "classification": {
+    "class": "D",
+    "name": "DEVELOPER_OR_MODEL_EXECUTION_FAILURE",
+    "primary_cause": "refused at StoryAdmission, owner PLAN, not retryable, no developer call: PRECONDITION_BROKEN on the PRESERVE obligation AC-STORY-04-01-2:S-9-b (R-9/2, exit 2 on a usage error) — the behaviour STORY-01-01 was to introduce and, rolled back, did not. Derivative of STORY-01-01's developer failure; the kernel refused fail-closed as RFC §13/§14 require (a hard plan blocker)."
+   },
+   "exact_config_involved": "none: StoryAdmission (frozen semantics); the harness ran every story in dependency order whatever its dependencies' outcomes",
+   "config_is_a_shipped_or_default_aisef_setting": false,
+   "can_affect_an_ordinary_v2_user": "an ordinary user's story whose PRESERVE precondition was not delivered upstream is refused the same way: intended behaviour",
+   "release_blocker": false
+  },
+  "STORY-05-01": {
+   "outcomes": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "parent_sha": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+   "candidate_sha": "de9cefcc1df7ea36f2187996dbfb055c2bf65142",
+   "candidate_note": null,
+   "candidate_proof_result": {
+    "records": 4,
+    "not_satisfied": []
+   },
+   "verified_proof_result": {
+    "proofs": 2,
+    "satisfied": 2,
+    "not_satisfied": []
+   },
+   "product_proof_satisfied_for_every_obligation": true,
+   "test_result": [
+    {
+     "outcome": "INADEQUATE",
+     "owner": "DEVELOPER",
+     "may_block": true,
+     "developer_chargeable": true,
+     "vacuity": "VACUOUS",
+     "relevance": "IRRELEVANT",
+     "selection": "STORY_TESTS_RAN",
+     "execution": "9 story-owned test(s) ran; 0 failed",
+     "regressions": "61 story-owned test(s) ran; 0 failed"
+    }
+   ],
+   "blocking_gate": [
+    {
+     "seq": 6123,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "retryable": true,
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    }
+   ],
+   "owner_and_failure_taxonomy": [
+    "TESTS_INADEQUATE / DEVELOPER",
+    "TESTS_INADEQUATE / DEVELOPER"
+   ],
+   "retryability": [
+    true,
+    true
+   ],
+   "retries_charged": 1,
+   "developer_requests": 2,
+   "attempts": [
+    {
+     "attempt": 1,
+     "parent_sha": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "candidate_sha": "f09f7c0d67888cae57183c9e5ea089e95985b5d2",
+     "candidate_is_the_parent": false,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": true,
+      "dispositions": {
+       "READY": 2
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 1,
+     "candidate_proof": {
+      "records": 4,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 2,
+      "satisfied": 2,
+      "not_satisfied": []
+     },
+     "test_result": [
+      {
+       "outcome": "INADEQUATE",
+       "owner": "DEVELOPER",
+       "may_block": true,
+       "developer_chargeable": true,
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT",
+       "selection": "STORY_TESTS_RAN",
+       "execution": "3 story-owned test(s) ran; 0 failed",
+       "regressions": "61 story-owned test(s) ran; 0 failed"
+      }
+     ],
+     "blocking_gate": [
+      {
+       "seq": 6076,
+       "code": "TESTS_INADEQUATE",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "engineering quality: TESTS_INADEQUATE"
+      }
+     ],
+     "retry_charged": true,
+     "terminal": "story/retry"
+    },
+    {
+     "attempt": 2,
+     "parent_sha": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "candidate_sha": "de9cefcc1df7ea36f2187996dbfb055c2bf65142",
+     "candidate_is_the_parent": false,
+     "admission": {
+      "admitted": true,
+      "developer_call_permitted": true,
+      "dispositions": {
+       "READY": 2
+      },
+      "not_ready": {}
+     },
+     "developer_requests": 1,
+     "candidate_proof": {
+      "records": 4,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 2,
+      "satisfied": 2,
+      "not_satisfied": []
+     },
+     "test_result": [
+      {
+       "outcome": "INADEQUATE",
+       "owner": "DEVELOPER",
+       "may_block": true,
+       "developer_chargeable": true,
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT",
+       "selection": "STORY_TESTS_RAN",
+       "execution": "9 story-owned test(s) ran; 0 failed",
+       "regressions": "61 story-owned test(s) ran; 0 failed"
+      }
+     ],
+     "blocking_gate": [
+      {
+       "seq": 6123,
+       "code": "TESTS_INADEQUATE",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "engineering quality: TESTS_INADEQUATE"
+      }
+     ],
+     "retry_charged": false,
+     "terminal": "story/rollback"
+    }
+   ],
+   "classification": {
+    "class": "C",
+    "name": "BENCHMARK_SPECIFIC_HARNESS_CONFIGURATION",
+    "primary_cause": "the developer wrote only tests/test_story_05_01.py in both attempts (the story's deliverable is a property test; its two obligations are both PRESERVE, READY at the parent: the plan asks this story for no new product behaviour). With no product hunk, vacuity is VACUOUS and relevance IRRELEVANT as RFC §15.1/§15.2 define them, so the assembly is INADEQUATE (DEVELOPER, may block), and the benchmark harness's blocking tests policy rolled the story back after one retry. The kernel followed §15 to the letter; no RFC MUST is contradicted (the developer was called and charged). The blocking policy is the qualification harness's own choice."
+   },
+   "exact_config_involved": "validation/qualification/c2_p9.py: sr.Policy(limits, TestsPolicy(True), tool_timeout_s=120) — a blocking tests policy; DeveloperTests(story, ('tests/test_<story>.py',)); limits DEVELOPER 1, PLAN 0, ENVIRONMENT 1, PROVIDER 1, INTEGRATION 0, REVIEW 1, SECURITY 1",
+   "config_is_a_shipped_or_default_aisef_setting": false,
+   "can_affect_an_ordinary_v2_user": "YES for any integrator who chooses a blocking tests policy: a story that changes no product code (tests-only, as here) cannot commit. The kernel offers one global stance, not a per-story one",
+   "release_blocker": false
+  },
+  "STORY-05-03": {
+   "outcomes": [
+    "ROLLBACK"
+   ],
+   "parent_sha": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+   "candidate_sha": null,
+   "candidate_note": "no candidate: refused at admission, no developer call",
+   "candidate_proof_result": {
+    "records": 0,
+    "not_satisfied": []
+   },
+   "verified_proof_result": {
+    "proofs": 0,
+    "satisfied": 0,
+    "not_satisfied": []
+   },
+   "product_proof_satisfied_for_every_obligation": false,
+   "test_result": [],
+   "blocking_gate": [
+    {
+     "seq": 6143,
+     "code": "PRECONDITION_BROKEN",
+     "owner": "PLAN",
+     "retryable": false,
+     "detail": "admission: PRECONDITION_BROKEN"
+    }
+   ],
+   "owner_and_failure_taxonomy": [
+    "PRECONDITION_BROKEN / PLAN"
+   ],
+   "retryability": [
+    false
+   ],
+   "retries_charged": 0,
+   "developer_requests": 0,
+   "attempts": [
+    {
+     "attempt": 1,
+     "parent_sha": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "candidate_sha": null,
+     "candidate_is_the_parent": false,
+     "admission": {
+      "admitted": false,
+      "developer_call_permitted": false,
+      "dispositions": {
+       "PRECONDITION_BROKEN": 1,
+       "READY": 5
+      },
+      "not_ready": {
+       "AC-STORY-05-03-1:S-10-a": "PRECONDITION_BROKEN"
+      }
+     },
+     "developer_requests": 0,
+     "candidate_proof": {
+      "records": 0,
+      "not_satisfied": []
+     },
+     "verified_proof": {
+      "proofs": 0,
+      "satisfied": 0,
+      "not_satisfied": []
+     },
+     "test_result": [],
+     "blocking_gate": [
+      {
+       "seq": 6143,
+       "code": "PRECONDITION_BROKEN",
+       "owner": "PLAN",
+       "retryable": false,
+       "detail": "admission: PRECONDITION_BROKEN"
+      }
+     ],
+     "retry_charged": false,
+     "terminal": "story/rollback"
+    }
+   ],
+   "classification": {
+    "class": "D",
+    "name": "DEVELOPER_OR_MODEL_EXECUTION_FAILURE",
+    "primary_cause": "refused at StoryAdmission, owner PLAN, not retryable, no developer call: PRECONDITION_BROKEN on the PRESERVE obligation AC-STORY-05-03-1:S-10-a (R-10/1, standard library only, allowed modules) — STORY-01-01's obligation, not holding at the parent. Derivative of STORY-01-01's developer failure; refused fail-closed."
+   },
+   "exact_config_involved": "none: StoryAdmission (frozen semantics)",
+   "config_is_a_shipped_or_default_aisef_setting": false,
+   "can_affect_an_ordinary_v2_user": "as STORY-04-01: intended behaviour",
+   "release_blocker": false
+  }
+ },
+ "non_committed": 6,
+ "by_class": {
+  "D": 3,
+  "A": 2,
+  "C": 1
+ },
+ "shipped_default_facts": {
+  "TestsPolicy.blocking_has_a_default": false,
+  "kernel_constructs_a_policy_itself": [],
+  "aisef2_excluded_from_the_wheel": true,
+  "wheel_entry_point": "aisef = \"aisef.cli:main\" (V1)",
+  "pyproject_version": "1.7.6",
+  "files_that_construct_a_TestsPolicy": [
+   "tests/v2/test_c2_orchestration_conformance.py",
+   "tests/v2/test_p6_orchestration.py",
+   "tests/v2/test_p6_stages.py",
+   "validation/qualification/c2_p9.py",
+   "validation/qualification/q5.py"
+  ],
+  "reading": "no shipped default exists: the kernel requires the caller to state the stance, constructs none itself, and aisef2 is not in the published wheel (the public `aisef` command is V1). The blocking stance of QP-2.9 is set in validation/qualification/c2_p9.py only"
+ },
+ "history_of_the_interaction": {
+  "adequacy_stage_source": {
+   "path": "aisef2/orchestrate/quality.py",
+   "commits_that_touched_it": [
+    "abfe99df27293fbfd2f820799d8cf235c2ee9a3d 2026-09-25 p6(WP-6.2, V2-005): the single authoritative orchestration path — aisef2/orchestrate, the real-pat"
+   ],
+   "blob_at_head": "61e53ae4002c08dd67bfae5e12ccfbfd42457da4",
+   "unchanged_by_cycle_2": true
+  },
+  "tests_that_run_a_fully_pre_satisfied_story": {
+   "tests/v2/test_p6_orchestration.py ORCH-4 (Cycle 1, P6)": "tests_block=False",
+   "validation/qualification/q5.py corpus item 'pre-satisfied' (Cycle 1, Q5)": "tests_block=False",
+   "tests/v2/test_c2_orchestration_conformance.py test_4 (Cycle 2)": "TestsPolicy(False)"
+  },
+  "who_chose_blocking_for_qp_2_9": "the QP-2.9 harness (validation/qualification/c2_p9.py), written by the engineer of this cycle; the QP-2.9 preflight record does not state the stance and the engineer knows of no Owner ruling that set it",
+  "reading": "the behaviour is Cycle-1 kernel code (WP-6.2), unchanged in Cycle 2; the three tests found that run a fully PRE_SATISFIED story all set the non-blocking stance, so QP-2.9 is the first recorded execution of the path under a blocking one"
+ },
+ "fully_pre_satisfied_reproducer": {
+  "source": "validation/qualification/q5.py CORPUS item 'pre-satisfied' (record mode: scripted stream, real git, probes, tests)",
+  "committed_form_sets_tests_block": false,
+  "non_blocking": {
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   },
+   "replay_stream_leftover": null,
+   "admitted": [
+    {
+     "developer_call_permitted": false,
+     "dispositions": {
+      "C1": "PRE_SATISFIED"
+     }
+    }
+   ],
+   "proof_verified": [
+    {
+     "criterion_id": "C1",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C1",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    }
+   ],
+   "tests_adequacy": [
+    {
+     "outcome": "INADEQUATE",
+     "owner": "DEVELOPER",
+     "may_block": true,
+     "developer_chargeable": true,
+     "vacuity": "VACUOUS",
+     "relevance": "IRRELEVANT",
+     "execution": "1 story-owned test(s) ran; 0 failed"
+    }
+   ],
+   "failures": [],
+   "developer_requests": 0,
+   "retries_charged": 0,
+   "plan_drift_events": 1,
+   "terminal": [
+    "story/commit"
+   ]
+  },
+  "blocking": {
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   },
+   "replay_stream_leftover": {
+    "assert_consumed_failure": 1
+   },
+   "admitted": [
+    {
+     "developer_call_permitted": false,
+     "dispositions": {
+      "C1": "PRE_SATISFIED"
+     }
+    },
+    {
+     "developer_call_permitted": false,
+     "dispositions": {
+      "C1": "PRE_SATISFIED"
+     }
+    }
+   ],
+   "proof_verified": [
+    {
+     "criterion_id": "C1",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C1",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    }
+   ],
+   "tests_adequacy": [
+    {
+     "outcome": "INADEQUATE",
+     "owner": "DEVELOPER",
+     "may_block": true,
+     "developer_chargeable": true,
+     "vacuity": "VACUOUS",
+     "relevance": "IRRELEVANT",
+     "execution": "1 story-owned test(s) ran; 0 failed"
+    },
+    {
+     "outcome": "INADEQUATE",
+     "owner": "DEVELOPER",
+     "may_block": true,
+     "developer_chargeable": true,
+     "vacuity": "VACUOUS",
+     "relevance": "IRRELEVANT",
+     "execution": "1 story-owned test(s) ran; 0 failed"
+    }
+   ],
+   "failures": [
+    {
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "retryable": true
+    },
+    {
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "retryable": true
+    }
+   ],
+   "developer_requests": 0,
+   "retries_charged": 1,
+   "plan_drift_events": 2,
+   "terminal": [
+    "story/rollback"
+   ]
+  },
+  "finding": {
+   "non_blocking_commits": true,
+   "blocking_rolls_back": true,
+   "blocking_charges_a_developer_retry_with_no_developer_call": true,
+   "the_proofs_are_satisfied_in_both": true
+  }
+ },
+ "rfc_sources": {
+  "§14": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md lines 688-701: an INTRODUCE obligation SATISFIED at the parent MUST be recorded PRE_SATISFIED, emit story/plan-drift, consume no developer budget, MUST NOT require that correct code be made incorrect; if every obligation is PRE_SATISFIED the story ends STORY_ALREADY_SATISFIED, every obligation still verified, the developer call skipped",
+  "§15.3": "INADEQUATE MAY block under project policy; owner DEVELOPER",
+  "§17": "a commit MUST NOT depend on a developer test verdict"
+ },
+ "release_blockers": [
+  "STORY-02-01",
+  "STORY-02-02"
+ ],
+ "classification_status": "the evidence's reading, returned for the Owner's ruling; the class A reading of STORY-02-01 and STORY-02-02 is a RELEASE BLOCKER under the ruling and stops the audit before closure acceptance",
+ "not_done": [
+  "no kernel change: fixing the §14/§15.3 interaction touches engineering-adequacy and commit semantics and needs an Owner ruling",
+  "no rerun of LedgerLock",
+  "no change of PLAN-V2.2 or of any spec"
+ ]
+}

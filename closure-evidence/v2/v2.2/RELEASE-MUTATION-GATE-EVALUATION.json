@@ -1,0 +1,45 @@
+{
+  "record": "AISEF v2.2 — RISK-BASED RELEASE MUTATION GATE EVALUATION (measured; NOT a PASS)",
+  "id": "AISEF-V2.2-RELEASE-MUTATION-GATE-EVALUATION",
+  "status": "MEASURED — the gate does NOT pass; reported for the owner's risk-based release decision",
+  "date": "2026-11-11",
+  "governed_by": "closure-evidence/v2/v2.2/RELEASE-MUTATION-SCOPE-AMENDMENT.json (PROPOSED; this evaluation applies its evidence_reuse_rule and not_run_rule)",
+  "rc": {"head": "b35ec9d7", "aisef2_tree": "ac7c170531fc3db1698f062d0bac6d921651d962"},
+  "method": "In-scope = the 15 aisef2/ files changed since the last qualified baseline v2.1.0 @ 8c7bdb44, mapped to the owner's risk dimensions. The frozen-campaign manifest (V2.2-MUTATION-CAMPAIGN-FREEZE.json, frozen_at.aisef2_tree = ac7c1705 = RC) is the RC source-binding reference (150 of its 627 targets are in-scope). Executed kill evidence is drawn only from committed measurements (WAVE1-MUTATION.json, MUTATION-WAVE2-CLASSIFICATION.json, MUTATION-WAVE2-KILL-MATRIX.json). A result counts as RC-source-bound only when the target's source_sha256 equals the RC/manifest binding; the whole-kernel digest is never RC (see binding_reality). NOT_RUN is never reported as PASS.",
+  "binding_reality": {
+    "decisive": "NO committed mutation measurement ran on the RC kernel tree ac7c1705. The three committed measurement trees all differ: WAVE1 and WAVE2-classification ran at aisef2 817c0e93; WAVE2 kill-matrix at aisef2 3cd9952b. Therefore nothing is full RC-KERNEL-bound. Reusable evidence is at best RC-SOURCE-bound (the mutated target file's bytes match RC) with kill-tests that executed against a non-RC kernel.",
+    "rc_kernel_bound_artifact": "only the frozen 627-target campaign (manifest at ac7c1705) is RC-kernel-bound, and it is FROZEN/INCOMPLETE: 2 targets durably complete (results in an external scratchpad queue, not committed in the repo), 625 NOT_RUN.",
+    "verified_by_engineering": "measurement trees differ from RC (git rev-parse); per-file manifest target counts; H1/H2 liveness functions absent from the manifest; seq-6 survivor source_sha mismatch — all re-verified directly, not taken from the analysis subagent."
+  },
+  "per_dimension": {
+    "security (client.py, tripwire.py)": {"in_scope_targets": 18, "rc_source_bound_killed_targets": 8, "note": "8 = all tripwire.py targets, each full-function-measured but WITH survivors; ALL 10 client.py targets NOT_RUN at RC (client.py manifest source 0e6146e9 = RC, but never executed; earlier client.py measurements were on 83a170c4/e3fdd68b != RC)."},
+    "authority (process_range.py, run_scope.py)": {"in_scope_targets": 23, "rc_source_bound_killed_targets": 0, "note": "ALL 23 process_range.py targets NOT_RUN; run_scope.py has real functions (RunLease/RunScope acquire/release/shutdown/interrupt/_fail) but is ENTIRELY ABSENT from the manifest. Dimension coverage = 0."},
+    "invariants (registry.py)": {"in_scope_targets": 4, "rc_source_bound_killed_targets": 3, "note": "3 measured WITH survivors (register_runtime 18, registry_digest 18, runtime_mechanism_digest 12 survivors); arm_runtime NOT_RUN (the KNW arm_runtime harness-defect target, owner #4)."},
+    "journal (fold.py)": {"in_scope_targets": 0, "rc_source_bound_killed_targets": 0, "note": "journal/fold.py (fold/resume/cache_row/oracle_problems/Authority.append+check) has real functions but is ENTIRELY ABSENT from the manifest. Dimension coverage = 0."},
+    "verdict_control (run.py, bundle_cli.py, adapters.py)": {"in_scope_targets": 82, "rc_source_bound_killed_targets": 3, "note": "bundle_cli.lint (4 surv) + bundle_cli.seal (19 surv) full-function; run.py::execute only the 4 H1/H2 pin/fence mutants RC-source-bound KILLED (kill-matrix), the full 458-mutant function measured only at non-RC source; 79 NOT_RUN."},
+    "verification (verify.py)": {"in_scope_targets": 5, "rc_source_bound_killed_targets": 2, "note": "verify.verify 201/213 (12 surv, 9 real); 3 NOT_RUN."},
+    "wave2_value (settings, calibrations, feedback, bundle, demo)": {"in_scope_targets": 18, "rc_source_bound_killed_targets": 1, "note": "bundle.load 89/101 (12 surv); 17 NOT_RUN; calibrations.py is data-only (0 functions, legitimately no targets); demo.py NEW and absent (offline dogfood harness, not a shipped control path)."}
+  },
+  "totals": {
+    "in_scope_targets": 150,
+    "targets_with_rc_source_bound_killed_evidence": 17,
+    "targets_with_rc_source_bound_killed_evidence_caveat": "every one of the 17 carries survivors; none is cleanly fully-killed; 16 are full-function-with-survivors and 1 (run.execute) is H1/H2-partial-only; none is full RC-KERNEL-bound",
+    "targets_NOT_RUN_at_rc": 133,
+    "real_gap_survivors_rc_source_bound": 134,
+    "equivalent_with_proof": 10,
+    "owner_accepted_survivors_applicable_to_rc": 0
+  },
+  "critical_not_run_gaps": [
+    "authority: 0 executed coverage (process_range.py 23 NOT_RUN; run_scope.py absent). process_range.py also changed 89de4685->RC (incl. _win_liveness H2 work).",
+    "journal: 0 executed coverage (fold.py absent from manifest).",
+    "security/client.py: 0 RC-bound executed coverage (all 10 NOT_RUN); client.py is a 5th distinct version at RC (round-3 H1/H2 _is_gone + budget _cost live-ceiling landed after every measurement, commit 1c42aaad).",
+    "H1/H2 Windows-liveness DECISION core unmutated: client.py::_is_gone and process_range.py::_win_liveness/pid_alive are not mutation targets at all. The only H1/H2 kills are run.execute pin/fence + tripwire serve-surface — not the liveness decision functions. (Note: H1/H2 liveness IS directly property-tested green on a live Win32 runner — readiness §2, run 42302873797 — just not mutation-covered.)",
+    "registry.py::arm_runtime NOT_RUN (KNW harness-defect target, owner #4)."
+  ],
+  "gate_verdict": "FAIL / INSUFFICIENT — the risk-based mutation gate does not pass at the RC. 17/150 in-scope targets carry RC-source-bound kills (all with survivors, none full RC-kernel-bound); 133/150 NOT_RUN; authority and journal dimensions and client.py security + the H1/H2 liveness decision core have zero executed RC coverage; 134 RC-source-bound real-gap survivors remain, none owner-accepted. This verdict is preserved at its real value and is NOT converted to PASS. Owner risk-based release decisions, if any, are recorded one layer above this gate (seq-6/seq-7 pattern) and do not alter it.",
+  "owner_options_one_layer_above": [
+    "accept the documented residual risk (133 NOT_RUN + 134 un-accepted survivors across security/authority/journal) as scoped residual — a far larger acceptance than seq-6's 7 survivors; or",
+    "authorize a targeted RC-KERNEL-bound mutation measurement of the critical in-scope subset (far smaller than the 627 campaign) on adequate infrastructure — contradicts 'no mutation on this Mac' unless relocated; or",
+    "HOLD the mutation gate."
+  ]
+}

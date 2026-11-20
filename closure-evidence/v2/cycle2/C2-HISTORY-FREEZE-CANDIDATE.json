@@ -1,0 +1,374 @@
+{
+ "record": "AISEF V2 — CYCLE-2 HISTORY FREEZE CANDIDATE (Owner-closure candidate record; evidence only)",
+ "authority": "owner ruling 'CYCLE-2 FINAL OWNER CLOSURE AUDIT' §8",
+ "written": "2026-10-01T11:07:24Z",
+ "existing_mechanism": {
+  "what_it_is": "validation/v2/run_history.py SEALS: a phase -> a seal or acceptance record whose attempt_history.total_attempts the checker compares with the history",
+  "can_it_seal_these_histories_without_changing_assurance_semantics": "NO",
+  "why": [
+   "registering a seal is an edit of validation/v2/run_history.py: the validation/v2 tree is an identity QP-2.6 consumed (R4), so the edit would move the qualified candidate",
+   "every Cycle-2 seal so far is an Owner acceptance or a closure written under an Owner ruling; no acceptance of C2-P7..C2-P10 or of the final candidate exists yet to seal against"
+  ],
+  "new_validation_code_written": false
+ },
+ "mandatory_seal_source": {
+  "searched": [
+   "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
+   "closure-evidence/v2/V2-RETRY-POLICY.json",
+   "docs/implementation/v2/cycle2/cycle2-manifest.json"
+  ],
+  "found": null,
+  "note": "no normative source read here says a mechanical history seal is mandatory for release; 'sealed' in the RFC is the evaluation-cohort state"
+ },
+ "accepted_candidate_identity": {
+  "final_candidate": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+  "aisef": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "aisef2": "254d8f559b879c210c4936321022f1350c4b2f89",
+  "aisef2/probe": "1aa9301285ccc964ee31d508089ea0119f49b629",
+  "aisef2/orchestrate": "a039b0eb5f3f09a49ab8782ad0bbec9a9ff32324",
+  "validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116",
+  "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196",
+  "head_when_written": "3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11"
+ },
+ "histories": {
+  "C2-P0": {
+   "path": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json",
+   "file_sha256_when_written": "737df06b4f4d216adda42f3a054bf4d5b0f224768a5fe81ec12d2b7255db5d6d",
+   "entry_count": 82,
+   "last_sequence": 82,
+   "full_history_digest": "93b16417f93db0f6c1444cb358fc48c2ba67137b9621e6b0ba03f8291baf0be0",
+   "known_failures": [
+    {
+     "seq": 9,
+     "commit": "fb641aa0f6d41a0cf6e382751c7e59c42720c415",
+     "where": "local",
+     "job": "gate (full suite in the owned range)",
+     "classification": "HARNESS",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 18,
+     "commit": "05e7b9bbdf152db663cb8f647d48e417108f009f",
+     "where": "local",
+     "job": "gate (full suite in the owned range)",
+     "classification": "HARNESS",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 21,
+     "commit": "fe9260b996b08595f6ea9d644c071c6d17e1e5b3",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "HARNESS",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 49,
+     "commit": "b07dbbd5d2c1a35228873444c2d002024e329646",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "ENVIRONMENT",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 50,
+     "commit": "b07dbbd5d2c1a35228873444c2d002024e329646",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "HARNESS",
+     "known_defect": null,
+     "gate_effect": "DIAGNOSTIC_ONLY"
+    },
+    {
+     "seq": 57,
+     "commit": "002fdb773c57a5c247b9ae900cb5ad7aa72bac08",
+     "where": "ci",
+     "job": "unit (ubuntu-latest, 3.11)",
+     "classification": "HARNESS",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    }
+   ],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-P0-ACCEPTANCE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-P1": {
+   "path": "closure-evidence/v2/cycle2/C2-P1-RUN-HISTORY.json",
+   "file_sha256_when_written": "c46cec67677233218d4d474dac056af50eae5743060ab02432667372151915a2",
+   "entry_count": 15,
+   "last_sequence": 15,
+   "full_history_digest": "62780ca2c75f63f0db9f2cd37b64a89961c05a2dd45101aaf819ce9ea743ca8a",
+   "known_failures": [],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-P1-LANE-CLOSURE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-P2": {
+   "path": "closure-evidence/v2/cycle2/C2-P2-RUN-HISTORY.json",
+   "file_sha256_when_written": "feb09f04e094a49e16b637fb71f087099336c8c190313a0b4fe33e05ba84de73",
+   "entry_count": 36,
+   "last_sequence": 36,
+   "full_history_digest": "9359e5b5a21fcdcba187339f20a3627b933379f884e467811435819ae035e84b",
+   "known_failures": [
+    {
+     "seq": 8,
+     "commit": "d986ffc24a579b0f4ea16add86dc58146d80807f",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 11,
+     "commit": "ac3ae16ad2e7c64d989fbc4d611617e572b0cf18",
+     "where": "ci",
+     "job": "unit (ubuntu-latest, 3.14)",
+     "classification": "DEVELOPER",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 12,
+     "commit": "ac3ae16ad2e7c64d989fbc4d611617e572b0cf18",
+     "where": "ci",
+     "job": "unit (ubuntu-latest, 3.12)",
+     "classification": "DEVELOPER",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 13,
+     "commit": "ac3ae16ad2e7c64d989fbc4d611617e572b0cf18",
+     "where": "ci",
+     "job": "unit (ubuntu-latest, 3.13)",
+     "classification": "DEVELOPER",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 14,
+     "commit": "ac3ae16ad2e7c64d989fbc4d611617e572b0cf18",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 15,
+     "commit": "ac3ae16ad2e7c64d989fbc4d611617e572b0cf18",
+     "where": "ci",
+     "job": "unit (ubuntu-latest, 3.11)",
+     "classification": "DEVELOPER",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 19,
+     "commit": "98b5a044f25cb3bf9d8a82913ba46f26f9dc7b0d",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 26,
+     "commit": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    }
+   ],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-P2-LANE-CLOSURE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-P3": {
+   "path": "closure-evidence/v2/cycle2/C2-P3-RUN-HISTORY.json",
+   "file_sha256_when_written": "225d51fa062661e6f55c9010144857a50c7f33c3001dbda8622ec706e370557c",
+   "entry_count": 15,
+   "last_sequence": 15,
+   "full_history_digest": "4c29906d98c1b8012b867819dc94bad9824fb8081d3d53d900f1b13cd9948769",
+   "known_failures": [],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-P3-LANE-CLOSURE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-P4": {
+   "path": "closure-evidence/v2/cycle2/C2-P4-RUN-HISTORY.json",
+   "file_sha256_when_written": "ac2b0b41286dea38aa9ca0d3c670cae596d417d94be5b6dfc92241751aec777f",
+   "entry_count": 15,
+   "last_sequence": 15,
+   "full_history_digest": "5c93dacd54b3248d35af56b7b6b5524f98787ef2d4f49f9708bfd228cbbc59e0",
+   "known_failures": [],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-P4-LANE-CLOSURE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-INTEGRATION": {
+   "path": "closure-evidence/v2/cycle2/C2-INTEGRATION-RUN-HISTORY.json",
+   "file_sha256_when_written": "47d03568de2a36d9f65bde07fddcf6dc7ab0f42dd72f873a49af9c56f659a2ed",
+   "entry_count": 17,
+   "last_sequence": 17,
+   "full_history_digest": "9be9413ac9d216994d571390562b88a6900d4802a9d7a9ad426529ca9e86240b",
+   "known_failures": [
+    {
+     "seq": 1,
+     "commit": "97353417a04ee855eb4fd9532e59b743f4bf80f8",
+     "where": "local",
+     "job": "gate (full suite in the owned range)",
+     "classification": "INTEGRATION",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    }
+   ],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-INTEGRATION-CLOSURE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-P5": {
+   "path": "closure-evidence/v2/cycle2/C2-P5-RUN-HISTORY.json",
+   "file_sha256_when_written": "ba70f860fc1bea8280956b224b51bef8e03979e7502ac7a2cde48c9159f9069d",
+   "entry_count": 32,
+   "last_sequence": 32,
+   "full_history_digest": "a2fa54603e0b5ed847f509ae2ccd4c88c7396a670b52b857984a82fdeb2d41af",
+   "known_failures": [],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-P6": {
+   "path": "closure-evidence/v2/cycle2/C2-P6-RUN-HISTORY.json",
+   "file_sha256_when_written": "1ecf3d689c973914969247f4589cf535ffcc2ce3029412ce9ff18c2457219d3b",
+   "entry_count": 47,
+   "last_sequence": 47,
+   "full_history_digest": "112453c0e38cc1b49731b4a49f5d558d0225bd589b9c78281943db241edb05cd",
+   "known_failures": [
+    {
+     "seq": 6,
+     "commit": "a76177ec20e2bee799763fc8d55a2eb285cef8a1",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT",
+     "known_defect": "V1-PF-001",
+     "gate_effect": "STOP"
+    },
+    {
+     "seq": 27,
+     "commit": "9d855a5b66942db0d917b094ea190745cbebf076",
+     "where": "ci",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 34,
+     "commit": "9d855a5b66942db0d917b094ea190745cbebf076",
+     "where": "ci",
+     "job": "qualification: qualify (windows-latest, 3.11)",
+     "classification": "PRODUCT",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 39,
+     "commit": "bfc4f37d8d04fe193c8867e76a5577366d19d989",
+     "where": "ci",
+     "job": "unit (ubuntu-latest, 3.13)",
+     "classification": "HARNESS",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    }
+   ],
+   "already_sealed_by": "closure-evidence/v2/cycle2/C2-P6-CLOSURE.json",
+   "status": "SEALED (existing mechanism, earlier ruling)"
+  },
+  "C2-P7": {
+   "path": "closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json",
+   "file_sha256_when_written": "ad626966c3f0f50d3a58dc72282aafb5c3e6ca2331144e6586e461ded8c0f823",
+   "entry_count": 19,
+   "last_sequence": 19,
+   "full_history_digest": "6f27fe66c2e057de23b5f4f6116ff3b2e24b518886c88f9fec417e0329ccce99",
+   "known_failures": [],
+   "already_sealed_by": null,
+   "status": "FROZEN_BY_OWNER_CLOSURE_PENDING_APPROVAL"
+  },
+  "C2-P8": {
+   "path": "closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json",
+   "file_sha256_when_written": "30def470984205a61fc764d08fc24de3fefe7df6055c934fa0d5d29e83a06740",
+   "entry_count": 3,
+   "last_sequence": 3,
+   "full_history_digest": "55e6cd997df97664176a904aed763be13e343fb37eb1ab3e08ba3d7afb564b80",
+   "known_failures": [],
+   "already_sealed_by": null,
+   "status": "FROZEN_BY_OWNER_CLOSURE_PENDING_APPROVAL"
+  },
+  "C2-P9": {
+   "path": "closure-evidence/v2/cycle2/C2-P9-RUN-HISTORY.json",
+   "file_sha256_when_written": "93f3a2c9d3bba02d45f4a9775868eeb96b71e3bba9dc8b6a8f1ce692007391ad",
+   "entry_count": 2,
+   "last_sequence": 2,
+   "full_history_digest": "42c62c8020533205a93da534df0940fe127977d3e59fb445878d42dcc93de60d",
+   "known_failures": [
+    {
+     "seq": 1,
+     "commit": "0b1f473b12c8b002145ba5a94681c661541f63ef",
+     "where": "local",
+     "job": "QP-2.9 live run (PLAN-V2.2 through story_runner; owned range)",
+     "classification": "HARNESS",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    }
+   ],
+   "already_sealed_by": null,
+   "status": "FROZEN_BY_OWNER_CLOSURE_PENDING_APPROVAL"
+  },
+  "C2-P10": {
+   "path": "closure-evidence/v2/cycle2/C2-P10-RUN-HISTORY.json",
+   "file_sha256_when_written": "ea979f30678853b97655b87c546f08aecfab83475ff0fc5b317b9dbafc0c5e48",
+   "entry_count": 2,
+   "last_sequence": 2,
+   "full_history_digest": "74bd5bf5ac3e8e42629e6f85526f98110b7c8e2294953b2d22036bb6cb1fcd34",
+   "known_failures": [
+    {
+     "seq": 1,
+     "commit": "8d6ab04ccf55073821402bddc0b98423b999fa8c",
+     "where": "local",
+     "job": "lane full suite (LANE-X worktree)",
+     "classification": "INTEGRATION",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    },
+    {
+     "seq": 2,
+     "commit": "6353aa815cdfbea3af477a0eadfae43130be6820",
+     "where": "local",
+     "job": "lane full suite (LANE-X worktree)",
+     "classification": "INTEGRATION",
+     "known_defect": null,
+     "gate_effect": "COUNTS"
+    }
+   ],
+   "already_sealed_by": null,
+   "status": "FROZEN_BY_OWNER_CLOSURE_PENDING_APPROVAL"
+  },
+  "C2-FINAL": {
+   "path": "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json",
+   "file_sha256_when_written": "e16319c6b6ff8cd8efd92762ef9f760c62f8a88e299acaca5abb6c28e8b967f3",
+   "entry_count": 43,
+   "last_sequence": 43,
+   "full_history_digest": "7bbee75ae25b3ac10b44e791a9d09c34451bb7591623e3d88a0a76b106f79dc4",
+   "known_failures": [],
+   "already_sealed_by": null,
+   "status": "FROZEN_BY_OWNER_CLOSURE_PENDING_APPROVAL"
+  }
+ },
+ "residual_processes_recorded": 0,
+ "escaped_processes_recorded": 0,
+ "digest_rule": "full_history_digest is sha256 over json.dumps(entries, sort_keys=True, ensure_ascii=False) of the entries with sequence 1..last_sequence: an append-only history keeps that prefix, so the digest stays checkable after a later append",
+ "rule": "no row deleted, edited or relabelled. The gate attempts of the commit that carries this record cannot be in the record it carries: they are reported to the Owner with the audit and are appended (append-only) by whatever commit the Owner's ruling next authorizes",
+ "status": "FROZEN_BY_OWNER_CLOSURE_PENDING_APPROVAL"
+}

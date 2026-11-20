@@ -1,0 +1,692 @@
+{
+ "record": "AISEF V2 — CYCLE-2 ORCHESTRATION CHANGE REVIEW (for the Owner's classification)",
+ "authority": "owner ruling 'CYCLE-2 FINAL OWNER CLOSURE AUDIT' §3",
+ "written": "2026-10-01T11:03:53Z",
+ "1_commits": {
+  "code": {
+   "e3d0560e277024eeb31ddf54a95dba8fb41ae1b6": "C2-ORCHESTRATION-CONFORMANCE-REPAIR (owner ruling 2026-09-30, \"ORCHESTRATION CONFORMANCE REPAIR AUTHORIZED\"): one ProductProof evaluation per PlanObligation, by",
+   "ac88f366f98e5d1f4e2859df1001d430bdb8364c": "C2-ORCHESTRATION-CONFORMANCE-REPAIR correction: a party without the spec's probe makes no record (invariant III); prove types it PROBE_INVALID_SPEC."
+  },
+  "lane": "c2/lane-o-orchestration (e3d0560 the change; ac88f36 the correction for invariant III in proof.py), merged at 6368ae57ec8ada335546bfd6ee979d98ed80615a; authorized by owner ruling 2026-09-30 B, Ruling 3 (C2-ORCHESTRATION-CONFORMANCE-REPAIR)",
+  "kernel_files_changed_between_the_old_kernel_and_head": [
+   "aisef2/cohort/__init__.py (A)",
+   "aisef2/cohort/lifecycle.py (A)",
+   "aisef2/cohort/preregistration.py (A)",
+   "aisef2/orchestrate/proof.py (M)",
+   "aisef2/orchestrate/story_runner.py (M)"
+  ]
+ },
+ "2_files": {
+  "aisef2/orchestrate/story_runner.py": {
+   "before": "7c2a168f8a74748f54fdcb2c9734cb903cfd5e20",
+   "after": "64c855cade3e8c9e17eff92da9848e578adfffcf"
+  },
+  "aisef2/orchestrate/proof.py": {
+   "before": "a1f8cff68a068efc534d5205a2e9ec0aa4e35d55",
+   "after": "89fa4c7dafebecdb89a9f679aff6d423376060f0"
+  }
+ },
+ "3_functions_and_classes": {
+  "aisef2/orchestrate/story_runner.py": {
+   "changed": [
+    "StoryInputs",
+    "_attempt",
+    "_probe"
+   ],
+   "unchanged_count": 17
+  },
+  "aisef2/orchestrate/proof.py": {
+   "changed": [
+    "Party",
+    "Party.__init__",
+    "Party.run",
+    "Proof",
+    "prove"
+   ],
+   "unchanged_count": 4
+  }
+ },
+ "4_before": "story_runner._probe(inputs, on_range, scratch) took the ONE factory of StoryInputs.probes and raised InvariantError('cycle 1 proves a story with exactly one probe factory') when there were more; both parties were built with a maker that never saw the spec being proved. StoryAdmission, in the same function, already resolved the probe per obligation by spec.probe_id.",
+ "5_after": "story_runner._probe(inputs, on_range, scratch, spec) returns the factory registered under spec.probe_id, or None; Party(by_spec=True) hands the spec to its maker; prove() types a party without a probe for the spec as PROBE_INVALID_SPEC with no record. One ProductProof evaluation per obligation, by the probe its spec names; no result is cached or shared.",
+ "6_why_the_four_stories_could_not_execute": "STORY-01-01, 03-01, 04-01 and 04-02 of PLAN-V2.2 carry specs of two or three probe kinds; admission needs every kind's factory wired, and with more than one factory wired the candidate stage raised the InvariantError — after the developer request had been spent (multi_kind_story.old)",
+ "7_required_because_new_probe_kinds_exist": "YES: Cycle 1 had one probe kind, so 'the one factory' and 'the factory of the spec's probe' were the same object. The second kind made the candidate stage's shortcut observable. The change adds no probe, no protocol and no probe-specific branch.",
+ "8_aspects": {
+  "scheduling": {
+   "evidence": {
+    "aisef2/orchestrate/story_runner.py::run_story": "AST-identical"
+   },
+   "note": "the order of stories is the caller's; run_story is AST-identical",
+   "altered": "NO"
+  },
+  "dependency semantics": {
+   "evidence": {
+    "aisef2/plan/obligation.py": "byte-identical",
+    "aisef2/plan/static_admission.py": "byte-identical",
+    "aisef2/plan/drift.py": "byte-identical"
+   },
+   "note": "the plan modules are byte-identical",
+   "altered": "NO"
+  },
+  "StoryAdmission": {
+   "evidence": {
+    "aisef2/plan/story_admission.py": "byte-identical"
+   },
+   "note": "byte-identical; it already selected the probe by spec.probe_id per obligation before the change",
+   "altered": "NO"
+  },
+  "retry routing": {
+   "evidence": {
+    "aisef2/control/routing.py": "byte-identical",
+    "aisef2/control/budget.py": "byte-identical"
+   },
+   "note": "byte-identical",
+   "altered": "NO"
+  },
+  "owner routing": {
+   "evidence": {
+    "aisef2/control/owner.py": "byte-identical"
+   },
+   "note": "byte-identical",
+   "altered": "NO"
+  },
+  "budget ownership": {
+   "evidence": {
+    "aisef2/control/budget.py": "byte-identical"
+   },
+   "note": "byte-identical",
+   "altered": "NO"
+  },
+  "story transaction semantics": {
+   "evidence": {
+    "aisef2/runtime/story_scope.py": "byte-identical",
+    "aisef2/runtime/run_scope.py": "byte-identical",
+    "aisef2/orchestrate/gate.py": "byte-identical",
+    "aisef2/orchestrate/merge.py": "byte-identical",
+    "aisef2/orchestrate/workspace.py": "byte-identical"
+   },
+   "note": "byte-identical",
+   "altered": "NO"
+  },
+  "proof ordering": {
+   "evidence": {
+    "aisef2/orchestrate/proof.py::prove": "CHANGED"
+   },
+   "note": "prove changed: implementer run -> its probe/evaluated -> verifier run -> its probe/evaluated -> proof/verified is preserved whenever both parties have a probe (the seven Cycle-1 corpus journals are identical under both kernels); when a party has none, nothing is measured and nothing is journaled before the typed failure",
+   "altered": "SEE NOTE"
+  },
+  "candidate freeze": {
+   "evidence": {
+    "aisef2/orchestrate/story_runner.py::_freeze_plan": "AST-identical",
+    "aisef2/orchestrate/story_runner.py::_committed": "AST-identical",
+    "aisef2/orchestrate/workspace.py": "byte-identical",
+    "aisef2/orchestrate/adapters.py": "byte-identical"
+   },
+   "note": "AST/byte-identical; _attempt differs only in how the two Party objects are constructed",
+   "altered": "NO"
+  },
+  "verifier agreement": {
+   "evidence": {
+    "aisef2/journal/format3.py": "byte-identical",
+    "aisef2/probe/protocol.py": "byte-identical"
+   },
+   "note": "verified_payload and the record comparison are byte-identical; prove's agreement branch is unchanged text",
+   "altered": "NO"
+  },
+  "journal events": {
+   "evidence": {
+    "aisef2/journal/event.py": "byte-identical",
+    "aisef2/journal/format2.py": "byte-identical",
+    "aisef2/journal/format3.py": "byte-identical",
+    "aisef2/journal/writer.py": "byte-identical",
+    "aisef2/arch/enums.py": "byte-identical"
+   },
+   "note": "no event type, payload field or enum member added or changed. ONE measured difference in which events a failure path emits: see old_vs_new.post_merge_reproof_of_a_prior_story_s_spec_of_an_unwired_kind",
+   "altered": "SEE NOTE"
+  },
+  "projections": {
+   "evidence": {
+    "aisef2/journal/fold.py": "byte-identical",
+    "aisef2/control/routing.py": "byte-identical",
+    "aisef2/control/budget.py": "byte-identical",
+    "aisef2/control/owner.py": "byte-identical"
+   },
+   "note": "byte-identical; Q4 on the changed kernel: 100000/100000 matched against the six reference models, twice",
+   "altered": "NO"
+  },
+  "failure taxonomy": {
+   "evidence": {
+    "aisef2/control/owner.py": "byte-identical",
+    "aisef2/arch/enums.py": "byte-identical"
+   },
+   "note": "byte-identical; prove uses the existing FailureCode.PROBE_INVALID_SPEC at one new site",
+   "altered": "NO"
+  }
+ },
+ "9_identities": {
+  "contracts": 59,
+  "contract_hashes_spec_hashes_semantic_hashes_equal_to_the_accepted_record": true,
+  "aggregate_digest": "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745",
+  "semantic_change": "NONE",
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "caveat": "unchanged hashes show the specs and the plan did not move; they do not by themselves show orchestration semantics unchanged — items 8, 11, 12, 13 and old_vs_new carry that"
+ },
+ "10_probes": {
+  "catalog": {
+   "probe.python_callable": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "probe.file_artifact": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe.python_callable_v2": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "probe.cli_invocation": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "probe.process_effect": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+  },
+  "equal_to_the_accepted_record": true,
+  "aisef2_probe_tree": {
+   "old": "1aa9301285ccc964ee31d508089ea0119f49b629",
+   "head": "1aa9301285ccc964ee31d508089ea0119f49b629"
+  }
+ },
+ "11_tests": {
+  "before_tests_unchanged_and_passing": {
+   "tests.v2.test_p6_stages": {
+    "blob_identical": true,
+    "module": "tests.v2.test_p6_stages",
+    "exit": 0,
+    "result": [
+     "Ran 39 tests in 5.478s",
+     "OK"
+    ]
+   },
+   "tests.v2.test_p6_orchestration": {
+    "blob_identical": true,
+    "module": "tests.v2.test_p6_orchestration",
+    "exit": 0,
+    "result": [
+     "Ran 32 tests in 61.390s",
+     "OK"
+    ]
+   }
+  },
+  "after_tests": {
+   "module": "tests.v2.test_c2_orchestration_conformance",
+   "exit": 0,
+   "result": [
+    "Ran 23 tests in 123.897s",
+    "OK"
+   ]
+  }
+ },
+ "12_cannot_silently_skip_a_probe": {
+  "tests": [
+   "Parties.test_a_party_without_the_spec_s_probe_runs_nothing_and_makes_no_record",
+   "Parties.test_prove_types_a_party_without_the_spec_s_probe_as_PROBE_INVALID_SPEC_and_seals_nothing",
+   "OneProofPerObligation.test_7_one_INVALID_SPEC_among_READY_is_PROBE_INVALID_from_the_real_probe_or_from_an_unwired_one",
+   "ReproofOfAnotherKind.test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_PROBE_INVALID_SPEC_never_a_crash",
+   "MixedStory.test_8_each_obligation_has_its_own_candidate_records_binding_its_spec_probe_and_candidate",
+   "MixedStory.test_11_no_evaluation_is_shared_two_specs_of_one_kind_and_one_spec_under_two_obligations_each_run"
+  ],
+  "measured_here": {
+   "story_whose_spec_kind_the_harness_did_not_wire": {
+    "raised": null,
+    "state": {
+     "admitted": false,
+     "attempt": 1,
+     "outcome": "ROLLBACK",
+     "state": "ENDED"
+    },
+    "failures": [
+     [
+      "PROBE_INVALID_SPEC",
+      "INTEGRATION",
+      false
+     ]
+    ],
+    "details": [
+     "admission: PROBE_INVALID"
+    ],
+    "dispositions": {
+     "C-P": "PROBE_INVALID"
+    }
+   },
+   "post_merge_reproof_of_a_prior_story_s_spec_of_an_unwired_kind": {
+    "raised": null,
+    "state": {
+     "admitted": true,
+     "attempt": 1,
+     "outcome": "ROLLBACK",
+     "state": "ENDED"
+    },
+    "failures": [
+     [
+      "PROBE_INVALID_SPEC",
+      "INTEGRATION",
+      false
+     ]
+    ],
+    "details": [
+     "post-merge C-K0: PROBE_INVALID_SPEC"
+    ],
+    "dispositions": {
+     "C-M2": "READY"
+    }
+   }
+  },
+  "reading": "an obligation whose probe is missing never commits: it is PROBE_INVALID at admission or PROBE_INVALID_SPEC at the proof; RFC §17's commit condition (a VerifiedProof per obligation) is evaluated by unchanged code"
+ },
+ "13_one_probe_cannot_satisfy_another_s_obligation": {
+  "tests": [
+   "OneProofPerObligation.test_10_one_failing_candidate_spec_is_not_masked_by_the_others_passing",
+   "MixedStory.test_9_each_obligation_has_its_own_verified_proof_citing_its_two_records",
+   "Parties.test_the_runner_resolves_the_factory_of_the_spec_s_own_probe_identity_or_none"
+  ],
+  "mechanism": "aisef2/probe/protocol.py run_probe (byte-identical) answers InvalidSpec when (spec.probe_id, spec.probe_digest) is not the probe's; each proof/verified binds its own spec_id, semantic_hash and its two records"
+ },
+ "14_generality": {
+  "ledgerlock_in_the_added_lines": false,
+  "probe_kinds_named_in_the_added_lines": [],
+  "reading": "the lookup is inputs.probes.get(spec.probe_id): any set of registered probes; the tests use synthetic two- and three-kind stories, permuted orders, and the four LedgerLock stories only as one case"
+ },
+ "15_exact_diff": [
+  "diff --git a/aisef2/orchestrate/proof.py b/aisef2/orchestrate/proof.py",
+  "index a1f8cff..89fa4c7 100644",
+  "--- a/aisef2/orchestrate/proof.py",
+  "+++ b/aisef2/orchestrate/proof.py",
+  "@@ -29,9 +29,9 @@ from aisef2.runtime.story_scope import StoryScope",
+  " class Proof:",
+  "     criterion_id: str",
+  "     spec_id: str",
+  "-    implementer_seq: int",
+  "-    verifier_seq: int",
+  "-    verified_seq: int | None       # None when the two records could not become a proof (mismatch)",
+  "+    implementer_seq: int | None    # None when that party had no probe for the spec (nothing measured)",
+  "+    verifier_seq: int | None",
+  "+    verified_seq: int | None       # None when the two records could not become a proof (mismatch, no probe)",
+  "     agreement: bool",
+  "     satisfaction: ContractSatisfaction | None   # the bound implementer result's, when it executed and they agree",
+  "     failure: Classification | None",
+  "@@ -53,19 +53,24 @@ class Ranged:",
+  " ",
+  " class Party:",
+  "     \"\"\"One party's probe run: the probe evaluates in the party's own checkout; its process range is acquired into the",
+  "-    story's scope when it starts and released when the probe returns (§17.1).\"\"\"",
+  "+    story's scope when it starts and released when the probe returns (§17.1). With `by_spec` the maker is also given",
+  "+    the spec it is asked to prove and answers with that spec's own probe (C2-ORCHESTRATION-CONFORMANCE-REPAIR), or",
+  "+    None when the harness has none for the spec's identity: the party then runs nothing and returns no record — a",
+  "+    party never manufactures one (invariant III: only the harness seals a record) — and `prove` types the outcome.\"\"\"",
+  " ",
+  "-    def __init__(self, scope: StoryScope, make_probe: Callable[[Callable], Probe], label: str) -> None:",
+  "-        self.scope, self._make, self.label = scope, make_probe, label",
+  "+    def __init__(self, scope: StoryScope, make_probe: Callable[..., Probe | None], label: str, *,",
+  "+                 by_spec: bool = False) -> None:",
+  "+        self.scope, self._make, self.label, self._by_spec = scope, make_probe, label, by_spec",
+  " ",
+  "-    def run(self, spec: ProductProofSpec, at: RevisionRef, env: ExecutionEnv, *, under: str) -> ProbeRecord:",
+  "+    def run(self, spec: ProductProofSpec, at: RevisionRef, env: ExecutionEnv, *, under: str) -> ProbeRecord | None:",
+  "         held: list = []",
+  " ",
+  "         def on_range(process_range) -> None:",
+  "             held.append(self.scope.acquire(Ranged(process_range, f\"{process_range.name} [{under} {self.label}]\")))",
+  " ",
+  "         try:",
+  "-            return run_probe(self._make(on_range), spec, at, env)",
+  "+            probe = self._make(on_range, spec) if self._by_spec else self._make(on_range)",
+  "+            return None if probe is None else run_probe(probe, spec, at, env)",
+  "         finally:",
+  "             for r in reversed(held):",
+  "                 if self.scope.held[-1:] == (r.name,):   # only the top of the stack is released early (§17.1)",
+  "@@ -75,14 +80,20 @@ class Party:",
+  " def prove(run, story_id: str, criterion_id: str, spec: ProductProofSpec, role: ObligationRole | None, *,",
+  "           implementer: Party, verifier: Party, candidate: str, implementer_root: str, verifier_root: str,",
+  "           env: ExecutionEnv, point: MeasurementPoint) -> Proof:",
+  "-    \"\"\"Two independent records of `spec` at `candidate`, journaled and bound into one proof or one typed failure.\"\"\"",
+  "+    \"\"\"Two independent records of `spec` at `candidate`, journaled and bound into one proof or one typed failure. A",
+  "+    party with no probe for the spec's identity measures nothing: PROBE_INVALID_SPEC, as an INVALID_SPEC result routes",
+  "+    at every point (§10) — never a crash, never another probe's run, never a record the party made itself.\"\"\"",
+  "     if point is MeasurementPoint.PARENT:",
+  "         raise InvariantError(\"the parent is measured by StoryAdmission, never by a proof (§13)\")",
+  "     under = f\"{criterion_id}/{point.value}\"",
+  "     a = implementer.run(spec, RevisionRef(candidate, implementer_root), env, under=under)",
+  "-    seq_a = run.append(T.PROBE_EVALUATED, {\"story_id\": story_id, \"criterion_id\": criterion_id, \"record\": plain(a)}).seq",
+  "-    b = verifier.run(spec, RevisionRef(candidate, verifier_root), env, under=under)",
+  "-    seq_b = run.append(T.PROBE_EVALUATED, {\"story_id\": story_id, \"criterion_id\": criterion_id, \"record\": plain(b)}).seq",
+  "+    seq_a = None if a is None else run.append(T.PROBE_EVALUATED, {\"story_id\": story_id, \"criterion_id\": criterion_id,",
+  "+                                                                   \"record\": plain(a)}).seq",
+  "+    b = None if a is None else verifier.run(spec, RevisionRef(candidate, verifier_root), env, under=under)",
+  "+    seq_b = None if b is None else run.append(T.PROBE_EVALUATED, {\"story_id\": story_id, \"criterion_id\": criterion_id,",
+  "+                                                                   \"record\": plain(b)}).seq",
+  "+    if b is None:",
+  "+        return Proof(criterion_id, spec.id, seq_a, seq_b, None, False, None, classify(FailureCode.PROBE_INVALID_SPEC))",
+  "     if a.comparability != b.comparability:",
+  "         return Proof(criterion_id, spec.id, seq_a, seq_b, None, False, None, classify(FailureCode.PROBE_MISMATCH))",
+  "     payload = verified_payload(story_id=story_id, criterion_id=criterion_id, spec_id=spec.id,",
+  "diff --git a/aisef2/orchestrate/story_runner.py b/aisef2/orchestrate/story_runner.py",
+  "index 7c2a168..64c855c 100644",
+  "--- a/aisef2/orchestrate/story_runner.py",
+  "+++ b/aisef2/orchestrate/story_runner.py",
+  "@@ -34,9 +34,11 @@ from aisef2.product.spec import ProductProofSpec",
+  " ",
+  " @dataclass(frozen=True, slots=True)",
+  " class StoryInputs:",
+  "-    \"\"\"What a story is proved with: its specs and probe factories (a factory takes the harness's `on_range` and the",
+  "-    story's scratch directory, and gives a Probe), the execution environment, the developer's tests and the regression tests at the candidate, the test",
+  "-    runner, and — only through the seam — any V1 proof modes with their typed declarations.\"\"\"",
+  "+    \"\"\"What a story is proved with: its specs and probe factories keyed by probe id (a factory takes the harness's",
+  "+    `on_range` and the story's scratch directory, and gives a Probe; a harness wires every probe the plan's specs name,",
+  "+    so a re-proof of another story's spec finds its own), the execution environment, the developer's tests and the",
+  "+    regression tests at the candidate, the test runner, and — only through the seam — any V1 proof modes with their",
+  "+    typed declarations.\"\"\"",
+  "     specs: Mapping[str, ProductProofSpec]",
+  "     probes: Mapping[str, Callable[[Callable, str], object]]",
+  "     env: ExecutionEnv",
+  "@@ -177,8 +179,10 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap",
+  "         checks.append(gate.check(run, story_id, \"resources\", False, detail))",
+  "     if failure is None:",
+  "         held = _Held(scope, \"admission\")",
+  "-        implementer = Party(scope, lambda on_range: _probe(inputs, on_range, str(scratch.path)), \"implementer\")",
+  "-        verifier = Party(scope, lambda on_range: _probe(inputs, on_range, str(scratch.path)), \"verifier\")",
+  "+        implementer = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec),",
+  "+                            \"implementer\", by_spec=True)",
+  "+        verifier = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec), \"verifier\",",
+  "+                         by_spec=True)",
+  "         specs = inputs.specs",
+  "         obligations = obligations_of(plan, story_id)",
+  "         probes = {pid: make(held, str(scratch.path)) for pid, make in inputs.probes.items()}",
+  "@@ -313,10 +317,16 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap",
+  "                    tuple(checks), decision_seq)",
+  " ",
+  " ",
+  "-def _probe(inputs: StoryInputs, on_range, scratch: str | None = None):",
+  "-    \"\"\"The party's probe: cycle 1 proves a story with one probe kind (python_callable), so one factory serves both",
+  "-    parties; each party gets its own instance, wired to the scope through `on_range` and given the story's scratch",
+  "-    directory, under which each of its evaluations keeps its own bytecode cache (never the checkout's).\"\"\"",
+  "+def _probe(inputs: StoryInputs, on_range, scratch: str | None = None, spec: ProductProofSpec | None = None):",
+  "+    \"\"\"The party's probe for `spec`: the factory of the spec's own probe identity, so each obligation is proved by the",
+  "+    probe its ProductProofSpec names — never by a representative of the story (C2-ORCHESTRATION-CONFORMANCE-REPAIR);",
+  "+    None when the harness wires no factory for that identity. Each evaluation gets its own instance, wired to the scope",
+  "+    through `on_range` and given the story's scratch directory, under which each of its evaluations keeps its own",
+  "+    bytecode cache (never the checkout's). Without a spec there is nothing to resolve by: only one factory is",
+  "+    unambiguous.\"\"\"",
+  "+    if spec is not None:",
+  "+        make = inputs.probes.get(spec.probe_id)",
+  "+        return None if make is None else make(on_range, scratch)",
+  "     factories = list(inputs.probes.values())",
+  "     if len(factories) != 1:",
+  "         raise InvariantError(\"cycle 1 proves a story with exactly one probe factory\")"
+ ],
+ "old_vs_new": {
+  "old_kernel": {
+   "commit": "63112544f1146097b69c538d98e09e5a52c547c1",
+   "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
+  },
+  "new_kernel": {
+   "aisef2_tree": "254d8f559b879c210c4936321022f1350c4b2f89"
+  },
+  "scenarios": {
+   "single_kind_story_wired_by_probe_id": {
+    "identical": true,
+    "differing_fields": [],
+    "old": {
+     "raised": null,
+     "state": {
+      "admitted": true,
+      "attempt": 1,
+      "outcome": "COMMIT",
+      "state": "ENDED"
+     },
+     "failures": [],
+     "details": [],
+     "dispositions": {
+      "C-F": "READY"
+     }
+    },
+    "new": {
+     "raised": null,
+     "state": {
+      "admitted": true,
+      "attempt": 1,
+      "outcome": "COMMIT",
+      "state": "ENDED"
+     },
+     "failures": [],
+     "details": [],
+     "dispositions": {
+      "C-F": "READY"
+     }
+    }
+   },
+   "single_kind_story_wired_under_another_key": {
+    "identical": true,
+    "differing_fields": [],
+    "old": {
+     "raised": null,
+     "state": {
+      "admitted": false,
+      "attempt": 1,
+      "outcome": "ROLLBACK",
+      "state": "ENDED"
+     },
+     "failures": [
+      [
+       "PROBE_INVALID_SPEC",
+       "INTEGRATION",
+       false
+      ]
+     ],
+     "details": [
+      "admission: PROBE_INVALID"
+     ],
+     "dispositions": {
+      "C-F": "PROBE_INVALID"
+     }
+    },
+    "new": {
+     "raised": null,
+     "state": {
+      "admitted": false,
+      "attempt": 1,
+      "outcome": "ROLLBACK",
+      "state": "ENDED"
+     },
+     "failures": [
+      [
+       "PROBE_INVALID_SPEC",
+       "INTEGRATION",
+       false
+      ]
+     ],
+     "details": [
+      "admission: PROBE_INVALID"
+     ],
+     "dispositions": {
+      "C-F": "PROBE_INVALID"
+     }
+    }
+   },
+   "story_whose_spec_kind_the_harness_did_not_wire": {
+    "identical": true,
+    "differing_fields": [],
+    "old": {
+     "raised": null,
+     "state": {
+      "admitted": false,
+      "attempt": 1,
+      "outcome": "ROLLBACK",
+      "state": "ENDED"
+     },
+     "failures": [
+      [
+       "PROBE_INVALID_SPEC",
+       "INTEGRATION",
+       false
+      ]
+     ],
+     "details": [
+      "admission: PROBE_INVALID"
+     ],
+     "dispositions": {
+      "C-P": "PROBE_INVALID"
+     }
+    },
+    "new": {
+     "raised": null,
+     "state": {
+      "admitted": false,
+      "attempt": 1,
+      "outcome": "ROLLBACK",
+      "state": "ENDED"
+     },
+     "failures": [
+      [
+       "PROBE_INVALID_SPEC",
+       "INTEGRATION",
+       false
+      ]
+     ],
+     "details": [
+      "admission: PROBE_INVALID"
+     ],
+     "dispositions": {
+      "C-P": "PROBE_INVALID"
+     }
+    }
+   },
+   "post_merge_reproof_of_a_prior_story_s_spec_of_an_unwired_kind": {
+    "identical": false,
+    "differing_fields": [
+     "event_types",
+     "proofs",
+     "records"
+    ],
+    "old": {
+     "raised": null,
+     "state": {
+      "admitted": true,
+      "attempt": 1,
+      "outcome": "ROLLBACK",
+      "state": "ENDED"
+     },
+     "failures": [
+      [
+       "PROBE_INVALID_SPEC",
+       "INTEGRATION",
+       false
+      ]
+     ],
+     "details": [
+      "post-merge C-K0: PROBE_INVALID_SPEC"
+     ],
+     "dispositions": {
+      "C-M2": "READY"
+     }
+    },
+    "new": {
+     "raised": null,
+     "state": {
+      "admitted": true,
+      "attempt": 1,
+      "outcome": "ROLLBACK",
+      "state": "ENDED"
+     },
+     "failures": [
+      [
+       "PROBE_INVALID_SPEC",
+       "INTEGRATION",
+       false
+      ]
+     ],
+     "details": [
+      "post-merge C-K0: PROBE_INVALID_SPEC"
+     ],
+     "dispositions": {
+      "C-M2": "READY"
+     }
+    },
+    "difference": {
+     "old_events_for_the_unwired_spec": {
+      "probe_evaluated": [
+       {
+        "criterion_id": "C-K0",
+        "probe_id": "probe.file_artifact",
+        "verdict": null,
+        "result_fields": [
+         "detail"
+        ]
+       },
+       {
+        "criterion_id": "C-K0",
+        "probe_id": "probe.file_artifact",
+        "verdict": null,
+        "result_fields": [
+         "detail"
+        ]
+       }
+      ],
+      "proof_verified": [
+       {
+        "criterion_id": "C-K0",
+        "agreement": true,
+        "verdict": null
+       }
+      ]
+     },
+     "new_events_for_the_unwired_spec": {
+      "probe_evaluated": [],
+      "proof_verified": []
+     },
+     "event_count": {
+      "old": 37,
+      "new": 34
+     },
+     "same_outcome_failure_owner_retryability_detail": true
+    }
+   },
+   "multi_kind_story": {
+    "identical": false,
+    "differing_fields": [
+     "attempts",
+     "committed",
+     "event_types",
+     "proofs",
+     "raised",
+     "records"
+    ],
+    "old": {
+     "raised": "InvariantError: cycle 1 proves a story with exactly one probe factory",
+     "failures": [],
+     "dispositions": {
+      "C-F": "READY",
+      "C-P": "READY"
+     },
+     "attempts": null,
+     "committed": false
+    },
+    "new": {
+     "raised": null,
+     "failures": [],
+     "dispositions": {
+      "C-F": "READY",
+      "C-P": "READY"
+     },
+     "attempts": [
+      "COMMIT"
+     ],
+     "committed": true
+    }
+   }
+  }
+ },
+ "classification": {
+  "options": [
+   "ORCH-BUGFIX-NO-SEMANTIC-CHANGE",
+   "ORCH-SEMANTIC-CHANGE",
+   "ORCH-ARCHITECTURE-CHANGE"
+  ],
+  "self_authorized": false,
+  "what_the_evidence_shows": [
+   "no frozen item, protocol, event type, payload field, enum, disposition, routing table, budget or projection module changed (item 8, byte/AST evidence)",
+   "single-kind stories behave identically under both kernels: the seven Cycle-1 corpus journals (C2-ORCHESTRATION-CONFORMANCE-REPAIR.json), and three single-kind paths measured here including two misconfigurations — identical",
+   "a multi-kind story: old InvariantError after a developer request; new COMMIT with one proof per obligation",
+   "ONE path differs in what is journaled, with the same outcome, failure code, owner, retryability and detail: the post-merge re-proof of a prior story's spec whose probe kind the current harness did not wire. Old: the story's single (wrong-kind) probe was run on that spec — two probe/evaluated InvalidSpec records and a proof/verified with no verdict — then PROBE_INVALID_SPEC. New: nothing is measured, no record, no proof/verified, then PROBE_INVALID_SPEC. Events for the story: {\"old\": 37, \"new\": 34}"
+  ],
+  "reading_of_the_evidence": "consistent with ORCH-BUGFIX-NO-SEMANTIC-CHANGE except for the one disclosed journal difference on a misconfiguration failure path; whether that difference is a semantic change is the Owner's ruling",
+  "status": "RETURNED FOR THE OWNER'S EXPLICIT RULING — not accepted here"
+ }
+}

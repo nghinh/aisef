@@ -1,0 +1,1222 @@
+{
+ "record": "AISEF V2 — CYCLE-2 FINAL CLOSURE AUDIT",
+ "authority": "owner ruling 'CYCLE-2 FINAL OWNER CLOSURE AUDIT / ENGINEERING RESULTS PROVISIONALLY ACCEPTED / PUBLIC RELEASE NOT YET AUTHORIZED'",
+ "written": "2026-10-01T11:07:29Z",
+ "4_qp26_lineage": [
+  {
+   "attempt": "R2",
+   "candidate_sha": "ac4a6c75b461e409f024965391ce77e7689c0e08",
+   "product_tree_aisef": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+   "assurance_trees": {
+    "validation/v2": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+    "tests/v2": "f6b04e08d6da55ad5e626087ebd4d1639960eb62"
+   },
+   "planes": {
+    "PRODUCT_AFFECTING": {
+     "digest": "68f500984d2b0e8945df76247f54f56554966455b73259ed95b8dcdf7aa5d253",
+     "files": 121
+    },
+    "ASSURANCE_AFFECTING": {
+     "digest": "8d4b87bdf248337213fa84991f36e3297f320ba195307c9c406767f5a314f004",
+     "files": 823
+    },
+    "EVIDENCE_ONLY": {
+     "digest": "c06175b5245edc31e55a76e6ede68e6d75c4dbf1e3d62de899bbe9a1793e280d",
+     "files": 2669
+    },
+    "DOCUMENTATION": {
+     "digest": "9cf542e8c7af3e40594b22d20a88fadd88ac6a218b6a99f7b5ee5b3a11787ffc",
+     "files": 118
+    },
+    "UNRESOLVED": {
+     "digest": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+     "files": 0
+    }
+   },
+   "summary": {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json",
+    "sha256": "2989e4bdb648000f6a2795789473dc911895be83e9e8e2b147e9162fe67163f5",
+    "verdict": "FAILED"
+   },
+   "Q0": "FAILED",
+   "Q1": "UNRUNNABLE",
+   "Q2": "UNRUNNABLE",
+   "Q3": "UNRUNNABLE",
+   "platforms": {
+    "linux-py3.11": {
+     "Q0": "GREEN 51 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.12": {
+     "Q0": "GREEN 51 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.13": {
+     "Q0": "GREEN 51 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.14": {
+     "Q0": "GREEN 51 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "windows-py3.11": {
+     "Q0": "FAILED 48 pass, 3 fail, 0 n/a",
+     "Q1": "NOT RUN (a lower rung was not GREEN on this platform)",
+     "Q2": "NOT RUN (a lower rung was not GREEN on this platform)",
+     "Q3": "NOT RUN (a lower rung was not GREEN on this platform)"
+    }
+   },
+   "mutation": {
+    "targets": 581,
+    "total": 14883,
+    "killed": 14873,
+    "survivors": 10,
+    "audited_survivors": 10,
+    "unaudited_survivors": 0
+   },
+   "note": "FAILED on Windows (Q0 48/51: validation/qualification/v1_pf_001_policy.py repo_path); kept"
+  },
+  {
+   "attempt": "R3",
+   "candidate_sha": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+   "product_tree_aisef": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+   "assurance_trees": {
+    "validation/v2": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+    "tests/v2": "a7d2fb385721891beabab3ac200b974ad81a221c"
+   },
+   "planes": {
+    "PRODUCT_AFFECTING": {
+     "digest": "68f500984d2b0e8945df76247f54f56554966455b73259ed95b8dcdf7aa5d253",
+     "files": 121
+    },
+    "ASSURANCE_AFFECTING": {
+     "digest": "7852141b807e0342f33e8f911bb277843c606418a39e87db687cd3e1c410928c",
+     "files": 824
+    },
+    "EVIDENCE_ONLY": {
+     "digest": "86fa2404b7916b27118a834746f1bf63634910e5f480a88b0595c03706d8ccfc",
+     "files": 2697
+    },
+    "DOCUMENTATION": {
+     "digest": "9cf542e8c7af3e40594b22d20a88fadd88ac6a218b6a99f7b5ee5b3a11787ffc",
+     "files": 118
+    },
+    "UNRESOLVED": {
+     "digest": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+     "files": 0
+    }
+   },
+   "summary": {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/SUMMARY.json",
+    "sha256": "247251e84f0ed2fded57f85d6e69139a770d324e778e4bab4359401ae1d28ecb",
+    "verdict": "GREEN"
+   },
+   "Q0": "GREEN",
+   "Q1": "GREEN",
+   "Q2": "GREEN",
+   "Q3": "GREEN",
+   "platforms": {
+    "linux-py3.11": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.12": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.13": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.14": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "windows-py3.11": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 178 pass, 0 fail, 13 n/a",
+     "Q3": "GREEN 541 pass, 0 fail, 19 n/a"
+    }
+   },
+   "mutation": {
+    "targets": 581,
+    "total": 14883,
+    "killed": 14873,
+    "survivors": 10,
+    "audited_survivors": 10,
+    "unaudited_survivors": 0
+   },
+   "note": "GREEN; closed C2-P6 (9bd16fa); the candidate LANE-Q ran on"
+  },
+  {
+   "attempt": "R4",
+   "candidate_sha": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+   "product_tree_aisef": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "aisef2_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+   "assurance_trees": {
+    "validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116",
+    "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"
+   },
+   "planes": {
+    "PRODUCT_AFFECTING": {
+     "digest": "68f500984d2b0e8945df76247f54f56554966455b73259ed95b8dcdf7aa5d253",
+     "files": 121
+    },
+    "ASSURANCE_AFFECTING": {
+     "digest": "bc25aae6c3d350f803d44506478a8ce6805256d9e78d35c663289e8b8fa53fe2",
+     "files": 846
+    },
+    "EVIDENCE_ONLY": {
+     "digest": "6cc95771e86466694796a258f20fb542f67c04f422880cb99ee2058ec0bd2b0c",
+     "files": 2807
+    },
+    "DOCUMENTATION": {
+     "digest": "9cf542e8c7af3e40594b22d20a88fadd88ac6a218b6a99f7b5ee5b3a11787ffc",
+     "files": 118
+    },
+    "UNRESOLVED": {
+     "digest": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+     "files": 0
+    }
+   },
+   "summary": {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json",
+    "sha256": "f2ca0fcd064b0396224886742483d92a15668fa0a4f94e77e7f82a6759a114d6",
+    "verdict": "GREEN"
+   },
+   "Q0": "GREEN",
+   "Q1": "GREEN",
+   "Q2": "GREEN",
+   "Q3": "GREEN",
+   "platforms": {
+    "linux-py3.11": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.12": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.13": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "linux-py3.14": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 189 pass, 0 fail, 2 n/a",
+     "Q3": "GREEN 559 pass, 0 fail, 1 n/a"
+    },
+    "windows-py3.11": {
+     "Q0": "GREEN 52 pass, 0 fail, 0 n/a",
+     "Q1": "GREEN 396 pass, 0 fail, 0 n/a",
+     "Q2": "GREEN 178 pass, 0 fail, 13 n/a",
+     "Q3": "GREEN 541 pass, 0 fail, 19 n/a"
+    }
+   },
+   "mutation": {
+    "targets": 620,
+    "total": 15578,
+    "killed": 15568,
+    "survivors": 10,
+    "audited_survivors": 10,
+    "unaudited_survivors": 0
+   },
+   "note": "GREEN on the final candidate (LANE-Q + LANE-X)"
+  }
+ ],
+ "4_survivor_audits": [
+  {
+   "target": "tests/v2/refmodel/story_state.py::_TABLE",
+   "mutant": "L19 False->True",
+   "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+  },
+  {
+   "target": "tests/v2/refmodel/story_state.py::_TABLE",
+   "mutant": "L20 False->True",
+   "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+  },
+  {
+   "target": "tests/v2/refmodel/story_state.py::_TABLE",
+   "mutant": "L21 False->True",
+   "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+  },
+  {
+   "target": "tests/v2/refmodel/story_state.py::_TABLE",
+   "mutant": "L22 False->True",
+   "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+  },
+  {
+   "target": "tests/v2/refmodel/story_state.py::_TABLE",
+   "mutant": "L23 False->True",
+   "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+  },
+  {
+   "target": "tests/v2/refmodel/budgets.py::model",
+   "mutant": "L75 True->False",
+   "audit": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything"
+  },
+  {
+   "target": "tests/v2/refmodel/qualification_counters.py::metrics",
+   "mutant": "L15 element 0 dropped",
+   "audit": "`pre` is read only through len(pre): a one-element tuple per entry counts the same"
+  },
+  {
+   "target": "tests/v2/refmodel/qualification_counters.py::metrics",
+   "mutant": "L15 element 1 dropped",
+   "audit": "`pre` is read only through len(pre): a one-element tuple per entry counts the same"
+  },
+  {
+   "target": "tests/v2/refmodel/qualification_counters.py::model",
+   "mutant": "L41 sorted() -> list()",
+   "audit": "`unplanned` is read only for truthiness and inside the refusal message"
+  },
+  {
+   "target": "tests/v2/refmodel/qualification_counters.py::model",
+   "mutant": "L44 sorted() -> list()",
+   "audit": "`misplaced` is read only for truthiness and inside the refusal message"
+  }
+ ],
+ "5_q4_q5_corrigendum_audit": {
+  "Q4": {
+   "original_record": {
+    "path": "closure-evidence/v2/cycle2/Q4/DIFFERENTIAL.json",
+    "sha256": "06fec168ddff676c880743365a50361bd56faf919456112df5398f788abfbf04"
+   },
+   "subject_record": {
+    "path": "closure-evidence/v2/cycle2/Q4/SUBJECT.json",
+    "sha256": "1fb3a9795360575bb4d73904aee47efac596e6617680b7b9b12b0c92dc213d00"
+   },
+   "subject_sha_at_execution": "ac608c1128c0a7b6061277cf9a12c234d86aa545",
+   "semantic_candidate_named": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+   "working_tree_clean_at_freeze": true,
+   "subject_trees": {
+    "aisef2": {
+     "r3_candidate": "37bf6457f350dd720a2214f04f3896c554ad0904",
+     "at_execution": "37bf6457f350dd720a2214f04f3896c554ad0904"
+    },
+    "tests/v2": {
+     "r3_candidate": "a7d2fb385721891beabab3ac200b974ad81a221c",
+     "at_execution": "a7d2fb385721891beabab3ac200b974ad81a221c"
+    },
+    "validation/v2": {
+     "r3_candidate": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+     "at_execution": "c990bf479a553ee7a3321be092cabacaa60b6211"
+    }
+   },
+   "consumed_paths": [
+    "aisef2",
+    "tests/v2/refmodel",
+    "tests/v2/p3/journal_gen.py",
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "consumed_paths_changed_between_the_r3_candidate_and_execution": [],
+   "validation_v2_changed_since_r3": {
+    "files": [
+     "validation/v2/run_history.py"
+    ],
+    "imported_by_this_rung": false,
+    "note": "history and seal registrations of 9bd16fa; the rung does not import run_history"
+   },
+   "qualification_kernel_identity": {
+    "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+    "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
+    "one_identity": "1a4309be81e5ecbd76881debdd52eca59f6640ec1e372999ec44ff4d3dcfa45e"
+   },
+   "active_probe_digests": {
+    "cli_invocation": {
+     "probe_id": "probe.cli_invocation",
+     "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+    },
+    "file_artifact": {
+     "probe_id": "probe.file_artifact",
+     "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+    },
+    "process_effect": {
+     "probe_id": "probe.process_effect",
+     "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+    },
+    "python_callable": {
+     "probe_id": "probe.python_callable_v2",
+     "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+    }
+   },
+   "active_probe_digests_equal_to_r3": true,
+   "runspec_capability_identity": {
+    "reference_digest": "9a5ea4c531ea5ddd29b129a42f7012b52706ba66430f949046ab8e5a06cd53f9",
+    "generator_digest": "85f93c7d3af6d5e7e29bf59e367a72a72bb7ace1d01df9fdb92fb0fb76263ab7",
+    "harness_digest": "90dcb40193ad391f6222d02697405496dd7c301a9f08cdb69ac5fd0f40b2fc0d"
+   },
+   "corpus_identity": {
+    "seed_schedule": {
+     "base": 0,
+     "chunks": 10,
+     "chunk_size": 10000,
+     "total": 100000,
+     "ranges": [
+      [
+       0,
+       9999
+      ],
+      [
+       10000,
+       19999
+      ],
+      [
+       20000,
+       29999
+      ],
+      [
+       30000,
+       39999
+      ],
+      [
+       40000,
+       49999
+      ],
+      [
+       50000,
+       59999
+      ],
+      [
+       60000,
+       69999
+      ],
+      [
+       70000,
+       79999
+      ],
+      [
+       80000,
+       89999
+      ],
+      [
+       90000,
+       99999
+      ]
+     ],
+     "prefix_every": 10
+    }
+   },
+   "timestamps": {
+    "subject_frozen_at": "2026-10-01T02:20:52Z",
+    "aggregated": "2026-10-01T02:32:12Z"
+   },
+   "erroneous_pointer_preserved": [
+    "closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json"
+   ],
+   "pointer_it_should_have_been": "closure-evidence/v2/cycle2/Q0-Q3-R3/SUMMARY.json",
+   "r2_and_r3_candidates_carry_the_same_kernel_tree": true,
+   "did_the_original_measurement_run_on_the_same_consumed_identities_as_the_qualifying_candidate": "YES",
+   "classification": "PROVENANCE_POINTER_CORRECTION"
+  },
+  "Q5": {
+   "original_record": {
+    "path": "closure-evidence/v2/cycle2/Q5/REPRODUCTION.json",
+    "sha256": "84396d361649eafdb7b7561526b920756109989976d38faaea67776a437b85f7"
+   },
+   "subject_record": {
+    "path": "closure-evidence/v2/cycle2/Q5/SUBJECT.json",
+    "sha256": "381f53194ca0aa1089062c4f780e4a289f5086b708dc3d5a7b65c7e85aa7a909"
+   },
+   "subject_sha_at_execution": "7e1e94571784c371e7654111e6fdf79c51372dfe",
+   "semantic_candidate_named": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+   "working_tree_clean_at_freeze": true,
+   "subject_trees": {
+    "aisef2": {
+     "r3_candidate": "37bf6457f350dd720a2214f04f3896c554ad0904",
+     "at_execution": "37bf6457f350dd720a2214f04f3896c554ad0904"
+    },
+    "tests/v2": {
+     "r3_candidate": "a7d2fb385721891beabab3ac200b974ad81a221c",
+     "at_execution": "a7d2fb385721891beabab3ac200b974ad81a221c"
+    },
+    "validation/v2": {
+     "r3_candidate": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+     "at_execution": "c990bf479a553ee7a3321be092cabacaa60b6211"
+    }
+   },
+   "consumed_paths": [
+    "aisef2",
+    "tests/v2"
+   ],
+   "consumed_paths_changed_between_the_r3_candidate_and_execution": [],
+   "validation_v2_changed_since_r3": {
+    "files": [
+     "validation/v2/run_history.py"
+    ],
+    "imported_by_this_rung": false,
+    "note": "history and seal registrations of 9bd16fa; the rung does not import run_history"
+   },
+   "qualification_kernel_identity": {
+    "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+    "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
+    "one_identity": "7497b610455cf4ca938499dbd296375d482561e2a69c98b2e86207fe34630608"
+   },
+   "active_probe_digests": {
+    "cli_invocation": {
+     "probe_id": "probe.cli_invocation",
+     "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+    },
+    "file_artifact": {
+     "probe_id": "probe.file_artifact",
+     "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+    },
+    "process_effect": {
+     "probe_id": "probe.process_effect",
+     "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+    },
+    "python_callable": {
+     "probe_id": "probe.python_callable_v2",
+     "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+    }
+   },
+   "active_probe_digests_equal_to_r3": true,
+   "runspec_capability_identity": {
+    "f1_identity": "34eb00bbb74ade41bebc98e7c06437c1c6833bb6f95d30b1d64b04ad905e37fc",
+    "f9_identity": "2f00a8b02918bc45eeec4549d0bd04b74fa9211c60060a2d32319beaa0b7baeb",
+    "harness_digest": "283c32d91527c19e0632143c46eb98615e6f1357633932139e323d70d4438ba9",
+    "fixture_digest": "6b7be925719dbf63743a32eae69147f6abcab57974a298ead641141780d31290"
+   },
+   "corpus_identity": {
+    "corpus_digest": "614c81687a213c4fef16644fde4c24fb0c16b0a69ad935337a837e5790754924",
+    "replay_digest": "aa9e5ff8a43c2ef63702a16fcd1ffd515484ede1bea4cd531dc8199939bf964b"
+   },
+   "timestamps": {
+    "subject_frozen_at": "2026-10-01T03:05:55Z",
+    "aggregated": "2026-10-01T03:06:48Z"
+   },
+   "erroneous_pointer_preserved": [
+    "closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json"
+   ],
+   "pointer_it_should_have_been": "closure-evidence/v2/cycle2/Q0-Q3-R3/SUMMARY.json",
+   "r2_and_r3_candidates_carry_the_same_kernel_tree": true,
+   "did_the_original_measurement_run_on_the_same_consumed_identities_as_the_qualifying_candidate": "YES",
+   "classification": "PROVENANCE_POINTER_CORRECTION"
+  },
+  "corrigendum": {
+   "path": "closure-evidence/v2/cycle2/C2-P7-P8-BINDING-CORRIGENDUM-1.json",
+   "sha256": "1d529d4dad5c1f5e7faaaf9a89c0a999cef9e0779cc5310716b3f07c11808acd"
+  },
+  "final_candidate": {
+   "Q4-FINAL": {
+    "record": {
+     "path": "closure-evidence/v2/cycle2/Q4-FINAL/DIFFERENTIAL.json",
+     "sha256": "09e2e3e865e1614702851200a12d789115e5e76eae36b19164a675e798782801"
+    },
+    "status": "GREEN",
+    "subject_sha_at_execution": "849b7e5092b2ecb690ef234939203f0dbe460d97",
+    "semantic_candidate_named": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+    "kernel_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+    "kernel_digest": "f763b238d9e9c007937b959238feac9d54e6af7d9c1bb707cad1686640526908",
+    "consumed_paths_changed_between_the_final_candidate_and_execution": [],
+    "active_probe_digests_equal_to_r4": true,
+    "lower_rung_bound": [
+     "closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json"
+    ],
+    "lower_rung_is_green_for_this_candidate": true,
+    "fresh": true
+   },
+   "Q5-FINAL": {
+    "record": {
+     "path": "closure-evidence/v2/cycle2/Q5-FINAL/REPRODUCTION.json",
+     "sha256": "a5875285af8782b99f4fed42309467826086c12c4a05d4b83940479640b93186"
+    },
+    "status": "GREEN",
+    "subject_sha_at_execution": "f3fb0c8b373426636732100a919c378780a34456",
+    "semantic_candidate_named": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+    "kernel_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+    "kernel_digest": "f763b238d9e9c007937b959238feac9d54e6af7d9c1bb707cad1686640526908",
+    "consumed_paths_changed_between_the_final_candidate_and_execution": [],
+    "active_probe_digests_equal_to_r4": true,
+    "lower_rung_bound": [
+     "closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json"
+    ],
+    "lower_rung_is_green_for_this_candidate": true,
+    "fresh": true
+   }
+  },
+  "why_the_final_reruns_were_needed": "the final candidate adds aisef2/cohort: the kernel digest Q4 and Q5 consume covers every aisef2 file, so both were rerun (Q4-FINAL, Q5-FINAL); the orchestration change itself was already in the R3 kernel both original runs measured"
+ },
+ "q4_final_totals": {
+  "MATCHED": 100000,
+  "DIVERGENCE": 0,
+  "INVARIANT_VIOLATION": 0,
+  "EXCEPTION": 0,
+  "SILENT_SKIP": 0,
+  "requested": 100000,
+  "attempted": 100000,
+  "terminal": 100000,
+  "rows": 100000,
+  "events": 5431248,
+  "matched_with_refusal": 0,
+  "prefix_traces": 10000
+ },
+ "q5_final_totals": {
+  "items": 12,
+  "green": 12,
+  "expected_model_calls": 31,
+  "consumed_model_calls": 31,
+  "tool_executions": 12,
+  "tool_result_replays": 0,
+  "subprocess_executions": 180,
+  "socket_attempts": 0,
+  "assert_consumed": true,
+  "only_model_stream_replayed": true
+ },
+ "6_commit_lineage_and_planes": {
+  "commits": {
+   "c11615a": {
+    "sha": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+    "parents": [
+     "edef4f16e851580fdcc8f88b2a7c8b34f04fda33"
+    ],
+    "subject": "Final integration candidate: the C2-FINAL history registered, LANE-X's attempts recorded.",
+    "changed_paths_since": null,
+    "changed_paths_in_this_commit": {
+     "ASSURANCE_AFFECTING": [
+      "validation/v2/run_history.py"
+     ],
+     "EVIDENCE_ONLY": [
+      "closure-evidence/v2/cycle2/C2-P10-RUN-HISTORY.json"
+     ]
+    },
+    "planes": {
+     "PRODUCT_AFFECTING": {
+      "digest": "68f500984d2b0e8945df76247f54f56554966455b73259ed95b8dcdf7aa5d253",
+      "files": 121
+     },
+     "ASSURANCE_AFFECTING": {
+      "digest": "bc25aae6c3d350f803d44506478a8ce6805256d9e78d35c663289e8b8fa53fe2",
+      "files": 846
+     },
+     "EVIDENCE_ONLY": {
+      "digest": "6cc95771e86466694796a258f20fb542f67c04f422880cb99ee2058ec0bd2b0c",
+      "files": 2807
+     },
+     "DOCUMENTATION": {
+      "digest": "9cf542e8c7af3e40594b22d20a88fadd88ac6a218b6a99f7b5ee5b3a11787ffc",
+      "files": 118
+     },
+     "UNRESOLVED": {
+      "digest": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "files": 0
+     }
+    },
+    "trees": {
+     "aisef": "4359f347378e84fcac2d213128c7c26f282c13c0",
+     "aisef2": "254d8f559b879c210c4936321022f1350c4b2f89",
+     "aisef2/probe": "1aa9301285ccc964ee31d508089ea0119f49b629",
+     "aisef2/orchestrate": "a039b0eb5f3f09a49ab8782ad0bbec9a9ff32324",
+     "validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116",
+     "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"
+    },
+    "inputs_of_the_plan_and_specs": {
+     "validation/qualification/p10_contracts.py": "5500e3b64335d2f383c8044bb523a810b8994c33",
+     "validation/qualification/p5_acceptance.py": "3fd26c4bfef398b67d842d87f49cff545cbafaec",
+     "validation/qualification/p5_falsifiability.py": "df9d4a1c4485ddfe94a6ebb1ebb5befde3fa2481",
+     "tests/v2/fixtures/workloads": "f5339aa768d7b1f3b8e3107a99c4d059b7e9ec59",
+     "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json": "a72c49ee9ae42676c872149ea47a1caa355b2e55",
+     "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json": "517894da476e7c19e944ffb61b9df3eec492ee33"
+    }
+   },
+   "2dd1226": {
+    "sha": "2dd12265caa47095ac8daebea4eda8f817f812f3",
+    "parents": [
+     "236b440ff0b3d9811a602c9c61b3b3c769a5a819"
+    ],
+    "subject": "CYCLE-2 P6/P7/P8/P9/P10 COMPLETE — the consolidated report for the final Owner closure review: closure-evidence/v2/cycle2/C2-FINAL-REPORT.js",
+    "changed_paths_since": {
+     "since": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+     "by_plane": {
+      "ASSURANCE_AFFECTING": [
+       "validation/qualification/c2_final_report.py",
+       "validation/qualification/common.py"
+      ],
+      "EVIDENCE_ONLY": [
+       "closure-evidence/v2/cycle2/C2-FINAL-INTEGRATION.json",
+       "closure-evidence/v2/cycle2/C2-FINAL-REPORT.json",
+       "closure-evidence/v2/cycle2/C2-FINAL-REPORT.md",
+       "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json",
+       "closure-evidence/v2/cycle2/C2-P9-RUN-HISTORY.json",
+       "closure-evidence/v2/cycle2/P10/attempt-2/JOURNAL.json",
+       "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json",
+       "closure-evidence/v2/cycle2/P10/attempt-2/STORY-ACCOUNT.json",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-01-01.developer.1.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-01-01.developer.2.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-01-05.developer.1.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-01-05.developer.2.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-01-05.reviewer.2.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-03-01.developer.1.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-03-01.reviewer.1.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-04-02.developer.1.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-04-02.developer.2.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-04-02.reviewer.2.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-05-01.developer.1.jsonl",
+       "closure-evidence/v2/cycle2/P10/attempt-2/sessions/STORY-05-01.developer.2.jsonl",
+       "closure-evidence/v2/cycle2/P10/owned/run.attempt-2.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/PLATFORMS/linux-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/PLATFORMS/linux-py3.12.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/PLATFORMS/linux-py3.13.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/PLATFORMS/linux-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/PLATFORMS/windows-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q0/Q0-darwin-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q0/Q0-linux-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q0/Q0-linux-py3.12.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q0/Q0-linux-py3.13.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q0/Q0-linux-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q0/Q0-windows-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q1/Q1-darwin-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q1/Q1-linux-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q1/Q1-linux-py3.12.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q1/Q1-linux-py3.13.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q1/Q1-linux-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q1/Q1-windows-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q2/Q2-darwin-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q2/Q2-linux-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q2/Q2-linux-py3.12.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q2/Q2-linux-py3.13.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q2/Q2-linux-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q2/Q2-windows-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q3/Q3-darwin-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q3/Q3-linux-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q3/Q3-linux-py3.12.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q3/Q3-linux-py3.13.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q3/Q3-linux-py3.14.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/Q3/Q3-windows-py3.11.json",
+       "closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/CALIBRATION.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/CONFORMANCE-end.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/CONFORMANCE-start.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/DIFFERENTIAL.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/RESOURCES.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/SUBJECT.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-0.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-2.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-3.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-4.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-5.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-6.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-7.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-8.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/chunks/chunk-9.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-0.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-1.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-2.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-3.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-4.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-5.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-6.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-7.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-8.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q4-FINAL/owned/chunk-9.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/CALIBRATION.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/CONFORMANCE-end.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/CONFORMANCE-start.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/CORPUS.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/REPRODUCTION.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/SUBJECT.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/bytes-returning-python-callable.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/cli-proved-story.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/cli-refuted-then-commit.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/developer-outage-rollback.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/file-artifact-prohibition.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/normal-completion.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/post-merge-regression.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/pre-satisfied.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/retry-then-commit.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/review-finding-rollback.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/scenario-proved-story.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/corpus/security-finding-rollback.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/owned/calibration.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/owned/record.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/owned/reproduction.attempt-1.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/bytes-returning-python-callable.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/cli-proved-story.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/cli-refuted-then-commit.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/developer-outage-rollback.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/file-artifact-prohibition.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/normal-completion.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/post-merge-regression.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/pre-satisfied.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/retry-then-commit.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/review-finding-rollback.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/scenario-proved-story.json",
+       "closure-evidence/v2/cycle2/Q5-FINAL/reproduction/security-finding-rollback.json",
+       "closure-evidence/v2/cycle2/V1-PF-001-POLICY-CALIBRATION.json",
+       "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json"
+      ]
+     }
+    },
+    "changed_paths_in_this_commit": {
+     "ASSURANCE_AFFECTING": [
+      "validation/qualification/c2_final_report.py"
+     ],
+     "EVIDENCE_ONLY": [
+      "closure-evidence/v2/cycle2/C2-FINAL-REPORT.json",
+      "closure-evidence/v2/cycle2/C2-FINAL-REPORT.md",
+      "closure-evidence/v2/cycle2/V1-PF-001-POLICY-CALIBRATION.json",
+      "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json"
+     ]
+    },
+    "planes": {
+     "PRODUCT_AFFECTING": {
+      "digest": "68f500984d2b0e8945df76247f54f56554966455b73259ed95b8dcdf7aa5d253",
+      "files": 121
+     },
+     "ASSURANCE_AFFECTING": {
+      "digest": "a79b6b588e776620d8e3d0708053f4dace6aea0b25fd0aad1ad893eea8110223",
+      "files": 847
+     },
+     "EVIDENCE_ONLY": {
+      "digest": "3dc8f5cfb7ab2a1545df8755cc38a2e7595796dd77f8c7648cf6a8b6426b04ab",
+      "files": 2916
+     },
+     "DOCUMENTATION": {
+      "digest": "9cf542e8c7af3e40594b22d20a88fadd88ac6a218b6a99f7b5ee5b3a11787ffc",
+      "files": 118
+     },
+     "UNRESOLVED": {
+      "digest": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "files": 0
+     }
+    },
+    "trees": {
+     "aisef": "4359f347378e84fcac2d213128c7c26f282c13c0",
+     "aisef2": "254d8f559b879c210c4936321022f1350c4b2f89",
+     "aisef2/probe": "1aa9301285ccc964ee31d508089ea0119f49b629",
+     "aisef2/orchestrate": "a039b0eb5f3f09a49ab8782ad0bbec9a9ff32324",
+     "validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116",
+     "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"
+    },
+    "inputs_of_the_plan_and_specs": {
+     "validation/qualification/p10_contracts.py": "5500e3b64335d2f383c8044bb523a810b8994c33",
+     "validation/qualification/p5_acceptance.py": "3fd26c4bfef398b67d842d87f49cff545cbafaec",
+     "validation/qualification/p5_falsifiability.py": "df9d4a1c4485ddfe94a6ebb1ebb5befde3fa2481",
+     "tests/v2/fixtures/workloads": "f5339aa768d7b1f3b8e3107a99c4d059b7e9ec59",
+     "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json": "a72c49ee9ae42676c872149ea47a1caa355b2e55",
+     "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json": "517894da476e7c19e944ffb61b9df3eec492ee33"
+    }
+   },
+   "3ed2c41": {
+    "sha": "3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11",
+    "parents": [
+     "2dd12265caa47095ac8daebea4eda8f817f812f3"
+    ],
+    "subject": "C2-FINAL-RUN-HISTORY.json seq 28-35: the attempts of the final head 2dd1226 — local suite 5096 OK in the owned range (0/0/0, escaped 0); tes",
+    "changed_paths_since": {
+     "since": "2dd12265caa47095ac8daebea4eda8f817f812f3",
+     "by_plane": {
+      "EVIDENCE_ONLY": [
+       "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json"
+      ]
+     }
+    },
+    "changed_paths_in_this_commit": {
+     "EVIDENCE_ONLY": [
+      "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json"
+     ]
+    },
+    "planes": {
+     "PRODUCT_AFFECTING": {
+      "digest": "68f500984d2b0e8945df76247f54f56554966455b73259ed95b8dcdf7aa5d253",
+      "files": 121
+     },
+     "ASSURANCE_AFFECTING": {
+      "digest": "a79b6b588e776620d8e3d0708053f4dace6aea0b25fd0aad1ad893eea8110223",
+      "files": 847
+     },
+     "EVIDENCE_ONLY": {
+      "digest": "d155efbbd2d6c4fe17172c90e760f80abf7c3b21a5686f357c8c0f0c897ce6e8",
+      "files": 2916
+     },
+     "DOCUMENTATION": {
+      "digest": "9cf542e8c7af3e40594b22d20a88fadd88ac6a218b6a99f7b5ee5b3a11787ffc",
+      "files": 118
+     },
+     "UNRESOLVED": {
+      "digest": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "files": 0
+     }
+    },
+    "trees": {
+     "aisef": "4359f347378e84fcac2d213128c7c26f282c13c0",
+     "aisef2": "254d8f559b879c210c4936321022f1350c4b2f89",
+     "aisef2/probe": "1aa9301285ccc964ee31d508089ea0119f49b629",
+     "aisef2/orchestrate": "a039b0eb5f3f09a49ab8782ad0bbec9a9ff32324",
+     "validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116",
+     "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"
+    },
+    "inputs_of_the_plan_and_specs": {
+     "validation/qualification/p10_contracts.py": "5500e3b64335d2f383c8044bb523a810b8994c33",
+     "validation/qualification/p5_acceptance.py": "3fd26c4bfef398b67d842d87f49cff545cbafaec",
+     "validation/qualification/p5_falsifiability.py": "df9d4a1c4485ddfe94a6ebb1ebb5befde3fa2481",
+     "tests/v2/fixtures/workloads": "f5339aa768d7b1f3b8e3107a99c4d059b7e9ec59",
+     "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json": "a72c49ee9ae42676c872149ea47a1caa355b2e55",
+     "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json": "517894da476e7c19e944ffb61b9df3eec492ee33"
+    }
+   }
+  },
+  "identical_across_the_three": {
+   "aisef2_tree": true,
+   "probe_tree": true,
+   "validation_v2_tree": true,
+   "tests_v2_tree": true,
+   "plan_and_spec_inputs": true,
+   "PRODUCT_AFFECTING_digest": true
+  },
+  "measured_at_head_and_valid_for_all_three_because_the_trees_are_identical": {
+   "active_probe_digests": {
+    "probe.file_artifact": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "probe.python_callable_v2": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "probe.cli_invocation": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "probe.process_effect": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+   },
+   "inactive_cycle1_probe": {
+    "probe.python_callable": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   },
+   "plan_v22_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+   "semantic_hashes_aggregate_59": "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745",
+   "contracts": 59,
+   "qualification_kernel_identity": {
+    "aisef2_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+    "kernel_digest": "f763b238d9e9c007937b959238feac9d54e6af7d9c1bb707cad1686640526908"
+   }
+  },
+  "plane_rules": "docs/closure-gate.json#planes via aisef.control.planes (the existing V1 closure model, read-only): PRODUCT_AFFECTING is what the published wheel ships (aisef/*, build config); aisef2/*, tests/* and validation/* are ASSURANCE_AFFECTING; closure-evidence/* is EVIDENCE_ONLY",
+  "answers": {
+   "product_candidate": "c11615aeb1dd9e6ff992b6190f8c39a272636742 — the V2 kernel under qualification is its aisef2 tree 254d8f559b879c210c4936321022f1350c4b2f89. Under the existing plane rules the PRODUCT_AFFECTING plane is the V1 wheel content, identical at all three commits: Cycle 2 changes nothing that ships",
+   "qualification_candidate": "c11615aeb1dd9e6ff992b6190f8c39a272636742 (QP-2.6 R4, Q4-FINAL, Q5-FINAL); QP-2.9 ran on kernel tree 37bf6457f350dd720a2214f04f3896c554ad0904 (the R3 candidate 37dc0dcdf819387b65ee60cf614273df94aaef31) and was not rerun: the kernel files that differ between that tree and the final one are ['A', 'aisef2/cohort/__init__.py', 'A', 'aisef2/cohort/lifecycle.py', 'A', 'aisef2/cohort/preregistration.py'] — the cohort package, which no other kernel module imports (git grep)",
+   "evidence_only_bookkeeping": "3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11 (one history file). 2dd12265caa47095ac8daebea4eda8f817f812f3 adds evidence and one validation/qualification builder (ASSURANCE_AFFECTING by the rule 'validation/*', outside the trees QP-2.6 consumes)",
+   "release_source_candidate_if_approved": "the branch head that carries this audit — its aisef2, validation/v2 and tests/v2 trees are the final candidate's (c11615aeb1dd9e6ff992b6190f8c39a272636742). The Owner names it; nothing here does",
+   "release_fact_for_the_owner": "pyproject.toml excludes aisef2* from the wheel and the version is the V1 one: as the tree stands, a published artifact contains no V2 code. Packaging a V2 release is a PRODUCT_AFFECTING change outside Cycle 2's scope"
+  }
+ },
+ "7_gate_of_3ed2c41": {
+  "commit": "3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11",
+  "recorded_in": "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json",
+  "seq": [
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43
+  ],
+  "local": {
+   "result": "PASS",
+   "tests_run": 5096,
+   "owned_after": 0,
+   "escaped": 0
+  },
+  "ci_run": [
+   36846856644
+  ],
+  "ci_jobs": {
+   "wheel": {
+    "result": "PASS",
+    "tests_run": null,
+    "owned_after": null,
+    "escaped": null
+   },
+   "unit (ubuntu-latest, 3.12)": {
+    "result": "PASS",
+    "tests_run": 5093,
+    "owned_after": 0,
+    "escaped": 0
+   },
+   "lint": {
+    "result": "PASS",
+    "tests_run": null,
+    "owned_after": null,
+    "escaped": null
+   },
+   "unit (windows-latest, 3.11)": {
+    "result": "PASS",
+    "tests_run": 5090,
+    "owned_after": 0,
+    "escaped": 0
+   },
+   "unit (ubuntu-latest, 3.11)": {
+    "result": "PASS",
+    "tests_run": 5093,
+    "owned_after": 0,
+    "escaped": 0
+   },
+   "unit (ubuntu-latest, 3.14)": {
+    "result": "PASS",
+    "tests_run": 5093,
+    "owned_after": 0,
+    "escaped": 0
+   },
+   "unit (ubuntu-latest, 3.13)": {
+    "result": "PASS",
+    "tests_run": 5093,
+    "owned_after": 0,
+    "escaped": 0
+   }
+  },
+  "all_pass": true,
+  "residual": 0,
+  "escaped": 0
+ },
+ "guards_now": {
+  "cycle2_baseline": {
+   "command": "python -P validation/v2/cycle2_baseline.py --check",
+   "exit": 0,
+   "tail": [
+    "cycle-2 baseline guard: PASS"
+   ]
+  },
+  "f1_f11": {
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "exit": 0,
+   "tail": [
+    "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
+   ]
+  },
+  "v1_guard": {
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "exit": 0,
+   "tail": [
+    "V1 evidence guard (DETECTIVE): PASS"
+   ]
+  },
+  "checker_calibration": {
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "exit": 0,
+   "tail": [
+    "calibrated 51/51; always-PASS mutants rejected 51/51"
+   ]
+  },
+  "run_history": {
+   "command": "python -P validation/v2/run_history.py check",
+   "exit": 0,
+   "tail": [
+    "run history: PASS"
+   ]
+  },
+  "mutation": {
+   "command": "python -P validation/v2/mutation.py --check",
+   "exit": 0,
+   "tail": [
+    "mutation: PASS"
+   ]
+  },
+  "orchestration_repair_record": {
+   "command": "python -P validation/qualification/c2_orchestration_repair.py --check",
+   "exit": 0,
+   "tail": [
+    "c2 orchestration repair: PASS"
+   ]
+  },
+  "v1_pf_001_policy": {
+   "command": "python -P validation/qualification/v1_pf_001_policy.py --check",
+   "exit": 0,
+   "tail": [
+    "decision RECORD_ONLY []; calibration all held True: known_recurrence_before_WP_4_2=STOP, exact_known_recurrence_after_WP_4_2_in_frozen_V1=RECORD_ONLY, same_signature_in_the_aisef2_process_path=STOP, known_frame_reached_through_the_aisef2_path=STOP, unknown_windows_process_cleanup_failure=STOP, changed_v1_tree_at_the_attempt=STOP, changed_v1_tree_being_checked=STOP, missing_replacement_evidence=STOP, missing_v2_range_qualification_binding=STOP, v2_range_qualification_not_green=STOP, cycle1_evidence_changed=STOP, a_second_failing_test_without_the_signature=STOP, a_v2_test=STOP, untyped_facts=STOP, policy_without_the_amendment=STOP, another_run_and_commit_same_facts=RECORD_ONLY"
+   ]
+  },
+  "c2_p10_cohort": {
+   "command": "python -P validation/qualification/c2_p10_cohort.py --check",
+   "exit": 0,
+   "tail": [
+    "c2_p10_cohort: PASS"
+   ]
+  },
+  "c2_p10_profile": {
+   "command": "python -P validation/qualification/c2_p10_profile.py --check",
+   "exit": 0,
+   "tail": [
+    "c2_p10_profile: PASS"
+   ]
+  }
+ },
+ "cycle1_drift": {
+  "probe_id": "probe.python_callable",
+  "catalog_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "module_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "active": false,
+  "active_for_kind": "probe.python_callable_v2",
+  "frozen": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "ok": true
+ },
+ "8_history_freeze": {
+  "path": "closure-evidence/v2/cycle2/C2-HISTORY-FREEZE-CANDIDATE.json",
+  "sha256": "397cf6198a1f8ffa1f74d237c058e28c8af664f4171c7cd9b8fed585ef1b5814"
+ },
+ "9_c2_p10": {
+  "cohort_count": 0,
+  "cohort_verdict": "machinery qualified; cohort count = 0",
+  "profile_verdict": "attestation qualified",
+  "live_provider_calls": 0,
+  "workload_selected": false,
+  "cohort_sealed": false
+ },
+ "ledgerlock": {
+  "delivery_verdict": "FAIL",
+  "plan_quality_verdict": "NOT_CLAIMED",
+  "generalization": "NONE",
+  "workload_class": "DEVELOPMENT_REGRESSION",
+  "story_outcomes": {
+   "STORY-01-01": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "STORY-01-05": [
+    "RETRY",
+    "COMMIT"
+   ],
+   "STORY-02-01": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "STORY-02-02": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "STORY-03-01": [
+    "COMMIT"
+   ],
+   "STORY-04-01": [
+    "ROLLBACK"
+   ],
+   "STORY-04-02": [
+    "RETRY",
+    "COMMIT"
+   ],
+   "STORY-05-01": [
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "STORY-05-03": [
+    "ROLLBACK"
+   ]
+  },
+  "attempt_1": {
+   "path": "closure-evidence/v2/cycle2/P10/NO-RECORD.json",
+   "sha256": "98677079fd68c2f21d5d259fba7041c65fde62d4f0c1896396c1482d4fbe529e"
+  },
+  "attempt_2": {
+   "record": {
+    "path": "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json",
+    "sha256": "b4ad12f52a061d6a1726304416f3809eed7c065a1c962201a341a079bb8f2ff7"
+   },
+   "execution_commit": "1f992baa55c28caf8be0c059aa081806bc931b1b",
+   "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+   "journal": {
+    "path": "closure-evidence/v2/cycle2/P10/attempt-2/JOURNAL.json",
+    "sha256": "eda76b7b07ef01596066aab62f15a61443a98607a259fb4d0f453bf5f35250ff"
+   },
+   "runspec_hash": "4278bd29f717ea047cad14c77b5df88d8850932c737c99d6b1e23d7138eb4c39"
+  },
+  "triage": {
+   "path": "closure-evidence/v2/cycle2/C2-LEDGERLOCK-FAILURE-TRIAGE.json",
+   "sha256": "49d1848094dbe7f98db8c99b00c713746497a3b6fb4195b670527b59bf84b36d"
+  }
+ },
+ "orchestration_review": {
+  "path": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CHANGE-REVIEW.json",
+  "sha256": "228c1816db49616732d43df6519ed3c21187b6f1c0b1adc4df93e854c4f8fd83"
+ },
+ "10_acceptance_test": {
+  "QP-2.6 final candidate GREEN": true,
+  "unaudited mutation survivors = 0": true,
+  "Q4 = 100000/100000, divergence = 0": true,
+  "Q4 binding/freshness proven": true,
+  "Q5 = 12/12": true,
+  "Q5 assertConsumed = GREEN": true,
+  "tool-result replay count = 0": true,
+  "Q5 binding/freshness proven": true,
+  "LedgerLock result preserved honestly as FAIL": true,
+  "LedgerLock classification DEVELOPMENT_REGRESSION": true,
+  "plan_quality NOT_CLAIMED": true,
+  "generalization NONE": true,
+  "no cohort selected/sealed": true,
+  "orchestration change separately reviewed": true,
+  "no unapproved orchestration semantic change": "PENDING THE OWNER'S CLASSIFICATION (C2-ORCHESTRATION-CHANGE-REVIEW.json)",
+  "all six failed LedgerLock stories triaged": true,
+  "no FRAMEWORK_KERNEL_DEFECT release blocker": false,
+  "no DEFAULT_PUBLIC_HARNESS_POLICY_DEFECT release blocker": true,
+  "3ed2c41 gates complete and acceptable": true,
+  "histories immutable/content-addressed": true,
+  "residual processes = 0": true,
+  "escaped processes = 0": true,
+  "cycle2_baseline PASS": true,
+  "F1-F11 PASS": true,
+  "V1 guard PASS": true,
+  "Cycle-1 frozen evidence unchanged": true,
+  "working tree clean": false,
+  "PR #6 still unmerged": true,
+  "master unchanged": true
+ },
+ "acceptance_failing": [
+  "no FRAMEWORK_KERNEL_DEFECT release blocker",
+  "working tree clean"
+ ],
+ "acceptance_pending_owner": [
+  "no unapproved orchestration semantic change"
+ ],
+ "release_blockers": [
+  {
+   "blocker": "FRAMEWORK_KERNEL_DEFECT (the evidence's reading; class A)",
+   "stories": [
+    "STORY-02-01",
+    "STORY-02-02"
+   ],
+   "what": "a fully PRE_SATISFIED story under a blocking tests policy is rolled back and charged a DEVELOPER retry with no developer call (RFC §14 vs §15.3); reproduced without LedgerLock",
+   "record": "closure-evidence/v2/cycle2/C2-LEDGERLOCK-FAILURE-TRIAGE.json"
+  },
+  {
+   "blocker": "ORCHESTRATION CHANGE CLASSIFICATION PENDING",
+   "what": "returned for the Owner's explicit ruling; one journal difference on a misconfiguration failure path is disclosed",
+   "record": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CHANGE-REVIEW.json"
+  },
+  {
+   "blocker": "PACKAGING (a fact, not a Cycle-2 defect)",
+   "what": "pyproject.toml excludes aisef2* from the wheel; version 1.7.6: a release from this tree ships no V2 code"
+  }
+ ],
+ "pr_6": {
+  "baseRefName": "master",
+  "headRefName": "hardening/systematic-v1",
+  "headRefOid": "3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11",
+  "isDraft": true,
+  "mergedAt": null,
+  "state": "OPEN"
+ },
+ "master": "671ef9b259c560bf07531bc5fed63b07dc28b323",
+ "working_tree_outside_this_audit": [
+  "M closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json"
+ ],
+ "verdict": "STOPPED BEFORE CLOSURE ACCEPTANCE — RELEASE BLOCKER RETURNED TO THE OWNER",
+ "conclusion": null
+}

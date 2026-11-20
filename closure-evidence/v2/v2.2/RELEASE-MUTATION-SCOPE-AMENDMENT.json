@@ -1,0 +1,44 @@
+{
+  "record": "AISEF v2.2 — PROPOSED RELEASE-SCOPE AMENDMENT: risk-based release mutation gate",
+  "id": "AISEF-V2.2-MUTATION-SCOPE-AMENDMENT-PROPOSAL",
+  "schema_note": "This is a DRAFT proposal presented for owner review in the V2.2 RELEASE GO/NO-GO. It is NOT an accepted RELEASE-DECISIONS entry. If the owner approves it, it becomes RELEASE-DECISIONS seq-9 and takes effect only when that entry is validly committed; no retroactive effect. Engineering drafted this file; the owner has not signed it.",
+  "status": "PROPOSED_PENDING_OWNER_APPROVAL",
+  "date_drafted": "2026-11-11",
+  "drafted_by": "engineering (Claude Code session 845c9f11), transcribing the owner's 2026-11-10/11 chat directive verbatim below",
+  "authority_basis": {
+    "owner_directive": "owner chat directive 'OWNER DIRECTIVE — AISEF v2.2 / RELEASE CLOSURE' (2026-11-10/11), section 1",
+    "relies_on": "RELEASE-DECISIONS seq-8 (AISEF_V2_2_VERSION_FORWARD_QUALIFICATION, committed b35ec9d7) for the v2.2 append-only record machinery; this amendment concerns the mutation release-scope only and loosens no invariant and no acceptance semantics",
+    "owner_text_verbatim_section_1": "1. Full mutation campaign — REMOVE FROM CRITICAL PATH. Keep the existing 627-target campaign FROZEN, preserving all evidence, results, source bindings and incomplete statuses. Authorize preparing a separate risk-based release mutation gate covering security, authority, invariants, journal, verdict, verification, H1/H2 and all changed critical control paths. Reuse only evidence whose exact source/kernel/registry bindings match the final RC. All remaining unexecuted mutants must be reported as NOT_RUN, never PASS. This is an explicit proposed release-scope amendment, not a retroactive qualification of the unfinished campaign. Document the changed scope and residual risks in a new owner decision record. Do not silently modify the original acceptance criteria."
+  },
+  "original_acceptance_criteria_preserved_unmodified": {
+    "the_full_campaign_gate": "The original v2.2 mutation release criterion is completion of the full frozen campaign V2.2-MUTATION-CAMPAIGN-FREEZE.json (627 targets / 16,667 mutants; kernel_digest 204ef0136bf6473154b3cffcfa57f610dffb980c7692536f7f3a90e88207ca89; per-target source_sha256).",
+    "its_real_verdict": "The machine verdict for the full campaign is FROZEN / INCOMPLETE — 2 targets durably complete, the remainder NOT_RUN. It is NOT PASS. This amendment does not edit, relax, or retroactively satisfy that criterion.",
+    "frozen_bytes": "The freeze manifest, the durable per-target results, the append-only ledger and every incomplete status stay byte-identical. Nothing in the frozen campaign is re-labelled by this amendment."
+  },
+  "proposed_amendment": {
+    "release_gate_scope_change": "For the v2.2 RELEASE decision ONLY, the mutation release gate is a RISK-BASED gate over a declared critical subset of targets, NOT completion of the full 627-target campaign. The full campaign is removed from the release critical path and remains frozen for later completion on adequate infrastructure.",
+    "risk_dimensions_in_scope": [
+      "security (secrets/redaction, key handling, egress, fence)",
+      "authority (destructive-authority ledger, INV-MUTATION-AUTHORITY, approval/commit control)",
+      "invariants (runtime-armed invariants, ALL_CONTROL_DECISIONS_JOURNAL_BACKED and siblings)",
+      "journal (append-only journal integrity, story state transitions)",
+      "verdict (delivery/contract verdict correctness, oracle_problems projection)",
+      "verification (--verify re-derivation, provenance binding)",
+      "H1/H2 (FINDING-WIN-OSKILL-001 Windows liveness: process-observation and fail-closed)",
+      "all changed critical control paths (every aisef2/ control path whose source changed since the last qualified kill set)"
+    ],
+    "evidence_reuse_rule": "Only mutation evidence whose EXACT (source_sha256, kernel_digest, registry/TARGETS binding) matches the final RC (aisef2 tree ac7c170531fc3db1698f062d0bac6d921651d962; exact kernel_digest bound in the gate-evaluation artifact) may be reused as a kill result. Any binding mismatch disqualifies reuse — no rebind, no tolerance, no global-newest fallback (consistent with seq-8 fail-closed resolution).",
+    "not_run_rule": "Every in-scope mutant NOT executed with RC-matching bindings is reported as NOT_RUN. NOT_RUN is NEVER reported as PASS or KILLED. A survivor is reported as a residual finding and individually evaluated (KILLED on re-check / EQUIVALENT with proof / OWNER_ACCEPTED scoped residual) — never silently dropped and never converted to PASS by wording.",
+    "verdict_layering": "Mirrors RELEASE-DECISIONS seq-6/seq-7: the machine mutation gate verdict is preserved at its real value (FAIL/NOT_RUN as measured). Any owner acceptance of a scoped residual risk is recorded ONE LAYER ABOVE the gate as the owner's risk-based release decision, and does NOT convert a FAIL/NOT_RUN into PASS.",
+    "gate_evaluation_artifact": "closure-evidence/v2/v2.2/RELEASE-MUTATION-GATE-EVALUATION.json (produced separately): per-dimension target list, RC-binding status, KILLED/SURVIVED/EQUIVALENT/NOT_RUN counts, and the residual-finding disposition."
+  },
+  "non_retroactivity": "This is a FORWARD release-scope amendment. It does not qualify, close, or re-label the unfinished full campaign. The campaign's own records keep their real verdicts; this amendment governs only which mutation evidence the v2.2 RELEASE decision is allowed to rely on.",
+  "residual_risks_of_the_amendment": [
+    "COVERAGE GAP: targets/mutants outside the declared risk subset are NOT_RUN for this release; a latent defect in an out-of-scope path would not be caught by this gate. The GO/NO-GO must state this explicitly.",
+    "RC-BINDING ATTRITION: prior Wave-1/Wave-2 mutation results were measured at earlier trees; where their source_sha256 no longer matches the RC, they are NOT reusable and the in-scope coverage is itself partly NOT_RUN. The gate reports measured in-scope coverage; it does not assume full in-scope coverage.",
+    "ACCEPTED SURVIVORS CARRY FORWARD: the seq-6 seven survivors (client.py::session report fields; story_runner.py::_attempt role/label mutants) remain OWNER_ACCEPTED scoped residual risks, and A-03 remains a documented supported-envelope limitation (seq-6).",
+    "INFRASTRUCTURE: the full campaign could not be completed on the current host (disk floor); this amendment is the means to release without that completion, at the documented coverage cost."
+  ],
+  "what_this_record_does_NOT_authorize": "creating the release tag, publishing to PyPI, starting Đợt 3, committing the C4 gated-test wiring, resealing historical evidence, modifying frozen product bytes, or converting any FAIL/NOT_RUN verdict to PASS — each remains a separate explicit owner decision.",
+  "on_owner_approval_becomes": "RELEASE-DECISIONS seq-9 (append-only; the owner's act of approval + valid commit makes it effective)"
+}
