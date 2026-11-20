@@ -1,0 +1,626 @@
+{
+ "record": "AISEF v2.2.0 — MUTATION EVIDENCE DISPOSITION RULING (Windows-portability _create fix)",
+ "id": "AISEF-V2.2-B1-MUTATION-EVIDENCE-REUSE-RULING",
+ "status": "RATIFIED — Option C (verified evidence reuse). The 42 VERIFIED_REUSE targets retain their original POSIX/Linux measured verdicts under a proof-backed applicability binding; their source_sha256 and survivor audits are UNCHANGED (never represented as freshly measured). The narrow, fail-closed VERIFIED_REUSE mechanism in validation/v2/mutation.py honours this ruling for the single assessed source transition only.",
+ "date": "2026-11-20",
+ "governed_by": "Owner FINAL RULING 2026-11-20 'APPROVE OPTION C'. Supersedes the earlier Option-A authorization (the measured 1,596-mutant campaign cost materially exceeded its approval basis). Not a general relaxation of mutation qualification; limited to the 42 explicitly identified bundle_cli targets and the one source transition below.",
+ "append_only": true,
+ "source_transition": {
+  "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+  "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+  "measured_on_commit": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+  "measured_on_note": "v2.2 B1 record regen 'import final server measurements -> mutation --check PASS'; every fresh entry's source_sha256 verified against this tree; bundle_cli.py @ this commit == the measured source. ec92d9cc carries the same c15d5b10 source.",
+  "execution_platform": "linux",
+  "platform_provenance": "Measured on the authorized Linux server (POSIX). Positive binding: the measured commit b1fb8580's bundle_cli.py hashes to the measured source; the 42 carry runner-2 results with T0 baselines across four Linux worker trees; no committed worker history or record carries a Windows/win32 measurement marker; no Windows mutation campaign exists in the committed tree. (Absence of Windows markers alone was treated as insufficient; this is positive provenance.)",
+  "corrected_rc_source_commit": "5810af4b5fcd664922fd133a592648106ed00629",
+  "only_changed_function": "aisef2/app/bundle_cli.py::_create — the single line `path.open(\"x\", encoding=\"utf-8\")` -> `path.open(\"x\", encoding=\"utf-8\", newline=\"\")`. _create is NOT itself a mutation target."
+ },
+ "disposition": {
+  "MEASURED": {
+   "aisef2/app/bundle_cli.py::_create": {
+    "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "mutants": 3,
+    "killed": 3,
+    "survivors": 0,
+    "expected_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16"
+   },
+   "aisef2/app/bundle_cli.py::_journal": {
+    "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "mutants": 48,
+    "killed": 43,
+    "survivors": 5,
+    "expected_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16"
+   },
+   "aisef2/app/bundle_cli.py::init": {
+    "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "mutants": 12,
+    "killed": 12,
+    "survivors": 0,
+    "expected_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16"
+   },
+   "aisef2/app/settings.py::OPTIONAL": {
+    "source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332",
+    "mutants": 6,
+    "killed": 6,
+    "survivors": 0,
+    "expected_source_sha256": "3c47c0f7983e78ba091838af9fe90a94c15555c1e99278cc3511b0268e63e332"
+   }
+  },
+  "MEASURED_note": "Freshly re-measured on POSIX at the corrected source: _create/_journal/init at bundle_cli 0fdfc022 (init also cross-platform, 12/12 on macOS and Linux, identical to its c15d5b10 verdict — direct before==after corroboration for a _create-reaching target); settings.py::OPTIONAL unchanged at 3c47c0f7. These are MEASURED, not reused.",
+  "VERIFIED_REUSE_count": 42,
+  "VERIFIED_REUSE_mutants": 1596,
+  "VERIFIED_REUSE": {
+   "aisef2/app/bundle_cli.py::APPROVAL_KEY": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 6,
+     "killed": 6,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::AUTHORING_KEYS": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 9,
+     "killed": 9,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::CONTRACT_KEYS": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 8,
+     "killed": 8,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::CRITERION_KEYS": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 6,
+     "killed": 6,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::EXAMPLES": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 1,
+     "killed": 1,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::JournalRefused.__init__": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 1,
+     "killed": 1,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::LIMITS": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::RELEASES": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 46,
+     "killed": 46,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_INTEGRITY": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 2,
+     "killed": 2,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_assess": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 125,
+     "killed": 125,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_authentic": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 39,
+     "killed": 24,
+     "survivors": 15
+    }
+   },
+   "aisef2/app/bundle_cli.py::_binds": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 9,
+     "killed": 9,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_closed": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 11,
+     "killed": 8,
+     "survivors": 3
+    }
+   },
+   "aisef2/app/bundle_cli.py::_declared": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 60,
+     "killed": 58,
+     "survivors": 2
+    }
+   },
+   "aisef2/app/bundle_cli.py::_earlier": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 7,
+     "killed": 7,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_earliest": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 4,
+     "killed": 4,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_exposure": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 1,
+     "killed": 1,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_ground": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 60,
+     "killed": 55,
+     "survivors": 5
+    }
+   },
+   "aisef2/app/bundle_cli.py::_grounds": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 7,
+     "killed": 7,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_group": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 19,
+     "killed": 15,
+     "survivors": 4
+    }
+   },
+   "aisef2/app/bundle_cli.py::_key": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 2,
+     "killed": 2,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_known": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 14,
+     "killed": 13,
+     "survivors": 1
+    }
+   },
+   "aisef2/app/bundle_cli.py::_mint": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 13,
+     "killed": 13,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_origins": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 8,
+     "killed": 8,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_read": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 7,
+     "killed": 6,
+     "survivors": 1
+    }
+   },
+   "aisef2/app/bundle_cli.py::_record": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 43,
+     "killed": 43,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_refs": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_selected": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 4,
+     "killed": 4,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_shell_word": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 12,
+     "killed": 12,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_spec_rows": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 38,
+     "killed": 38,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::_write_new": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::approve": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 27,
+     "killed": 26,
+     "survivors": 1
+    }
+   },
+   "aisef2/app/bundle_cli.py::continue_from": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "cb17f57f6cd685f118b2add264bf0f3bcd9a96b61853d0c5dd5402c7e76cb5ee",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 217,
+     "killed": 216,
+     "survivors": 1
+    }
+   },
+   "aisef2/app/bundle_cli.py::coverage": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 48,
+     "killed": 47,
+     "survivors": 1
+    }
+   },
+   "aisef2/app/bundle_cli.py::explain": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 34,
+     "killed": 34,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::exposure_of": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 14,
+     "killed": 12,
+     "survivors": 2
+    }
+   },
+   "aisef2/app/bundle_cli.py::lint": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 59,
+     "killed": 59,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::main": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "cb17f57f6cd685f118b2add264bf0f3bcd9a96b61853d0c5dd5402c7e76cb5ee",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 169,
+     "killed": 152,
+     "survivors": 17
+    }
+   },
+   "aisef2/app/bundle_cli.py::migrate": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "6bf3683573dfe638dfd17c86798fe06940c60c133bdef840aba843673628200d",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 200,
+     "killed": 190,
+     "survivors": 10
+    }
+   },
+   "aisef2/app/bundle_cli.py::seal": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 198,
+     "killed": 191,
+     "survivors": 7
+    }
+   },
+   "aisef2/app/bundle_cli.py::unapproved": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 19,
+     "killed": 19,
+     "survivors": 0
+    }
+   },
+   "aisef2/app/bundle_cli.py::with_commands": {
+    "measured_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+    "current_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+    "measured_on": "b1fb858085f82c3692cd73e352b43b51c553c4b4",
+    "platform": "linux",
+    "worker_tree_sha256": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "classification": "VERIFIED_REUSE",
+    "original_outcome": {
+     "mutants": 40,
+     "killed": 39,
+     "survivors": 1
+    }
+   }
+  },
+  "UNRESOLVED_REUSE": []
+ },
+ "measured_vs_verified_reuse": "MEASURED results were produced by running the mutation tool against the corrected source. VERIFIED_REUSE results were produced earlier against c15d5b10 (full digest above) and are retained verbatim — their source_sha256, survivor audits and measured identities are NOT rewritten and are NOT represented as fresh measurements; only their applicability to the corrected source is owner-authorized, under the proof below.",
+ "dependency_impact_and_posix_equivalence_proof": {
+  "ast_slice_isolation": "AST per-function comparison of bundle_cli.py @ c15d5b10 vs @ 0fdfc022: the ONLY changed source segment is _create; module-level constants/enum members are identical, so the mutant generator yields identical mutants (same descriptions, same line numbers) for every one of the 42.",
+  "posix_no_op": "The _create change is a byte-for-byte no-op on POSIX: in text mode, write translates \\n to os.linesep (=\\n on POSIX) with newline=None and performs no translation with newline=\"\"; both emit identical bytes for all inputs. The only observable difference is Windows CRLF suppression. All mutation measurement is POSIX. Since _create is the only changed function and is not a target, a mutant of any of the 42 differs from its c15d5b10 counterpart only inside _create and therefore executes identically on POSIX — identical kill/survive verdict and identical survivor-audit validity.",
+  "kill_test_identity": "The entire fix touched 3 files (bundle_cli.py + two test files). None of the 42's kill tests is either changed test file; all 42 kill-test closures are byte-identical across the transition.",
+  "transitive_dependency": "Static call graph: 40 of the 42 never reach _create (fully independent of the only change); 2 (_write_new, main) transitively reach it and are covered by the POSIX no-op. main's 17 audited survivors remain valid (each reasons about a mutant-vs-original comparison in which _create is identical on both sides).",
+  "measured_corroboration": "init transitively reaches _create and measured 12/12 killed, 0 survivors at BOTH c15d5b10 and 0fdfc022, on both macOS and Linux — a direct measured before==after confirmation that the _create change does not alter a _create-reaching target's verdicts."
+ },
+ "independent_verification": {
+  "verdict": "REUSE SAFE / NO REFUTATION FOUND",
+  "method": "An independent adversarial verifier was tasked only to refute the claim that any kill/survive verdict or survivor audit for the 42 could differ at 0fdfc022 vs c15d5b10 on POSIX.",
+  "result": "No refutation found. It specifically checked the byte-exact _write_new/main kill tests, the CLI self-reported-sha256 test, the two kill tests that read bundle_cli.py's source text, and main's 17 survivor audits — none can flip. It confirmed the mutant generator yields identical mutants. It independently rediscovered the whole-file currency-gate staleness (the blocker this ruling addresses) and flagged the POSIX-provenance assumption, which was then positively closed."
+ },
+ "mechanism": {
+  "where": "validation/v2/mutation.py: VERIFIED_REUSE table + verified_reuse_current(), consulted by both currency paths (_problems_v2 and target_problems).",
+  "fail_closed": "A target is accepted as current ONLY if: it is one of the 42; its recorded source_sha256 == the measured digest; its recorded tree_sha256 == the authorized Linux worker tree; the live file == the authorized current digest; this ruling file is present; AND the recorded measurement commit's own bundle_cli.py hashes to the measured digest (runtime git, fail-closed). Any mismatch, a subsequent source change, an unauthorized target, a wrong digest, or a missing ruling/provenance => rejected (stale).",
+  "not_modified": "source_sha256 is NOT overwritten; survivor audits are NOT re-stamped; FROZEN_CRITERIA_SHA256 is NOT changed; no general qualification allowlist is introduced; the known-bad calibration fixtures and all other mutation checks and survivor-audit requirements are unaffected."
+ },
+ "preservation": "Original measurement results, source_sha256 values (c15d5b10), survivor audits, and measured identities for the 42 are preserved unchanged. Historical mutation records (P1..V2.0-S2) and V1 evidence are untouched (V1 evidence guard PASS).",
+ "limitations_and_residual_risk": {
+  "scope": "Authorized ONLY for these 42 targets and ONLY for the c15d5b10 -> 0fdfc022 transition on POSIX. Not generalizable to other targets, other source changes, or Windows mutation evidence.",
+  "residual": "The raw whole-file source_sha256 currency gate still reports these 42 as module-stale by design (the module hash moved by _create's line); this ruling and the fail-closed mechanism authorize their acceptance as current without rewriting any measured field. A function-granular mutation currency mechanism is out of scope for this release."
+ },
+ "reconciliation": "The 42 VERIFIED_REUSE targets carry 1,596 mutants; with init's 12 that is 1,608, the original 43-target affected set. The earlier '1,590' figure was an arithmetic slip, corrected here from the committed record."
+}

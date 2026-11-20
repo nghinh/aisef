@@ -1,0 +1,19 @@
+{
+ "record": "AISEF v2.2.0 — B1 BINDING AMENDMENT 10 (re-freeze after the _create Windows-portability fix)",
+ "id": "B1-BINDING-AMENDMENT-10",
+ "date": "2026-11-20",
+ "governed_by": "Owner FINAL RULING 2026-11-20 'APPROVE OPTION C' §4.3 (re-freeze B1 bindings).",
+ "cause": "v2.2.0 Windows-portability fix: aisef2/app/bundle_cli.py::_create `open(..., newline=\"\")` moved the file (and the aisef2 kernel tree). The 45 bundle_cli.py targets' source bindings and the frozen kernel tree are re-frozen to the corrected source; the registry is unchanged.",
+ "frozen_kernel_tree": {
+  "old": "55d378bfa6d4617aea574c6f80a1e8dca3fe803e",
+  "new": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713"
+ },
+ "source_bindings_rebound": {
+  "source_file": "aisef2/app/bundle_cli.py",
+  "old_source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+  "new_source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
+  "target_count": 45
+ },
+ "registry": "unchanged (aisef2/invariants/registry.py).",
+ "mutation_disposition": "The 45 bundle_cli mutation targets are dispositioned separately: 3 MEASURED (_create/_journal/init) + 42 VERIFIED_REUSE, per closure-evidence/v2/v2.2/B1-MUTATION-EVIDENCE-REUSE-RULING.json. This amendment only re-freezes the B1 risk-gate source bindings."
+}

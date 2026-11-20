@@ -1554,6 +1554,97 @@ def source_digest(text: str) -> str:
     return hashlib.sha256(text.replace("\r\n", "\n").encode("utf-8")).hexdigest()
 
 
+# ----------------------------------------------------------------- VERIFIED_REUSE (owner ruling 2026-11-20, Option C)
+# Narrowly scoped, evidence-bound reuse authorized by the owner for AISEF v2.2.0 RC2. These 42 bundle_cli targets were
+# measured on the POSIX/Linux server (the v2.2 B1 post-RC6 remeasurement, imported at b1fb8580 with every entry's
+# source_sha256 verified against that c15d5b10 tree) and are proven to retain their verdicts at the corrected source
+# 0fdfc022: the ONLY changed function between the two sources is bundle_cli.py::_create (`open(..., newline="")`), a
+# byte-for-byte POSIX no-op, and _create is not itself a target (closure-evidence/v2/v2.2/
+# B1-MUTATION-EVIDENCE-REUSE-RULING.json — AST-slice isolation, POSIX no-op, kill-test identity, init 12/12
+# before==after on two platforms, independent adversarial refutation). This authorizes ONLY the single source
+# transition c15d5b10 -> 0fdfc022, for ONLY these 42 targets. It does NOT rewrite source_sha256 or the survivor
+# audits (both stay at the measured digest, so the evidence is never represented as freshly measured), is NOT a
+# general relaxation of mutation qualification, and FAILS CLOSED on any mismatch of identity, either full digest, the
+# recorded Linux worker tree, the committed ruling, or the recorded measurement commit's own source. Not to be
+# extended to other targets, other source changes, or Windows mutation evidence.
+VERIFIED_REUSE_RULING = "AISEF-V2.2-B1-MUTATION-EVIDENCE-REUSE-RULING"
+VERIFIED_REUSE_RULING_REL = "closure-evidence/v2/v2.2/B1-MUTATION-EVIDENCE-REUSE-RULING.json"
+VERIFIED_REUSE_MEASURED_SHA256 = "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e"   # bundle_cli.py @ b1fb8580
+VERIFIED_REUSE_CURRENT_SHA256 = "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16"   # bundle_cli.py @ the _create fix
+VERIFIED_REUSE_MEASURED_ON = "b1fb858085f82c3692cd73e352b43b51c553c4b4"   # the Linux-server measurement import commit
+VERIFIED_REUSE_PLATFORM = "linux"
+#: target -> the Linux worker tree_sha256 the server measured it on (four worker trees), each a per-target binding
+VERIFIED_REUSE: dict[str, str] = {
+    "aisef2/app/bundle_cli.py::APPROVAL_KEY": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::CONTRACT_KEYS": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::EXAMPLES": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::JournalRefused.__init__": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::LIMITS": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::RELEASES": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_INTEGRITY": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_assess": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_authentic": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::_binds": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_closed": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_declared": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_earlier": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_earliest": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_exposure": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_ground": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_grounds": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::_group": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_key": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_known": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_mint": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_origins": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_read": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::_record": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::_refs": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_selected": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_shell_word": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_spec_rows": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::_write_new": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::approve": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::continue_from": "cb17f57f6cd685f118b2add264bf0f3bcd9a96b61853d0c5dd5402c7e76cb5ee",
+    "aisef2/app/bundle_cli.py::coverage": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::explain": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::exposure_of": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::lint": "ce87088a52809ad3734175580e4445e91b93ac9d975082dd3b7184e53af233f4",
+    "aisef2/app/bundle_cli.py::main": "cb17f57f6cd685f118b2add264bf0f3bcd9a96b61853d0c5dd5402c7e76cb5ee",
+    "aisef2/app/bundle_cli.py::migrate": "6bf3683573dfe638dfd17c86798fe06940c60c133bdef840aba843673628200d",
+    "aisef2/app/bundle_cli.py::seal": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::unapproved": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+    "aisef2/app/bundle_cli.py::with_commands": "ce4a76fbb6f41030d97945b7948e5e2b75383457f73d2f07a518a4257da14272",
+}
+
+
+def verified_reuse_current(root: pathlib.Path, target: str, t: dict) -> bool:
+    """Owner ruling VERIFIED_REUSE (2026-11-20, Option C): True iff `target`'s POSIX/Linux-measured result `t`
+    (recorded at VERIFIED_REUSE_MEASURED_SHA256) is owner-authorized to remain current at the corrected source
+    VERIFIED_REUSE_CURRENT_SHA256. Fail-closed: the target must be one of the 42; its recorded source digest must be
+    the measured digest; its recorded measurement tree must be the authorized Linux worker tree; the live file must be
+    exactly the authorized current digest; the committed ruling must be present; and the recorded Linux measurement
+    commit's own bundle_cli.py must itself hash to the measured digest (positive provenance, not merely 'no Windows
+    markers'). Any mismatch -> not reused -> the target is 'changed' and must be re-run."""
+    tree = VERIFIED_REUSE.get(target)
+    if tree is None:
+        return False
+    if t.get("source_sha256") != VERIFIED_REUSE_MEASURED_SHA256 or t.get("tree_sha256") != tree:
+        return False
+    rel = target.split("::")[0]
+    try:
+        if source_digest((root / rel).read_text(encoding="utf-8")) != VERIFIED_REUSE_CURRENT_SHA256:
+            return False
+    except OSError:
+        return False
+    if not (root / VERIFIED_REUSE_RULING_REL).is_file():
+        return False
+    prov = subprocess.run(["git", "-C", str(root), "show", f"{VERIFIED_REUSE_MEASURED_ON}:{rel}"], capture_output=True)
+    return prov.returncode == 0 and source_digest(prov.stdout.decode("utf-8")) == VERIFIED_REUSE_MEASURED_SHA256
+
+
 def _enum_members(module_src: str, root: pathlib.Path) -> dict[str, list[str]]:
     """Enum classes visible to the module (its own and those it imports from aisef2), by name -> members."""
     out: dict[str, list[str]] = {}
@@ -2430,7 +2521,8 @@ def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
     SURVIVED (every kill file PASSed); any other class is refused and no audit excuses it (VS-2, VS-4)."""
     name, res = t["target"], t.get("results", [])
     out = [f"{name}: {t['error']}"] if t.get("error") else []
-    if source_digest((root / name.split("::")[0]).read_text(encoding="utf-8")) != t.get("source_sha256"):
+    if source_digest((root / name.split("::")[0]).read_text(encoding="utf-8")) != t.get("source_sha256") \
+            and not verified_reuse_current(root, name, t):
         out.append(f"{name}: target changed since the mutation run — re-run it")
     if not t.get("mutants"):
         out.append(f"{name}: no mutants generated — a run that cannot say NO proves nothing")
@@ -2483,7 +2575,8 @@ def target_problems(t: dict, root: pathlib.Path = ROOT) -> list[str]:
         return [f"{t['target']}: {t['error']}"]
     out = []
     rel = t["target"].split("::")[0]
-    if source_digest((root / rel).read_text(encoding="utf-8")) != t["source_sha256"]:
+    if source_digest((root / rel).read_text(encoding="utf-8")) != t["source_sha256"] \
+            and not verified_reuse_current(root, t["target"], t):
         out.append(f"{t['target']}: target changed since the mutation run — re-run it")
     if t["mutants"] == 0:
         out.append(f"{t['target']}: no mutants generated — a run that cannot say NO proves nothing")

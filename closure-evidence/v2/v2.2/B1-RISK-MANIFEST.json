@@ -1,10 +1,10 @@
 {
- "record": "AISEF v2.2 \u2014 B1 RISK-BASED RELEASE MUTATION MANIFEST (finalized; owner final-closure \u00a72)",
- "status": "FROZEN SCOPE \u2014 NOT EXECUTED (no mutant run; paid execution separately gated)",
+ "record": "AISEF v2.2 — B1 RISK-BASED RELEASE MUTATION MANIFEST (finalized; owner final-closure §2)",
+ "status": "FROZEN SCOPE — NOT EXECUTED (no mutant run; paid execution separately gated)",
  "date": "2026-11-12",
  "frozen_bindings": {
   "head": "b35ec9d7",
-  "aisef2_kernel_tree": "55d378bfa6d4617aea574c6f80a1e8dca3fe803e",
+  "aisef2_kernel_tree": "e865d65c80e2e134e2154c15ed5d58fe0b9ff713",
   "registry_sha256": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
   "registry_file": "aisef2/invariants/registry.py",
   "baseline": "v2.1.0 @ 8c7bdb44 (aisef2 5f34a3f3)",
@@ -18,12 +18,12 @@
   "B_authority_journal_now_included": {
    "targets": 24,
    "mutants": 233,
-   "note": "run_scope.py (authority) + fold.py (journal): already in mutation.TARGETS with kill_tests, outside the 627-freeze; now enumerated \u2014 NOT excluded."
+   "note": "run_scope.py (authority) + fold.py (journal): already in mutation.TARGETS with kill_tests, outside the 627-freeze; now enumerated — NOT excluded."
   },
   "C_h1h2_liveness_core": {
    "targets": 3,
    "mutants": 60,
-   "note": "_win_liveness/pid_alive/_is_gone: not previously targets; kill_tests bound to Win32-native liveness tests \u2014 REQUIRE a Windows runner (they skip off-Windows)."
+   "note": "_win_liveness/pid_alive/_is_gone: not previously targets; kill_tests bound to Win32-native liveness tests — REQUIRE a Windows runner (they skip off-Windows)."
   }
  },
  "totals": {
@@ -300,7 +300,7 @@
   },
   "aisef2/app/bundle_cli.py::APPROVAL_KEY": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -308,7 +308,7 @@
   },
   "aisef2/app/bundle_cli.py::AUTHORING_KEYS": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -320,7 +320,7 @@
   },
   "aisef2/app/bundle_cli.py::CONTRACT_KEYS": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -332,7 +332,7 @@
   },
   "aisef2/app/bundle_cli.py::CRITERION_KEYS": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -344,7 +344,7 @@
   },
   "aisef2/app/bundle_cli.py::EXAMPLES": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -356,7 +356,7 @@
   },
   "aisef2/app/bundle_cli.py::JournalRefused.__init__": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_pw_lineage_continue.py"
    ],
@@ -364,7 +364,7 @@
   },
   "aisef2/app/bundle_cli.py::LIMITS": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -372,7 +372,7 @@
   },
   "aisef2/app/bundle_cli.py::RELEASES": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -385,7 +385,7 @@
   },
   "aisef2/app/bundle_cli.py::_INTEGRITY": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_pw_lineage_continue.py",
     "tests/v2/test_v21_continue_integrity.py"
@@ -394,7 +394,7 @@
   },
   "aisef2/app/bundle_cli.py::_assess": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -402,7 +402,7 @@
   },
   "aisef2/app/bundle_cli.py::_authentic": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli__authentic.py",
     "tests/v2/test_v21_pw_lineage_continue.py"
@@ -411,7 +411,7 @@
   },
   "aisef2/app/bundle_cli.py::_binds": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -419,7 +419,7 @@
   },
   "aisef2/app/bundle_cli.py::_closed": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -433,7 +433,7 @@
   },
   "aisef2/app/bundle_cli.py::_create": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -445,7 +445,7 @@
   },
   "aisef2/app/bundle_cli.py::_declared": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -453,7 +453,7 @@
   },
   "aisef2/app/bundle_cli.py::_earlier": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -465,7 +465,7 @@
   },
   "aisef2/app/bundle_cli.py::_earliest": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -473,7 +473,7 @@
   },
   "aisef2/app/bundle_cli.py::_exposure": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -481,7 +481,7 @@
   },
   "aisef2/app/bundle_cli.py::_ground": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -489,7 +489,7 @@
   },
   "aisef2/app/bundle_cli.py::_grounds": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli__grounds.py",
     "tests/v2/test_v21_migrate_semantics.py"
@@ -498,7 +498,7 @@
   },
   "aisef2/app/bundle_cli.py::_group": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -506,7 +506,7 @@
   },
   "aisef2/app/bundle_cli.py::_journal": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli__journal.py",
     "tests/v2/test_v21_pw_lineage_continue.py",
@@ -517,7 +517,7 @@
   },
   "aisef2/app/bundle_cli.py::_key": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -525,7 +525,7 @@
   },
   "aisef2/app/bundle_cli.py::_known": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -533,7 +533,7 @@
   },
   "aisef2/app/bundle_cli.py::_mint": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -545,7 +545,7 @@
   },
   "aisef2/app/bundle_cli.py::_origins": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -553,7 +553,7 @@
   },
   "aisef2/app/bundle_cli.py::_read": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli__read.py",
     "tests/v2/test_v21_bundle_tools.py",
@@ -567,7 +567,7 @@
   },
   "aisef2/app/bundle_cli.py::_record": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli__record.py",
     "tests/v2/test_v21_pw_lineage_continue.py",
@@ -577,7 +577,7 @@
   },
   "aisef2/app/bundle_cli.py::_refs": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -589,7 +589,7 @@
   },
   "aisef2/app/bundle_cli.py::_selected": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -597,7 +597,7 @@
   },
   "aisef2/app/bundle_cli.py::_shell_word": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -611,7 +611,7 @@
   },
   "aisef2/app/bundle_cli.py::_spec_rows": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -624,7 +624,7 @@
   },
   "aisef2/app/bundle_cli.py::_write_new": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli__write_new.py",
     "tests/v2/test_v21_bundle_tools.py",
@@ -638,7 +638,7 @@
   },
   "aisef2/app/bundle_cli.py::approve": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -653,7 +653,7 @@
   },
   "aisef2/app/bundle_cli.py::continue_from": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap2_bundle_cli_continue_from.py",
     "tests/v2/test_v21_bundle_tools.py",
@@ -673,7 +673,7 @@
   },
   "aisef2/app/bundle_cli.py::coverage": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -688,7 +688,7 @@
   },
   "aisef2/app/bundle_cli.py::explain": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli_explain.py",
     "tests/v2/test_v21_bundle_tools.py",
@@ -703,7 +703,7 @@
   },
   "aisef2/app/bundle_cli.py::exposure_of": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli_exposure_of.py",
     "tests/v2/test_v21_migrate_semantics.py"
@@ -712,7 +712,7 @@
   },
   "aisef2/app/bundle_cli.py::init": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -725,7 +725,7 @@
   },
   "aisef2/app/bundle_cli.py::lint": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap_bundle_cli_lint.py",
     "tests/v2/test_v21_bundle_tools.py",
@@ -740,7 +740,7 @@
   },
   "aisef2/app/bundle_cli.py::main": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap2_bundle_cli_main.py",
     "tests/v2/test_v21_bundle_tools.py",
@@ -759,7 +759,7 @@
   },
   "aisef2/app/bundle_cli.py::migrate": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_b1gap3_bundle_cli_migrate.py",
     "tests/v2/test_b1gap2_bundle_cli_migrate.py",
@@ -777,7 +777,7 @@
   },
   "aisef2/app/bundle_cli.py::seal": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -793,7 +793,7 @@
   },
   "aisef2/app/bundle_cli.py::unapproved": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_bundle_tools.py",
     "tests/v2/test_v21_identity.py",
@@ -806,7 +806,7 @@
   },
   "aisef2/app/bundle_cli.py::with_commands": {
    "source": "aisef2/app/bundle_cli.py",
-   "source_sha256": "c15d5b10a76381b3a1562a6fe89b2a58640d4ba62aa0668b32956aa6a019e23e",
+   "source_sha256": "0fdfc022931354332f9987b656541acba525aaefc95f84762bb45102d30fdd16",
    "kill_tests": [
     "tests/v2/test_v21_migrate_semantics.py"
    ],
@@ -2129,6 +2129,12 @@
    "date": "2026-11-18",
    "cause": "rc8 stale-target survivors: require_armed + _read killed, _win_rows EQUIVALENT audited",
    "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-9.json"
+  },
+  {
+   "record": "B1-BINDING-AMENDMENT-10",
+   "date": "2026-11-20",
+   "cause": "v2.2.0 Windows-portability fix: aisef2/app/bundle_cli.py::_create `open(..., newline=\"\")` moved the file (and the aisef2 kernel tree). The 45 bundle_cli.py targets' source bindings and the frozen kernel tree are re-frozen to the corrected source; the registry is unchanged.",
+   "detail": "closure-evidence/v2/v2.2/B1-BINDING-AMENDMENT-10.json"
   }
  ]
 }
