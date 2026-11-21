@@ -97,13 +97,23 @@ section { padding: 100px 0; }
 @media (max-width: 768px) { section { padding: 64px 0; } }
 .section-rule { border-top: 1px solid var(--rule); }
 .eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--verify);
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  background: var(--verify);
+  flex: none;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -187,7 +197,13 @@ section { padding: 100px 0; }
   margin-left: auto; margin-right: auto;
   letter-spacing: -0.02em;
 }
-.hero h1 .accent { color: var(--verify); }
+.hero h1 .accent {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--verify);
+  text-decoration-thickness: 0.055em;
+  text-underline-offset: 0.11em;
+}
 .hero-sub {
   font-size: clamp(1rem, 1.8vw, 1.15rem);
   color: var(--muted);
@@ -424,6 +440,21 @@ section { padding: 100px 0; }
   overflow-x: auto;
   max-width: 640px;
 }
+.evidence-terminal .term-bar {
+  margin: -32px -32px 24px;
+  padding: 13px 20px;
+  border-bottom: 1px solid #27272A;
+  display: flex; align-items: center; gap: 10px;
+  color: #A1A1AA;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+.evidence-terminal .term-bar::before {
+  content: "";
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #22C55E; flex: none;
+}
+.evidence-terminal .term-bar .ro { margin-left: auto; color: #52525B; }
 .evidence-terminal .prompt { color: #71717A; }
 .evidence-terminal .cmd { color: #E4E4E7; }
 .evidence-terminal .label { color: #A1A1AA; display: inline-block; min-width: 160px; }
@@ -670,7 +701,7 @@ section { padding: 100px 0; }
   <div class="wrap hero-content">
     <div class="hero-badge">
       <span class="dot"></span>
-      v2.2.0 · Open Source · Zero Dependencies
+      v2.2.0 — live on PyPI
     </div>
     <h1>AI writes code.<br>The harness <span class="accent">proves it works.</span></h1>
     <p class="hero-sub">
@@ -913,6 +944,7 @@ section { padding: 100px 0; }
       Where something hasn't been measured, the framework says so &mdash; it never defaults to "probably fine".
     </p>
     <div class="evidence-terminal">
+      <div class="term-bar">V2.2.0-STATUS.json<span class="ro">read-only &middot; re-derivable on disk</span></div>
       <div><span class="cmd">AISEF 2.0.0 kernel qualification &mdash; one record behind every row</span></div>
       <br>
       <div><span class="label">  Tests</span> <span class="val">5,454</span> <span class="ok">✓ 0 failing, hermetic</span></div>
