@@ -1,0 +1,176 @@
+{
+ "closure_evidence_files_at_v2_2_0": 8645,
+ "closure_evidence_v2_files_at_v2_2_0": 6339,
+ "closure_evidence_v2_since_v2_2_0": {
+  "added": [
+   "closure-evidence/v2/cycle2/C2-CLOSURE-AUDIT.json",
+   "closure-evidence/v2/cycle2/C2-CLOSURE-AUDIT.md",
+   "closure-evidence/v2/cycle2/C2-HISTORY-FREEZE-CANDIDATE.json",
+   "closure-evidence/v2/cycle2/C2-LEDGERLOCK-FAILURE-TRIAGE.json",
+   "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CHANGE-REVIEW.json",
+   "closure-evidence/v2/v2.2/RELEASE-MUTATION-GATE-EVALUATION.json",
+   "closure-evidence/v2/v2.2/RELEASE-MUTATION-SCOPE-AMENDMENT.json",
+   "closure-evidence/v2/v2.2/V2.2-MUTATION-CAMPAIGN-FREEZE.json",
+   "closure-evidence/v2/v2.2/V2.2-RELEASE-GO-NO-GO.md"
+  ],
+  "name_status": [
+   "A\tclosure-evidence/v2/cycle2/C2-CLOSURE-AUDIT.json",
+   "A\tclosure-evidence/v2/cycle2/C2-CLOSURE-AUDIT.md",
+   "A\tclosure-evidence/v2/cycle2/C2-HISTORY-FREEZE-CANDIDATE.json",
+   "A\tclosure-evidence/v2/cycle2/C2-LEDGERLOCK-FAILURE-TRIAGE.json",
+   "A\tclosure-evidence/v2/cycle2/C2-ORCHESTRATION-CHANGE-REVIEW.json",
+   "A\tclosure-evidence/v2/v2.2/RELEASE-MUTATION-GATE-EVALUATION.json",
+   "A\tclosure-evidence/v2/v2.2/RELEASE-MUTATION-SCOPE-AMENDMENT.json",
+   "A\tclosure-evidence/v2/v2.2/V2.2-MUTATION-CAMPAIGN-FREEZE.json",
+   "A\tclosure-evidence/v2/v2.2/V2.2-RELEASE-GO-NO-GO.md"
+  ],
+  "only_additions": true
+ },
+ "date_utc": "2026-11-21",
+ "head": "f237ad146ba89413314ae688c3d68341b01777bb",
+ "host": {
+  "arch": "arm64",
+  "git": "2.53.0",
+  "kernel": "25.5.0",
+  "os": "Darwin",
+  "python": "3.14.7"
+ },
+ "ledger": {
+  "entries_at_head": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "entries_at_v2_2_0": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "entry_sha256": [
+   {
+    "id": "AISEF_V2_STABLE_RELEASE_DECISION_AFTER_ATTEMPT4",
+    "identical_at_head": true,
+    "seq": 1,
+    "sha256": "1c50c92da376e2ed91175551be5fb46178e7003e12e40ced42701d66ba7f16de"
+   },
+   {
+    "id": "AISEF_V2_0_STABLE_RELEASE_PROCESS_CHARTER",
+    "identical_at_head": true,
+    "seq": 2,
+    "sha256": "7b3637aba4467a634c3d0ad11d6bfe2ed5594bfece9940363e7ebe26b8dee065"
+   },
+   {
+    "id": "AISEF_V2_0_PRODUCTION_PUBLISH",
+    "identical_at_head": true,
+    "seq": 3,
+    "sha256": "f144730faff131c0eb3bcf62cec6fa483e9c893a3bc2705168908271fa74f6dc"
+   },
+   {
+    "id": "AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007",
+    "identical_at_head": true,
+    "seq": 4,
+    "sha256": "08d10c464da1b0977607cec5fc69bf7eabaede6cfbee566d139c45b9628234f3"
+   },
+   {
+    "id": "AISEF_V2_1_B03_REQUALIFICATION_ROUND",
+    "identical_at_head": true,
+    "seq": 5,
+    "sha256": "f39dfe3ea1383b157f5a626385ee3c7623edc3becf3b9d2ec641d276b109c232"
+   },
+   {
+    "id": "AISEF_V2_1_SCOPED_RELEASE_PREPARATION_AND_HANDOVER",
+    "identical_at_head": true,
+    "seq": 6,
+    "sha256": "9aacd4d52cfe11f34538bcf37e1f886974e6e07297b86e585bf8e1c652ebce82"
+   },
+   {
+    "id": "AISEF_V2_1_0_PRODUCTION_PUBLISH_AUTHORIZED_OPTION_1",
+    "identical_at_head": true,
+    "seq": 7,
+    "sha256": "076cd61a5da9197a5006096242e9031acce8bf14dec06f91286c811be5d61130"
+   },
+   {
+    "id": "AISEF_V2_2_VERSION_FORWARD_QUALIFICATION",
+    "identical_at_head": true,
+    "seq": 8,
+    "sha256": "9f4a461188fc3181a7bd5012b149abd5ed3f1cb471a402cc7cc86fbf8d5c6f4b"
+   },
+   {
+    "id": "AISEF_V2_2_RELEASE_MUTATION_SCOPE_AMENDMENT",
+    "identical_at_head": true,
+    "seq": 9,
+    "sha256": "abd5f2a5a10268f520ef568ff16e9062b7ca53f5973e723588827caa105e6959"
+   },
+   {
+    "id": "AISEF_V2_2_FINAL_CLOSE_BLOCKERS_PARALLEL_EXECUTION",
+    "identical_at_head": true,
+    "seq": 10,
+    "sha256": "599687afb8bb74cc6a3611c6f2ad2ea240e0ed647e99ef386d40757c7727f01f"
+   },
+   {
+    "id": "AISEF_V2_2_0_PRODUCTION_PUBLISH_AUTHORIZED",
+    "identical_at_head": true,
+    "seq": 11,
+    "sha256": "335963f0099b1bd7a002940e4276da43426bd30ba3e6497dee83b0dfa0d7d3cc"
+   },
+   {
+    "id": "AISEF_V2_2_0_PRODUCTION_PUBLISH_AUTHORIZED_RC2",
+    "identical_at_head": true,
+    "seq": 12,
+    "sha256": "4efdd6cec6ac5ef8acc1b7ae659f0c25cd8c7adf0453d8052a07333913459737"
+   }
+  ],
+  "file_byte_identical": true,
+  "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
+ },
+ "q0": {
+  "git_log_since_v2_2_0": [],
+  "harness_sha256": "06a4aed1b2ac936bc82943e20e59f981c087c584dc2412fd69983666471d5780",
+  "path": "closure-evidence/v2/v2.1/Q0-CHECKER-CALIBRATION.json",
+  "regenerated": {
+   "at_head": {
+    "calibrated": "57/57",
+    "history_problems": [],
+    "note": "measured at the first code commit; the later commit changes only tests/v23/test_v23_rounds.py",
+    "problems": [],
+    "render_equals_committed": true,
+    "seconds": 258.6,
+    "sha256": "714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c",
+    "tree": "d522dd8453647789857d0905c3650568cb2ed56a"
+   },
+   "at_v2_2_0": {
+    "calibrated": "57/57",
+    "history_problems": [],
+    "problems": [],
+    "render_equals_committed": true,
+    "seconds": 250.6,
+    "sha256": "714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c",
+    "tree": "da3ea33f3b695aaca73e87a704145a0193aced23"
+   },
+   "how": "render(run()) of validation/v2/checker_calibration.py in a scratch copy, env guard; problems_of + history_problems = the --check problem set"
+  },
+  "sha256_at_head": "714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c",
+  "sha256_at_v2_2_0": "714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c"
+ },
+ "schema": "aisef.v23.round-auth-history-identity/1",
+ "v2_2_0": "da3ea33f3b695aaca73e87a704145a0193aced23",
+ "v2_2_0_files_changed_or_removed_at_head": []
+}

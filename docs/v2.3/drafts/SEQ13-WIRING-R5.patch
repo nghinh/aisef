@@ -1,0 +1,93 @@
+diff --git a/tests/v2/sealing_gate.py b/tests/v2/sealing_gate.py
+index a6ac6a1..2b3af88 100644
+--- a/tests/v2/sealing_gate.py
++++ b/tests/v2/sealing_gate.py
+@@ -14,16 +14,86 @@ never be dropped silently."""
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import inspect
+ import os
++import pathlib
+ import unittest
+ 
+ SEALING = os.environ.get("AISEF_SEALING") == "1"
++ROOT = pathlib.Path(__file__).resolve().parents[2]
+ 
+-#: the one gate: without AISEF_SEALING=1 a record-currency test is a visible skip, never a red herring
+-sealing = unittest.skipUnless(
++_sealing = unittest.skipUnless(
+     SEALING, "record-currency/sealing check: binds committed evidence records to the sealed tree; red on every "
+              "unsealed branch by design — runs on master and sealed tags (AISEF_SEALING=1)")
+ 
++#: ledger seq 13 (ROUND-AUTH, GATED_TEST_WIRING): the v2.2-round currency tests, which select records by round v2.2 +
++#: HEAD:aisef2, are history on the v2.3 branch — replayed byte-identically at v2.2.0 by validation/v23/replay_v22.py
++#: (tests/v23/test_v23_rounds.py::RoundV23.test_replay_v22) and skipped here, naming the replay; their round-v2.3
++#: counterparts are tests/v23/test_v23_rounds.py::RoundV23. Each id stays in GATED, which is unchanged.
++V22_REPLAYED = (
++    "tests/v2/test_c2_delivery_experiment.py::PlanCorrection.test_the_committed_record_is_what_this_tree_derives",
++    "tests/v2/test_c2_k_nowork_001.py::Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after",
++    "tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story",
++    "tests/v2/test_c2_p10_cohort_static.py::Record.test_the_evidence_record_re_derives_from_the_tree",
++    "tests/v2/test_c2_p10_profile_freeze.py::Checker.test_the_evidence_record_re_derives",
++    "tests/v2/test_c2_p5_acceptance.py::Acceptance.test_the_acceptance_re_derives_on_this_tree",
++    "tests/v2/test_c2_p5_acceptance.py::KernelProvenance.test_on_this_tree_the_committed_proposal_is_current",
++    "tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before",
++    "tests/v2/test_p5_plan_v22_proposal.py::Record.test_P5_8_committed_record_is_current",
++    "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree",
++    "tests/v2/test_v21_conformance_ruling.py::CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives",
++)
++
++#: Q0-1 (docs/v2.3/amendments/Q0-1-V23-ROUND.md): the v2.2 round's GATED Q0 calibration, the whole class, is history
++#: as well — replayed at v2.2.0 by validation/v23/replay_v22.py, where the record it derives must be byte-identical to
++#: the committed closure-evidence/v2/v2.1/Q0-CHECKER-CALIBRATION.json — and is skipped here by the same rule. Its
++#: round-v2.3 counterpart is tests/v23/test_v23_q0_round.py::Q0RoundV23 (validation/v23/q0_round.py, with the round's
++#: own Q0 record). It is replayed only together with that counterpart: both files are in V23_PINNED.
++V22_REPLAYED_Q0 = ("tests/v2/p0/test_checker_calibration.py::CheckerCalibration",)
++
++
++#: RA-GP-1, Q0-1: what the V22_REPLAYED and V22_REPLAYED_Q0 skip stands on, pinned by the sha256 of each file's LF
++#: bytes — the round-v2.3 counterparts (the 11 and Q0), the replay, the round's Q0 calibration, the digest tool, and
++#: the (empty) package file that lets `discover` find them. The skip holds only while every pinned file is exactly as
++#: pinned; a deleted or edited one un-skips all 12, which then run under AISEF_SEALING=1 as they did before seq 13. Changing a pinned file therefore needs an edit of this file, which
++#: is wiring other than the one ledger seq 13 names.
++V23_PINNED = {
++    "tests/v23/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "tests/v23/test_v23_q0_round.py": "653c06423a4eeaac7888a26c593f900eff8755a915ff64a57398f4e4a0048b86",
++    "tests/v23/test_v23_rounds.py": "ddef983626724a35a83c499d731f049641e92d2c566fd49d44c7b25d8e6b7cbc",
++    "validation/v23/ledger_digest.py": "660624c01b47811b8b9d2f41f371d4b721bb8b7c802eaa87b656c05f99ee3df9",
++    "validation/v23/q0_round.py": "038906381a500a0c40e179803078c471527f960b884644d34eea64b4ff85fccf",
++    "validation/v23/replay_v22.py": "3f54e22b0f201072be279c058381e2dee3726bd86ac09bc52b3a09bbb788f87e",
++}
++
++
++def _lf_sha256(rel: str) -> str | None:
++    try:
++        return hashlib.sha256((ROOT / rel).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
++    except OSError:
++        return None
++
++
++V23_PINS_HOLD = all(_lf_sha256(rel) == want for rel, want in V23_PINNED.items())
++
++
++def sealing(obj):
++    """The one gate. Its id is the defining file's repo-relative path + `__qualname__` (never `__module__`: `discover
++    -s tests` names modules `v2.test_x`). A V22_REPLAYED or V22_REPLAYED_Q0 test is skipped naming the replay, but
++    only while V23_PINS_HOLD; every other gated test, and a replayed one when a pin breaks, is a visible skip without
++    AISEF_SEALING=1 and runs with it."""
++    try:
++        rid = f"{pathlib.Path(inspect.getfile(obj)).resolve().relative_to(ROOT).as_posix()}::{obj.__qualname__}"
++    except (TypeError, ValueError):
++        rid = None
++    if rid in (*V22_REPLAYED, *V22_REPLAYED_Q0) and V23_PINS_HOLD:
++        return unittest.skip("round v2.2 history: replayed at v2.2.0 (da3ea33f) by validation/v23/replay_v22.py; "
++                             "round v2.3 = tests/v23/test_v23_rounds.py::RoundV23, "
++                             "tests/v23/test_v23_q0_round.py::Q0RoundV23")(obj)
++    return _sealing(obj)
++
++
+ #: every gated test, closed: "path::Class" gates the class, "path::Class.method" one method
+ GATED = (
+     "tests/v2/p0/test_checker_calibration.py::CheckerCalibration",
