@@ -38,6 +38,9 @@ Declared limitations (§2.7, §2.9 residual):
 - RESOLVED_SITES is empty: any dynamic site (R8) in S(F) makes tier S unavailable for that kill file.
 - S(F) literal naming (D2 b) is the static rule of v21_snapshot_delta._info/_names plus whole-constant directories
   of two or more components; data a kill file reaches by other means is R2/R3's (observed), never S(F)'s.
+- R5/R6/R7/R8 read the import-reached part of S(F) (s2 closure, D2 c, D2 d) plus what an observation saw loaded; a
+  file only named by a literal (every tests/v2 file, through registry's TESTS_V2) is read, listed or run, which
+  R1-R3 decide. Without an observation that part is never cleared: R1 cannot be excluded.
 Read-only: git and the repository; the only write is --json OUT (and a temporary extraction of each commit's
 aisef2/ and validation/v2/, v21_snapshot_delta.Rev, removed afterwards).
 """
@@ -48,6 +51,7 @@ import argparse
 import ast
 import bisect
 import collections
+import concurrent.futures
 import dataclasses
 import functools
 import hashlib
@@ -427,51 +431,83 @@ class _Ctx:
     def copy_files(self, R) -> list[str]:
         return self.cache(("copy", R.sha), lambda: sorted(p for p in S2._files(self.root, R.sha) if self._in_copy(p)))
 
-    def _named(self, R, g: str) -> set[str]:
-        """D2 (b) literal paths and (c) dotted import strings in the .py file `g`."""
+    def _dotted(self, R, g: str) -> set[str]:
+        """D2 (c): module files named by dotted import strings in the .py file `g`."""
+        def compute():
+            files, out = S2._files(self.root, R.sha), set()
+            for c in SD._info(self.root, R.sha, g)[1]:
+                m = _DOTTED.match(c)
+                if m and m[1].split(".")[0] in S2.ROOTS:
+                    parts = m[1].split(".")
+                    out.update(f for k in range(2, len(parts) + 1) if (f := S2._module_file(files, ".".join(parts[:k]))))
+            return out
+        return self.cache(("dotted", R.sha, g), compute)
+
+    def _literal(self, R, g: str) -> set[str]:
+        """D2 (b): COPY paths the .py file `g` names (v21_snapshot_delta._names), and every file under a directory it
+        names by one whole constant of two or more components."""
         def compute():
             info = SD._info(self.root, R.sha, g)
             text, consts, calls = info
             files = self.copy_files(R)
             out = {p for p in files if p != g and (p.rsplit("/", 1)[-1] in text or calls) and SD._names(info, g, p)}
             up = g.split("/")
-            for c in consts:
-                if c.count("/") >= 1:
-                    for a in {"/".join(up[:k]) for k in range(len(up))}:
-                        d = f"{a}/{c}" if a else c
-                        i = bisect.bisect_left(files, d + "/")
-                        while i < len(files) and files[i].startswith(d + "/"):
-                            out.add(files[i])
-                            i += 1
-                m = _DOTTED.match(c)
-                if m and m[1].split(".")[0] in S2.ROOTS:
-                    parts = m[1].split(".")
-                    out.update(f for k in range(2, len(parts) + 1)
-                               if (f := S2._module_file(S2._files(self.root, R.sha), ".".join(parts[:k]))))
+            for c in (c for c in consts if "/" in c):
+                for a in {"/".join(up[:k]) for k in range(len(up))}:
+                    d = f"{a}/{c}" if a else c
+                    i = bisect.bisect_left(files, d + "/")
+                    while i < len(files) and files[i].startswith(d + "/"):
+                        out.add(files[i])
+                        i += 1
             return out
-        return self.cache(("named", R.sha, g), compute)
+        return self.cache(("literal", R.sha, g), compute)
 
-    def _closure_at(self, R, F: str) -> set[str]:
-        files = S2._files(self.root, R.sha)
+    def _discovery(self, R, F: str) -> list[str]:
+        """D2 (d): every __init__.py under F's directory and every file there with F's basename (`-s dirname(F)`)."""
         d, name = posixpath.dirname(F), posixpath.basename(F)
-        out: set[str] = set()
-        todo = [F, *(p for p in files if p.startswith(d + "/") and posixpath.basename(p) in ("__init__.py", name))]
+        return [p for p in S2._files(self.root, R.sha) if p.startswith(d + "/") and posixpath.basename(p) in ("__init__.py", name)]
+
+    def _grow(self, R, out: set[str], todo: list[str], literal: bool) -> set[str]:
+        files = S2._files(self.root, R.sha)
         while todo:
             f = todo.pop()
             if f in out or f not in files:
                 continue
             new = (set(S2.closure(self.root, R.sha, (f,))) | {f}) - out if f.endswith(".py") else {f}
             out |= new
-            for g in sorted(new):
-                if g.endswith(".py") and self._in_copy(g):
-                    todo += [x for x in self._named(R, g) if x not in out]
+            for g in sorted(x for x in new if x.endswith(".py") and self._in_copy(x)):
+                todo += [x for x in (self._dotted(R, g) | (self._literal(R, g) if literal else set())) if x not in out]
         return out
 
+    def code(self, F: str) -> frozenset[str]:
+        """The import-reached part of S(F) at basis ∪ now: s2 closure, dotted import strings (D2 c) and the discovery
+        set (D2 d), to a fixpoint — what F's process imports. R5, R6, R7 and R8 read this part; a file only NAMED by
+        a literal (D2 b, e.g. every tests/v2 file through registry's TESTS_V2) is read, listed or run, which R2/R3 and
+        an observation's `loaded` decide, never import-time rules."""
+        self.prefetch()
+        return self.cache(("code", F), lambda: frozenset(set().union(*(
+            self._grow(R, set(), [F, *self._discovery(R, F)], False) for R in (self.B, self.H)))))
+
     def S(self, F: str) -> frozenset[str]:
-        """S(F) at basis ∪ now: s2 closure, literal paths, dotted names, discovery set, to a fixpoint."""
+        """S(F) at basis ∪ now (§2.9 D2): the import-reached part plus literal paths (D2 b), to a fixpoint."""
         if F not in self._S:
-            self._S[F] = frozenset(self._closure_at(self.B, F) | self._closure_at(self.H, F))
+            self._S[F] = frozenset(set().union(*(self._grow(R, set(), [F, *self._discovery(R, F)], True)
+                                                 for R in (self.B, self.H))))
         return self._S[F]
+
+    def prefetch(self) -> None:
+        """Every s2.closure the import-reached parts need, in parallel (each call runs one git show per file it
+        visits; the frozen function is called, never changed)."""
+        if self._c.get("prefetched"):
+            return
+        self._c["prefetched"] = True
+        jobs = sorted({(R.sha, f) for R in (self.B, self.H) for F in {f for k in self.H.m.TARGETS.values() for f in k}
+                       for f in [F, *self._discovery(R, F)] if f.endswith(".py") and f in S2._files(self.root, R.sha)})
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+            list(ex.map(lambda j: S2.closure(self.root, j[0], (j[1],)), jobs))
+            texts = sorted({(sha, f) for sha, g in jobs for f in S2.closure(self.root, sha, (g,))
+                            if f.endswith(".py") and self._in_copy(f)})
+            list(ex.map(lambda j: SD._raw(self.root, *j), texts))
 
     # ---- per-file facts
 
@@ -601,10 +637,10 @@ class _Ctx:
         compared.append("I3")
         kill = list(current)
         # I4
-        additive = []
-        if any(p.startswith("tests/") for p in self.delta):
+        additive = sorted(p for p, s in self.delta.items() if p.startswith("tests/") and s == "A")   # no old segment
+        if any(p.startswith("tests/") and s != "A" for p, s in self.delta.items()):
             for F in kill:
-                for p in sorted(x for x in self.S(F) if x.startswith("tests/") and x in self.delta):
+                for p in sorted(x for x in self.S(F) if x.startswith("tests/") and self.delta.get(x, "A") != "A"):
                     a, b = SD._segments(self.B.text(p)), SD._segments(self.H.text(p))
                     gone = sorted(k for k in a if b.get(k) != a[k])
                     if gone or self.delta[p] == "D":
@@ -688,24 +724,21 @@ class _Ctx:
         moved = sorted(p for p, s in delta.items() if s in "AD" and p.endswith(".py"))
         if moved:
             for F in kill:
-                named = set().union(*(self.modules_named(R, f) for R in (self.B, self.H) for f in self.S(F) if f.endswith(".py")))
+                named = set().union(*(self.modules_named(R, f) for R in (self.B, self.H) for f in self.code(F) if f.endswith(".py")))
                 for p in moved:
                     mod = p[:-3].replace("/", ".").removesuffix(".__init__")
                     if any(x == mod or x.startswith(mod + ".") for x in named):
                         return "INVALIDATED", "R5", f"{F} imports {mod}, whose file {p} was {'added' if delta[p] == 'A' else 'removed'}"
         # R6 import-time statements
         code = sorted(p for p in delta if p.endswith(".py"))
-        for F in kill:
-            for p in (x for x in code if x in self.S(F)):
-                c = self.changed(p)
-                if isinstance(c, str):
-                    return "UNRESOLVED", "R6", c
-                if c["module"] != "unchanged":
-                    return "INVALIDATED", "R6", f"import-time statements of {p} changed ({c['module']}) in S({F})"
+        for F in kill if code else ():
+            if fired := self._r6(F, self.code(F), code):
+                return fired
         # R0, D2, R1, R2, R3
         if self.obs is None:
             return "INVALIDATED", "R1", f"no observation of {kill[0] if kill else '<no kill file>'}; R1 cannot be excluded"
         data_tokens: set[str] = set()
+        ran: dict[str, frozenset[str]] = {}
         ev["observation"] = {}
         py = f"{sys.version_info.major}.{sys.version_info.minor}"
         for F in kill:
@@ -743,12 +776,15 @@ class _Ctx:
                 above = [x for x in ("/".join(p.split("/")[:i]) for i in range(len(p.split("/")))) if x in listed]
                 if above and not SD._discounted(p, above, by, None if registry_changed else self.listing_changed()):
                     return "INVALIDATED", "R3", f"{F} lists {above[-1] or '.'}, which holds {p}"
-            data_tokens |= {w for p, tag in opened.items() if tag == "data" and not p.endswith(".py")
-                            for w in _WORD.findall(self.H.text(p) or "")}
-        # R8, then R7 (tier S)
+            data_tokens |= {w for p, tag in opened.items() if tag == "data" for w in _WORD.findall(self.H.text(p) or "")}
+            # what F's processes actually loaded is code too (a script run by a literal path): import-time rule again
+            ran[F] = self.code(F) | (self.S(F) & set(O.get("loaded") or []))
+            if fired := self._r6(F, ran[F] - self.code(F), code):
+                return fired
+        # R8, then R7 (tier S), over the code F's processes run
         unref = []
         for F in kill if code else ():
-            S = self.S(F)
+            S = ran[F]
             defs = []
             for p in (x for x in code if x in S):
                 c = self.changed(p)
@@ -768,6 +804,15 @@ class _Ctx:
                 unref.append(f"{p}::{q}")
         if unref:
             ev["unreferenced_changes"] = sorted(set(unref))
+        return None
+
+    def _r6(self, F: str, files, code: list[str]) -> tuple | None:
+        for p in (x for x in code if x in files):
+            c = self.changed(p)
+            if isinstance(c, str):
+                return "UNRESOLVED", "R6", c
+            if c["module"] != "unchanged":
+                return "INVALIDATED", "R6", f"import-time statements of {p} changed ({c['module']}) in S({F})"
         return None
 
     def both(self, f: str) -> str:

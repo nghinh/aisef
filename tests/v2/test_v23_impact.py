@@ -393,6 +393,24 @@ def n33b(t: Toy) -> Case:
     return Case(b, h, None, "aisef2/util.py::inc", "INVALIDATED", "I9")
 
 
+NEW_TEST = "tests/v2/test_new.py"
+
+
+def new_test_file(t: Toy) -> Case:   # §2.8: a NEW test file in a directory a code file names (registry's TESTS_V2)
+    t.files["aisef2/reg.py"] = 'TESTS_V2 = "tests/v2"\n'
+    t.edit("tests/v2/test_k.py", "from aisef2 import toy, util\n", "from aisef2 import reg, toy, util\n")
+    b = t.commit()
+    t.files[NEW_TEST] = "import unittest\n\n\nclass N(unittest.TestCase):\n    def test_n(self):\n        pass\n"
+    h = t.commit()
+    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "VERIFIED_REUSE", "")
+
+
+def new_test_file_loaded(t: Toy) -> Case:   # the same file, observed loaded by the kill file's process: code, R6
+    c = new_test_file(t)
+    c.obs["tests/v2/test_k.py"]["loaded"].append(NEW_TEST)
+    return c._replace(state="INVALIDATED", component="R6")
+
+
 def no_observation(t: Toy) -> Case:   # N2's edit with no observation: R1 cannot be excluded
     c = n2(t)
     return c._replace(obs=None, state="INVALIDATED", component="R1")
@@ -411,7 +429,7 @@ def unobserved_child(t: Toy) -> Case:   # R1 with an observation that has an unh
 
 NEGATIVE = [n1, n3, n3b, n4, n5, n6, n6b, n7a_windows_for_posix, n7a_posix_for_windows, n7c, n7d_separators, n7d_flavors,
             n7e, n7f, n7g, n8, n9_table, n9_ruling, n10, n13_data_reader, n13b, n18, n21, n21b, n22, n23, n31, n33, n33b,
-            no_observation, wrong_tree_observation, unobserved_child]
+            no_observation, wrong_tree_observation, unobserved_child, new_test_file_loaded]
 
 
 class ImpactTest(unittest.TestCase):
@@ -600,6 +618,18 @@ class ImpactTest(unittest.TestCase):
         self.run_case(wrong_tree_observation)
         self.toy = Toy(pathlib.Path(self._tmp.name) / "again")
         self.run_case(unobserved_child)
+
+    def test_new_test_file_named_by_a_directory_constant(self):
+        s = self.run_case(new_test_file)
+        self.assertEqual(s.evidence["additive_test_changes"], [NEW_TEST])
+        b, h = _last(self.toy)
+        # red-before: the file is in S(F) by D2 (b), and as a new module its import-time statements are "new" —
+        # judged over the whole S(F), R6 would re-open every target the kill file has
+        self.assertIn(NEW_TEST, impact.kill_closure(self.toy.root, b, h, "tests/v2/test_k.py"))
+        self.assertEqual(impact.reach.changed(None, self.toy.files[NEW_TEST])["module"], "new")
+
+    def test_new_test_file_observed_loaded(self):
+        self.run_case(new_test_file_loaded)
 
     def test_unchanged_base_is_reused(self):
         b = self.toy.commit()
