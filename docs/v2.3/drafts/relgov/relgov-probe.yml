@@ -1,0 +1,16 @@
+# REL-GOV-01 probe — a job bound to environment `pypi` that can publish nothing (W1-DESIGN §5).
+# Lives ONLY in the owner's probe commit P (parent = origin/master); never on a release branch.
+# Barriers: no permissions (no id-token => no OIDC => no trusted publishing); one echo step; no checkout,
+# no artifact, no `uses:`; PyPI trusted publishing is bound to release.yml + pypi; the owner rejects.
+name: relgov-probe
+on:
+  push:
+    tags: ["v0.0.0-relgov-probe-*", "relgov-probe-neg-*"]
+permissions: {}
+jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions: {}
+    steps:
+      - run: echo "REL-GOV-01 probe $GITHUB_REF $GITHUB_SHA - no checkout, no artifact, no id-token, no publish step"
