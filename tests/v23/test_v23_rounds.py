@@ -14,10 +14,14 @@ the round-v2.3 selection exists (lane L1-F5). Until then every counterpart FAILS
 AISEF_SEALING=1, so the sealing gate (the tests.yml `sealing` job, which runs `discover -s tests`) stays closed.
 
 The gate is AISEF_SEALING=1, exactly as the sealing tier's, but it is `round_gate`, not `sealing`: W1-DESIGN.md §7 keeps
-tests/v2/sealing_gate.py GATED byte-identical (the file changes only for V22_REPLAYED) and tests/v2/test_sealing_gate.py
-unedited. The round's own closed list is V23_GATED, and `Coverage.test_the_round_gate_list_is_closed` refuses a
-`round_gate` test missing from it or a listed test missing its gate, so no round-v2.3 check can be dropped silently.
-`Seq13Wiring` is red until the wiring seq 13 would authorize (docs/v2.3/drafts/SEQ13-WIRING.patch) is applied.
+tests/v2/sealing_gate.py GATED byte-identical (the file changes only for V22_REPLAYED and the pins that guard its skip)
+and tests/v2/test_sealing_gate.py unedited. The round's own closed list is V23_GATED, and
+`Coverage.test_the_round_gate_list_is_closed` refuses a `round_gate` test missing from it or a listed test missing its
+gate. The wiring seq 13 would authorize (SEQ13_PATCH_REL) pins this file by sha256 (RA-GP-1): the 11 v2.2 tests are
+skipped only while it, the replay, the digest tool and tests/v23/__init__.py are exactly as pinned — a deleted or edited
+one un-skips all 11 — so no round-v2.3 check can be dropped silently. `Seq13Wiring` is red until that patch is applied,
+exactly. The round opens only for the reviewed ruling, by digest, in the owner's own words (RA-INT-2,
+`ledger_seq13_problems`).
 """
 from __future__ import annotations
 
@@ -29,8 +33,10 @@ import importlib.util
 import inspect
 import json
 import pathlib
+import hashlib
 import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -42,6 +48,10 @@ from validation.v23 import replay_v22 as RP  # noqa: E402
 
 LEDGER_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
 ROUND_ID = "AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED"
+#: the reviewed ruling seq 13 must be, and the wiring it names. Paths, not digests: the ruling names the patch by sha256
+#: and the patch pins this file, so neither digest can be written here (it would be a hash cycle).
+SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R3.md"
+SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R3.patch"
 OK = ("MEASURED", "VERIFIED_REUSE")
 STALE_SOURCE = ": target changed since the mutation run — re-run it"
 #: the historical phases the v2.2 test reads (m.RECORDS at v2.2.0, minus V2.1 — the runner-2 phase it treats apart)
@@ -61,30 +71,81 @@ round_gate = unittest.skipUnless(
 V23_GATED = ("tests/v23/test_v23_rounds.py::RoundV23", "tests/v23/test_v23_rounds.py::Seq13Wiring")
 
 
-def _git(*args: str) -> bytes:
-    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, check=True).stdout
+def _git(*args: str, root: pathlib.Path = ROOT) -> bytes:
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, check=True).stdout
+
+
+def _lf(b: bytes) -> bytes:
+    return b.replace(b"\r\n", b"\n")
+
+
+def reviewed_draft(root: pathlib.Path = ROOT) -> dict:
+    """The entry of SEQ13_DRAFT_REL as committed at HEAD. ValueError unless HEAD's blob is the blob of every commit
+    that added the file: a reviewed draft is never rewritten in place (R1, R2, R3 are each kept as written)."""
+    from validation.v23 import ledger_digest as LD
+    head = _git("rev-parse", f"HEAD:{SEQ13_DRAFT_REL}", root=root).strip()
+    added = _git("log", "--no-renames", "--format=%H", "--diff-filter=A", "HEAD", "--", SEQ13_DRAFT_REL, root=root).split()
+    if not added or any(_git("rev-parse", f"{c.decode()}:{SEQ13_DRAFT_REL}", root=root).strip() != head for c in added):
+        raise ValueError(f"{SEQ13_DRAFT_REL} is not the draft as first committed")
+    (entry,) = LD.entries(_git("show", f"HEAD:{SEQ13_DRAFT_REL}", root=root).decode("utf-8"))
+    return entry
+
+
+def ledger_seq13_problems(root: pathlib.Path = ROOT) -> list[str]:
+    """Why the committed ledger does not open round v2.3 ([] = it does): exactly one seq 13, the owner's, whose canonical
+    ruling digest (validation/v23/ledger_digest.py) is the reviewed draft's, and whose `authority` is the owner's own
+    words — not empty, not the draft's `<…>` placeholder, and quoting that digest (RA-INT-2)."""
+    from validation.v23 import ledger_digest as LD
+    out = []
+    try:
+        committed = _git("show", f"HEAD:{LEDGER_REL}", root=root)
+        entries = json.loads(committed)["entries"]
+        if _lf((root / LEDGER_REL).read_bytes()) != committed:
+            out.append(f"{LEDGER_REL} differs from its committed bytes")
+        want = LD.digest(reviewed_draft(root))
+    except (subprocess.CalledProcessError, OSError, ValueError, KeyError, TypeError) as e:
+        return out + [f"the ledger or the reviewed draft is unreadable: {type(e).__name__}"]
+    e13 = [e for e in entries if isinstance(e, dict) and e.get("seq") == 13]
+    d = e13[0].get("decision") if len(e13) == 1 else None
+    if not (len(e13) == 1 and e13[0].get("id") == ROUND_ID and e13[0].get("approver") == "human:owner"
+            and isinstance(d, dict) and d.get("QUALIFICATION_ROUND") == "v2.3"):
+        return out + [f"the ledger holds no single committed owner entry seq 13 {ROUND_ID} (ROUND-AUTH: draft only)"]
+    try:
+        got = LD.digest(e13[0])
+    except KeyError as e:
+        return out + [f"seq 13 is not a ruling entry: {e}"]
+    if got != want:
+        out.append(f"seq 13's ruling digest {got} is not the reviewed draft's {want} ({SEQ13_DRAFT_REL})")
+    a = e13[0].get("authority")
+    a = a.strip() if isinstance(a, str) else ""
+    if not a or (a.startswith("<") and a.endswith(">")):
+        out.append("seq 13 authority is empty or the draft's placeholder, not the owner's own words")
+    elif got not in a:
+        out.append(f"seq 13 authority does not quote its ruling digest {got}")
+    return out
 
 
 def round_v23_missing() -> list[str]:
     """Why round v2.3 is not open on this tree ([] = open): the owner's authority, then the round's selection."""
-    out = []
-    try:
-        committed = _git("show", f"HEAD:{LEDGER_REL}")
-        entries = json.loads(committed)["entries"]
-        if (ROOT / LEDGER_REL).read_bytes().replace(b"\r\n", b"\n") != committed:
-            out.append(f"{LEDGER_REL} differs from its committed bytes")
-        e13 = [e for e in entries if e.get("seq") == 13]
-        if not (e13 and e13[0].get("id") == ROUND_ID and e13[0].get("approver") == "human:owner"
-                and (e13[0].get("decision") or {}).get("QUALIFICATION_ROUND") == "v2.3"):
-            out.append(f"the ledger holds no committed owner entry seq 13 {ROUND_ID} (ROUND-AUTH: draft only)")
-    except (subprocess.CalledProcessError, OSError, ValueError, KeyError) as e:
-        out.append(f"the ledger is unreadable: {type(e).__name__}")
+    out = ledger_seq13_problems()
     from validation.v2 import currency_dag, version_forward as vf
     if not hasattr(vf, "in_round"):
         out.append("validation/v2/version_forward.py has no in_round (round-v2.3 selection, W1-DESIGN §2.6, L1-F5)")
     if "round" not in inspect.signature(currency_dag.validate).parameters:
         out.append("validation/v2/currency_dag.py validate() takes no round (W1-DESIGN §2.6, L1-F5)")
     return out
+
+
+def wired_sealing_gate(patch: bytes, root: pathlib.Path = ROOT) -> bytes:
+    """v2.2.0's tests/v2/sealing_gate.py with `patch` applied (git apply in a repository of its own), LF."""
+    with tempfile.TemporaryDirectory(prefix="aisef-seq13-wiring-") as t:
+        t = pathlib.Path(t)
+        (t / "tests/v2").mkdir(parents=True)
+        (t / "tests/v2/sealing_gate.py").write_bytes(_git("show", f"{RP.V2_2_0}:tests/v2/sealing_gate.py", root=root))
+        (t / "wiring.patch").write_bytes(_lf(patch))
+        subprocess.run(["git", "init", "-q", str(t)], capture_output=True, check=True)
+        subprocess.run(["git", "-C", str(t), "apply", "wiring.patch"], capture_output=True, check=True)
+        return _lf((t / "tests/v2/sealing_gate.py").read_bytes())
 
 
 @functools.lru_cache(maxsize=1)
@@ -262,7 +323,14 @@ class RoundV23(unittest.TestCase):
 
 @round_gate
 class Seq13Wiring(unittest.TestCase):
-    """Red until the GATED_TEST_WIRING seq 13 would authorize is applied (docs/v2.3/drafts/SEQ13-WIRING.patch)."""
+    """Red until the GATED_TEST_WIRING seq 13 would authorize (SEQ13_PATCH_REL) is applied, exactly."""
+
+    def test_the_applied_wiring_is_exactly_the_reviewed_patch_and_its_pins_hold(self):
+        patch = _lf((ROOT / SEQ13_PATCH_REL).read_bytes())
+        self.assertIn(hashlib.sha256(patch).hexdigest(), reviewed_draft()["decision"]["GATED_TEST_WIRING"])
+        self.assertEqual(_lf((ROOT / "tests/v2/sealing_gate.py").read_bytes()), wired_sealing_gate(patch),
+                         "tests/v2/sealing_gate.py is not v2.2.0's plus the reviewed patch")
+        self.assertTrue(getattr(sealing_gate, "V23_PINS_HOLD", False), "a V23_PINNED file is not as pinned")
 
     def test_V22_REPLAYED_is_the_replayed_set_and_each_is_gated(self):
         self.assertEqual(tuple(getattr(sealing_gate, "V22_REPLAYED", ())), RP.V22_REPLAYED)
