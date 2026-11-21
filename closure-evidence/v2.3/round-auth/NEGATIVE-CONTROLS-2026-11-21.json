@@ -1,0 +1,402 @@
+{
+ "a_record_corruption": {
+  "after_restore": {
+   "full_replay_exit": 0,
+   "tree_clean": true,
+   "verdict": "PASS"
+  },
+  "cases": 12,
+  "finding": "case 2: a one-character change of old_kernel.kernel_digest in closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json is NOT detected by test_15 itself (it PASSES); the replay fails it by its clean-tree and committed-bytes rules. Case 11 (identical 6 -> 5) is detected by test_15 itself.",
+  "harness_sha256": "5710e45a778dfc5a6c7a46d99cae0efcd2a387243a81a95dba496b0abf9de472",
+  "record_named": 12,
+  "replay_exit_nonzero": 12,
+  "rows": [
+   {
+    "corrupted": "closure-evidence/v2/v2.2/PLAN-V2.2-CORRECTION-1.json",
+    "corruption": {
+     "from": "7",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 572,
+     "to": "0"
+    },
+    "id": "tests/v2/test_c2_delivery_experiment.py::PlanCorrection.test_the_committed_record_is_what_this_tree_derives",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/PLAN-V2.2-CORRECTION-1.json",
+     "tests/v2/test_c2_delivery_experiment.py::PlanCorrection.test_the_committed_record_is_what_this_tree_derives: record closure-evidence/v2/v2.2/PLAN-V2.2-CORRECTION-1.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "e3557261c671bb445e7bc559f4a2351d92970ceeefa693698d23277c42d422bb",
+    "test_messages": [
+     "tests.v2.test_c2_delivery_experiment.PlanCorrection.test_the_committed_record_is_what_this_tree_derives: -  'record_digest does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/v2.2/K-NOWORK-001-REHEARSAL.json",
+    "corruption": {
+     "from": "4",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 816,
+     "to": "0"
+    },
+    "id": "tests/v2/test_c2_k_nowork_001.py::Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/K-NOWORK-001-REHEARSAL.json",
+     "tests/v2/test_c2_k_nowork_001.py::Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after: record closure-evidence/v2/v2.2/K-NOWORK-001-REHEARSAL.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "348810f2a982346eaf805e83fd966bd02431467c6d45e42005121539d48bd879",
+    "test_messages": [
+     "tests.v2.test_c2_k_nowork_001.Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after: -  'record_digest does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+    "corruption": {
+     "from": "0",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 1069,
+     "to": "1"
+    },
+    "id": "tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+     "tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story: record closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "fd2f891b2dfa9614552392559e5141779dd5cb6ace28b0891a63cfbee064bd30",
+    "test_messages": [],
+    "test_outcome": "PASS"
+   },
+   {
+    "corrupted": "closure-evidence/v2/v2.2/P10-COHORT-MACHINERY.json",
+    "corruption": {
+     "from": "8",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 699,
+     "to": "0"
+    },
+    "id": "tests/v2/test_c2_p10_cohort_static.py::Record.test_the_evidence_record_re_derives_from_the_tree",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/P10-COHORT-MACHINERY.json",
+     "tests/v2/test_c2_p10_cohort_static.py::Record.test_the_evidence_record_re_derives_from_the_tree: record closure-evidence/v2/v2.2/P10-COHORT-MACHINERY.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "527ecd4325288382c84fe537b98e7f6523a4263cc7ae7a5b7532fa0f056783c5",
+    "test_messages": [
+     "tests.v2.test_c2_p10_cohort_static.Record.test_the_evidence_record_re_derives_from_the_tree: -  'record_digest does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/v2.2/P10-PROFILE-FREEZE.json",
+    "corruption": {
+     "from": "f",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 548,
+     "to": "0"
+    },
+    "id": "tests/v2/test_c2_p10_profile_freeze.py::Checker.test_the_evidence_record_re_derives",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/P10-PROFILE-FREEZE.json",
+     "tests/v2/test_c2_p10_profile_freeze.py::Checker.test_the_evidence_record_re_derives: record closure-evidence/v2/v2.2/P10-PROFILE-FREEZE.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "71d4dd3737752a400cceca8de87a50851cfd65aedd42c4c4e029954b0bcf2129",
+    "test_messages": [
+     "tests.v2.test_c2_p10_profile_freeze.Checker.test_the_evidence_record_re_derives: -  'record_digest does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/v2.2/C2-P5-ACCEPTANCE-REVERIFICATION.json",
+    "corruption": {
+     "from": "d",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 904,
+     "to": "0"
+    },
+    "id": "tests/v2/test_c2_p5_acceptance.py::Acceptance.test_the_acceptance_re_derives_on_this_tree",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/C2-P5-ACCEPTANCE-REVERIFICATION.json",
+     "tests/v2/test_c2_p5_acceptance.py::Acceptance.test_the_acceptance_re_derives_on_this_tree: record closure-evidence/v2/v2.2/C2-P5-ACCEPTANCE-REVERIFICATION.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "c3a334595961c6d9bffb452f633a60073fb094149e4a507da93a20eed9cc9310",
+    "test_messages": [
+     "tests.v2.test_c2_p5_acceptance.Acceptance.test_the_acceptance_re_derives_on_this_tree: -  'does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/v2.2/P5-PLAN-V2.2-PROPOSAL.json",
+    "corruption": {
+     "from": "6",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 1438,
+     "to": "0"
+    },
+    "id": "tests/v2/test_c2_p5_acceptance.py::KernelProvenance.test_on_this_tree_the_committed_proposal_is_current",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/P5-PLAN-V2.2-PROPOSAL.json",
+     "tests/v2/test_c2_p5_acceptance.py::KernelProvenance.test_on_this_tree_the_committed_proposal_is_current: record closure-evidence/v2/v2.2/P5-PLAN-V2.2-PROPOSAL.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "f47d4d4b3a8c33cc821d1853c671d2e51445f5d21fcf6306600f35af4f2ddb9b",
+    "test_messages": [
+     "tests.v2.test_c2_p5_acceptance.KernelProvenance.test_on_this_tree_the_committed_proposal_is_current: -  'record_digest does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/P1-MUTATION.json",
+    "corruption": {
+     "from": "6",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 335,
+     "to": "0"
+    },
+    "id": "tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/P1-MUTATION.json",
+     "tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before: record closure-evidence/v2/P1-MUTATION.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "0b8c2867d3846071365e4975541ad74b2967a7dff811161a82351e3046fd6ce3",
+    "test_messages": [
+     "tests.v2.test_v21_mutation_runner.Classify.test_historical_records_read_as_before [P1]: -  're-run it']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json",
+    "corruption": {
+     "from": "6",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 811,
+     "to": "0"
+    },
+    "id": "tests/v2/test_p5_plan_v22_proposal.py::Record.test_P5_8_committed_record_is_current",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json",
+     "tests/v2/test_p5_plan_v22_proposal.py::Record.test_P5_8_committed_record_is_current: record closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "350ace0cb3fe8ed4a646e0158ee8d010c1a238644e533bfd642cd9f1b292951e",
+    "test_messages": [
+     "tests.v2.test_p5_plan_v22_proposal.Record.test_P5_8_committed_record_is_current: -  \"candidate's\"]"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/v2.2/Q5-KERNEL-COMPARISON.json",
+    "corruption": {
+     "from": "f",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 782,
+     "to": "0"
+    },
+    "id": "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/Q5-KERNEL-COMPARISON.json",
+     "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree: record closure-evidence/v2/v2.2/Q5-KERNEL-COMPARISON.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "cbbbb31ac7f630eca08d37317243ce3576f2a0627ed13332f13f3f54ce53240d",
+    "test_messages": [
+     "tests.v2.test_p9_reproduction.KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree: -  'record_digest does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/v2.2/CONFORMANCE-RULING.json",
+    "corruption": {
+     "from": "a",
+     "kind": "last hex digit of the first quoted sha256",
+     "offset": 2363,
+     "to": "0"
+    },
+    "id": "tests/v2/test_v21_conformance_ruling.py::CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/v2.2/CONFORMANCE-RULING.json",
+     "tests/v2/test_v21_conformance_ruling.py::CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives: record closure-evidence/v2/v2.2/CONFORMANCE-RULING.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "3e7b24d36df24bd9a0e6d8e3f34fed71019dffe3bfaaa4124f4fc2cb7198699c",
+    "test_messages": [
+     "tests.v2.test_v21_conformance_ruling.CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives: -  'record_digest does not recompute (tampered)']"
+    ],
+    "test_outcome": "FAIL"
+   },
+   {
+    "corrupted": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+    "corruption": {
+     "from": "6",
+     "kind": "single_probe_equivalence.identical 6 -> 5 (a field test_15 asserts)",
+     "offset": 10796,
+     "to": "5"
+    },
+    "id": "tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story",
+    "named_in_problems": [
+     "tree not clean: M closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+     "tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story: record closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json is not the v2.2.0 committed bytes"
+    ],
+    "replay_exit": 1,
+    "restored": true,
+    "stdout_sha256": "c1646109a0a86e1cc09dc9c575128bb38e9b059c44be99d1dcd4ee02691e5f88",
+    "test_messages": [
+     "tests.v2.test_c2_orchestration_conformance.Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story: -  \"story (K-PRESAT-001): expected 6 and ['pre-satisfied']\"]"
+    ],
+    "test_outcome": "FAIL"
+   }
+  ],
+  "test_itself_failed": 11,
+  "tool_sha256": "3414936eac1e1b70ef626c12b1348f8c2d2c90041980bdb743e5a6ff8fcf9a46",
+  "tree": "da3ea33f3b695aaca73e87a704145a0193aced23",
+  "what": "in a scratch copy of the v2.2.0 tree (never committed), one input record of each replayed test is corrupted by one character (JSON stays valid), replay_v22.py --only <that test> is run, the record is restored; row 11 is a second, semantic corruption of the ORCH record (a field test_15 asserts)"
+ },
+ "b_wiring_propagation": {
+  "cells": {
+   "C_real-fail__R_stub-fail": {
+    "exit": 1,
+    "expect": "red",
+    "failing": [
+     "test_CONFORMANCE_RULING",
+     "test_K_NOWORK",
+     "test_MUTATION_historical",
+     "test_ORCH",
+     "test_P10_COHORT",
+     "test_P10_PROFILE",
+     "test_P5_PROPOSAL_P5_8",
+     "test_P5_PROPOSAL_kernel_provenance",
+     "test_P5_REVERIFICATION",
+     "test_PLAN",
+     "test_Q5",
+     "test_replay_v22"
+    ],
+    "log_sha256": "c353528bcb02667c69d30d6cecccc95c7e951b850f57902f84da546ec1950fb3",
+    "summary": [
+     "Ran 20 tests in 2.215s",
+     "FAILED (failures=12)"
+    ]
+   },
+   "C_real-fail__R_stub-pass": {
+    "exit": 1,
+    "expect": "red",
+    "failing": [
+     "test_CONFORMANCE_RULING",
+     "test_K_NOWORK",
+     "test_MUTATION_historical",
+     "test_ORCH",
+     "test_P10_COHORT",
+     "test_P10_PROFILE",
+     "test_P5_PROPOSAL_P5_8",
+     "test_P5_PROPOSAL_kernel_provenance",
+     "test_P5_REVERIFICATION",
+     "test_PLAN",
+     "test_Q5"
+    ],
+    "log_sha256": "69f32841b70ae242d18e1bdb2605e1d4ebbb51a6f7e3c91ee2ee27937a011390",
+    "summary": [
+     "Ran 20 tests in 3.953s",
+     "FAILED (failures=11)"
+    ]
+   },
+   "C_stub-pass__R_stub-fail": {
+    "exit": 1,
+    "expect": "red",
+    "failing": [
+     "test_replay_v22"
+    ],
+    "log_sha256": "18dd25f352054f486448a53f82921cb33f9d9b32532942e4c9f6f76bc7b72330",
+    "summary": [
+     "Ran 20 tests in 70.208s",
+     "FAILED (failures=1)"
+    ]
+   },
+   "C_stub-pass__R_stub-pass": {
+    "exit": 0,
+    "expect": "green",
+    "failing": [],
+    "log_sha256": "3dd5c182cd89657c12a2d726727c6cdd6d3926da7a98d05cf7f13cc8e0f37e74",
+    "summary": [
+     "Ran 20 tests in 28.742s",
+     "OK"
+    ]
+   },
+   "pre-patch__C_stub-pass__R_stub-pass": {
+    "exit": 1,
+    "expect": "red (Seq13Wiring only)",
+    "failing": [
+     "test_V22_REPLAYED_is_the_replayed_set_and_each_is_gated",
+     "test_each_replayed_test_is_skipped_at_head_naming_the_replay"
+    ],
+    "log_sha256": "61b7dd97b619bab3ba3dd99d352c823ebdc2e55b30caeec225e440f5363ef188",
+    "summary": [
+     "Ran 20 tests in 27.672s",
+     "FAILED (failures=12)"
+    ]
+   }
+  },
+  "closure_test_sealing_gate_with_patch": {
+   "exit": 0,
+   "failing": [],
+   "log_sha256": "2aa0869abe758e5942ba307a5e6520b30b83b911cf92d4f81edc20b3fb3849ec",
+   "summary": [
+    "Ran 3 tests in 1.169s",
+    "OK"
+   ]
+  },
+  "code_commit": "f237ad146ba89413314ae688c3d68341b01777bb",
+  "discovery_without_pattern_with_patch": {
+   "RoundV23": 13,
+   "Seq13Wiring": 2,
+   "discovered": 8389,
+   "failed_imports": 0
+  },
+  "harness_sha256": {
+   "cells": "9c4ffa9e651c05e4770f9e2c04267710cfac85b8f189d57e959504f77ce3255d",
+   "discover": "c4b4c1354be4227833277d862266708b8017b47df2315bb01d94ac65aba770c6"
+  },
+  "job_command": "python3 -P validation/v2/owned_run.py -- python3 -m unittest discover -s tests -q -p <pattern>",
+  "not_run": [
+   "the full sealing job (the whole suite under AISEF_SEALING=1): project rule, the integrator runs one batch",
+   "the real replay inside the patched copy (a fresh 1.8 GB clone; disk floor 15 GiB): the real gated replay test passed separately at the pre-patch commit (RoundV23.test_replay_v22, fresh clone)"
+  ],
+  "patch_sha256": "c5bfc527182c9f5969532630b680b98e746c867ebf351e28e3b5c4e5c2bbd68b",
+  "patched_commit": "scratch-only (the patch applied on code_commit)",
+  "release_path": {
+   "release.yml": "job `tests` = uses ./.github/workflows/tests.yml; job `publish` needs [stable-tag, tests, staging, v2-gate]",
+   "tests.yml": "job `sealing` (if master or tag): AISEF_SEALING=1 python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q"
+  },
+  "v22_replayed_at_head_with_patch": {
+   "exit": 0,
+   "reason": [
+    "round v2.2 history: replayed at v2.2.0 (da3ea33f) by validation/v23/replay_v22.py; round v2.3 = tests/v23/test_v23_rounds.py::RoundV23"
+   ],
+   "skipped_naming_the_replay": 11
+  },
+  "what": "in a scratch copy of the branch at the code commit with docs/v2.3/drafts/SEQ13-WIRING.patch applied (never committed here), the tests.yml sealing job command restricted to tests/v23/test_v23_rounds.py (-p test_v23_rounds.py; the full-suite job is not run) under the env guard, with each component either real or a scratch stub: C_stub-pass stubs only the round-v2.3 parts that do not exist yet (round_v23 precondition/state and the F5 state), so the 39 verbatim v2.2 assertions and the legacy half of the rebound one run for real at HEAD; R_stub replaces replay_v22's exit code"
+ },
+ "date_utc": "2026-11-21",
+ "host": {
+  "arch": "arm64",
+  "git": "2.53.0",
+  "kernel": "25.5.0",
+  "os": "Darwin",
+  "python": "3.14.7"
+ },
+ "schema": "aisef.v23.round-auth-negative-controls/1"
+}
