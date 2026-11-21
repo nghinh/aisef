@@ -18,15 +18,19 @@ calibration records (bound to the earlier digests) stay as committed, as history
 
 v2.3 (EVID-COUPLING-01, W1-DESIGN §3): the record the release cites is resolved by INPUT IDENTITY, never by the
 pyproject version string alone. `resolve()` takes the newest record of the nearest version <= this one and gives it one
-of the F5 states (validation/v23/impact.py's four): MEASURED (a record written by this file in v2.3, committed at HEAD),
-VERIFIED_REUSE (a legacy record, byte-identical to its blob at the v2.2.0 release commit, basis
-`identical-inputs:V<ver>`), INVALIDATED or UNRESOLVED. Either current state needs all three inputs equal now: the
-record's rows (KEYS) are the shipped `calibrations.py` rows and the rows derived from the catalog (probe ids, executing
-digests, classes, fixture paths), and every row's positive and negative fixture tree has the record's sha256. A
-version bump with no other change therefore keeps citing the same record, and `--write` then writes nothing.
+of the F5 states (validation/v23/impact.py's four): MEASURED (a record this file wrote in v2.3, committed once at HEAD
+from a clean tree, whose generator sha256 and aisef2 tree are those of its `measured_on` commit, an ancestor of the
+commit that added it, where this file is the v2.3 writer — the round label alone proves nothing), VERIFIED_REUSE (a
+legacy record, byte-identical to its blob at the v2.2.0 release commit, basis `identical-inputs:V<ver>`; or such a
+v2.3 record that carries rows over from the record it supersedes, which must still verify), INVALIDATED or UNRESOLVED.
+Either current state needs all three inputs equal now: the record's rows (KEYS) are the shipped `calibrations.py` rows
+and the rows derived from the catalog (probe ids, executing digests, classes, fixture paths), and every row's positive
+and negative fixture tree has the record's sha256. A version bump with no other change therefore keeps citing the same
+record, and `--write` then writes nothing; otherwise it re-demonstrates only the rows whose inputs changed (#104 b).
 Declared limits: the demonstration procedure (aisef2/probe/calibration.py, this generator) is not an impact input —
-the record proves contrast for the probe bytes and fixtures it names; and a legacy record is anchored to git history
-(it proves the bytes v2.2.0 committed, not who calibrated).
+the record proves contrast for the probe bytes and fixtures it names; a legacy record is anchored to git history (it
+proves the bytes v2.2.0 committed, not who calibrated); and resolve() checks a v2.3 record's provenance, not its
+contrast — a record forged with consistent values is caught only by `--check`, which re-runs calibrate().
 """
 
 from __future__ import annotations
@@ -49,6 +53,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 SHIPPED_REL = "aisef2/app/calibrations.py"
+GENERATOR_REL = "validation/qualification/release_calibration.py"
 
 
 def record_rel(version: str, n: int = 1) -> str:
@@ -101,12 +106,21 @@ def _rows(rows) -> list[tuple]:
     return sorted(tuple(r[k] for k in KEYS) for r in rows)
 
 
+def _assigned(source: bytes | str, name: str):
+    """The literal module-level `name = ...` of `source` (parsed, never imported); StopIteration when absent."""
+    tree = ast.parse(source)
+    return ast.literal_eval(next(n.value for n in tree.body if isinstance(n, ast.Assign)
+                                 and [getattr(t, "id", None) for t in n.targets] == [name]))
+
+
+def shipped_literal() -> tuple[dict, ...]:
+    """The rows of `calibrations.py` as its bytes say (parsed, not imported: an edit is seen at once)."""
+    return _assigned((ROOT / SHIPPED_REL).read_text(encoding="utf-8"), "CALIBRATIONS")
+
+
 def shipped_rows() -> list[tuple]:
-    """The KEYS tuples of `calibrations.py` as its bytes say (parsed, not imported: an edit is seen at once)."""
-    tree = ast.parse((ROOT / SHIPPED_REL).read_text(encoding="utf-8"))
-    value = next(n.value for n in tree.body if isinstance(n, ast.Assign)
-                 and [getattr(t, "id", None) for t in n.targets] == ["CALIBRATIONS"])
-    return _rows(ast.literal_eval(value))
+    """The KEYS tuples of `calibrations.py`."""
+    return _rows(shipped_literal())
 
 
 def derived_rows() -> list[tuple]:
@@ -125,44 +139,32 @@ def _name(row: tuple) -> str:
 def resolve(version: str | None = None) -> tuple[str, str, str]:
     """(record path, state, basis) of the calibration record this tree cites (module doc, W1-DESIGN §3). Never raises:
     an identity it cannot compute is UNRESOLVED; INVALIDATED names every differing row."""
+    return _assess(version)[:3]
+
+
+def _assess(version: str | None = None) -> tuple[str, str, str, set]:
+    """resolve(), plus the rows of the cited record that may be carried into a new one (write()): those whose inputs
+    equal the tree's, when the record's own provenance holds; none otherwise."""
     version = version or _version()
     try:
         return _resolve(version)
     except Exception as x:          # noqa: BLE001 — fail closed: unparsable record, missing file, broken import
-        return newest_rel(version)[0], "UNRESOLVED", f"{type(x).__name__}: {x}"
+        return newest_rel(version)[0], "UNRESOLVED", f"{type(x).__name__}: {x}", set()
 
 
-def _resolve(version: str) -> tuple[str, str, str]:
+def _resolve(version: str) -> tuple[str, str, str, set]:
     now = _vkey(version)
     if now is None:
-        return record_rel(version), "UNRESOLVED", f"version {version!r} is not N.N.N[.devN]"
+        return record_rel(version), "UNRESOLVED", f"version {version!r} is not N.N.N[.devN]", set()
     found = {m[1] or "2.0.0" for p in (ROOT / record_rel("2.0.0")).parent.glob("*.json")
              if (m := _RECORD_NAME.fullmatch(p.name))}
     found = {v for v in found if _vkey(v) is not None and _vkey(v) <= now}
     if not found:
-        return record_rel(version), "UNRESOLVED", f"no calibration record of a version <= {version}"
-    ver = max(found, key=_vkey)
-    rel = newest_rel(ver)[0]
-    raw = (ROOT / rel).read_bytes().replace(b"\r\n", b"\n")
-    doc = json.loads(raw)
-    identity = doc.get("identity")
-    v23 = isinstance(identity, dict) and identity.get("round") == ROUND
-    at, label = ("HEAD", "HEAD") if v23 else (BASE, "v2.2.0")
-    if _git("cat-file", "-e", f"{at}^{{commit}}") is None:
-        return rel, "UNRESOLVED", f"basis {label} is not in this repository (shallow clone or no git)"
-    blob = _git("cat-file", "blob", f"{at}:{rel}")
-    if blob is None and v23:
-        return rel, "UNRESOLVED", f"{rel} is not committed (a v2.3 record counts once committed)"
-    if blob is None:
-        return rel, "INVALIDATED", f"{rel} is neither a record v2.2.0 committed nor a v2.3 record"
-    if blob.replace(b"\r\n", b"\n") != raw:
-        return rel, "INVALIDATED", f"{rel} differs from its committed bytes at {label}"
-    if v23 and len((_git("log", "--format=%H", "HEAD", "--", rel) or b"").split()) != 1:
-        return rel, "INVALIDATED", f"{rel} was rewritten after it was committed (a record is written once)"
-    if v23 and identity.get("dirty") is not False:
-        return rel, "UNRESOLVED", f"{rel} was written from a dirty tree"
-    if doc.get("verdict") != "CALIBRATED" or doc.get("problems"):
-        return rel, "INVALIDATED", f"{rel} does not record a calibration without problems"
+        return record_rel(version), "UNRESOLVED", f"no calibration record of a version <= {version}", set()
+    rel = newest_rel(max(found, key=_vkey))[0]
+    doc, state, basis = _record(rel)
+    if state not in CURRENT:
+        return rel, state, basis, set()
     rows, shipped, derived = _rows(doc["rows"]), shipped_rows(), derived_rows()
     why = [f"{_name(r)}: in the record, not in {SHIPPED_REL}" for r in rows if r not in shipped]
     why += [f"{_name(r)}: in {SHIPPED_REL}, not in the record" for r in shipped if r not in rows]
@@ -170,21 +172,97 @@ def _resolve(version: str) -> tuple[str, str, str]:
     why += [f"{_name(r)}: this tree's, not in the record" for r in derived if r not in rows]
     if len(set(rows)) != len(rows) or len(set(shipped)) != len(shipped):
         why.append("a row is duplicated")
-    fixtures = doc.get("fixtures") or {}
+    fixtures, good = doc.get("fixtures") or {}, {r for r in rows if r in shipped and r in derived}
     for r in rows:
         group = r[3].rsplit("/", 1)[0]
         for side, path in (("positive", r[3]), ("negative", r[4])):
             want = (fixtures.get(group) or {}).get(side)
             have = _sha_tree(ROOT / path) if (ROOT / path).is_dir() else None
             if want is None or have != want:
+                good.discard(r)
                 why.append(f"{_name(r)}: the {side} fixture tree is not the record's "
                            f"(record {str(want)[:12]}…, now {str(have)[:12]}…)")
     if set(fixtures) != {r[3].rsplit("/", 1)[0] for r in rows}:
         why.append("the record's fixture trees are not its rows'")
-    if why:
-        return rel, "INVALIDATED", "; ".join(why)
-    return (rel, "MEASURED", f"v2.3-measured@{identity.get('measured_on')}") if v23 else \
-        (rel, "VERIFIED_REUSE", f"identical-inputs:V{ver}")
+    return (rel, "INVALIDATED", "; ".join(why), good) if why else (rel, state, basis, good)
+
+
+def _record(rel: str, seen: tuple[str, ...] = ()) -> tuple[dict, str, str]:
+    """(doc, state, basis) of one record by its provenance alone (_resolve compares its rows with the tree)."""
+    raw = (ROOT / rel).read_bytes().replace(b"\r\n", b"\n")
+    doc = json.loads(raw)
+    identity = doc.get("identity")
+    v23 = isinstance(identity, dict) and identity.get("round") == ROUND
+    at, label = ("HEAD", "HEAD") if v23 else (BASE, "v2.2.0")
+    if _git("cat-file", "-e", f"{at}^{{commit}}") is None:
+        return doc, "UNRESOLVED", f"basis {label} is not in this repository (shallow clone or no git)"
+    blob = _git("cat-file", "blob", f"{at}:{rel}")
+    if blob is None and v23:
+        return doc, "UNRESOLVED", f"{rel} is not committed (a v2.3 record counts once committed)"
+    if blob is None:
+        return doc, "INVALIDATED", f"{rel} is neither a record v2.2.0 committed nor a v2.3 record"
+    if blob.replace(b"\r\n", b"\n") != raw:
+        return doc, "INVALIDATED", f"{rel} differs from its committed bytes at {label}"
+    added = (_git("log", "--format=%H", "HEAD", "--", rel) or b"").decode().split() if v23 else []
+    if v23 and len(added) != 1:
+        return doc, "INVALIDATED", f"{rel} was rewritten after it was committed (a record is written once)"
+    if v23 and identity.get("dirty") is not False:
+        return doc, "UNRESOLVED", f"{rel} was written from a dirty tree"
+    if doc.get("verdict") != "CALIBRATED" or doc.get("problems"):
+        return doc, "INVALIDATED", f"{rel} does not record a calibration without problems"
+    if not v23:
+        return doc, "VERIFIED_REUSE", f"identical-inputs:V{_RECORD_NAME.fullmatch(rel.rsplit('/', 1)[1])[1] or '2.0.0'}"
+    m = identity.get("measured_on")
+    if why := _measured_problems(doc, m, added[0], rel):
+        return doc, "INVALIDATED", f"{rel} is not a {ROUND} measurement: " + "; ".join(why)
+    carried = {tuple(k) for k in identity.get("carried") or ()}
+    if not carried:
+        return doc, "MEASURED", f"{ROUND}-measured@{m}"
+    src = (identity.get("supersedes") or {}).get("path")
+    if not isinstance(src, str) or src == rel or src in seen or src.rsplit("/", 1)[0] != rel.rsplit("/", 1)[0] \
+            or not _RECORD_NAME.fullmatch(src.rsplit("/", 1)[1]):
+        return doc, "INVALIDATED", f"{rel} carries rows from no other record ({src!r})"
+    sdoc, sstate, sbasis = _record(src, (*seen, rel))
+    if sstate not in CURRENT:
+        return doc, "INVALIDATED", f"{rel} carries rows from {src}, which is {sstate} — {sbasis}"
+    mine, theirs = _inputs(doc), _inputs(sdoc)
+    bad = sorted(k for k in carried if k not in mine or theirs.get(k) != mine[k])
+    if bad:
+        return doc, "INVALIDATED", f"{rel} carries rows {src} does not hold with the same inputs: {bad}"
+    return doc, "VERIFIED_REUSE", (f"{ROUND}-measured@{m}; {len(carried)} of {len(doc['rows'])} rows carried from {src} "
+                                   "by identical inputs")
+
+
+def _inputs(doc: dict) -> dict:
+    """(probe id, class) -> (KEYS row, its fixture trees' sha256) of a record: what a carried row must equal."""
+    fixtures = doc.get("fixtures") or {}
+    return {(r[0], r[2]): (r, fixtures.get(r[3].rsplit("/", 1)[0])) for r in _rows(doc["rows"])}
+
+
+def _measured_problems(doc: dict, m, added: str, rel: str) -> list[str]:
+    """Why a v2.3-labelled record is not what this round's writer measured at `measured_on` (L1Q-R3). It proves
+    provenance only: the generator and aisef2 tree it names are measured_on's, measured_on is an ancestor of the commit
+    that added the record (and did not hold it), and this file at measured_on is the ROUND writer."""
+    if not isinstance(m, str) or not re.fullmatch(r"[0-9a-f]{40}(?:[0-9a-f]{24})?", m) \
+            or _git("cat-file", "-e", f"{m}^{{commit}}") is None:
+        return [f"measured_on {m!r} is not a commit of this repository"]
+    why = []
+    if _git("merge-base", "--is-ancestor", m, added) is None or _git("cat-file", "-e", f"{m}:{rel}") is not None:
+        why.append(f"measured_on {m[:12]}… is not an ancestor of the commit that added it ({added[:12]}…)")
+    gen = _git("cat-file", "blob", f"{m}:{GENERATOR_REL}")
+    if gen is None or doc.get("generator") != {"path": GENERATOR_REL,
+                                               "sha256": hashlib.sha256(gen.replace(b"\r\n", b"\n")).hexdigest()}:
+        why.append(f"the generator is not {GENERATOR_REL} at measured_on")
+    else:
+        try:
+            writer = _assigned(gen, "ROUND") == ROUND
+        except (SyntaxError, ValueError, StopIteration):
+            writer = False
+        if not writer:
+            why.append(f"{GENERATOR_REL} at measured_on is not the {ROUND} writer")
+    if doc.get("aisef2_tree") != (_git("rev-parse", f"{m}:aisef2") or b"").decode().strip():
+        why.append("aisef2_tree is not measured_on's")
+    return why
 
 
 def state_problems() -> list[str]:
@@ -201,17 +279,22 @@ CALIBRATIONS = (
 
 
 def _sha_tree(path: pathlib.Path) -> str:
+    """Ordered by the relative path's parts (case-sensitive), never by the platform's Path comparison: WindowsPath
+    case-folds, which swapped grep_count's NOTES.md and main.py (L1Q-R1). Every v2.2 sha was written in this order."""
     h = hashlib.sha256()
-    for p in sorted(x for x in path.rglob("*") if x.is_file() and "__pycache__" not in x.parts):
+    files = (x for x in path.rglob("*") if x.is_file() and "__pycache__" not in x.parts)
+    for p in sorted(files, key=lambda x: x.relative_to(path).parts):
         h.update(p.relative_to(path).as_posix().encode() + b"\0" + p.read_bytes().replace(b"\r\n", b"\n") + b"\0")
     return h.hexdigest()
 
 
-def calibrate_all() -> tuple[list[dict], list[str], dict]:
+def calibrate_all(carry: dict | None = None) -> tuple[list[dict], list[str], dict]:
+    """Every active class's row and fixture trees. `carry` maps (probe id, class) to a row kept as it is (write(): its
+    inputs are the cited record's), so only the other classes are demonstrated; check() and --print carry nothing."""
     from aisef2.probe import catalog
     from aisef2.probe.calibration import NotQualified, calibrate, calibration_env
     registry, env = catalog.registry(), calibration_env(sys.executable)
-    rows, problems, fixtures = [], [], {}
+    rows, problems, fixtures, carry = [], [], {}, carry or {}
     for e in catalog.CATALOG:
         if not e.active:
             continue
@@ -225,6 +308,9 @@ def calibrate_all() -> tuple[list[dict], list[str], dict]:
                 problems.append(f"{e.probe_id} {cls}: no committed fixtures at {rel}")
                 continue
             fixtures[rel] = {"positive": _sha_tree(pos), "negative": _sha_tree(neg)}
+            if (e.probe_id, cls) in carry:
+                rows.append(carry[(e.probe_id, cls)])
+                continue
             try:
                 rec = calibrate(probe, cls, pos, neg, env, time.time, registry=registry,
                                 names=(f"{rel}/positive", f"{rel}/negative"))
@@ -249,8 +335,8 @@ def record(rows: list[dict], problems: list[str], fixtures: dict) -> dict:
     from validation.qualification import common as C
     return {"record": f"AISEF {_version()} — THE PROBE CAPABILITY CALIBRATIONS THE RELEASE SHIPS",
             "keyed_by": "each active probe's EXECUTION_DIGEST (V2.1, V2-007): the bytes the contrast was demonstrated on",
-            "generator": {"path": "validation/qualification/release_calibration.py", "sha256": C.lf_sha(HERE / "release_calibration.py")},
-            "aisef2_tree": C.git("rev-parse", "HEAD:aisef2"), "shipped": SHIPPED_REL,
+            "generator": {"path": GENERATOR_REL, "sha256": C.lf_sha(HERE / "release_calibration.py")},
+            "aisef2_tree": (_git("rev-parse", "HEAD:aisef2") or b"").decode().strip() or None, "shipped": SHIPPED_REL,
             "rows": [{k: r[k] for k in KEYS} for r in rows], "fixtures": fixtures, "problems": problems,
             "verdict": "CALIBRATED" if not problems else "PROBLEMS"}
 
@@ -275,15 +361,20 @@ RECORD_REL, STATE, BASIS = resolve()
 
 
 def write() -> int:
-    """--write: nothing while resolve() is current (calibrations.py byte-unchanged, nothing appended). Otherwise every
-    class is re-demonstrated and a NEW v2.3 record is written once (`open "x"`, the next number of this version);
-    calibrations.py is rewritten only when its rows change (then it is a kernel change, qualified by F5)."""
-    rel, state, basis = resolve()
+    """--write: nothing while resolve() is current (calibrations.py byte-unchanged, nothing appended). Otherwise only
+    the rows whose inputs changed are re-demonstrated (#104 b): a row of the cited record whose probe digest and
+    fixture trees equal the tree's is carried over (its shipped row byte-for-byte) when that record's own provenance
+    holds, and a record without it carries nothing. A NEW v2.3 record is written once (`open "x"`, the next number of
+    this version) naming what it carried; calibrations.py is rewritten only when its rows change (then it is a kernel
+    change, qualified by F5)."""
+    rel, state, basis, good = _assess()
     if state in CURRENT:
         print(f"{rel}: {state} ({basis}) — nothing written; {SHIPPED_REL} unchanged")
         return 0
-    dirty = _git("status", "--porcelain", "--", "aisef2", FIXTURES_REL)    # the inputs as measured, before any run
-    rows, problems, fixtures = calibrate_all()
+    dirty = _git("status", "--porcelain", "--", "aisef2", FIXTURES_REL, GENERATOR_REL)   # the inputs, before any run
+    shipped = {tuple(r[k] for k in KEYS): r for r in shipped_literal()}
+    carry = {(r[0], r[2]): shipped[r] for r in good}
+    rows, problems, fixtures = calibrate_all(carry)
     rec = record(rows, problems, fixtures)
     if problems:
         print(json.dumps(rec, indent=1, sort_keys=True))
@@ -293,7 +384,8 @@ def write() -> int:
     if (ROOT / new).exists():
         new = record_rel(version, n + 1)      # the earlier record stays as history (2.0.0's name never numbers)
     rec["identity"] = {"round": ROUND, "measured_on": (_git("rev-parse", "HEAD") or b"").decode().strip() or None,
-                       "dirty": dirty is None or bool(dirty.strip()), "supersedes": {"path": rel, "state": state, "basis": basis}}
+                       "dirty": dirty is None or bool(dirty.strip()), "supersedes": {"path": rel, "state": state, "basis": basis},
+                       "carried": sorted([k[0], k[1]] for k in carry)}
     (ROOT / new).parent.mkdir(parents=True, exist_ok=True)
     try:
         with open(ROOT / new, "x", encoding="utf-8", newline="\n") as f:
@@ -304,7 +396,8 @@ def write() -> int:
     changed = _rows(rows) != shipped_rows()
     if changed:
         (ROOT / SHIPPED_REL).write_text(shipped_source(rows), encoding="utf-8")
-    print(f"wrote {new}" + (f" and {SHIPPED_REL} ({len(rows)} rows)" if changed else f"; {SHIPPED_REL} unchanged (same rows)"))
+    print(f"wrote {new} ({len(rows) - len(carry)} re-demonstrated, {len(carry)} carried)"
+          + (f" and {SHIPPED_REL} ({len(rows)} rows)" if changed else f"; {SHIPPED_REL} unchanged (same rows)"))
     return 0
 
 
