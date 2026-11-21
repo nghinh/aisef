@@ -39,7 +39,9 @@ python3 -P docs/v2.3/drafts/relgov/relgov_evidence.py precheck > relgov-precheck
 ```
 
 Exit 0 = protected (a `can_admins_bypass` note alone does not fail; the owner decides). Today it exits 1, truthfully:
-no required reviewer, no tag policy.
+no required reviewer, no tag policy. The predicate release.yml's `governance` job runs at tag time is
+`validation/qualification/release_governance.py` (same GET endpoints, read-only; it needs `GITHUB_REPOSITORY` and a
+token in `GITHUB_TOKEN`); its PASS is the precheck that counts.
 
 ## 2. Probe commit P (owner)
 
@@ -94,7 +96,8 @@ evidence. Commit P is left unreferenced.
 
 ## 6. Evidence (agent, after the owner hands over the three snapshot files)
 
-`closure-evidence/v2/v2.3/REL-GOV-01-W1-PROBE.json`: environment + policies raw JSON and their sha256, P and its parent,
+`docs/v2.3/evidence/rel-gov-01/REL-GOV-01-W1-PROBE.json` (Amendment A2 placement: never under `closure-evidence/`):
+environment + policies raw JSON and their sha256, P and its parent,
 positive and negative run ids with their snapshots, observed-at timestamps, cleanup, and verdict
 `CHECKPOINT_PAUSES` + `TAG_RESTRICTED`, or the observed failure. A probe that does not pause is recorded as FAIL, never
 retried into a PASS.

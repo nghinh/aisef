@@ -1,0 +1,12 @@
+{
+ "baseline": "AISEF V2 RELEASED-EVIDENCE BASELINE",
+ "item": "CODE-AUDIT #52 (b); COMPATIBILITY-MATRIX CT-6",
+ "scope": "every git-tracked file under closure-evidence/v2/ at the source revision; additions are not released records",
+ "source_revision": "da3ea33f3b695aaca73e87a704145a0193aced23",
+ "source_role": "tag v2.2.0",
+ "file_count": 6339,
+ "files_digest_sha256": "08bed2aefb2b44d77cd26f605a359e7cb6d7a031a01c88f81e9eefed42a03d84",
+ "files_digest_rule": "sha256 over sorted lines '<path>\\t<blob>\\n'",
+ "comparison_key": "git blob id (platform-independent)",
+ "checked_by": "validation/v23/released_evidence_guard.py --check (tests.yml unit job, after the suite)"
+}

@@ -8,6 +8,7 @@
 #   v2-gate  validation/v2_release_gate.py: tag == pyproject version; closure-evidence/v2/release/V2-STABLE-STATUS.json
 #            says FINAL_RELEASE_READY "PASS" with no open V2.0 blocker; the owner's latest RELEASE-DECISIONS ruling
 #            on PRODUCTION_PUBLISH is "AUTHORIZED" for exactly this VERSION. It fails today, by design (§19 hold).
+#            It needs `governance` (REL-GOV-01, below), so publish does too.
 # The publish job uploads the very files staging built and smoked, after re-checking their sha256.
 #
 # RC / prerelease tags (v*rc*, v*-rc*, v*.dev*) and manual runs go to staging.yml, which cannot publish.
@@ -22,6 +23,8 @@
 # (`nghinh/aisef` — renaming the repository IS changing the publisher), workflow `release.yml`, environment `pypi`.
 # Protect the `pypi` environment with the owner as required reviewer: that approval is the owner's final
 # production-publish confirmation (charter §19), on top of the RELEASE-DECISIONS entry the v2-gate reads.
+# REL-GOV-01 (docs/v2.3/RELEASE-GOVERNANCE-FINDING.md): at 2.2.0 it had no protection rule, so publish never paused.
+# The `governance` job reads that setting and fails until it is there (docs/v2.3/W1-DESIGN.md §5).
 name: release
 
 on:
@@ -56,8 +59,28 @@ jobs:
     needs: stable-tag
     uses: ./.github/workflows/staging.yml
 
+  # REL-GOV-01 (docs/v2.3/W1-DESIGN.md §5, CODE-AUDIT #1): the human pause before a production upload is the `pypi`
+  # environment's Required reviewer + tag-only deployment policy, a repository setting no YAML can hold. This job reads
+  # it with GET requests (read-only token) and fails closed until the owner has configured it; it FAILs truthfully
+  # until then. v2-gate needs it and publish needs v2-gate (publish's own `needs` list is pinned by
+  # tests/test_release_gate.py); tests/v23/test_v23_release_governance.py pins that no publish path bypasses it.
+  governance:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: the pypi environment waits for a required reviewer, and deploys tags only
+        run: python -P validation/qualification/release_governance.py
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
   v2-gate:
-    needs: stable-tag
+    needs: [stable-tag, governance]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
