@@ -1,10 +1,11 @@
-# ROUND-AUTH parity — the evidence for ledger seq 13 (draft R2), items 1–5
+# ROUND-AUTH parity — the evidence for ledger seq 13 (draft R3; R2 superseded), items 1–7
 
 Owner status: **CONDITIONAL HOLD**. The principle of a separate v2.3 qualification round is approved. The seq 13 draft
 is not authorized for the ledger. This page is the evidence the owner asked for before any ratification request. It
 is a draft and authorizes nothing.
 
-Code commit: `f237ad14` on `v23/roundauth`, based on `release/v2.3-big` at `1e25ef84`. v2.2.0 = `da3ea33f3b695aaca73e87a704145a0193aced23`.
+Code commit: `f237ad14` on `v23/roundauth`, based on `release/v2.3-big` at `1e25ef84`; review-finding fix commit
+`5a0b1c24` (§7). v2.2.0 = `da3ea33f3b695aaca73e87a704145a0193aced23`.
 Host for every measurement: Darwin 25.5.0 arm64, CPython 3.14.7, git 2.53.0.
 
 Evidence, all new files under `docs/v2.3/evidence/round-auth/`. Each was written once with `open(…, "x")` and
@@ -28,12 +29,14 @@ The integrator decides the final location; the guard is not touched.
 | `COVERAGE-MAP-2026-11-21.json` | `2bb5b5501b7ab966cef61ca13ca5bbbe4c40f9692284bce037e21ef4e9bd8c8d` | 3 |
 | `NEGATIVE-CONTROLS-2026-11-21.json` | `15087001cd877db180ea51f72be8db7b34aa103b99ac3fd4ea0e7ee013270969` | 4 |
 | `HISTORY-IDENTITY-2026-11-21.json` | `cc18861af3712821335c16ebbdc31604cef974d7006f726ab840dad2d9dad91f` | 5 |
-| `docs/v2.3/drafts/SEQ13-WIRING.patch` (not applied) | `c5bfc527182c9f5969532630b680b98e746c867ebf351e28e3b5c4e5c2bbd68b` | 4b |
+| `docs/v2.3/drafts/SEQ13-WIRING.patch` (R2's; not applied; **must not be applied**, RA-GP-1) | `c5bfc527182c9f5969532630b680b98e746c867ebf351e28e3b5c4e5c2bbd68b` | 4b |
+| `docs/v2.3/drafts/SEQ13-WIRING-R3.patch` (R3's; not applied) | `40e6b57adff814933c863c14b3e32a413b5f7b79a8bf0d187889e5635ea1cca5` | 7 |
 
 Tools: `validation/v23/replay_v22.py` (sha256 `3414936eac1e1b70ef626c12b1348f8c2d2c90041980bdb743e5a6ff8fcf9a46`,
 LF), `validation/v23/ledger_digest.py`. Tests: `tests/v23/test_v23_rounds.py` (sha256
-`62061facbc0f49335991165e44c73fb4eb48a673faf10ebf8ea688691d1e32d3`), `tests/v23/test_v23_replay_v22.py`,
-`tests/v23/test_v23_ledger_digest.py`. The scratch harnesses of items 4 and 5 are not committed; the evidence files
+`62061facbc0f49335991165e44c73fb4eb48a673faf10ebf8ea688691d1e32d3` at `f237ad14`, measured in items 1–6;
+`79433cacb80ba7abf9234dfaaac39c996486ea745b2a1849f3a619aa2aa56620` at `5a0b1c24`, the bytes the R3 patch pins),
+`tests/v23/test_v23_replay_v22.py`, `tests/v23/test_v23_ledger_digest.py`, `tests/v23/test_v23_seq13_wiring.py` (§7). The scratch harnesses of items 4 and 5 are not committed; the evidence files
 carry their sha256.
 
 ## 1. The 11 v2.2-round sealing-gated tests and what each enforces
@@ -109,7 +112,8 @@ Other replays of the same 11:
 
 **What a counterpart does.** It runs the same assertions verbatim inside `version_forward.in_round("v2.3")`, where each
 node's own check selects the verified head of its chain (W1-DESIGN §2.6). Before them, it asserts three things:
-* **(i)** the round is open: ledger seq 13 `AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED` is committed by `human:owner`;
+* **(i)** the round is open: ledger seq 13 `AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED` is committed by `human:owner`
+  (since §7: exactly one, whose ruling digest is the reviewed draft R3's, with the owner's words quoting it);
 * **(ii)** the round-v2.3 selection exists: `vf.in_round` and `currency_dag.validate(round=)`;
 * **(iii)** the node's round-v2.3 state is MEASURED or VERIFIED_REUSE.
 
@@ -224,6 +228,9 @@ replay rejects it anyway. This is why R2 makes "every record read equal to its v
 
 ### 4b. The seq 13 wiring and the release gate path (scratch copy of HEAD, never committed)
 
+**Superseded.** This subsection measured R2's patch `c5bfc527…`. Review finding RA-GP-1 (§7) showed that its skip is
+unconditional; R3's patch replaces it and is measured in §7.
+
 **The patch.** `docs/v2.3/drafts/SEQ13-WIRING.patch` changes `tests/v2/sealing_gate.py` only:
 * adds `V22_REPLAYED`;
 * turns `sealing` into a function. The id comes from `inspect.getfile` (repo-relative) + `__qualname__`, never
@@ -298,16 +305,111 @@ GATED is byte-identical, as checked by AST, and `test_sealing_gate.py` is unedit
 * the per-entry canonical sha256 values are in the evidence file;
 * `LedgerHistory.test_entries_1_to_12_are_the_v2_2_0_entries` re-checks entries 1–12 on every branch.
 
-## 6. The revised draft
+## 6. The revised drafts
 
-`docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R2.md`: canonical ruling digest
-`a7fa9f97c6a324f3f1d53df2ca42cd8c46135751977bcdafa5c3d63716daa940` (`validation/v23/ledger_digest.py`). R1 is unchanged
-(`824091110a8bb0fcf8726e889f4ff0c3f11e8f102dfa18f028e343a968caa79b`, recomputed by the same script). The changes and
-their reasons are in R2.
+* `docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R3.md` — the current draft: ruling digest
+  `72e296b6b2f991e7f66a82bcebb9baff3bf337954b722316defa16db94a2dd9f`. Changes vs R2 and their reasons are in R3.
+* `LEDGER-SEQ-13-DRAFT-R2.md` — unchanged, `a7fa9f97c6a324f3f1d53df2ca42cd8c46135751977bcdafa5c3d63716daa940`,
+  now pinned by `tests/v23/test_v23_ledger_digest.py`. **Not to be ratified** (§7).
+* `LEDGER-SEQ-13-DRAFT.md` (R1) — unchanged, `824091110a8bb0fcf8726e889f4ff0c3f11e8f102dfa18f028e343a968caa79b`.
+
+All three are recomputed by `validation/v23/ledger_digest.py`.
+
+## 7. Review findings RA-GP-1 and RA-INT-2 (fixed fail-closed in `5a0b1c24`)
+
+Both findings were MEDIUM, and a verifier reproduced each one independently at `c6344aa4` before the fix.
+
+### RA-GP-1 — R2's wiring skipped the 11 unconditionally
+
+**Defect.** With `SEQ13-WIRING.patch` applied, `sealing()` skipped every V22_REPLAYED id with no condition. Every
+closure over the counterparts (Coverage, Seq13Wiring, `test_replay_v22`) lives in `tests/v23/test_v23_rounds.py`,
+which nothing protected. Deleting that file, or a one-line edit of `round_gate` (variant D), dropped the 11 controls
+and the replay, and the sealing job stayed green.
+
+**Fix** (`SEQ13-WIRING-R3.patch`, still `tests/v2/sealing_gate.py` only; GATED byte-identical, checked by test). This is
+the finding's option 2; option 1 (an AST check) does not close variant D.
+* `V23_PINNED` pins the sha256 of the LF bytes of the four files the skip stands on:
+
+  | Pinned file | sha256 (LF) |
+  |---|---|
+  | `tests/v23/__init__.py` (empty; without it `discover` does not find tests/v23) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+  | `tests/v23/test_v23_rounds.py` | `79433cacb80ba7abf9234dfaaac39c996486ea745b2a1849f3a619aa2aa56620` |
+  | `validation/v23/ledger_digest.py` | `660624c01b47811b8b9d2f41f371d4b721bb8b7c802eaa87b656c05f99ee3df9` |
+  | `validation/v23/replay_v22.py` | `3414936eac1e1b70ef626c12b1348f8c2d2c90041980bdb743e5a6ff8fcf9a46` |
+
+* `sealing()` skips a V22_REPLAYED id only while `V23_PINS_HOLD`. Otherwise it falls back to the ordinary gate: under
+  `AISEF_SEALING=1` the v2.2 test runs, as it did before seq 13; without it, it is the usual visible skip.
+* `Seq13Wiring.test_the_applied_wiring_is_exactly_the_reviewed_patch_and_its_pins_hold` requires HEAD's
+  `sealing_gate.py` to be exactly v2.2.0's plus the patch whose sha256 the reviewed draft names, with every pin
+  holding. So "any wiring other than the named patch" is now a red test, not only a sentence.
+
+**Regression tests** (`tests/v23/test_v23_seq13_wiring.py::WiringR3`, always run, throwaway trees). For each of the
+four files, deleting it or editing it un-skips all 11. Variant D un-skips all 11. A CRLF checkout keeps the pins. A
+broken pin without the sealing tier is the ordinary skip. The drafted pins equal this tree's files. On R2's patch,
+the same deletion skips all 11: the contrast.
+
+**Measured end to end.** Setup: a scratch APFS copy of `5a0b1c24` with the R3 patch applied, `AISEF_SEALING=1`, the
+env guard. Each run covers the 11 ids, `test_sealing_gate.py` and every tests/v23 module. `RoundV23.test_replay_v22`
+is left out (a 1.8 GB clone at the disk floor). Logs stay in scratch and are given by sha256.
+
+| Scenario | Wiring | The 11 v2.2 tests | Run | Gate | Log sha256 |
+|---|---|---|---|---|---|
+| A: intact | R3 | 11 SKIP, naming the replay | ran 59, failures 11 (the counterparts: "round v2.3 is not open"); Seq13Wiring 3/3 OK | red | `94ec3d1659db291f84d8acd687467dcf6bdd2c090a17bf8757a2884c2586ac6f` |
+| B: counterparts file and regression module deleted, committed | R3 | 11 RUN, 11 PASS (the kernel is still v2.2.0's) | ran 28, 0 failures, 0 skipped | green, on the 11 themselves | `46f3acc725d4eb00694ee2c4ed45e686fa98446e55c10ad1acf3a04ba75d7ae9` |
+| B + a kernel edit (one comment line in `aisef2/orchestrate/story_runner.py`, committed) | R3 | 11 RUN, 10 FAIL | ran 28, 10 failures | red | `7cf9727c6f9419a79f105e0b75a2c4247190f7fdea26746e12f8248b57e1ab06` |
+| the same tree | R2 `c5bfc527…` | 11 SKIP | ran 28, 0 failures, 11 skipped | **green: the finding** | `91239eb0441916590b30ddafab91174fa6724b64e8c1dd48c365f7e1817a3a73` |
+| D: `round_gate` neutered + the kernel edit | R3 | 11 RUN, 10 FAIL, 0 SKIP | ran 59, 14 failures (10 v2.2 + 4 WiringR3), 15 skipped (RoundV23, Seq13Wiring) | red | `483e841a1318a0f163d0b99d6aa1be71f83707060e9cbb073014ad1e92e88dc5` |
+
+In the kernel-edit rows, the 11th test (`Classify.test_historical_records_read_as_before`) passes, because
+`story_runner.py` is not a mutation target. **Reading:** with R3's wiring, removing or neutering the replacement
+restores the v2.2.0 behaviour: the original controls run, and they go red as soon as the kernel moves. It no longer
+drops them.
+
+### RA-INT-2 — any seq 13 with the right id opened the round
+
+**Defect.** `round_v23_missing` checked only seq, id, approver and `QUALIFICATION_ROUND`. It accepted all of these:
+the R2 placeholder authority, R1 verbatim, an empty or missing authority, a minimal entry, and a doctored decision.
+
+**Fix:** `tests/v23/test_v23_rounds.py::ledger_seq13_problems`. The HEAD-committed check is kept. It then requires:
+* exactly one seq 13, with the id, `human:owner` and `QUALIFICATION_ROUND` v2.3, and `decision` an object;
+* its canonical ruling digest equal to that of the reviewed draft `LEDGER-SEQ-13-DRAFT-R3.md` as committed at HEAD.
+  `reviewed_draft` refuses a draft whose HEAD blob differs from the blob of any commit that added it, so the draft
+  cannot be rewritten to match an entry;
+* `authority` not empty and not the `<…>` placeholder;
+* `authority` quoting that digest. R2 says the owner's instruction names the digest; this makes it checked.
+
+**Why no digest constant.** The finding asked for a constant in the code. A constant in a pinned file would be a hash
+cycle: R3 names the patch by sha256, the patch pins `test_v23_rounds.py`, and that file would hold R3's digest. The
+binding therefore runs through two things: the never-rewritten reviewed draft, which the pinned file names by path,
+and the owner's own words, which must quote the digest.
+
+**Regression tests** (`tests/v23/test_v23_seq13_wiring.py::LedgerSeq13`, throwaway repositories holding ledger 1–12
+plus one appended entry and the R3 draft).
+* Refused: all six of the verifier's entries; R2 approved in words quoting R2's digest; a doctored entry approved in
+  words quoting its own digest; R3 with words that quote no digest or another digest; a second seq 13; a rewritten
+  draft with a matching entry; an uncommitted ledger change.
+* Controls refused as before: approver `agent`, round `v2.4`, id `X`, a non-object `decision`.
+* Opens: R3 with the owner's words quoting its digest. This is the only case that opens.
+
+### What the fix does not close (stated, not hidden)
+
+* The counterparts call code the pins do not cover: `validation/v23/impact.py` (the F5 engine, W1a's) and L1-F5's
+  `version_forward.in_round` / `currency_dag.validate(round=)`. A wrong change there weakens a counterpart without
+  un-skipping the 11. Pinning them would freeze other lanes' code. They carry their own tests and qualification.
+* A coordinated forgery is not stopped: a ledger entry plus owner words that the owner did not write, or a history
+  rewrite of the R3 draft. No in-tree check can tell forged owner words from real ones; the existing consumers
+  (`p5_acceptance.py` V22_AUTHORITY) have the same limit.
+* Workflow edits and a sibling test module that monkeypatches RoundV23 at import are outside this mechanism, as they
+  are for v2.2.0's GATED closure.
+* Any later edit of a pinned file, for example to follow L1-F5's real interface, needs a new patch and a new ruling
+  (R4). This is the intended cost.
+* W1-DESIGN §7 says `sealing_gate.py` changes "only for V22_REPLAYED". R2's patch already went beyond that (`sealing`
+  became a function), and R3 adds the pins that guard the skip. The integrator should confirm this reading.
 
 ## Reproduce
 
     python3 -P validation/v23/replay_v22.py                       # fresh clone at v2.2.0, all 11, exit 0 = PASS
     python3 -P validation/v23/replay_v22.py --coverage            # 40 assertions, 0 gaps
     python3 -P validation/v23/ledger_digest.py docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT*.md
+    python3 -P -m unittest discover -s tests/v23 -t . -p test_v23_seq13_wiring.py   # RA-GP-1 / RA-INT-2 regressions
     AISEF_SEALING=1 python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q -p test_v23_rounds.py   # red today: round not open
