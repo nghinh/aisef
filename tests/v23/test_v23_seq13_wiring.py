@@ -1,8 +1,9 @@
 """ROUND-AUTH review findings, fixed fail-closed. Always runs; seconds; throwaway trees and repositories only.
 
-* RA-GP-1 — with the reviewed wiring (SEQ13-WIRING-R3.patch) applied, the 11 V22_REPLAYED tests are skipped only
-  while every V23_PINNED file is exactly as pinned. Deleting or editing one (the counterparts, `round_gate`, the
-  replay, the digest tool, tests/v23/__init__.py) un-skips all 11: they run under AISEF_SEALING=1 as before seq 13.
+* RA-GP-1 — with the reviewed wiring (SEQ13-WIRING-R4.patch; R3's plus Q0-1) applied, the 11 V22_REPLAYED tests and
+  the V22_REPLAYED_Q0 class are skipped only while every V23_PINNED file is exactly as pinned. Deleting or editing one
+  (the counterparts, the Q0 counterpart, `round_gate`, the replay, q0_round.py, the digest tool, tests/v23/__init__.py)
+  un-skips all 12: they run under AISEF_SEALING=1 as before seq 13.
 * RA-INT-2 — round v2.3 opens only for exactly one committed seq 13 that is the reviewed draft's ruling, by
   canonical digest, with the owner's own words quoting that digest. The placeholder, R1, R2, a minimal or doctored
   entry, a rewritten draft and a second seq 13 are each refused.
@@ -32,8 +33,8 @@ from tests.v23 import test_v23_rounds as R  # noqa: E402  (module import: its Te
 from validation.v23 import ledger_digest as LD  # noqa: E402
 from validation.v23 import replay_v22 as RP  # noqa: E402
 
-PINNED = ("tests/v23/__init__.py", "tests/v23/test_v23_rounds.py", "validation/v23/ledger_digest.py",
-          "validation/v23/replay_v22.py")
+PINNED = ("tests/v23/__init__.py", "tests/v23/test_v23_q0_round.py", "tests/v23/test_v23_rounds.py",
+          "validation/v23/ledger_digest.py", "validation/v23/q0_round.py", "validation/v23/replay_v22.py")
 NOT_REPLAYED = "tests/v2/test_cycle2_wp201.py::Baseline.test_the_committed_freeze_manifest_holds"
 _n = itertools.count()
 
@@ -46,8 +47,8 @@ def _sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
-class WiringR3(unittest.TestCase):
-    """RA-GP-1, on a throwaway tree holding the patched sealing_gate.py and copies of the pinned files."""
+class WiringR4(unittest.TestCase):
+    """RA-GP-1 + Q0-1, on a throwaway tree holding the patched sealing_gate.py and copies of the pinned files."""
 
     @classmethod
     def setUpClass(cls):
@@ -99,22 +100,23 @@ class WiringR3(unittest.TestCase):
         gated_src = re.compile(rb"\nGATED = \(\n.*?\n\)\n", re.S)
         self.assertEqual(gated_src.findall(self.wired), gated_src.findall(_lf((ROOT / "tests/v2/sealing_gate.py").read_bytes())))
         self.assertEqual(mod.V22_REPLAYED, RP.V22_REPLAYED)
+        self.assertEqual(mod.V22_REPLAYED_Q0, (RP.Q0_REPLAYED,))
         self.assertEqual(tuple(mod.V23_PINNED), PINNED)
         for rel in PINNED:   # the drafted pins are this tree's files: an edit of one without a new patch is red here
             self.assertEqual(mod.V23_PINNED[rel], _sha(_lf((ROOT / rel).read_bytes())), rel)
         self.assertEqual((ROOT / "tests/v23/__init__.py").read_bytes(), b"")
         self.assertTrue(mod.V23_PINS_HOLD)
 
-    def test_with_every_pin_holding_the_11_are_skipped_naming_the_replay(self):
+    def test_with_every_pin_holding_the_11_and_q0_are_skipped_naming_the_replay(self):
         t = self.tree()
         mod = self.gate(t)
-        for tid in RP.V22_REPLAYED:
+        for tid in RP.REPLAYED:
             skipped, why = self.decorated(mod, t, tid)
             self.assertTrue(skipped, tid)
             self.assertIn("replayed at v2.2.0", why)
         self.assertEqual(self.decorated(mod, t, NOT_REPLAYED), (False, ""))      # the other 7 run, as before
 
-    def test_a_dropped_or_edited_pinned_file_un_skips_all_11(self):
+    def test_a_dropped_or_edited_pinned_file_un_skips_all_12(self):
         def delete(rel):
             return lambda t: (t / rel).unlink()
 
@@ -134,13 +136,13 @@ class WiringR3(unittest.TestCase):
                 t = self.tree(change)
                 mod = self.gate(t)
                 self.assertFalse(mod.V23_PINS_HOLD)
-                for tid in RP.V22_REPLAYED:
+                for tid in RP.REPLAYED:
                     self.assertEqual(self.decorated(mod, t, tid), (False, ""), f"{name}: {tid} is not run")
 
     def test_without_the_sealing_tier_a_broken_pin_is_the_ordinary_visible_skip(self):
         t = self.tree(lambda t: (t / "tests/v23/test_v23_rounds.py").unlink())
         mod = self.gate(t, sealing_on=False)
-        for tid in RP.V22_REPLAYED:
+        for tid in RP.REPLAYED:
             skipped, why = self.decorated(mod, t, tid)
             self.assertTrue(skipped)
             self.assertIn("record-currency/sealing check", why)
@@ -163,6 +165,16 @@ class WiringR3(unittest.TestCase):
         mod = self.gate(t)
         self.assertTrue(all(self.decorated(mod, t, tid)[0] for tid in RP.V22_REPLAYED))
 
+    def test_R3s_patch_never_skips_q0_and_on_this_tree_skips_nothing(self):
+        """R3 is superseded, not unsafe: it never names Q0, and its pins no longer hold, so applied now it skips none."""
+        old = R.wired_sealing_gate((ROOT / "docs/v2.3/drafts/SEQ13-WIRING-R3.patch").read_bytes())
+        t = self.tree()
+        (t / "tests/v2/sealing_gate.py").write_bytes(old)
+        mod = self.gate(t)
+        self.assertFalse(hasattr(mod, "V22_REPLAYED_Q0"))
+        self.assertFalse(mod.V23_PINS_HOLD)
+        self.assertEqual([tid for tid in RP.REPLAYED if self.decorated(mod, t, tid)[0]], [])
+
 
 def _git(root, *a) -> str:
     return subprocess.run(["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@example.invalid",
@@ -170,7 +182,8 @@ def _git(root, *a) -> str:
 
 
 class LedgerSeq13(unittest.TestCase):
-    """RA-INT-2: ledger_seq13_problems on a throwaway repository (ledger 1-12 + one appended entry, the R3 draft)."""
+    """RA-INT-2: ledger_seq13_problems on a throwaway repository (ledger 1-12 + one appended entry, the reviewed draft:
+    R4 since Q0-1; `self.r3` names the reviewed ruling)."""
 
     @classmethod
     def setUpClass(cls):
@@ -214,6 +227,7 @@ class LedgerSeq13(unittest.TestCase):
     def test_the_reviewers_six_entries_are_refused(self):
         r1 = LD.entries((ROOT / "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT.md").read_text(encoding="utf-8"))[0]
         r2 = LD.entries((ROOT / "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R2.md").read_text(encoding="utf-8"))[0]
+        r3 = LD.entries((ROOT / "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R3.md").read_text(encoding="utf-8"))[0]
         doctored = json.loads(json.dumps(self.r3))
         doctored.update(authority="agent wrote this", subject_to="nothing")
         doctored["decision"].update(NOT_AUTHORIZED="", GATED_TEST_WIRING="any wiring")
@@ -226,6 +240,7 @@ class LedgerSeq13(unittest.TestCase):
             "minimal entry": (minimal, "is not a ruling entry"),
             "doctored": (doctored, "is not the reviewed draft's"),
             "R2 approved in words quoting R2's digest": (self.approved(r2), "is not the reviewed draft's"),
+            "R3 (superseded by R4) approved in words quoting R3's digest": (self.approved(r3), "is not the reviewed draft's"),
             "doctored, approved in words quoting its own digest": (self.approved(dict(doctored)), "is not the reviewed draft's"),
             "R3 approved in words that do not quote the digest": (dict(self.r3, authority="owner, 2026-11-22: approved"),
                                                                  "does not quote its ruling digest"),

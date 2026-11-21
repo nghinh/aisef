@@ -17,9 +17,10 @@ The gate is AISEF_SEALING=1, exactly as the sealing tier's, but it is `round_gat
 tests/v2/sealing_gate.py GATED byte-identical (the file changes only for V22_REPLAYED and the pins that guard its skip)
 and tests/v2/test_sealing_gate.py unedited. The round's own closed list is V23_GATED, and
 `Coverage.test_the_round_gate_list_is_closed` refuses a `round_gate` test missing from it or a listed test missing its
-gate. The wiring seq 13 would authorize (SEQ13_PATCH_REL) pins this file by sha256 (RA-GP-1): the 11 v2.2 tests are
-skipped only while it, the replay, the digest tool and tests/v23/__init__.py are exactly as pinned — a deleted or edited
-one un-skips all 11 — so no round-v2.3 check can be dropped silently. `Seq13Wiring` is red until that patch is applied,
+gate. The wiring seq 13 would authorize (SEQ13_PATCH_REL) pins this file by sha256 (RA-GP-1): the 11 v2.2 tests — and,
+since R4 (Q0-1), the v2.2 Q0 calibration, whose counterpart is tests/v23/test_v23_q0_round.py — are skipped only while
+this file, the Q0 counterpart, the replay, q0_round.py, the digest tool and tests/v23/__init__.py are exactly as pinned —
+a deleted or edited one un-skips all 12 — so no round-v2.3 check can be dropped silently. `Seq13Wiring` is red until that patch is applied,
 exactly. The round opens only for the reviewed ruling, by digest, in the owner's own words (RA-INT-2,
 `ledger_seq13_problems`).
 """
@@ -50,8 +51,8 @@ LEDGER_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
 ROUND_ID = "AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED"
 #: the reviewed ruling seq 13 must be, and the wiring it names. Paths, not digests: the ruling names the patch by sha256
 #: and the patch pins this file, so neither digest can be written here (it would be a hash cycle).
-SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R3.md"
-SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R3.patch"
+SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R4.md"
+SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R4.patch"
 OK = ("MEASURED", "VERIFIED_REUSE")
 STALE_SOURCE = ": target changed since the mutation run — re-run it"
 #: the historical phases the v2.2 test reads (m.RECORDS at v2.2.0, minus V2.1 — the runner-2 phase it treats apart)
@@ -68,7 +69,8 @@ round_gate = unittest.skipUnless(
                           "ledger seq 13 opens the v2.3 round")
 
 #: every `round_gate` test, closed ("path::Class" gates the class), as sealing_gate.GATED is for `sealing`
-V23_GATED = ("tests/v23/test_v23_rounds.py::RoundV23", "tests/v23/test_v23_rounds.py::Seq13Wiring")
+V23_GATED = ("tests/v23/test_v23_rounds.py::RoundV23", "tests/v23/test_v23_rounds.py::Seq13Wiring",
+             "tests/v23/test_v23_q0_round.py::Q0RoundV23", "tests/v23/test_v23_q0_round.py::Q0Wiring")
 
 
 def _git(*args: str, root: pathlib.Path = ROOT) -> bytes:
@@ -197,7 +199,7 @@ class RoundV23(unittest.TestCase):
                 out.append(f"{t}: {'no F5 state' if s is None else f'{s.state} ({s.component}: {s.reason})'}")
         return out
 
-    # ---- the history: the 11 v2.2 tests themselves, byte-identical, at v2.2.0 --------------------------------
+    # ---- the history: the 11 v2.2 tests and the Q0 class themselves, byte-identical, at v2.2.0 ----------------
     def test_replay_v22(self):
         r = subprocess.run([sys.executable, "-P", str(ROOT / RP.TOOL)], capture_output=True, encoding="utf-8", cwd=ROOT)
         self.assertEqual(r.returncode, 0, r.stdout[-6000:] + r.stderr[-2000:])

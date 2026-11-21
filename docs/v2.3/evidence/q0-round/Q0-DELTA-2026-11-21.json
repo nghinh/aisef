@@ -1,0 +1,272 @@
+{
+ "base_commit": "0a034025a865b1645193f296618e7e2b912f3838",
+ "harness_sha256": {
+  "delta.py": "208fc9469beb1ed11c6150366ec0795d68ceaa211f8076a271b5bd92d4fc47af",
+  "delta_report.py": "07462be0643381e6adc7c3ecaa60d3962e1b0aee2ee0638472bb0b7c4ddb309e",
+  "guard.sh": "0685c46000d1681fb96f72d3627649e13adf9f0eb8ac006aa20952e1d857a937",
+  "mkcopy.sh": "96576d6230244212b1c998ca5312843ec906150edcdcd382792bff9912fb75e2",
+  "q0gen.py": "337af7cbddfa0c054b497b97b59292753221c37d956a3b21d1b595f1185f20f2"
+ },
+ "host": {
+  "arch": "arm64",
+  "git": "2.53.0",
+  "kernel": "25.5.0",
+  "os": "Darwin",
+  "python": "3.14.7"
+ },
+ "measured_utc": "2026-11-21T16:56:23Z..2026-11-21T17:20:40Z",
+ "method": "APFS clone of the worktree at base_commit; the clone's .git replaced by a new repository borrowing the main object store read-only; per scenario: reset to base, apply one edit, commit in the clone, regenerate Q0 (validation/v2/checker_calibration.render(run())) in its own process under the mutation-worker env guard (no opencode on PATH, XDG in scratch, no PYTHONPATH, PYTHONDONTWRITEBYTECODE=1), diff each checker entry against the committed v2.2 record",
+ "record": "Q0-1 — measured Q0 delta of representative v2.3 edits",
+ "scenarios": [
+  {
+   "byte_identical": true,
+   "calibrated": "57/57",
+   "edit": "none",
+   "lane": null,
+   "moved_checkers": {},
+   "moved_top_level": {},
+   "render_sha256": "714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c",
+   "scenario": "base",
+   "seconds": 237.3,
+   "uncovered": []
+  },
+  {
+   "byte_identical": false,
+   "calibrated": "54/57",
+   "edit": "one comment line inserted after aisef2/app/run.py:693",
+   "lane": "W1b L1-LIFECYCLE (DEPENDENCY-DAG.md:338); later every lane owning aisef2/app/run.py",
+   "moved_checkers": {
+    "b1_bindings": {
+     "calibrated": {
+      "now": false,
+      "v22": true
+     },
+     "clean_passes": {
+      "now": false,
+      "v22": true
+     },
+     "clean_problems": {
+      "now": [
+       "aisef2/app/run.py::OCR_CHECKS: aisef2/app/run.py moved since the manifest froze",
+       "aisef2/app/run.py::_close: aisef2/app/run.py moved since the manifest froze",
+       "aisef2/app/run.py::_content_sha: aisef2/app/run.py moved since the manifest froze",
+       "aisef2/app/run.py::admit: aisef2/app/run.py moved since the manifest froze",
+       "aisef2/app/run.py::anchor_in: aisef2/app/run.py moved since the manifest froze"
+      ],
+      "v22": []
+     },
+     "observed": {
+      "now": [
+       "kernel d6027cea9e5b is not the frozen 000000000000",
+       "the registry moved since the manifest froze",
+       "aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze"
+      ],
+      "v22": [
+       "kernel e865d65c80e2 is not the frozen 000000000000",
+       "the registry moved since the manifest froze",
+       "aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze"
+      ]
+     }
+    },
+    "currency_dag": {
+     "calibrated": {
+      "now": false,
+      "v22": true
+     },
+     "clean_passes": {
+      "now": false,
+      "v22": true
+     },
+     "clean_problems": {
+      "now": [
+       "P5-FALSIFIABILITY: upstream not resolvable for this round: [\"P5-PROPOSAL (no record declared for round 'v2.2' binds this tree (kernel_digest d6027cea9e5b); missing supersession — refusing to fall back)\"]",
+       "P5-REVERIFICATION: upstream not resolvable for this round: [\"P5-FALSIFIABILITY (no record declared for round 'v2.2' binds this tree (kernel_digest d6027cea9e5b); missing supersession — refusing to fall back)\", \"P5-PROPOSAL (no record declared for round 'v2.2' binds this tree (kernel_digest d6027cea9e5b); missing supersession — refusing to fall back)\"]",
+       "PLAN: upstream not resolvable for this round: [\"P5-FALSIFIABILITY (no record declared for round 'v2.2' binds this tree (kernel_digest d6027cea9e5b); missing supersession — refusing to fall back)\"]",
+       "K-NOWORK: upstream not resolvable for this round: [\"PLAN (no record declared for round 'v2.2' binds this tree (kernel_digest d6027cea9e5b); missing supersession — refusing to fall back)\"]",
+       "ORCH: upstream not resolvable for this round: [\"CONFORMANCE-RULING (no record declared for round 'v2.2' binds this tree (kernel_digest d6027cea9e5b); missing supersession — refusing to fall back)\", \"P5-REVERIFICATION (no record declared for round 'v2.2' binds this tree (kernel_digest d6027cea9e5b); missing supersession — refusing to fall back)\"]"
+      ],
+      "v22": []
+     }
+    },
+    "mutation": {
+     "calibrated": {
+      "now": false,
+      "v22": true
+     },
+     "clean_passes": {
+      "now": false,
+      "v22": true
+     },
+     "clean_problems": {
+      "now": [
+       "aisef2/app/run.py::OCR_CHECKS: target changed since the mutation run — re-run it",
+       "aisef2/app/run.py::_close: target changed since the mutation run — re-run it",
+       "aisef2/app/run.py::_content_sha: target changed since the mutation run — re-run it",
+       "aisef2/app/run.py::admit: target changed since the mutation run — re-run it",
+       "aisef2/app/run.py::anchor_in: target changed since the mutation run — re-run it"
+      ],
+      "v22": []
+     }
+    }
+   },
+   "moved_top_level": {
+    "calibrated_count": [
+     57,
+     54
+    ]
+   },
+   "render_sha256": "a05d0d469578721946af736625934bf9d8e83409b3ddc1f8ef5c7e6fe46a0123",
+   "scenario": "A_run_py_693_comment",
+   "seconds": 243.2,
+   "uncovered": []
+  },
+  {
+   "byte_identical": false,
+   "calibrated": "57/57",
+   "edit": "a new empty validation/v2/gen_probe_grammar.py",
+   "lane": "W5-main L5-AUTHOR (DEPENDENCY-DAG.md:384)",
+   "moved_checkers": {},
+   "moved_top_level": {
+    "uncovered_checker_modules": [
+     [],
+     [
+      "validation/v2/gen_probe_grammar.py"
+     ]
+    ]
+   },
+   "render_sha256": "fb76bd15da0b1a6cdc2de67ab2f5d01a37ff3d163481fe5d3173d97b050f138d",
+   "scenario": "B_new_validation_v2_module",
+   "seconds": 241.1,
+   "uncovered": [
+    "validation/v2/gen_probe_grammar.py"
+   ]
+  },
+  {
+   "byte_identical": false,
+   "calibrated": "55/57",
+   "edit": "one comment line appended to aisef2/orchestrate/story_runner.py",
+   "lane": "W1b L1-LIFECYCLE; W2b L2-ACCOUNTING; W3 L3-SANDBOX; W4",
+   "moved_checkers": {
+    "b1_bindings": {
+     "observed": {
+      "now": [
+       "kernel f20f6aabd59f is not the frozen 000000000000",
+       "the registry moved since the manifest froze",
+       "aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze"
+      ],
+      "v22": [
+       "kernel e865d65c80e2 is not the frozen 000000000000",
+       "the registry moved since the manifest froze",
+       "aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze"
+      ]
+     }
+    },
+    "currency_dag": {
+     "calibrated": {
+      "now": false,
+      "v22": true
+     },
+     "clean_passes": {
+      "now": false,
+      "v22": true
+     },
+     "clean_problems": {
+      "now": [
+       "P5-FALSIFIABILITY: upstream not resolvable for this round: [\"P5-PROPOSAL (no record declared for round 'v2.2' binds this tree (kernel_digest f20f6aabd59f); missing supersession — refusing to fall back)\"]",
+       "P5-REVERIFICATION: upstream not resolvable for this round: [\"P5-FALSIFIABILITY (no record declared for round 'v2.2' binds this tree (kernel_digest f20f6aabd59f); missing supersession — refusing to fall back)\", \"P5-PROPOSAL (no record declared for round 'v2.2' binds this tree (kernel_digest f20f6aabd59f); missing supersession — refusing to fall back)\"]",
+       "PLAN: upstream not resolvable for this round: [\"P5-FALSIFIABILITY (no record declared for round 'v2.2' binds this tree (kernel_digest f20f6aabd59f); missing supersession — refusing to fall back)\"]",
+       "K-NOWORK: upstream not resolvable for this round: [\"PLAN (no record declared for round 'v2.2' binds this tree (kernel_digest f20f6aabd59f); missing supersession — refusing to fall back)\"]",
+       "ORCH: upstream not resolvable for this round: [\"CONFORMANCE-RULING (no record declared for round 'v2.2' binds this tree (kernel_digest f20f6aabd59f); missing supersession — refusing to fall back)\", \"P5-REVERIFICATION (no record declared for round 'v2.2' binds this tree (kernel_digest f20f6aabd59f); missing supersession — refusing to fall back)\"]"
+      ],
+      "v22": []
+     }
+    },
+    "mutation": {
+     "calibrated": {
+      "now": false,
+      "v22": true
+     },
+     "clean_passes": {
+      "now": false,
+      "v22": true
+     },
+     "clean_problems": {
+      "now": [
+       "aisef2/orchestrate/story_runner.py::StoryResult.committed: target changed since the mutation run — re-run it",
+       "aisef2/orchestrate/story_runner.py::StoryResult.revision: target changed since the mutation run — re-run it",
+       "aisef2/orchestrate/story_runner.py::_Held.__call__: target changed since the mutation run — re-run it",
+       "aisef2/orchestrate/story_runner.py::_Held.__init__: target changed since the mutation run — re-run it",
+       "aisef2/orchestrate/story_runner.py::_Held.release: target changed since the mutation run — re-run it"
+      ],
+      "v22": []
+     }
+    }
+   },
+   "moved_top_level": {
+    "calibrated_count": [
+     57,
+     55
+    ]
+   },
+   "render_sha256": "a8186826a1970f3a7446eb2844b2b4c0643e56db0f1c254a35cab31fe387833f",
+   "scenario": "C_story_runner_comment",
+   "seconds": 234.8,
+   "uncovered": []
+  },
+  {
+   "byte_identical": false,
+   "calibrated": "56/57",
+   "edit": "one comment line appended to validation/v2/except_boundaries.py",
+   "lane": "W1a L1-AUTHCHK (DEPENDENCY-DAG.md:339)",
+   "moved_checkers": {
+    "mutation": {
+     "calibrated": {
+      "now": false,
+      "v22": true
+     },
+     "clean_passes": {
+      "now": false,
+      "v22": true
+     },
+     "clean_problems": {
+      "now": [
+       "validation/v2/except_boundaries.py::_caught: target changed since the mutation run — re-run it",
+       "validation/v2/except_boundaries.py::_could_hold: target changed since the mutation run — re-run it",
+       "validation/v2/except_boundaries.py::_disposition: target changed since the mutation run — re-run it",
+       "validation/v2/except_boundaries.py::_is_invariant_reraise: target changed since the mutation run — re-run it",
+       "validation/v2/except_boundaries.py::_reraises_all: target changed since the mutation run — re-run it"
+      ],
+      "v22": []
+     }
+    }
+   },
+   "moved_top_level": {
+    "calibrated_count": [
+     57,
+     56
+    ]
+   },
+   "render_sha256": "fd7ba14cb62875d5ec91d35067127f9a512ccdb930b9a29a93e5239f4d40cc76",
+   "scenario": "D_except_boundaries_comment",
+   "seconds": 237.6,
+   "uncovered": []
+  },
+  {
+   "byte_identical": true,
+   "calibrated": "57/57",
+   "edit": "a throwaway seq 13 entry appended to closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+   "lane": "the owner's act (ROUND-AUTH)",
+   "moved_checkers": {},
+   "moved_top_level": {},
+   "render_sha256": "714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c",
+   "scenario": "E_ledger_seq13_appended",
+   "seconds": 243.6,
+   "uncovered": []
+  }
+ ],
+ "schema": "aisef.v23.q0-delta/1",
+ "v22_record": {
+  "path": "closure-evidence/v2/v2.1/Q0-CHECKER-CALIBRATION.json",
+  "sha256": "714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c"
+ }
+}

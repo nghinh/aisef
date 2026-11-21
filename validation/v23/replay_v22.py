@@ -3,9 +3,10 @@
     python3 -P validation/v23/replay_v22.py [--tree DIR] [--only ID ...] [--out FILE]
     python3 -P validation/v23/replay_v22.py --coverage [--out FILE]
 
-The 11 tests of V22_REPLAYED bind committed records to the tree by the v2.2 selection rule (round v2.2 + HEAD:aisef2);
-any kernel or ruling-row edit on the v2.3 branch turns them red, so seq 13 (ROUND-AUTH, draft) proposes to skip them
-at HEAD and prove them where they are true: on v2.2.0 itself. This script is that proof, fail-closed:
+The 11 tests of V22_REPLAYED bind committed records to the tree by the v2.2 selection rule (round v2.2 + HEAD:aisef2),
+and the Q0 calibration class Q0_REPLAYED binds the v2.2 Q0 record (Q0-1); any kernel or ruling-row edit on the v2.3
+branch turns them red, so seq 13 (ROUND-AUTH, draft) proposes to skip them at HEAD and prove them where they are true:
+on v2.2.0 itself. This script is that proof, fail-closed:
 
 * the tree is a fresh `git clone --shared --no-checkout` of this repository detached at V2_2_0, or `--tree DIR`;
   either way it MUST be at exactly V2_2_0 with no tracked change and no untracked or ignored file (a planted file or
@@ -18,7 +19,11 @@ at HEAD and prove them where they are true: on v2.2.0 itself. This script is tha
 * a test PASSes only if it ran (>= 1), with no failure, error, skip, expected failure or unexpected success, and
   owned_run exited 0. Anything else is named — the script never masks a red;
 * every record (a file under closure-evidence/) the test process opened is reported with its sha256, and MUST equal
-  the bytes V2_2_0 committed (a corrupted record is named even when the test would not notice it).
+  the bytes V2_2_0 committed (a corrupted record is named even when the test would not notice it);
+* Q0 (Q0-1, docs/v2.3/amendments/Q0-1-V23-ROUND.md): the GATED Q0 calibration class Q0_REPLAYED replays with the
+  others, and the record its own run derives (`render(CheckerCalibration.result)`, read after the class ran, no second
+  calibration) MUST be byte-identical to the Q0 record V2_2_0 committed, which MUST be in the tree as committed — a
+  missing, corrupted or not-regenerated Q0 record is named, fail closed.
 
 Declared limitations: the read set is the test process's `open` audit events; records read by child processes or
 through git objects (`git show`) are not listed (they are still covered by the test's own verdict and the clean-tree
@@ -51,6 +56,7 @@ RECORDS_DIR = "closure-evidence/"
 TIMEOUT_S = 3600
 PASS, FAIL, SKIP, ERROR = "PASS", "FAIL", "SKIP", "ERROR"
 COUNTERPARTS_REL = "tests/v23/test_v23_rounds.py"
+Q0_COUNTERPART_REL = "tests/v23/test_v23_q0_round.py"
 
 #: the v2.2-round sealing-gated tests that cannot run at HEAD (W1-DESIGN.md §2.6, "Replayed at v2.2.0 (11)")
 V22_REPLAYED = (
@@ -66,6 +72,13 @@ V22_REPLAYED = (
     "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree",
     "tests/v2/test_v21_conformance_ruling.py::CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives",
 )
+
+#: Q0-1: the v2.2 round's GATED Q0 calibration (the whole class) and its committed record, replayed at v2.2.0; its
+#: round-v2.3 counterpart is Q0_COUNTERPART_REL::Q0RoundV23 (validation/v23/q0_round.py)
+Q0_REPLAYED = "tests/v2/p0/test_checker_calibration.py::CheckerCalibration"
+Q0_RECORD_REL = "closure-evidence/v2/v2.1/Q0-CHECKER-CALIBRATION.json"
+#: everything the round-v2.2 history replays: the 11 and Q0
+REPLAYED = (*V22_REPLAYED, Q0_REPLAYED)
 
 #: each replayed test -> (the currency-DAG node it binds, or None; its round-v2.3 counterpart method)
 COUNTERPART = dict(zip(V22_REPLAYED, (
@@ -90,6 +103,10 @@ REBOUND = {
     ("tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before",
      "self.assertEqual(m.problems_of(record, ROOT, phase), [])"):
         "self.assertEqual(self.f5_problems(m, record, phase), [])",
+    # Q0: the round's own record replaces the v2.2 one (validation/v23/q0_round.py); every other Q0 assertion is verbatim
+    (f"{Q0_REPLAYED}.test_every_checker_is_calibrated_and_the_committed_record_is_current",
+     "self.assertEqual((ROOT / cc.OUT_REL).read_text(encoding='utf-8'), cc.render(self.result))"):
+        "self.assertEqual((ROOT / Q.V23_REL).read_text(encoding='utf-8'), Q.render(self.result))",
 }
 
 
@@ -191,6 +208,8 @@ def run_one(tree: pathlib.Path, tid: str, env: dict, work: pathlib.Path, commit:
         rc = None
     wall = round(time.monotonic() - t0, 3)
     out = {"id": tid, "outcome": ERROR, "exit": rc, "wall_s": wall, "log_sha256": _sha(log.read_bytes()) if log.exists() else None}
+    if tid == Q0_REPLAYED:      # before anything else: a crashed run still names its Q0 record
+        out["q0_record"] = q0_identity(tree, commit, work / f"{stem}.q0.render")
     try:
         res = json.loads(child.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -225,7 +244,38 @@ def run_one(tree: pathlib.Path, tid: str, env: dict, work: pathlib.Path, commit:
     return out
 
 
-def replay(tree: pathlib.Path, ids=V22_REPLAYED, *, scratch: pathlib.Path, commit: str = V2_2_0) -> dict:
+def q0_identity(tree: pathlib.Path, commit: str, rendered: pathlib.Path) -> dict:
+    """The Q0 record: its bytes committed at `commit`, in the tree, and as the replayed run regenerated them."""
+    blob = _git(tree, "show", f"{commit}:{Q0_RECORD_REL}", check=False)
+    p = tree / Q0_RECORD_REL
+    doc = {"path": Q0_RECORD_REL, "committed_sha256": _sha(blob.stdout) if blob.returncode == 0 else None,
+           "tree_sha256": _sha(p.read_bytes()) if p.is_file() else None,
+           "regenerated_sha256": _sha(rendered.read_bytes()) if rendered.is_file() else None}
+    doc["byte_identical"] = doc["committed_sha256"] is not None and \
+        doc["committed_sha256"] == doc["tree_sha256"] == doc["regenerated_sha256"]
+    return doc
+
+
+def q0_problems(t: dict) -> list[str]:
+    q = t.get("q0_record") or {}
+    if q.get("byte_identical"):
+        return []
+    name = f"{t['id']}: Q0 record {Q0_RECORD_REL}"
+    if not q.get("committed_sha256"):
+        return [f"{name} is not committed at v2.2.0"]
+    out = []
+    if q.get("tree_sha256") is None:
+        out.append(f"{name} is missing from the tree (fail closed)")
+    elif q["tree_sha256"] != q["committed_sha256"]:
+        out.append(f"{name} in the tree is not the v2.2.0 committed bytes (corrupted)")
+    if q.get("regenerated_sha256") is None:
+        out.append(f"{name} was not regenerated (the class did not calibrate)")
+    elif q["regenerated_sha256"] != q["committed_sha256"]:
+        out.append(f"{name}: the regenerated record is not byte-identical to the v2.2.0 committed bytes")
+    return out
+
+
+def replay(tree: pathlib.Path, ids=REPLAYED, *, scratch: pathlib.Path, commit: str = V2_2_0) -> dict:
     tree = pathlib.Path(tree).resolve()
     ids = list(ids)
     facts, problems = preflight(tree, ids, commit)
@@ -240,12 +290,14 @@ def replay(tree: pathlib.Path, ids=V22_REPLAYED, *, scratch: pathlib.Path, commi
         for r in t.get("records", []):
             if not r["committed"]:
                 problems.append(f"{t['id']}: record {r['path']} is not the v2.2.0 committed bytes")
+        if t["id"] == Q0_REPLAYED:
+            problems += q0_problems(t)
     return {"schema": SCHEMA, "tool": TOOL, "tool_sha256": tool_sha256(), "round": "v2.2", "replayed_at": commit,
-            "tree": facts, "selection": "all" if ids == list(V22_REPLAYED) else "subset",
+            "tree": facts, "selection": "all" if ids == list(REPLAYED) else "subset",
             "env_guard": {"AISEF_SEALING": "1", "opencode_on_path": False, "xdg_in_scratch": True,
                           "pythonpath_removed": True, "bytecode_written": False},
             "host": host(), "tests": tests, "problems": problems,
-            "verdict": "PASS" if not problems and ids == list(V22_REPLAYED) else "PARTIAL" if not problems else "FAIL"}
+            "verdict": "PASS" if not problems and ids == list(REPLAYED) else "PARTIAL" if not problems else "FAIL"}
 
 
 def host() -> dict:
@@ -284,22 +336,36 @@ def assertions(fn: ast.FunctionDef) -> list[tuple[int, str]]:
     return sorted((n.lineno, ast.unparse(n)) for n in calls)
 
 
+def _read(root: pathlib.Path, rel: str) -> str:
+    return (root / rel).read_text(encoding="utf-8") if (root / rel).is_file() else ""
+
+
+def q0_pairs(root: pathlib.Path = ROOT, commit: str = V2_2_0) -> list[tuple[str, str, str, str, None]]:
+    """Q0_REPLAYED is a class: each of its test methods at `commit` pairs with the same-named Q0RoundV23 method."""
+    path, cls = Q0_REPLAYED.split("::")
+    tree = ast.parse(_git(root, "show", f"{commit}:{path}").stdout.decode("utf-8"))
+    node = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == cls)
+    return [(f"{Q0_REPLAYED}.{f.name}", f"{cls}.{f.name}", Q0_COUNTERPART_REL, f"Q0RoundV23.{f.name}", None)
+            for f in node.body if isinstance(f, ast.FunctionDef) and f.name.startswith("test_")]
+
+
 def coverage(root: pathlib.Path = ROOT, commit: str = V2_2_0) -> dict:
-    """The assertion-level map: each assertion of each replayed test (read from `commit`'s blob) -> replayed at
-    v2.2.0, and the counterpart assertion that enforces it in round v2.3 (verbatim, or REBOUND). A gap is an
-    assertion whose counterpart text is absent from the counterpart method."""
-    csrc = (root / COUNTERPARTS_REL).read_text(encoding="utf-8") if (root / COUNTERPARTS_REL).is_file() else ""
+    """The assertion-level map: each assertion of each replayed test (read from `commit`'s blob; Q0_REPLAYED: each
+    method of the class) -> replayed at v2.2.0, and the counterpart assertion that enforces it in round v2.3
+    (verbatim, or REBOUND). A gap is an assertion whose counterpart text is absent from the counterpart method."""
+    pairs = [(tid, tid.split("::")[1], COUNTERPARTS_REL, COUNTERPART[tid][1], COUNTERPART[tid][0]) for tid in V22_REPLAYED]
+    pairs += q0_pairs(root, commit)
     rows, gaps = [], []
-    for tid in V22_REPLAYED:
-        path, qual = tid.split("::")
+    for tid, qual, crel, cqual, node in pairs:
+        path = tid.split("::")[0]
+        csrc = _read(root, crel)
         blob = _git(root, "show", f"{commit}:{path}").stdout
         here = (root / path).read_bytes() if (root / path).is_file() else None
         fn = _method(blob.decode("utf-8"), qual)
-        node, cqual = COUNTERPART[tid]
         cfn = _method(csrc, cqual) if csrc else None
         have = {a for _, a in assertions(cfn)} if cfn else set()
         entry = {"id": tid, "node": node, "blob_sha256": _sha(blob), "byte_identical_at_head": here == blob,
-                 "counterpart": f"{COUNTERPARTS_REL}::{cqual}", "counterpart_found": cfn is not None, "assertions": []}
+                 "counterpart": f"{crel}::{cqual}", "counterpart_found": cfn is not None, "assertions": []}
         for line, a in assertions(fn) if fn else []:
             want = REBOUND.get((tid, a), a)
             ok = want in have
@@ -312,7 +378,8 @@ def coverage(root: pathlib.Path = ROOT, commit: str = V2_2_0) -> dict:
             gaps.append(f"{tid}: method not found at {commit[:12]}")
         rows.append(entry)
     return {"schema": "aisef.v23.round-coverage/1", "tool": TOOL, "tool_sha256": tool_sha256(), "v22_commit": commit,
-            "counterparts_sha256": _sha(csrc.encode("utf-8")), "tests": rows,
+            "counterparts_sha256": _sha(_read(root, COUNTERPARTS_REL).encode("utf-8")),
+            "q0_counterpart_sha256": _sha(_read(root, Q0_COUNTERPART_REL).encode("utf-8")), "tests": rows,
             "assertions": sum(len(r["assertions"]) for r in rows), "gaps": gaps}
 
 
@@ -335,6 +402,13 @@ def _child(tree: str, tid: str, out: str) -> int:
     dur = round(time.monotonic() - t0, 3)
     pre = os.path.realpath(tree) + os.sep
     rel = sorted({os.path.realpath(p)[len(pre):] for p in opened if os.path.realpath(p).startswith(pre)})
+    if tid == Q0_REPLAYED:
+        # the record this very run derived: the class's setUpClass result, rendered by the module it calibrated with
+        mod = sys.modules.get(_unittest_name(Q0_REPLAYED).rsplit(".", 1)[0])
+        res = getattr(getattr(mod, Q0_REPLAYED.split("::")[1], None), "result", None)
+        if res is not None:
+            with open(os.path.join(os.path.dirname(out), os.path.basename(out).replace("child.json", "q0.render")), "wb") as f:
+                f.write(mod.cc.render(res).encode("utf-8"))
     msgs = [f"{case.id()}: {tb.strip().splitlines()[-1] if tb.strip() else ''}" for case, tb in result.failures + result.errors]
     msgs += [f"skip: {why}" for _, why in result.skipped]
     with open(out, "w", encoding="utf-8") as f:
@@ -369,8 +443,8 @@ def main(argv: list[str] | None = None) -> int:
         if a.out:
             _write(a.out, doc)
         return 1 if doc["gaps"] else 0
-    ids = a.only or list(V22_REPLAYED)
-    unknown = [t for t in ids if t not in V22_REPLAYED]
+    ids = a.only or list(REPLAYED)
+    unknown = [t for t in ids if t not in REPLAYED]
     if unknown:
         print(f"refused: not a replayed v2.2 test: {unknown}", file=sys.stderr)
         return 2

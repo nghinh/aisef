@@ -1,11 +1,16 @@
-# ROUND-AUTH parity — the evidence for ledger seq 13 (draft R3; R2 superseded), items 1–7
+# ROUND-AUTH parity — the evidence for ledger seq 13 (draft R4; R3 and R2 superseded), items 1–8
 
 Owner status: **CONDITIONAL HOLD**. The principle of a separate v2.3 qualification round is approved. The seq 13 draft
 is not authorized for the ledger. This page is the evidence the owner asked for before any ratification request. It
 is a draft and authorizes nothing.
 
 Code commit: `f237ad14` on `v23/roundauth`, based on `release/v2.3-big` at `1e25ef84`; review-finding fix commit
-`5a0b1c24` (§7). v2.2.0 = `da3ea33f3b695aaca73e87a704145a0193aced23`.
+`5a0b1c24` (§7); Q0-1 commit (§8, the distinct v2.3 Q0 round, draft R4) on top of `0a034025`.
+v2.2.0 = `da3ea33f3b695aaca73e87a704145a0193aced23`.
+
+**What R4 supersedes (§8).** R4 supersedes R3: the current draft is `LEDGER-SEQ-13-DRAFT-R4.md` with
+`SEQ13-WIRING-R4.patch`. R3 and its patch (`40e6b57a…`) must not be ratified or applied. The R3 rows of §4b and §7 are
+kept as measured history. Their mechanisms (the pins and the round check) carry over to R4 unchanged, extended by Q0.
 Host for every measurement: Darwin 25.5.0 arm64, CPython 3.14.7, git 2.53.0.
 
 Evidence, all new files under `docs/v2.3/evidence/round-auth/`. Each was written once with `open(…, "x")` and
@@ -307,13 +312,15 @@ GATED is byte-identical, as checked by AST, and `test_sealing_gate.py` is unedit
 
 ## 6. The revised drafts
 
-* `docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R3.md` — the current draft: ruling digest
-  `72e296b6b2f991e7f66a82bcebb9baff3bf337954b722316defa16db94a2dd9f`. Changes vs R2 and their reasons are in R3.
+* `docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R4.md` — the current draft (§8); its ruling digest is in §8.7. Changes vs
+  R3 and their reasons are in R4.
+* `LEDGER-SEQ-13-DRAFT-R3.md` — unchanged, `72e296b6b2f991e7f66a82bcebb9baff3bf337954b722316defa16db94a2dd9f`,
+  now pinned by `tests/v23/test_v23_ledger_digest.py`. **Superseded by R4; not to be ratified** (§8).
 * `LEDGER-SEQ-13-DRAFT-R2.md` — unchanged, `a7fa9f97c6a324f3f1d53df2ca42cd8c46135751977bcdafa5c3d63716daa940`,
   now pinned by `tests/v23/test_v23_ledger_digest.py`. **Not to be ratified** (§7).
 * `LEDGER-SEQ-13-DRAFT.md` (R1) — unchanged, `824091110a8bb0fcf8726e889f4ff0c3f11e8f102dfa18f028e343a968caa79b`.
 
-All three are recomputed by `validation/v23/ledger_digest.py`.
+All four are recomputed by `validation/v23/ledger_digest.py`.
 
 ## 7. Review findings RA-GP-1 and RA-INT-2 (fixed fail-closed in `5a0b1c24`)
 
@@ -406,6 +413,202 @@ plus one appended entry and the R3 draft).
 * W1-DESIGN §7 says `sealing_gate.py` changes "only for V22_REPLAYED". R2's patch already went beyond that (`sealing`
   became a function), and R3 adds the pins that guard the skip. The integrator should confirm this reading.
 
+## 8. Q0-1: the distinct v2.3 Q0 round (draft R4)
+
+The owner, 2026-11-22: approve the architectural direction of a distinct v2.3 Q0 qualification round, without modifying
+or invalidating the historical v2.2 Q0 record. Before the final ruling the owner asked for six things: a byte-identical
+historical replay; mandatory v2.3 counterparts; red on a deleted or broken counterpart; fail-closed on a missing or
+corrupted historical record; the exact Q0 delta, affected code and negative tests; and the revised seq-13 object.
+
+The design and the full 57-checker delta are in `docs/v2.3/amendments/Q0-1-V23-ROUND.md`. Nothing here applies the
+patch, writes the ledger or writes the round-v2.3 Q0 record. `tests/v2/**`, `closure-evidence/**`, `validation/v2/**`,
+`aisef2/**`, R1–R3 and their patches are unchanged versus `0a034025`.
+
+Evidence, all new files under `docs/v2.3/evidence/q0-round/`, each written once with `open(…, "x")`, with no local path:
+
+| File | sha256 | What |
+|---|---|---|
+| `REPLAY-V22-Q0-2026-11-21.json` | `0f8bd55cd078e38115976c0c3d68fcf89f70fa37698654e048d5457e886e513c` | the 11 and the Q0 class replayed at v2.2.0 (§8.2) |
+| `COVERAGE-MAP-2026-11-21.json` | `644d874c610a8c8315554db2e402ac8bad9fa51d6006aaa902680714e054fc2c` | assertion map: 11 + 9 Q0 methods (§8.3) |
+| `Q0-DELTA-2026-11-21.json` | `f885b37454f99fa51c332c46fab9ee54b6e84876c5654a9ac4697d94f582ad54` | the measured Q0 delta (§8.1) |
+| `NEGATIVE-CONTROLS-2026-11-21.json` | `6ee4f872d35da24fb5c1ff6027584d22208e97f74f4ff3b107d3d9571550bea8` | historical negatives and the end-to-end scenarios (§8.2, §8.5) |
+| `docs/v2.3/drafts/SEQ13-WIRING-R4.patch` (not applied) | `a0f79fc19b0841d22cf6800051dd4dfddeab21b3860d38f1587c89f61fa24254` | the wiring (§8.4) |
+
+Tools: `validation/v23/q0_round.py` (new), `validation/v23/replay_v22.py` (extended). Raw logs and harnesses stay in
+scratch, referenced by sha256 inside the evidence. Host for every measurement: Darwin 25.5.0 arm64, CPython 3.14.7,
+git 2.53.0.
+
+### 8.1 The exact Q0 delta (measured)
+
+| Scenario | Lane | Calibrated | Record | Moved |
+|---|---|---|---|---|
+| base `0a034025` | — | 57/57 | byte-identical `714625b1…` | — |
+| A: comment after `aisef2/app/run.py:693` | W1b L1-LIFECYCLE | 54/57 | `a05d0d46…` | b1_bindings clean (25 run.py targets), currency_dag clean, mutation clean |
+| B: new empty `validation/v2/gen_probe_grammar.py` | W5-main L5-AUTHOR | 57/57 | `fb76bd15…` | `uncovered_checker_modules` (problems_of red) |
+| C: comment appended to `story_runner.py` | W1b and later | 55/57 | `a8186826…` | currency_dag, mutation clean; b1 known-bad `observed[0]` |
+| D: comment appended to `validation/v2/except_boundaries.py` | W1a L1-AUTHCHK | 56/57 | `fd7ba14c…` | mutation clean (9 targets) |
+| E: seq 13 appended to the ledger | owner | 57/57 | byte-identical | — |
+
+**Finding.** W1-DESIGN.md:299 ("Q0-1 is not triggered") does not hold:
+
+* A shows `b1_bindings`' clean red from the first W1b edit of `run.py`, which the story_runner-only probe could not
+  see (scope row OD-Q0-1-W1B, confirmed);
+* D shows L1-AUTHCHK moves Q0 already in W1a.
+
+Committing seq 13 itself does not move Q0 (E).
+
+### 8.2 Historical side: byte-identical replay at v2.2.0, fail closed
+
+`replay_v22.py --tree <APFS clone of the v2.2.0 worktree>` ran all 12 at 2026-11-21T17:20:55Z. **Verdict PASS**, exit 0:
+
+* the 11 PASS, as in §2;
+* `CheckerCalibration` PASS: 9 ran, 0 skipped, 245.56 s, owned_run clean;
+* all 4,734 records it read are the v2.2.0 committed bytes;
+* the Q0 record is committed = in the tree = regenerated, each `714625b14e8972f166b37a467b5f83761d1f2672d076e5f5f0f342e2eb91332c`.
+
+The regenerated bytes are `cc.render(CheckerCalibration.result)` from the class's own run.
+
+| Case (same clone, record restored after each) | Exit | Q0 record | Problems naming it | Log sha256 |
+|---|---|---|---|---|
+| full replay (12) | 0 | byte-identical | — | `57a099ad704e6851dd7575a7654e781bd87e5c67c6705e55965a436ebde5fbc7` |
+| Q0 record deleted | 1 | tree `None`, regenerated `714625b1…` | "is missing from the tree (fail closed)"; "tree not clean: D …"; the test's FileNotFoundError | `bced832ec1e620c9795135709a2abdf0e412081182e817442d9317cd6edbfbc9` |
+| Q0 record corrupted (`checker_count` 57 → 58, valid JSON) | 1 | tree `e2b94bc1…` | "in the tree is not the v2.2.0 committed bytes (corrupted)"; "record … is not the v2.2.0 committed bytes"; "tree not clean: M …"; the test's render mismatch | `8d9de76efa68b846d260b25d20217b6d1f55ccc69d6f418ddc2f2a99f872f989` |
+
+**Observed side effect (new with Q0, stated).** The full replay's own Q0 calibration, which is v2.2.0 code, writes
+bytecode for some child processes into the tree. The two negatives therefore ran on a clone that held 9 ignored
+`__pycache__` entries. The preflight named each one as "tree not clean: !! …", next to the record problems.
+
+* `RoundV23.test_replay_v22` uses a fresh clone per run, removed afterwards, so it is not affected.
+* A reused `--tree` must be cleaned (`git clean -fdX`) before the next replay, or the preflight refuses it.
+
+The always-run `Q0Replay` tests (synthetic v2.2.0 trees) cover five cases:
+
+* intact, regenerated byte-identically;
+* missing;
+* corrupted;
+* regenerated-but-different while the test itself passes. This one is stricter than the v2.2 test, as §4a was;
+* a class that cannot calibrate (named "was not regenerated").
+
+### 8.3 v2.3 side: the counterpart and the map
+
+`tests/v23/test_v23_q0_round.py::Q0RoundV23` holds the v2.2 class's 9 tests, bodies verbatim, on `q0_round.run()` (the
+same calibration on HEAD, in round v2.3). It adds four v2.3 conditions: the round is open (seq 13 = R4, by digest, in
+the owner's words), the v2.2 record is still `714625b1…`, no v2.2 checker is dropped, and
+`docs/v2.3/evidence/q0-round/Q0-CHECKER-CALIBRATION-V23.json` equals what HEAD derives.
+
+`replay_v22.py --coverage` gives 59 assertions over 20 entries (the 11 + the 9 Q0 methods): 57 verbatim, 2 rebound
+(the mutation rule of §3, and the Q0 record assertion `cc.OUT_REL`/`cc.render` → `Q.V23_REL`/`Q.render`), **0 gaps**.
+`Q0Coverage` re-checks this on every branch, and shows that a dropped Q0 assertion is a gap.
+
+### 8.4 The wiring: `SEQ13-WIRING-R4.patch` (sha256 `a0f79fc19b0841d22cf6800051dd4dfddeab21b3860d38f1587c89f61fa24254`)
+
+R3's mechanism, extended; `tests/v2/sealing_gate.py` only; GATED byte-identical (`WiringR4`):
+
+* `V22_REPLAYED_Q0 = ("tests/v2/p0/test_checker_calibration.py::CheckerCalibration",)` joins the skip;
+* `V23_PINNED` (LF sha256):
+
+| Pinned file | sha256 |
+|---|---|
+| `tests/v23/__init__.py` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| `tests/v23/test_v23_q0_round.py` | `8bdf86cd908e224bb2d3df60a16aad7cf17ccaf6a2e601791044ecd91d963004` |
+| `tests/v23/test_v23_rounds.py` | `7594e4d7ff0d51070dd78f918aea5515fe8c17d31fe9eacb98a3c0f9f7e3ad0c` |
+| `validation/v23/ledger_digest.py` | `660624c01b47811b8b9d2f41f371d4b721bb8b7c802eaa87b656c05f99ee3df9` |
+| `validation/v23/q0_round.py` | `e7b487a2a44ffa903a27a4d0aa92d53a9e0de4735012cb185189d941ea09df8f` |
+| `validation/v23/replay_v22.py` | `3f54e22b0f201072be279c058381e2dee3726bd86ac09bc52b3a09bbb788f87e` |
+
+The Q0 test is skipped at HEAD only while all six hold; any broken pin un-skips all 12. `Seq13Wiring` and `Q0Wiring`
+each require every pin to hold, so the gate is red while either file survives. R3's patch, applied to this tree, skips
+nothing: its pins no longer hold (`WiringR4.test_R3s_patch_never_skips_q0_and_on_this_tree_skips_nothing`).
+
+### 8.5 Negative controls, end to end
+
+Setup:
+
+* an APFS clone of the worktree (`0a034025` + this change), with the R4 patch applied and committed in the clone;
+* `AISEF_SEALING=1 python -P validation/v2/owned_run.py -- python -P run_ids.py <clone>`: the sealing job restricted to
+  the 11 + the Q0 class by name, `tests/v2/test_sealing_gate.py`, and everything `discover` finds under
+  `test_v23*` (so a deleted `tests/v23/__init__.py` hides tests/v23, as in the real job);
+* the env guard;
+* `RoundV23.test_replay_v22` left out: the replay is measured in §8.2.
+
+O-rows use a harness-level **round-open stub**, because L1-F5 does not exist yet:
+
+* a no-op `in_round` and a `validate(round=)`;
+* a seq 13 that is the provisional R4 entry, with a "SCRATCH-COPY STUB" authority quoting its digest
+  `1fb2e077…`, committed only in the clone;
+* only the Q0 tests are kept.
+
+The provisional draft differs from R4 only in `EVIDENCE_REVIEWED`, which cannot name the evidence it produces.
+
+| Scenario | The 11 (v2.2) | Q0 class (v2.2) | Q0RoundV23 | Q0Wiring / Seq13Wiring | Exit | Gate | Log sha256 |
+|---|---|---|---|---|---|---|---|
+| S1_intact_no_seq13: none: R4 applied, no seq 13 in the ledger (ran 169: 20 failures, 0 errors, 20 skipped) | 11 SKIP | 9 SKIP | 9 FAIL | 1 OK / 3 OK | 1 | **red** | `24196ec9694078f2d657036ba3b0b618431432afa070a54c6243f13c40036bc5` |
+| S2_q0_counterpart_deleted: tests/v23/test_v23_q0_round.py deleted (committed) (ran 144: 25 failures, 19 errors, 0 skipped) | 11 OK | 9 OK | not run | not run / 1 FAIL, 1 OK | 1 | **red** | `30091383fdd53e27cf175c0247483ac9cd205fa405ac0e492fbf28b103942d20` |
+| S3_q0_round_module_deleted: validation/v23/q0_round.py deleted (committed) (ran 145: 23 failures, 20 errors, 0 skipped) | 11 OK | 9 OK | not run | not run / 1 FAIL, 1 OK | 1 | **red** | `8c6967046620747159410c41240a7c2e26bbf3216b19015e2a30274fbc0e7fde` |
+| S4_q0_counterpart_open_neutered: tests/v23/test_v23_q0_round.py: Q0RoundV23.open() returns instead of failing on a closed round (committed) (ran 169: 28 failures, 0 errors, 0 skipped) | 11 OK | 9 OK | 1 FAIL, 8 OK | 1 FAIL / 1 FAIL, 1 OK | 1 | **red** | `6c29f20245c5687e35b8d4c11712b4961e14323eb0438251725d803a1f58ec8a` |
+| S5_tests_v23_init_deleted: tests/v23/__init__.py deleted (committed): discover no longer finds tests/v23 (ran 97: 0 failures, 0 errors, 0 skipped) | 11 OK | 9 OK | not run | not run / not run | 0 | **green** | `1a58f0dc0888ee2ccba5d408356dd5c9044c87df5efe82309e975b08c24a0c8f` |
+| S6_tests_v23_init_deleted_plus_run_py_edit: tests/v23/__init__.py deleted + one comment line after aisef2/app/run.py:693 (committed) (ran 97: 14 failures, 0 errors, 0 skipped) | 10 FAIL, 1 OK | 1 FAIL, 7 OK | not run | not run / not run | 1 | **red** | `1d4e5e71839bf6756513e522871795bcd844c40417ce0d235b8e8a13685aa7fd` |
+| S7_test_v23_rounds_deleted: tests/v23/test_v23_rounds.py deleted (committed) (ran 114: 0 failures, 2 errors, 0 skipped) | 11 OK | 9 OK | not run | not run / not run | 1 | **red** | `277c392b3d31a003ce8a9feeb04f8fc6fe9fa9d48b62123357986de392d5e3e7` |
+| O0_round_open_stub_record_missing: round-open stub; no round-v2.3 Q0 record (ran 40: 1 failures, 0 errors, 9 skipped) | not run | 9 SKIP | 1 FAIL, 8 OK | 1 OK / 3 OK | 1 | **red** | `002a8b84e762e365095de9f5bf2f371478725905c7d88de426c5e0af251d7daa` |
+| O1_round_open_stub_record_current: round-open stub; the record written by q0_round.py --write and committed (ran 40: 0 failures, 0 errors, 9 skipped) | not run | 9 SKIP | 9 OK | 1 OK / 3 OK | 0 | **green** | `1fbc5806bd47c263c1cdf0863877cdd57d134ce9ec4bb31e2006557507e4b982` |
+| O2_round_open_stub_record_stale_after_run_py_edit: round-open stub; the O1 record committed, then one comment line after aisef2/app/run.py:693 committed (ran 40: 4 failures, 0 errors, 9 skipped) | not run | 9 SKIP | 1 FAIL, 7 OK | 1 OK / 3 OK | 1 | **red** | `fe0e3b0ab3457fde954c85fb568aa4dc59a3c6af57b02e201416612b627cb535` |
+| O3_round_open_stub_record_one_byte_changed: round-open stub; the O1 record with calibrated_count 57 -> 56 (valid JSON) (ran 40: 1 failures, 0 errors, 9 skipped) | not run | 9 SKIP | 1 FAIL, 8 OK | 1 OK / 3 OK | 1 | **red** | `079d1329c1c764c5e7165770fde42d5cd71dc4f913f6ea5daff4b6cd193b1dc4` |
+| O4_round_open_stub_v22_record_corrupted_at_head: round-open stub; O1 record; the v2.2 Q0 record's checker_count 57 -> 58 at HEAD (ran 40: 5 failures, 0 errors, 9 skipped) | not run | 9 SKIP | 1 FAIL, 8 OK | 1 OK / 3 OK | 1 | **red** | `6931c1dffe6c397014dd16d1934be0e3eb1b06484445d3f23e73f05e0255e73e` |
+| O5_round_open_stub_v22_record_deleted_at_head: round-open stub; O1 record; the v2.2 Q0 record deleted at HEAD (ran 33: 1 failures, 1 errors, 9 skipped) | not run | 9 SKIP | 1 FAIL, 8 OK | 1 OK / 3 OK | 1 | **red** | `bd5e2c3bb6df387158fbd0a04f9bab931e0b69a2549126ab18c035fb62ee2d85` |
+
+Per-test lines in the logs omit subTest failures; the SUMMARY counts in the evidence include them.
+
+**Reading.**
+
+* **Intact without seq 13 (S1): red.** Every counterpart fails on the closed round. Q0RoundV23's test 1 names the
+  missing record too.
+* **Deleting or breaking the Q0 counterpart or q0_round.py (S2–S4), or `test_v23_rounds.py` (S7): red.** The 12 v2.2
+  tests run again, and the surviving wiring test, Coverage or import fails.
+* **Deleting `tests/v23/__init__.py` (S5) hides all of tests/v23: the v2.2.0 gate itself.** All 12 original
+  controls run and pass, because nothing has moved yet (as R3's scenario B). With one comment line in `run.py` (S6)
+  they are red, Q0 included (b1_bindings uncalibrated).
+* **With the round open (stubbed), only the current record is green (O1).** Missing (O0), stale after a run.py edit
+  (O2), one byte changed (O3), and the v2.2 record corrupted (O4) or deleted (O5) at HEAD are each red on Q0RoundV23
+  test 1, naming the cause.
+
+The record the real writer produced in O1 has a `calibration` body exactly equal to the v2.2 record's JSON: nothing
+has moved yet.
+
+### 8.6 Regression tests (always run, seconds)
+
+* `tests/v23/test_v23_q0_round.py`:
+  * `Q0Record`: record missing, not JSON, not UTF-8, stale, one byte changed, CRLF and current; v2.2 history missing,
+    corrupted or truncated, and CRLF; a dropped checker and a short registry; the writer refuses a closed round, an
+    existing file and an uncalibrated tree, and writes once; `run()` enters round v2.3;
+  * `Q0Coverage`;
+  * `Q0Replay`.
+* `tests/v23/test_v23_seq13_wiring.py`:
+  * `WiringR4`: 6 pins; deleting or editing each un-skips all 12; variant D; CRLF; the ordinary skip without the
+    tier; the R2 and R3 contrasts;
+  * `LedgerSeq13` now also refuses R3 approved in words quoting R3's digest.
+* `tests/v23/test_v23_ledger_digest.py`: pins R3 `72e296b6…` and R4 `8db40e8c65c0094b36812ff6338819e8afbe91388e8f058647ae935a6978d63b`; R4 only extends R3's `SCOPE`,
+  `EVIDENCE_REVIEWED` and `NOT_AUTHORIZED`.
+
+### 8.7 The revised seq-13 object
+
+`docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R4.md`, **canonical ruling digest `8db40e8c65c0094b36812ff6338819e8afbe91388e8f058647ae935a6978d63b`**. The authority stays a placeholder
+that asks for the owner's own words quoting the digest; there is no signature and no approval date. The changes vs R3,
+field by field, are in R4.
+
+**R4 supersedes R3** (and R3's patch `40e6b57a…`): neither is to be ratified or applied. R1–R3 are unchanged and
+digest as recorded.
+
+### 8.8 NOT_DONE (stated)
+
+* Full suite and full sealing job: not run (project rule; the integrator's batch).
+* `RoundV23.test_replay_v22` was not run inside the patched clone: a second full checkout during the e2e copy would
+  break the one-copy rule. The same tool replayed all 12 at v2.2.0 on its own (§8.2).
+* The round-v2.3 Q0 record is not committed. It cannot be: the writer refuses until seq 13 (R4) is committed and the
+  round exists (L1-F5). Its green was shown only with the harness stub (O1).
+* Not decided, and not to be decided by this track: OD-Q0-1-W1B / OD-B1B (`b1_bindings`), OD-NEWMOD, the F5 cut-over,
+  L1-F5's round path. **Final E5 qualification waits at this boundary.**
+* Measured after the evidence was written, so recorded here only: on an APFS clone of the final tree of this commit (everything above committed in the clone, the patch not applied), Q0 regenerates **57/57, byte-identical** (`714625b1…`), 230.5 s, with `problems_of` = [] and `history_problems` = []. Targeted tests in the worktree (unsealed, env guard): `discover -s tests/v23` ran 73, OK, 26 skipped (gated); `tests/v2/test_sealing_gate.py` 3 OK; `tests/v2/test_v1_evidence_guard.py` 26 OK; `tests/v2/p0/test_checker_calibration.py` 13 ran, OK, 9 skipped (gated). ruff clean.
+
 ## Reproduce
 
     python3 -P validation/v23/replay_v22.py                       # fresh clone at v2.2.0, all 11, exit 0 = PASS
@@ -413,3 +616,5 @@ plus one appended entry and the R3 draft).
     python3 -P validation/v23/ledger_digest.py docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT*.md
     python3 -P -m unittest discover -s tests/v23 -t . -p test_v23_seq13_wiring.py   # RA-GP-1 / RA-INT-2 regressions
     AISEF_SEALING=1 python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q -p test_v23_rounds.py   # red today: round not open
+    python3 -P validation/v23/q0_round.py --check                  # round-v2.3 Q0 vs this tree (red today: no record)
+    python3 -P -m unittest discover -s tests/v23 -t . -p test_v23_q0_round.py   # Q0-1 controls (Q0RoundV23/Q0Wiring gated)

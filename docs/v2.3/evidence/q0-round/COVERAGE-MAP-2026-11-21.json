@@ -1,0 +1,684 @@
+{
+ "assertions": 59,
+ "counterparts_sha256": "7594e4d7ff0d51070dd78f918aea5515fe8c17d31fe9eacb98a3c0f9f7e3ad0c",
+ "gaps": [],
+ "q0_counterpart_sha256": "8bdf86cd908e224bb2d3df60a16aad7cf17ccaf6a2e601791044ecd91d963004",
+ "schema": "aisef.v23.round-coverage/1",
+ "tests": [
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(pc.check_v22(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 62,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(pc.check_v22(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(pc.record_v22(self.b)['verdict'], 'PLAN CORRECTION ADMITTED STATICALLY')",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 63,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(pc.record_v22(self.b)['verdict'], 'PLAN CORRECTION ADMITTED STATICALLY')"
+    },
+    {
+     "counterpart": "self.assertEqual(pc.history_problems(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 64,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(pc.history_problems(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(json.loads((ROOT / pc.OUT_REL).read_text(encoding='utf-8'))['verdict'], 'PLAN CORRECTION ADMITTED STATICALLY')",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 65,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(json.loads((ROOT / pc.OUT_REL).read_text(encoding='utf-8'))['verdict'], 'PLAN CORRECTION ADMITTED STATICALLY')"
+    }
+   ],
+   "blob_sha256": "e775b80f884d225beb4b482ce442d0e135717a26550f2d191574e44d98fae55c",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_PLAN",
+   "counterpart_found": true,
+   "id": "tests/v2/test_c2_delivery_experiment.py::PlanCorrection.test_the_committed_record_is_what_this_tree_derives",
+   "node": "PLAN"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(kn.check_v22(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 261,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(kn.check_v22(), [])"
+    },
+    {
+     "counterpart": "self.assertIn('closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json', kn.BOUND)",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 262,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertIn('closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json', kn.BOUND)"
+    },
+    {
+     "counterpart": "self.assertEqual(kn.history_problems(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 263,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(kn.history_problems(), [])"
+    }
+   ],
+   "blob_sha256": "c3af2b0625f946736f86d303d261e300e40127797fd20c9ffe1dd4c932898103",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_K_NOWORK",
+   "counterpart_found": true,
+   "id": "tests/v2/test_c2_k_nowork_001.py::Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after",
+   "node": "K-NOWORK"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(rp.release_differences_v22(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 732,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(rp.release_differences_v22(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual((eq['items'], eq['identical'], staged), (7, 6, ['pre-satisfied']))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 736,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual((eq['items'], eq['identical'], staged), (7, 6, ['pre-satisfied']))"
+    },
+    {
+     "counterpart": "self.assertTrue(all((v['outcomes_identical'] for v in eq['by_item'].values())))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 737,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(all((v['outcomes_identical'] for v in eq['by_item'].values())))"
+    },
+    {
+     "counterpart": "self.assertEqual(sorted((i for i, v in eq['by_item'].items() if not v['journal_identical_but_kernel_identity'])), staged)",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 738,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(sorted((i for i, v in eq['by_item'].items() if not v['journal_identical_but_kernel_identity'])), staged)"
+    },
+    {
+     "counterpart": "self.assertEqual(k['removed_from_the_old_journal'], {'story/resource-acquired': 3, 'tests/adequacy': 1, 'story/resource-released': 3, 'gate/check': 1})",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 740,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(k['removed_from_the_old_journal'], {'story/resource-acquired': 3, 'tests/adequacy': 1, 'story/resource-released': 3, 'gate/check': 1})"
+    },
+    {
+     "counterpart": "self.assertEqual(k['adequacy_stage_events_in_the_new_journal'], {})",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 742,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(k['adequacy_stage_events_in_the_new_journal'], {})"
+    },
+    {
+     "counterpart": "self.assertTrue(k['journal_identical_but_kernel_identity_and_the_adequacy_stage'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 743,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(k['journal_identical_but_kernel_identity_and_the_adequacy_stage'])"
+    },
+    {
+     "counterpart": "self.assertTrue(k['subprocesses_identical_but_the_tests_of_the_stage'] and k['other_observations_identical_but_subprocesses'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 744,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(k['subprocesses_identical_but_the_tests_of_the_stage'] and k['other_observations_identical_but_subprocesses'])"
+    },
+    {
+     "counterpart": "self.assertEqual((k['subprocesses']['old']['tests'], k['subprocesses']['new']['tests']), (3, 0))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 745,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual((k['subprocesses']['old']['tests'], k['subprocesses']['new']['tests']), (3, 0))"
+    },
+    {
+     "counterpart": "self.assertEqual(old['raised'], 'InvariantError: cycle 1 proves a story with exactly one probe factory')",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 747,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(old['raised'], 'InvariantError: cycle 1 proves a story with exactly one probe factory')"
+    },
+    {
+     "counterpart": "self.assertEqual((new['raised'], new['attempts']), (None, ['COMMIT']))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 748,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual((new['raised'], new['attempts']), (None, ['COMMIT']))"
+    }
+   ],
+   "blob_sha256": "19e9da22eaca190f9d90a655ba656cec37e8e5101d94c21e8f051d334524367b",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_ORCH",
+   "counterpart_found": true,
+   "id": "tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story",
+   "node": "ORCH"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(B.check_version_forward(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 104,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(B.check_version_forward(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual((rec['verdict'], rec['census']['cohort_count'], rec['census']['cohort_records']), ('machinery qualified; cohort count = 0', 0, []))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 106,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual((rec['verdict'], rec['census']['cohort_count'], rec['census']['cohort_records']), ('machinery qualified; cohort count = 0', 0, []))"
+    },
+    {
+     "counterpart": "self.assertTrue(all((c['holds'] for c in rec['adversarial'])))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 108,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(all((c['holds'] for c in rec['adversarial'])))"
+    },
+    {
+     "counterpart": "self.assertTrue(B.problems_of(broken))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 111,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(B.problems_of(broken))"
+    }
+   ],
+   "blob_sha256": "c1595c22ff1e70b958ae5a714bb3c1cb3395ef1382cd25c4371d057da5b044f9",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_P10_COHORT",
+   "counterpart_found": true,
+   "id": "tests/v2/test_c2_p10_cohort_static.py::Record.test_the_evidence_record_re_derives_from_the_tree",
+   "node": "P10-COHORT"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(B.check_version_forward(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 200,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(B.check_version_forward(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual((rec['verdict'], rec['live_provider_calls']), ('attestation qualified', 0))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 202,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual((rec['verdict'], rec['live_provider_calls']), ('attestation qualified', 0))"
+    },
+    {
+     "counterpart": "self.assertEqual({c['id']: c['grade'] for c in rec['classifications'] if c['id'].startswith('FIX-')}, {'FIX-FIXED': 'ATTESTED', 'FIX-COMBO': 'OPAQUE', 'FIX-ALIAS': 'OPAQUE', 'FIX-ROTATING': 'OPAQUE', 'FIX-UNLISTED': 'OPAQUE', 'FIX-UNMEASURED': 'OPAQUE'})",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 203,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual({c['id']: c['grade'] for c in rec['classifications'] if c['id'].startswith('FIX-')}, {'FIX-FIXED': 'ATTESTED', 'FIX-COMBO': 'OPAQUE', 'FIX-ALIAS': 'OPAQUE', 'FIX-ROTATING': 'OPAQUE', 'FIX-UNLISTED': 'OPAQUE', 'FIX-UNMEASURED': 'OPAQUE'})"
+    }
+   ],
+   "blob_sha256": "75b567758cc0fefeaee29012fb954c32300e164e762195f2b4fa8025c423b34d",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_P10_PROFILE",
+   "counterpart_found": true,
+   "id": "tests/v2/test_c2_p10_profile_freeze.py::Checker.test_the_evidence_record_re_derives",
+   "node": "P10-PROFILE"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(A.history_problems(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 69,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(A.history_problems(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(A.reverification_v22_problems(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 70,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(A.reverification_v22_problems(), [])"
+    }
+   ],
+   "blob_sha256": "f63dccfd1cd11d093efab9d3ed325c7924571c81265a82a175eef7b6e6c0d800",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_P5_REVERIFICATION",
+   "counterpart_found": true,
+   "id": "tests/v2/test_c2_p5_acceptance.py::Acceptance.test_the_acceptance_re_derives_on_this_tree",
+   "node": "P5-REVERIFICATION"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(A.check_v22_proposal(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 549,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(A.check_v22_proposal(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(A.proposal_history_problems(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 550,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(A.proposal_history_problems(), [])"
+    }
+   ],
+   "blob_sha256": "f63dccfd1cd11d093efab9d3ed325c7924571c81265a82a175eef7b6e6c0d800",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_P5_PROPOSAL_kernel_provenance",
+   "counterpart_found": true,
+   "id": "tests/v2/test_c2_p5_acceptance.py::KernelProvenance.test_on_this_tree_the_committed_proposal_is_current",
+   "node": "P5-PROPOSAL"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertFalse([t for t in record['targets'] if t.get('runner')])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 1696,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse([t for t in record['targets'] if t.get('runner')])"
+    },
+    {
+     "counterpart": "self.assertEqual(self.f5_problems(m, record, phase), [])",
+     "covered": true,
+     "kind": "rebound",
+     "line": 1697,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(m.problems_of(record, ROOT, phase), [])"
+    },
+    {
+     "counterpart": "self.assertIn(f'{t}: measured by a runner that does not classify — re-measure', problems)",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 1702,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertIn(f'{t}: measured by a runner that does not classify — re-measure', problems)"
+    }
+   ],
+   "blob_sha256": "5fbb7cb502e13a323c6184b24256ab80c81ff1ca40c039842578816d9944f1d8",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_MUTATION_historical",
+   "counterpart_found": true,
+   "id": "tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(PA.proposal_history_problems(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 146,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(PA.proposal_history_problems(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(PA.check_v22_proposal(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 147,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(PA.check_v22_proposal(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(found, [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 151,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(found, [])"
+    },
+    {
+     "counterpart": "self.assertEqual(rec['approvals']['given'], [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 153,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(rec['approvals']['given'], [])"
+    },
+    {
+     "counterpart": "self.assertFalse(any((m['approved'] for m in rec['decision_3_mappings'])))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 154,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse(any((m['approved'] for m in rec['decision_3_mappings'])))"
+    }
+   ],
+   "blob_sha256": "4c241500be0a59a06e7bab5acc8cb50e965e5065027bf8697d73d425eba69a0f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_P5_PROPOSAL_P5_8",
+   "counterpart_found": true,
+   "id": "tests/v2/test_p5_plan_v22_proposal.py::Record.test_P5_8_committed_record_is_current",
+   "node": "P5-PROPOSAL"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(self.M.check_v22(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 478,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(self.M.check_v22(), [])"
+    }
+   ],
+   "blob_sha256": "dd60d593d42b941aac0a4cb0e9a5232cb556f4b1017fdac9feb7761f68105531",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_Q5",
+   "counterpart_found": true,
+   "id": "tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree",
+   "node": "Q5"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(R.check_version_forward(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 169,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(R.check_version_forward(), [])"
+    },
+    {
+     "counterpart": "self.assertTrue(R.tolerated(), f'{R.OUT_REL} is not committed as it is')",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 170,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(R.tolerated(), f'{R.OUT_REL} is not committed as it is')"
+    }
+   ],
+   "blob_sha256": "b59e96a11b03f83160a742e29c4920a44b8e464b9af8886ccf2d6295806f2cc4",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_rounds.py::RoundV23.test_CONFORMANCE_RULING",
+   "counterpart_found": true,
+   "id": "tests/v2/test_v21_conformance_ruling.py::CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives",
+   "node": "CONFORMANCE-RULING"
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(cc.problems_of(self.result), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 34,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(cc.problems_of(self.result), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(self.result['calibrated_count'], len(cc.REGISTRY))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 35,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(self.result['calibrated_count'], len(cc.REGISTRY))"
+    },
+    {
+     "counterpart": "self.assertEqual((ROOT / Q.V23_REL).read_text(encoding='utf-8'), Q.render(self.result))",
+     "covered": true,
+     "kind": "rebound",
+     "line": 36,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual((ROOT / cc.OUT_REL).read_text(encoding='utf-8'), cc.render(self.result))"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_every_checker_is_calibrated_and_the_committed_record_is_current",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_every_checker_is_calibrated_and_the_committed_record_is_current",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertNotEqual(cc.OUT_REL, cc.HISTORY_REL)",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 39,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertNotEqual(cc.OUT_REL, cc.HISTORY_REL)"
+    },
+    {
+     "counterpart": "self.assertEqual(cc.history_problems(), [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 40,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(cc.history_problems(), [])"
+    },
+    {
+     "counterpart": "self.assertEqual(cc.history_problems(), [f'{cc.HISTORY_REL} is not its v2.0.0 blob (history)'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 43,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(cc.history_problems(), [f'{cc.HISTORY_REL} is not its v2.0.0 blob (history)'])"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_the_2_0_record_is_history",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_the_2_0_record_is_history",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertTrue((ROOT / r['fixture']).is_file())",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 48,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue((ROOT / r['fixture']).is_file())"
+    },
+    {
+     "counterpart": "self.assertTrue(r['clean_passes'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 49,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(r['clean_passes'])"
+    },
+    {
+     "counterpart": "self.assertTrue(r['rejects_for_the_expected_reason'], r['observed'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 50,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(r['rejects_for_the_expected_reason'], r['observed'])"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertFalse(cc.calibrate(cc.always_pass_mutant(c))['calibrated'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 56,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse(cc.calibrate(cc.always_pass_mutant(c))['calibrated'])"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_an_always_pass_checker_fails_calibration",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_an_always_pass_checker_fails_calibration",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertFalse(cc.calibrate(broken)['calibrated'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 61,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse(cc.calibrate(broken)['calibrated'])"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_a_checker_that_fails_everything_fails_calibration",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_a_checker_that_fails_everything_fails_calibration",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertFalse(cc.calibrate(wrong)['calibrated'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 66,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse(cc.calibrate(wrong)['calibrated'])"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_a_checker_that_rejects_for_the_wrong_reason_fails_calibration",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_a_checker_that_rejects_for_the_wrong_reason_fails_calibration",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertFalse(r['calibrated'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 71,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse(r['calibrated'])"
+    },
+    {
+     "counterpart": "self.assertIn('no committed known-bad fixture', r['reason'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 72,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertIn('no committed known-bad fixture', r['reason'])"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_a_missing_fixture_means_not_calibrated",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_a_missing_fixture_means_not_calibrated",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertFalse(r['rejects_known_bad'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 79,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse(r['rejects_known_bad'])"
+    },
+    {
+     "counterpart": "self.assertFalse(r['calibrated'])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 80,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertFalse(r['calibrated'])"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_a_stale_fixture_that_no_longer_fails_is_a_calibration_failure",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_a_stale_fixture_that_no_longer_fails_is_a_calibration_failure",
+   "node": null
+  },
+  {
+   "assertions": [
+    {
+     "counterpart": "self.assertEqual(self.result['uncovered_checker_modules'], [])",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 83,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertEqual(self.result['uncovered_checker_modules'], [])"
+    },
+    {
+     "counterpart": "self.assertIn('validation/v2/packaging_check.py', cc.uncovered_checker_modules(dropped))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 85,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertIn('validation/v2/packaging_check.py', cc.uncovered_checker_modules(dropped))"
+    },
+    {
+     "counterpart": "self.assertTrue(cc.problems_of(bad))",
+     "covered": true,
+     "kind": "verbatim",
+     "line": 87,
+     "replayed_at_v2_2_0": true,
+     "v22": "self.assertTrue(cc.problems_of(bad))"
+    }
+   ],
+   "blob_sha256": "8faac4dc1d54fb8b770598a1e640497df4e726d612b850727a2a6c4bf157fd6f",
+   "byte_identical_at_head": true,
+   "counterpart": "tests/v23/test_v23_q0_round.py::Q0RoundV23.test_an_uncalibrated_checker_module_is_a_failure",
+   "counterpart_found": true,
+   "id": "tests/v2/p0/test_checker_calibration.py::CheckerCalibration.test_an_uncalibrated_checker_module_is_a_failure",
+   "node": null
+  }
+ ],
+ "tool": "validation/v23/replay_v22.py",
+ "tool_sha256": "3f54e22b0f201072be279c058381e2dee3726bd86ac09bc52b3a09bbb788f87e",
+ "v22_commit": "da3ea33f3b695aaca73e87a704145a0193aced23"
+}
