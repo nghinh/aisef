@@ -881,27 +881,26 @@ def _classify(root, base, head, observations, tmp) -> list[State]:
         H = SD.Rev(root, head_sha, tmp)
     except SystemExit as e:
         return [State("<all>", "UNRESOLVED", "basis", f"the head's harness cannot be loaded: {e}")]
-    live, bad = _live(root, H)
-    stop = None
+    def stopped(component: str, reason: str) -> list[State]:
+        live, bad = _live(root, H)
+        out = [State(t["target"], "UNRESOLVED", component, reason, mutants=t.get("mutants") or 0) for _, t in live]
+        return sorted(out + [dataclasses.replace(s, state="UNRESOLVED", component=component, reason=reason) for s in bad],
+                      key=lambda s: s.target)
     base_sha = _rev(root, base)
     if S2._git(root, "rev-parse", "--is-shallow-repository").stdout.strip() == b"true":
-        stop = ("basis", "shallow clone: the basis history cannot be proven")
-    elif base_sha is None:
-        stop = ("basis", f"basis commit {base} unavailable")
-    elif dirty := _dirty(root, head_sha, H.copy):
-        stop = ("dirty", f"dirty tree: {dirty[0]}" + (f" (+{len(dirty) - 1} more)" if len(dirty) > 1 else ""))
-    if stop:
-        out = [State(t["target"], "UNRESOLVED", *stop, mutants=t.get("mutants") or 0) for _, t in live]
-        return sorted(out + [dataclasses.replace(s, state="UNRESOLVED", component=stop[0], reason=stop[1]) for s in bad],
-                      key=lambda s: s.target)
+        return stopped("basis", "shallow clone: the basis history cannot be proven")
+    if base_sha is None:
+        return stopped("basis", f"basis commit {base} unavailable")
+    if dirty := _dirty(root, head_sha, H.copy):
+        return stopped("dirty", f"dirty tree: {dirty[0]}" + (f" (+{len(dirty) - 1} more)" if len(dirty) > 1 else ""))
     try:
         B = H if base_sha == head_sha else SD.Rev(root, base_sha, tmp)
     except SystemExit as e:
-        stop = ("basis", f"the basis harness cannot be loaded: {e}")
-        return sorted([State(t["target"], "UNRESOLVED", *stop, mutants=t.get("mutants") or 0) for _, t in live]
-                      + [dataclasses.replace(s, state="UNRESOLVED", component=stop[0], reason=stop[1]) for s in bad],
-                      key=lambda s: s.target)
+        return stopped("basis", f"the basis harness cannot be loaded: {e}")
     ctx = _Ctx(root, B, H, observations)
+    if any(p.endswith(".py") for p in ctx.delta) or (observations is not None and ctx.delta):
+        ctx.prefetch()   # before any record is read: each git child is forked from this process, small only now
+    live, bad = _live(root, H)
     base_entries: dict[str, dict[str, list]] = {}
     out = list(bad)
     for rel in sorted({r for r, _ in live}):
