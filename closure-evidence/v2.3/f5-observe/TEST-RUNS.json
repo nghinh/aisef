@@ -1,0 +1,77 @@
+{
+ "about": "tests/v23 (validation/v23/impact.py and validation/v23/observe.py, W1a F5 recorder) run on each host at the lane's final code commit f95ff6e8; raw logs stay in scratch, named here by sha256",
+ "command": "python3 -P -m unittest discover -v -s tests/v23 -t .",
+ "commit": "f95ff6e8",
+ "earlier": {
+  "commit": "75080a80",
+  "log_sha256": {
+   "darwin": "f58f1695329904673ca527a4a32df8db7a21f2c930a06d2e893eece0d8b3a7a6",
+   "linux": "d254ea25c798580995a43b75ab0b33adbea2c3ab04b509fcbe5bd7c784b8295c"
+  },
+  "note": "the same two runs at the previous code commit, before the strace fd-relative accounting fix: 89 tests, 88 passed, 1 skipped on each host"
+ },
+ "env_guard": "PATH without any directory holding an opencode executable; XDG_DATA_HOME, XDG_STATE_HOME, XDG_CACHE_HOME in scratch; no network, no paid provider, opencode never run",
+ "fixture": {
+  "normalized": "run tree -> /w/tree; every path under /home, /tmp or /root -> /w/x",
+  "path": "tests/v23/fixtures/strace-toy.json",
+  "recorded_on": "the Linux host above, strace 6.8, CPython 3.12.3"
+ },
+ "owner_negatives": [
+  "test_1_missing_child_process_tracing",
+  "test_2a_dynamic_import",
+  "test_2b_runtime_path_construction",
+  "test_3_directory_enumeration_detects_a_new_test",
+  "test_4_changed_environment_platform_or_toolchain",
+  "test_5_a_mutant_branch_reads_a_changed_file",
+  "test_6_changed_transitive_dependency",
+  "test_7_missing_or_truncated_trace_files",
+  "test_8_tampered_provenance_or_missing_measurement",
+  "test_9_modified_kill_test_or_mutant_generator"
+ ],
+ "runs": [
+  {
+   "backend_of_real_recordings": "audit",
+   "errors": 0,
+   "failures": 0,
+   "host": {
+    "arch": "arm64",
+    "git": "2.53.0",
+    "os": "Darwin",
+    "python": "CPython 3.14.7",
+    "release": "25.5.0",
+    "strace": null
+   },
+   "log_sha256": "1f06dadc4aa2b30a7766c09a2f1b7284714f0c26b98000f680196d47a4b87335",
+   "passed": 88,
+   "ran": 89,
+   "seconds": 406.4,
+   "skipped": 1,
+   "skipped_tests": {
+    "StraceBackend.test_backend_records_children_and_threads": "strace backend: needs strace on a Linux host (this host has none; the parser runs on recorded fixtures)"
+   },
+   "tree": "the lane's worktree holding the commit's code and test bytes (its docs and evidence were committed after the run)"
+  },
+  {
+   "backend_of_real_recordings": "strace",
+   "errors": 0,
+   "failures": 0,
+   "host": {
+    "arch": "x86_64",
+    "git": "2.43.0",
+    "os": "Linux",
+    "python": "CPython 3.12.3",
+    "release": "6.8.0-147-generic",
+    "strace": "6.8"
+   },
+   "log_sha256": "dd29851ef8ac0914369121b00ddb89d462984b0ba7c6247e48e3febc0d1c481b",
+   "passed": 88,
+   "ran": 89,
+   "seconds": 144.6,
+   "skipped": 1,
+   "skipped_tests": {
+    "ImpactTest.test_option_c_honoured_on_the_real_repository": "v2.2.0 history not available (an archive has no git history)"
+   },
+   "tree": "git archive of the commit, extracted into a new scratch directory (no .git)"
+  }
+ ]
+}
