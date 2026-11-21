@@ -233,9 +233,13 @@ def _on(rule: str) -> bool:
 
 
 def _fold(p: str) -> str:
-    """A path as a case- and normalization-insensitive volume compares it (APFS, NTFS): two spellings of one file
-    fold alike. Comparing folded names can only match more paths, never fewer."""
-    return unicodedata.normalize("NFKC", unicodedata.normalize("NFKC", p).casefold())
+    """A path as the coarsest volume compares it: NFKC, case folded, format characters (HFS+'s ignorables) dropped.
+    Two names one supported volume takes for the same (exact on ext4; case- and normalization-insensitive on APFS, ext4
+    casefold, HFS+) fold alike. In a MEMBERSHIP test (is any spelling of p among what was read or listed) folding can
+    only match more paths. Never compare two folded ANSWERS for equality: two different spellings fold alike, so a
+    change between them would be hidden (Review 2, R2-1); the lookup check compares `_Ctx.spellings` instead."""
+    p = "".join(c for c in unicodedata.normalize("NFKC", p) if unicodedata.category(c) != "Cf")
+    return unicodedata.normalize("NFKC", p.casefold())
 
 
 # ---------------------------------------------------------------------------------------------- source segments
@@ -479,10 +483,29 @@ def _qualdefs(src: str) -> collections.Counter:
 
 
 _DYN_ATTR = {"getattr": 1, "hasattr": 1, "setattr": 1, "delattr": 1, "attrgetter": 0, "methodcaller": 0}
-#: a computed name unless every argument (module name AND file path) is a literal
-_DYN_IMPORT = {"import_module", "spec_from_file_location", "SourceFileLoader", "run_path", "run_module"}
-_DYN_BUILTIN = {"exec", "eval", "compile", "globals", "vars", "locals", "dir", "__import__"}
-_LAUNCH = {"run", "Popen", "call", "check_call", "check_output", "system", "posix_spawn", "spawnv", "execv"}
+#: name-taking import entry points and loaders: a site unless every argument (module name AND file path) is a literal
+#: and the name is absolute; referenced other than by a call, or named by a string constant, always (Review 2, R2-2)
+_DYN_IMPORT = {"import_module", "spec_from_file_location", "SourceFileLoader", "SourcelessFileLoader",
+               "ExtensionFileLoader", "run_path", "run_module", "find_spec", "find_module", "find_loader", "get_loader",
+               "resolve_name", "module_from_spec", "exec_module", "load_module", "load_source", "spec_from_loader",
+               "zipimporter", "loadTestsFromName", "loadTestsFromNames"}
+#: a site wherever the name occurs: an import in any form, a test walk, the import path's hooks
+_DYN_ANY = {"__import__", "discover", "meta_path", "path_hooks", "path_importer_cache"}
+_DYN_BUILTIN = {"exec", "eval", "compile", "globals", "vars", "locals", "dir"}
+#: modules whose members hide a site when bound under another name (`as`), or are read by getattr
+_LOADERS = {"importlib", "pkgutil", "runpy", "zipimport", "imp", "builtins", "sys", "unittest", "subprocess", "os",
+            "asyncio", "pty"}
+#: a launch runs code S(F) need not hold (a script, `-c` text, stdin, another PYTHONPATH): always a site (R2-2)
+_SPAWNERS = ("subprocess", "os", "asyncio", "pty")
+_LAUNCH = {"run", "Popen", "call", "check_call", "check_output", "getoutput", "getstatusoutput", "system", "popen",
+           "posix_spawn", "posix_spawnp", "create_subprocess_exec", "create_subprocess_shell"}
+
+
+def _launch(owner, name) -> bool:
+    """`owner.name(...)` starts a process (os.exec*/spawn*, subprocess.*, asyncio.create_subprocess_*, pty.spawn)."""
+    name = str(name)
+    return owner in _SPAWNERS and (name in _LAUNCH or name.startswith(("exec", "spawn"))) and (
+        owner != "asyncio" or name.startswith("create_subprocess"))
 
 
 def _module_of(p: str) -> str | None:
@@ -503,8 +526,12 @@ def _literal(x: ast.AST) -> bool:
 
 
 def dynamic_sites(src: str, path: str) -> list[tuple[str, str, int, str]]:
-    """R8: (file, enclosing qualname, line, ast.dump) of every computed-name site."""
+    """R8: (file, enclosing qualname, line, ast.dump) of every computed-name site: a call that may load or run code by
+    a name or path not written as a literal, and every way of reaching such a call under another name (Review 2,
+    R2-2: the spellings are enumerated; an unlisted one is the residual R8-SPELLINGS)."""
     out = []
+    tree = ast.parse(_lf(src))
+    called = {id(c.func) for c in ast.walk(tree) if isinstance(c, ast.Call)}
 
     def visit(node, qual):
         for ch in ast.iter_child_nodes(node):
@@ -515,27 +542,38 @@ def dynamic_sites(src: str, path: str) -> list[tuple[str, str, int, str]]:
             if isinstance(ch, ast.Call):
                 f = ch.func
                 name = getattr(f, "attr", None) or getattr(f, "id", None)
-                owner = getattr(getattr(f, "value", None), "id", None)
+                v = getattr(f, "value", None)
+                owner = getattr(v, "id", None) or getattr(v, "attr", None)
+                args = [*ch.args, *(k.value for k in ch.keywords)]
                 if name in _DYN_ATTR:
                     i = _DYN_ATTR[name]
-                    hit = len(ch.args) <= i or not _literal(ch.args[i])
-                elif name in _DYN_IMPORT:
-                    hit = not ch.args or not all(_literal(x) for x in [*ch.args, *(k.value for k in ch.keywords)])
+                    hit = len(ch.args) <= i or not _literal(ch.args[i]) or getattr(ch.args[0], "id", None) in _LOADERS
+                elif name in _DYN_IMPORT or owner == "resources":   # importlib.resources imports the package it names
+                    hit = not ch.args or not all(_literal(x) for x in args) or ch.args[0].value.startswith(".")
                 elif (isinstance(f, ast.Name) and name in _DYN_BUILTIN) or name == "getmembers" or owner == "runpy" \
                         or (owner in ("pickle", "marshal") and name in ("load", "loads")):
                     hit = True
-                elif name in _LAUNCH and owner in ("subprocess", "os") and ch.args:
-                    argv = ch.args[0]
-                    elts = argv.elts if isinstance(argv, ast.List | ast.Tuple) else [argv]
-                    hit = not all(_literal(e) or ast.unparse(e) == "sys.executable" for e in elts)
+                elif _launch(owner, name):
+                    hit = True
+            elif isinstance(ch, ast.Name | ast.Attribute):
+                name, v = (ch.id, None) if isinstance(ch, ast.Name) else (ch.attr, ch.value)
+                hit = (name in _DYN_ANY or (name in _DYN_IMPORT and id(ch) not in called)
+                       or (name == "path" and getattr(v, "id", None) == "sys")
+                       or (id(ch) not in called and _launch(getattr(v, "id", None), name)))
+            elif isinstance(ch, ast.Constant):
+                hit = isinstance(ch.value, str) and ch.value in _DYN_IMPORT | _DYN_ANY
+            elif isinstance(ch, ast.Import | ast.ImportFrom):
+                mod = getattr(ch, "module", None) or ""
+                hit = any(
+                    a.name == "*" or (a.asname and (mod or a.name).split(".")[0] in _LOADERS)
+                    or mod.startswith("importlib.resources") or _launch(mod.split(".")[0], a.name)
+                    or (mod == "sys" and a.name in {"path"} | _DYN_ANY) for a in ch.names)
             elif isinstance(ch, ast.Subscript) and isinstance(ch.value, ast.Attribute) and ch.value.attr == "__dict__":
-                hit = True
-            elif isinstance(ch, ast.ImportFrom) and any(a.name == "*" for a in ch.names):
                 hit = True
             if hit:
                 out.append((path, qual, getattr(ch, "lineno", 0), ast.dump(ch)))
             visit(ch, q)
-    visit(ast.parse(_lf(src)), "")
+    visit(tree, "")
     return out
 
 
@@ -795,17 +833,20 @@ class _Ctx:
         return self.cache(("blobsha", path), lambda: _sha(b) if (b := _blob(self.root, self.H.sha, path)) is not None
                           else None)
 
-    def kind(self, R, p: str) -> str | None:
-        """What `p` is in the runner tree of commit R: "file", "dir" (a file lies under it) or None — under any
-        spelling a case- or normalization-insensitive volume takes for it (folded)."""
-        files = self.cache(("folded", R.sha), lambda: sorted(_fold(x) for x in self.copy_files(R)))
-        p = _fold(p)
-        i = bisect.bisect_left(files, p)
-        if i < len(files) and files[i] == p:
-            return "file"
-        d = "" if p in ("", ".") else p + "/"
-        i = bisect.bisect_left(files, d)
-        return "dir" if i < len(files) and files[i].startswith(d) else None
+    def spellings(self, R, p: str) -> frozenset:
+        """R2: every (exact path, "file" or "dir") of commit R's runner tree that folds as `p` does ("" is the tree;
+        a dir is a path a file lies under). When these sets are equal at basis and head, a lookup of p gets one answer
+        at both on any volume whose name equivalence the fold covers. One folded kind compared would not see a
+        directory renamed to another spelling that folds alike (Review 2, R2-1)."""
+        def index():
+            out = collections.defaultdict(set)
+            for f in self.copy_files(R):
+                parts = f.split("/")
+                out[_fold(f)].add((f, "file"))
+                for k in range(len(parts)):
+                    out[_fold("/".join(parts[:k]))].add(("/".join(parts[:k]), "dir"))
+            return out
+        return frozenset(self.cache(("spellings", R.sha), index).get("" if p in ("", ".") else _fold(p), ()))
 
     def admissible(self, F: str, O: dict, claim: str, plat: dict, entry_py: str | None) -> tuple[str | None, list]:
         """R0: why O(F) is not admissible for an entry measured on `plat` with interpreter `entry_py`, or None; and
@@ -1265,9 +1306,11 @@ class _Ctx:
             for p in sorted(delta) if _on("R2") else ():
                 if _fold(p) in fdata or (delta[p] == "D" and _fold(p) in fopened):
                     return "INVALIDATED", "R2", f"{F} reads {p} as data" if delta[p] != "D" else f"{F} opened {p}, now removed"
-            for p in sorted(data) if _on("R2") and delta else ():   # a lookup's answer: existence and kind
-                if (was := self.kind(self.B, p)) != (now := self.kind(self.H, p)):
-                    return "INVALIDATED", "R2", f"{F} looked up {p}, which was {was or 'absent'} and is {now or 'absent'}"
+            for p in sorted(data) if _on("R2") and delta else ():   # a lookup's answer: existence and kind, any spelling
+                if (was := self.spellings(self.B, p)) != (now := self.spellings(self.H, p)):
+                    def said(s, p=p):
+                        return ", ".join(k if x == p else f"{k} {x}" for x, k in sorted(s)) or "absent"
+                    return "INVALIDATED", "R2", f"{F} looked up {p}, which was {said(was)} and is {said(now)}"
             listed = {_fold(SD._norm(x)) for x in O.get("listed") or []}
             by = {SD._norm(k): frozenset(v) for k, v in (O.get("listed_by") or {}).items()}
             registry_changed = SD.REGISTRY in delta
