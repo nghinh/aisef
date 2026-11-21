@@ -1,0 +1,97 @@
+{
+ "record": "AISEF v2.3 — F5 SCALE-1 PILOT 1 (impact validation + throughput only)",
+ "owner_direction": "SCALE-1 bounded GO 2026-11-21: one pilot, <= 12 representative targets, <= 300 mutants, <= 8 cumulative machine-hours; impact validation and throughput only; qualifies nothing else",
+ "qualifies": "NOTHING. Not a qualification record; no target outside this file is measured by it, and no row here is offered as MEASURED or VERIFIED_REUSE evidence without a separate owner decision.",
+ "tree": {
+  "commit": "79e9b88f9cd65b0f52e329ae4157cfeedae031ad",
+  "branch": "release/v2.3-big (pushed)",
+  "how": "detached git worktree; validation/v2/mutation.py run (unchanged since v2.2.0), records written only inside that worktree, never the main checkout; no --order table"
+ },
+ "basis": {
+  "commit": "da3ea33f3b695aaca73e87a704145a0193aced23",
+  "what": "v2.2.0 records read with git show <basis>:<record>"
+ },
+ "budget": {
+  "targets": [
+   12,
+   12
+  ],
+  "mutants": [
+   233,
+   300
+  ],
+  "machine_hours": [
+   0.53,
+   8
+  ],
+  "workers": 1,
+  "paid_spend_usd": 0
+ },
+ "host": {
+  "cpu": "Apple M1",
+  "cores": 8,
+  "memory_gib": 16,
+  "os": "macOS 26.5.2",
+  "python": "CPython 3.14.7 arm64",
+  "concurrent_load": "an F5 fix-pass agent ran tests/classification on the same host during the pilot",
+  "loadavg_start_end": [
+   "{ 1.46 1.84 2.25 }",
+   "{ 5.36 4.48 3.38 }"
+  ]
+ },
+ "run": {
+  "start_utc": "2026-11-21T07:49:29Z",
+  "end_utc": "2026-11-21T08:21:14Z",
+  "wall_seconds": 1905,
+  "runner_exit": 1,
+  "runner_check": "mutation: FAIL in the pilot tree, only `unaudited survivor` x4 for aisef2/app/bundle_cli.py::_group (its v2.2 audits bind the ruling-basis digest; the pilot row carries the current source digest). Expected for a scratch tree; not a defect."
+ },
+ "env_guard": {
+  "path_without_opencode": true,
+  "xdg_data_state_cache": "scratch, left empty",
+  "opencode_store_sessions_before_after": [
+   1998,
+   1998
+  ]
+ },
+ "selection": "strata: platform flavor darwin / linux / unproven / runner-1 legacy (I6); basis v2.2.0-accepted and ruling (I8); survivors present; kill files that read closure-evidence (where the post-v2.2.0 delta lies); a story_runner target (E5 module); one heavy-tail target (~85 s/mutant). Windows-only entries (3) excluded: not runnable on this host.",
+ "results": {
+  "mutant_lists_identical": true,
+  "kill_sets_identical": true,
+  "killed_counts_identical": true,
+  "survivor_sets_identical": true,
+  "survivors": 14,
+  "per_mutant_class_differences": 0,
+  "first_kill_file_differences": 4,
+  "first_kill_file_note": "all 4 in aisef2/app/review_ocr.py::OCR: its v2.2 entry ran under an execution_order table, the pilot ran the default order; outcome class unchanged",
+  "source_digest_note": "11/12 equal; aisef2/app/bundle_cli.py::_group differs by design (its v2.2 entry keeps the original measured digest under the B1 reuse ruling, I8); classes unchanged"
+ },
+ "throughput": {
+  "seconds_per_mutant_wall": 8.18,
+  "test_seconds_pilot_total": 1040.4,
+  "t0_seconds_pilot_total": 407.4,
+  "overhead_seconds": 457,
+  "timed_targets_test_seconds_basis_vs_pilot": [
+   1088.7,
+   1015.9
+  ],
+  "ratio_pilot_over_basis": 0.93,
+  "per_target_ratio_range": [
+   0.49,
+   1.3
+  ]
+ },
+ "interpretation": [
+  "F5 (static, no recorder) classified all 12 as non-reusable: 10 INVALIDATED (R1: no observation) and 2 UNRESOLVED (I6: no platform evidence). Fresh measurement found 0 outcome differences in 233 mutants.",
+  "For these 12 targets only: the post-v2.2.0 delta (9 added closure-evidence records + docs) changed no kill outcome; R1's INVALIDATED here reflects missing observation, not observed impact. This is consistent with R1 being conservative and is NOT a proof for any other target.",
+  "The v2.2 record timings predict this host's cost (ratio 0.93 over 10 timed targets, per-target 0.49-1.30); runner-1 legacy entries carry no timings, and the two measured here cost 0.6 s/mutant."
+ ],
+ "files": {
+  "pilot-entries.redacted.json": {
+   "sha256_unredacted": "f8ea380e60af92c6c5ef7c14d566884d9038e10f2bae88e7e20713945ebadefc",
+   "redactions": 2,
+   "what": "local macOS temp-dir prefix -> <tmp>"
+  },
+  "compare.json": "per-target, per-mutant comparison (compare.py logic: positional rows, class, first kill file)"
+ }
+}
