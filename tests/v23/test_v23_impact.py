@@ -1,21 +1,26 @@
 """validation/v23/impact.py (F5 static impact engine) on toy git repositories: the W1-DESIGN §9 negatives N1-N33, the
 adversarial-review regressions D1-D5 and the re-review's A1/D4/I4/F2 (each mirrors the reviewer's probe), and N14: every rule is load-bearing — with
 that one rule switched off, at least one negative case becomes VERIFIED_REUSE, while the intact engine keeps every
-negative case non-reuse. Each toy holds the real generator and runner-settings segments of validation/v2/mutation.py
-(copied into the toy at test time, so the toy follows the real harness), toy tables, toy targets and one committed
-record. Nothing is measured; no kill test runs. Not a kill file."""
+negative case non-reuse. Each toy holds the whole of the real validation/v2/mutation.py with toy tables appended (so
+the toy's runner is the real one and validation/v23/observe.py can run it), toy targets and one committed record.
+Observations are observe.py records derived from a synthetic witness written here (`Toy.observe`): R0 verifies and
+binds them exactly as it does a recorded one. Nothing is measured; no kill test runs. Not a kill file (tests/v23 is
+outside every mutation.COPY root: Amendment A2)."""
 
 from __future__ import annotations
 
 import contextlib
+import functools
 import io
 import json
 import os
 import pathlib
+import posixpath
 import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.case
 from typing import NamedTuple
 from unittest import mock
 
@@ -27,10 +32,11 @@ from validation.qualification import s2_mutation_record as S2  # noqa: E402
 from validation.qualification import v21_snapshot_delta as SD  # noqa: E402
 from validation.v2 import mutation as M  # noqa: E402
 from validation.v23 import impact  # noqa: E402
+from validation.v23 import observe as OBS  # noqa: E402
 
 REAL = (ROOT / impact.MUTATION_REL).read_text(encoding="utf-8")
-KEEP = {"source_digest", "_SWAP", "_inert", "_script", "_root", "mutants", "_enum_members", "null_mutant",
-        "superseded", *impact.I9_NAMES}
+#: what a toy commits besides its own files: the real runner's helper and the real recorder, byte for byte
+RUNNER_FILES = {rel: (ROOT / rel).read_bytes() for rel in ("validation/v2/cleanup_authority.py", OBS.TOOL)}
 RECORD = "closure-evidence/v2/T-MUTATION.json"
 TGT, INC, DOC, DYN = "aisef2/toy.py::target", "aisef2/util.py::inc", "aisef2/doc.py::keys", "aisef2/dyn.py::pick"
 K = "tests/v2/test_k.py"
@@ -44,6 +50,11 @@ TARGETS = {
 PY = f"{sys.version_info.major}.{sys.version_info.minor}"
 POSIX_TAIL = 'Traceback (most recent call last):\n  File "<tree>/aisef2/toy.py", line 7, in target\nAssertionError\n'
 WIN_TAIL = 'Traceback (most recent call last):\n  File "<tree>\\aisef2\\app\\client.py", line 2, in _is_gone\nAssertionError\n'
+#: a frame of this interpreter's own unittest: the default entries carry this host's flavor and python, as an entry
+#: measured here would (R0 binds an observation to the entry's own flavor and interpreter)
+LOCAL = f'  File "{unittest.case.__file__}", line 58, in run\n'
+FLAVORED = POSIX_TAIL + LOCAL
+WIN_FLAVORED = WIN_TAIL + f'  File "C:\\Python{sys.version_info.major}{sys.version_info.minor}\\Lib\\unittest\\case.py", line 58\n'
 HOMEBREW = '  File "/opt/homebrew/Cellar/python@3.14/3.14.7/lib/python3.14/unittest/case.py", line 58, in run\n'
 USRLIB = '  File "/usr/lib/python3.12/unittest/case.py", line 58, in run\n'
 RULES = ("I7", "I6", "I1", "I8", "I3", "I4", "I5", "I9", "R4", "R5", "R6", "R0", "D2", "R1", "R2", "R3", "R8", "I2")
@@ -82,16 +93,15 @@ FILES = {
 
 
 def harness(targets=None, extra: str = "") -> str:
-    """The toy's validation/v2/mutation.py: the real generator and I9 segments, toy tables."""
-    keep = [text for names, text, _ in impact.segments(REAL) if set(names) & KEEP]
-    tables = (f"RECORDS = {{'T': {RECORD!r}}}\nPHASE_TARGETS = {{'T': {targets or TARGETS!r}}}\n"
+    """The toy's validation/v2/mutation.py: the real one, its tables replaced by the toy's (appended: the last binding
+    wins), so the generator, the I9 segments and the runner are the real ones."""
+    tables = (f"\n\n# ---- the toy's tables\nRECORDS = {{'T': {RECORD!r}}}\nPHASE_TARGETS = {{'T': {targets or TARGETS!r}}}\n"
               "TARGETS = {t: k for ts in PHASE_TARGETS.values() for t, k in ts.items()}\n"
-              f"SUPERSEDED = {{}}\nV21_RETIRED = ()\nV21_TARGETS = {{}}\nCOPY = {M.COPY!r}\n{extra}")
-    return ("from __future__ import annotations\n\nimport ast\nimport copy\nimport hashlib\nimport os\nimport pathlib\n"
-            "import re\nimport sys\n\n" + "\n".join(keep) + "\n" + tables)
+              f"SUPERSEDED = {{}}\nV21_RETIRED = ()\nV21_TARGETS = {{}}\nVERIFIED_REUSE = {{}}\nCOPY = {M.COPY!r}\n{extra}")
+    return REAL + tables
 
 
-def entry(files: dict, target: str, tail: str | None = POSIX_TAIL, survivor: bool = False, kill=None) -> dict:
+def entry(files: dict, target: str, tail: str | None = FLAVORED, survivor: bool = False, kill=None) -> dict:
     """A runner-2 result with every mutant KILLED by a bracketed kill (mutation._confirmed holds), measured on
     `files`; `survivor` adds a second, SURVIVED mutant."""
     kill = kill or TARGETS[target]
@@ -120,7 +130,7 @@ def _git(root: pathlib.Path, *args: str) -> str:
 
 class Toy:
     def __init__(self, root: pathlib.Path):
-        self.root = root
+        self.root = root   # its parent holds what the toy writes beside it (observation witnesses)
         self.files = dict(FILES)
         self.targets = dict(TARGETS)
         self.harness = harness()
@@ -130,7 +140,7 @@ class Toy:
         _git(root, "init", "-q")
 
     def reentry(self) -> None:
-        self.entries = {t: entry(self.files, t, WIN_TAIL if t in impact.WINDOWS_CLAIM else POSIX_TAIL) for t in TARGETS}
+        self.entries = {t: entry(self.files, t, WIN_FLAVORED if t in impact.WINDOWS_CLAIM else FLAVORED) for t in TARGETS}
 
     def set_targets(self, targets: dict) -> None:
         self.targets = targets
@@ -144,7 +154,7 @@ class Toy:
         record = {"record": "toy", "tool": impact.MUTATION_REL,
                   "targets": [self.entries[t] for t in sorted(self.entries)]}
         out = {**{k: v.encode() for k, v in self.files.items()}, impact.MUTATION_REL: self.harness.encode(),
-               RECORD: (json.dumps(record, indent=1) + "\n").encode(), **self.extra}
+               RECORD: (json.dumps(record, indent=1) + "\n").encode(), **RUNNER_FILES, **self.extra}
         for rel, data in out.items():   # files are only added or rewritten, never removed
             (self.root / rel).parent.mkdir(parents=True, exist_ok=True)
             (self.root / rel).write_bytes(data)
@@ -152,18 +162,78 @@ class Toy:
         _git(self.root, "commit", "-q", "--allow-empty", "-m", "c")
         return _git(self.root, "rev-parse", "HEAD")
 
-    def observe(self, head: str, data=None, **over) -> dict:
-        """A complete, admissible O(F) for every toy kill file: every .py of its static closure loaded."""
+    def observe(self, head: str, data=None, opened=None, loaded=None, **over) -> dict:
+        """An observe.py record of every toy kill file, derived (observe.finish) from a synthetic witness: complete and
+        admissible unless `over` says otherwise — every .py of its static closure load-opened and executed, `data`
+        {kill: [paths read as data]}, `opened` {kill: {path: tag}}, `loaded` {kill: [more executed files]}; `over`:
+        commit, platform, python, outcome, witness (False: none), outside_tree, lost, unparsed_lines, os_trace,
+        children {hooked, unhooked_python, other}, listed, listed_by."""
         out = {}
-        for kill in {f for k in self.targets.values() for f in k}:
-            py = sorted(p for p in S2.closure(self.root, head, (kill,)) if p.endswith(".py"))
-            out[kill] = {"commit": head, "platform": "windows" if kill == "tests/v2/test_client.py" else "posix",
-                         "python": PY, "witness": True, "outcome": "PASS", "opened": dict.fromkeys(py, "load"),
-                         "loaded": py, "listed": [], "listed_by": {}, "lost": 0, "unparsed_lines": 0,
-                         "children": {"hooked": 0, "unhooked_python": 0, "other": 0}, **over}
-            for p in (data or {}).get(kill, ()):
-                out[kill]["opened"][p] = "data"
+        for kill in sorted({f for k in self.targets.values() for f in k}):
+            py = sorted(p for p in S2.closure(self.root, over.get("commit", head), (kill,)) if p.endswith(".py"))
+            ops = {**dict.fromkeys(py, "load"), **dict.fromkeys((data or {}).get(kill, ()), "data"),
+                   **(opened or {}).get(kill, {})}
+            out[kill] = synthetic(self, head, kill, ops, py + list((loaded or {}).get(kill, ())), over)
         return out
+
+
+RUNNER_ENV = sorted({*(k for k in M.ENV_KEEP if k in os.environ), *M._FRESH, M.TOKEN, "PYTHONPATH", OBS.MARK})
+
+
+@functools.lru_cache(maxsize=256)
+def _tree(root: pathlib.Path, commit: str) -> str | None:
+    return impact.tree_digest(root, commit, M.COPY, [RECORD])
+
+
+def synthetic(t: Toy, head: str, kill: str, ops: dict, mods: list, over: dict) -> dict:
+    """observe.finish() of a witness written here as the recorder would have written it for `kill` at `head`."""
+    commit = over.get("commit", head)
+    w = pathlib.Path(tempfile.mkdtemp(prefix="obs-", dir=t.root.parent))
+    tree = w / "tree"   # the path the run's events name; nothing runs there
+    ident = OBS.identity()
+    fam = over.get("platform") or ("windows" if kill == "tests/v2/test_client.py" else "posix")
+    plat = {**ident["platform"], "family": fam, **({"flavor": None} if fam == "windows" else {})}
+    trace = bool(over.get("os_trace"))
+    blob = impact._blob(t.root, commit, kill) or b""
+    man = {"format": OBS.FORMAT, "tool": OBS.TOOL, "commit": commit, "tree": str(tree), "checkout": str(t.root),
+           "tree_sha256": _tree(t.root, commit),
+           "kill_file": {"path": kill, "sha256": impact._sha(blob)}, "module": kill[len("tests/"):-3].replace("/", "."),
+           "runner_sha256": impact._sha(impact._blob(t.root, commit, impact.MUTATION_REL) or b""),
+           "observe_sha256": OBS.own_sha256(), "backend": "strace" if trace else "audit",
+           "tools": {"strace": "strace -- version 6.8" if trace else None, "git": "git version 2", "strace_events": None},
+           "platform": plat, "python": over.get("python", ident["python"]), "toolchain": ident["toolchain"],
+           "env": dict.fromkeys(RUNNER_ENV, "0" * 64),
+           "row": {"outcome": over.get("outcome", "PASS"), "exit": 0, "ran": 1}}
+    (w / "hook").mkdir()
+    (w / "manifest.json").write_text(json.dumps(man, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    (w / "log.txt").write_text(f"test_x ({man['module']}.T.test_x) ... ok\n\nRan 1 test in 0.001s\n\nOK\n", encoding="utf-8")
+    at = {p: posixpath.normpath(posixpath.join(str(tree), p)) for p in {*ops, *mods}}
+    lines = ["S\t100\t1"] + [f"o\t{tag}\t{at[p]}" for p, tag in sorted(ops.items())] + [f"m\t{at[p]}" for p in sorted(set(mods))]
+    listed_by = over.get("listed_by") or {}
+    for d in over.get("listed") or []:
+        callers = [posixpath.normpath(posixpath.join(str(tree), c)) for c in listed_by.get(d, [kill])]
+        lines.append("\t".join(["l", "run", posixpath.normpath(posixpath.join(str(tree), d)), *callers]))
+    kids = {"hooked": 0, "unhooked_python": 0, "other": 0, **(over.get("children") or {})}
+    lines += ["C\tsubprocess.Popen\t1\t0\t['python3']"] * kids["unhooked_python"]
+    lines += ["C\tsubprocess.Popen\t0\t0\t['wc']"] * kids["other"]
+    lines += ["C\tsubprocess.Popen\t1\t1\t['python3']"] * kids["hooked"]
+    if over.get("outside_tree"):
+        lines.append(f"o\tdata\t{t.root / 'aisef2' / 'toy.py'}")
+    lines += [f"L\t{over['lost']}"] if over.get("lost") else []
+    lines += ["?garbage"] * (over.get("unparsed_lines") or 0)
+    (w / "hook" / "100-root.ev").write_text("\n".join([*lines, "E\t0"]) + "\n", encoding="utf-8")
+    for i in range(kids["hooked"]):
+        (w / "hook" / f"{101 + i}-kid.ev").write_text(f"S\t{101 + i}\t100\nE\t0\n", encoding="utf-8")
+    if trace:
+        (w / "strace").mkdir()
+        forks = "".join(f"vfork() = {101 + i}\n" for i in range(kids["hooked"]))
+        (w / "strace" / "tr.100").write_text(forks + "+++ exited with 0 +++\n", encoding="utf-8")
+        for i in range(kids["hooked"]):
+            (w / "strace" / f"tr.{101 + i}").write_text("+++ exited with 0 +++\n", encoding="utf-8")
+    rec = OBS.finish(w)
+    if over.get("witness") is False:
+        rec.pop("witness")
+    return rec
 
 
 class Case(NamedTuple):
@@ -419,17 +489,15 @@ def d5_loader(t: Toy) -> Case:   # probe_untested: a kill file runs aisef2/doc.p
     b = t.commit()
     t.edit("aisef2/doc.py", "return sorted(d)", "return list(d)")
     h = t.commit()
-    obs = t.observe(h)
-    obs[K]["opened"]["aisef2/doc.py"] = "load"   # module_from_spec raises no import event: not in `loaded`
-    return Case(b, h, obs, INC, "INVALIDATED", "R8")
+    obs = t.observe(h, opened={K: {"aisef2/doc.py": "load"}})   # module_from_spec raises no import event: not loaded
+    return Case(b, h, obs, INC, "INVALIDATED", "R2")   # the literal path names doc.py: the static boundary (R8 behind)
 
 
 def d5_load_tag_data(t: Toy) -> Case:   # a "load" of a non-.py file is a data read
     b = t.commit()
     t.files["docs/v2.1/schema.json"] = '{"a": 2}\n'
     h = t.commit()
-    obs = t.observe(h)
-    obs["tests/v2/test_doc.py"]["opened"]["docs/v2.1/schema.json"] = "load"
+    obs = t.observe(h, opened={"tests/v2/test_doc.py": {"docs/v2.1/schema.json": "load"}})
     return Case(b, h, obs, DOC, "INVALIDATED", "R2")
 
 
@@ -485,7 +553,8 @@ def _child(t: Toy, argv: str, change, trace: bool, children: dict) -> Case:
     h = t.commit()
     over = {"os_trace": True} if trace else {"children": {"hooked": 0, **children}}
     obs = t.observe(h, {K: ["aisef2/toy.py"]} if trace else None, **over)   # traced: the child's opens are data
-    return Case(b, h, obs, INC, "INVALIDATED", "R2" if trace else "R1")
+    named = "aisef2/toy.py" in argv   # a literal path in the kill test: the static boundary (R2S) fires first
+    return Case(b, h, obs, INC, "INVALIDATED", "R2" if trace or named else "R1")
 
 
 def _helper_body(t: Toy) -> None:
@@ -661,8 +730,7 @@ def n30(t: Toy, loaded: str = "aisef2/plug.py", state: str = "VERIFIED_REUSE", c
     t.files["aisef2/plug.py"] = "VALUE = 1\n"
     t.edit(K, "from aisef2 import toy, util\n", "from aisef2 import reg, toy, util\n")
     c = n2(t)
-    c.obs[K]["loaded"].append(loaded)
-    return c._replace(state=state, component=component)
+    return c._replace(obs=t.observe(c.head, loaded={K: [loaded]}), state=state, component=component)
 
 
 def n30_miss(t: Toy) -> Case:   # loaded, but not in S(F): the D2 check
@@ -701,8 +769,7 @@ def new_test_file(t: Toy) -> Case:   # §2.8: a NEW test file in a directory a c
 
 def new_test_file_loaded(t: Toy) -> Case:   # the same file, observed loaded by the kill file's process: R6
     c = new_test_file(t)
-    c.obs[K]["loaded"].append(NEW_TEST)
-    return c
+    return c._replace(obs=t.observe(c.head, loaded={K: [NEW_TEST]}))
 
 
 def no_observation(t: Toy) -> Case:   # N2's edit with no observation: R1 cannot be excluded
@@ -744,13 +811,12 @@ def a1_loader(t: Toy, old: str = 'PREFIX = "value "', new: str = 'PREFIX = "thre
     b = t.commit()
     t.edit("aisef2/describers/other.py", old, new)
     h = t.commit()
-    obs = t.observe(h)
-    obs[K]["opened"]["aisef2/describers/exact.py"] = "load"
+    obs = t.observe(h, opened={K: {"aisef2/describers/exact.py": "load"}})
     return Case(b, h, obs, TGT, "INVALIDATED", component)
 
 
-def a1_loader_body(t: Toy) -> Case:   # a def-body change of other.py: R8 at the loader site in S(F)
-    return a1_loader(t, "return PREFIX + str(value)", 'return "three " + str(value)', "R8")
+def a1_loader_body(t: Toy) -> Case:   # a def-body change of other.py: its literal path parts (R2S), R8 behind
+    return a1_loader(t, "return PREFIX + str(value)", 'return "three " + str(value)', "R2")
 
 
 D4_KILL = ("import unittest\n\nfrom aisef2 import toy, util\n\n\nclass T(unittest.TestCase):\n"
@@ -824,13 +890,13 @@ NEGATIVE = [n1, n1_comment, n3, n3b, n4, i4_comment, n5, n6, n6b, n7a_windows_fo
 class ImpactTest(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
-        self.toy = Toy(pathlib.Path(self._tmp.name))
+        self.toy = Toy(pathlib.Path(self._tmp.name) / "repo")
 
     def tearDown(self):
         self._tmp.cleanup()
 
     def again(self) -> Toy:
-        self.toy = Toy(pathlib.Path(tempfile.mkdtemp(dir=self._tmp.name)))
+        self.toy = Toy(pathlib.Path(tempfile.mkdtemp(dir=self._tmp.name)) / "repo")
         return self.toy
 
     def run_case(self, fn, *args) -> impact.State:
@@ -1036,7 +1102,9 @@ class ImpactTest(unittest.TestCase):
         self.assertIn("changed order", self.run_case(d4_order_r6).reason)
 
     def test_d5_code_run_by_path_in_process(self):
-        self.run_case(d5_loader)
+        self.assertIn("aisef2/doc.py", self.run_case(d5_loader).reason)   # the static boundary: its literal path
+        with mock.patch.object(impact, "_OFF", frozenset({"R2S"})):   # R8 (the computed-name loader) still holds
+            self.assertEqual(state_of(self.toy, self.case).component, "R8")
         # red-before: the observation never lists doc.py as loaded; only its "load" open says it ran
         self.assertNotIn("aisef2/doc.py", self.case.obs[K]["loaded"])
         site = 'spec_from_file_location("doc_script", ROOT / "aisef2" / "doc.py")'
@@ -1131,7 +1199,7 @@ class ImpactTest(unittest.TestCase):
         self.assertEqual(s.evidence["additive_test_changes"], [NEW_TEST])
         b, h = _last(self.toy)
         self.assertIn(NEW_TEST, impact.kill_closure(self.toy.root, b, h, K))
-        with mock.patch.object(impact, "_OFF", frozenset({"R6"})):
+        with mock.patch.object(impact, "_OFF", frozenset({"R6", "R2S"})):   # R2S: TESTS_V2 names every tests/v2 file
             self.assertNotEqual(state_of(self.toy, self.case).component, "R3")
             self.again()
             c = n20_new_dir(self.toy)
@@ -1226,7 +1294,9 @@ class ImpactTest(unittest.TestCase):
         s = self.run_case(a1_loader)
         self.assertIn("aisef2/describers/other.py", s.reason)
         self.again()
-        self.assertIn("aisef2/dispatch.py:10", self.run_case(a1_loader_body).reason)
+        self.assertIn("aisef2/describers/other.py", self.run_case(a1_loader_body).reason)   # R2S: its literal parts
+        with mock.patch.object(impact, "_OFF", frozenset({"R2S"})):   # R8 at the computed-name loader site behind it
+            self.assertIn("aisef2/dispatch.py:10", state_of(self.toy, self.case).reason)
         b, h = _last(self.toy)
         self.assertNotIn("aisef2/describers/other.py", S2.closure(self.toy.root, h, (K,)))   # not import-reached
 
@@ -1333,7 +1403,7 @@ class ImpactTest(unittest.TestCase):
         wrong, flipped = [], set()
         for fn in NEGATIVE:
             with tempfile.TemporaryDirectory() as d:
-                toy = Toy(pathlib.Path(d))
+                toy = Toy(pathlib.Path(d) / "repo")
                 case = fn(toy)
                 self.assertNotEqual(case.state, "VERIFIED_REUSE", fn.__name__)
                 wrong += [f"{fn.__name__}: {x}" for x in check(toy, case)]

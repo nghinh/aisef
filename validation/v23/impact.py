@@ -27,13 +27,27 @@ empty diff or a clean tree. An entry is reused only if the BASIS's own tables (R
 V21_RETIRED) read it (I7); its source digest is checked with the basis's own `source_digest`; worker (W) platform
 evidence is read at the basis, from histories whose log and record are their own `<stem>.log`/`<stem>.record.json`.
 
-Observations. `observations` maps a kill file F to its O(F) (§2.9 D3) as a dict: commit (the head sha), platform
-(`posix`/`windows`), python (`3.N`), witness, outcome (`PASS`), opened ({path: "load"|"data"}; a list = all data;
-"load" of a non-.py file, or any other tag, is a data read), loaded, listed, listed_by ({dir: [files]}), children
-({hooked, unhooked_python, other}), lost, unparsed_lines, os_trace, outside_tree. With `observations=None` (no
-recorder exists yet) R0-R3 cannot be excluded: a target is INVALIDATED ("no observation of F; R1 cannot be
-excluded") whenever Δ is not empty — an unobserved process may read any path of the tree — and Δ = ∅ gives
-VERIFIED_REUSE. Tier R (E_full) is not available in this increment.
+Observations (`--observations DIR`, validation/v23/observe.py records; an input only — the owner ruling of 2026-11-21
+approves the recorder for development, not as a VERIFIED_REUSE authority). `observations` maps a kill file F to its
+O(F) (§2.9 D3) as observe.load() returns it. R0 admits O(F) only when observe.verify() finds its witness files are the
+bytes recorded and the record is what they derive to, and it is bound to: head (commit), head's kill file bytes, head's
+runner tree (`tree_sha256`, mutation._pristine's digest recomputed from git), head's runner (mutation.py) and recorder
+(observe.py, which must also be the module the engine re-derives with), a PASS, the claim's family AND the entry's own
+flavor (unproven: inadmissible), the entry's own interpreter minor read from its frames (unproven: inadmissible) on
+CPython, the runner's environment allowlist (plus PYTHONPATH and the marker; nothing else), and no read of the checkout
+outside the tree. Any incompleteness (a missing or changed witness file, lost events, unparsed lines, cut strings,
+untraced or unaccounted processes, truncated traces, tracer errors, fd-relative access, a process that did not exit
+normally under the audit backend) is R1. With `observations=None` R0-R3 cannot be excluded: a target is INVALIDATED
+("no observation of F; R1 cannot be excluded") whenever Δ is not empty, and Δ = ∅ gives VERIFIED_REUSE. Tier R (E_full)
+is not available in this increment.
+
+The static boundary holds with or without observations: an observed read set alone never yields reuse. Besides R4-R6
+and R8 over S(F), R2 also fires, before any observation, for a Δ path some file of S(F) names by a literal path (string
+constants only: one constant, consecutive constants joined as a path, a parent directory and its name, a listed
+directory, a directory constant) or reaches by a computed path whose literal part is a directory (`/`, `+`,
+os.path.join, Path(...), joinpath, f-strings; one level of names bound to such a directory) — a mutant's branch may read
+it although the unmutated run did not. An observed lookup of a path whose existence or kind (file / directory / none)
+differs between basis and head is R2 too.
 
 Declared limitations (§2.7, §2.9 residual):
 - C code that reads tree files is seen only through os_trace; a SIGKILLed recorder can lose its `lost` count.
@@ -43,6 +57,9 @@ Declared limitations (§2.7, §2.9 residual):
   a POSIX host, not killed on every POSIX flavor; row evidence needs tails that keep their traceback frames.
 - Before the basis, legacy records carry no kill-file, generator or platform identity (no retro-tagging).
 - RESOLVED_SITES is empty: any dynamic site (R8) in S(F) makes tier S unavailable for that kill file.
+- A path built with no literal directory part (`ROOT / name`, a parameter, `"%s" % x`, `str.format`, `"/".join`) or
+  through more than one level of names is not bounded statically: only the observation sees it, and only for the
+  unmutated run (docs/v2.3/amendments/A3-OBSERVE-SOUNDNESS.md).
 - S(F) literal naming (D2 b) is the static rule of v21_snapshot_delta._info/_names plus whole-constant directories
   of two or more components; data a kill file reaches by other means is R2/R3's (observed), never S(F)'s.
 - R5-R8 judge Δ ∩ S(F) (the frozen §2.9 letter; W1-DESIGN Amendment A1's narrowing is withdrawn) plus what an
@@ -76,6 +93,7 @@ import os
 import pathlib
 import posixpath
 import re
+import subprocess
 import sys
 import tempfile
 import time
@@ -87,6 +105,7 @@ if str(ROOT) not in sys.path:
 from validation.qualification import s2_mutation_record as S2  # noqa: E402  (closure, blob, _git: frozen, called)
 from validation.qualification import v21_snapshot_delta as SD  # noqa: E402  (Rev, _segments, _info, _names, ...)
 from validation.v21 import reach  # noqa: E402  (changed(): own code vs import-time statements)
+from validation.v23 import observe as OBS  # noqa: E402  (verify(): an observation's witness and derivation)
 
 TOOL = "validation/v23/impact.py"
 STATES = ("MEASURED", "VERIFIED_REUSE", "INVALIDATED", "UNRESOLVED")
@@ -535,6 +554,16 @@ def markers(texts, escaped: bool = False) -> tuple[set[str], set[str]]:
     return fam, fl
 
 
+_PYVER = re.compile(r"[/\\][Pp]ython(3\.\d+|3\d\d?)[/\\]")
+
+
+def python_of(entry: dict) -> str | None:
+    """The interpreter minor version the entry's own traceback frames name (`.../python3.N/...`, or a Windows
+    `\\Python3NN\\`): None when they name none, or more than one."""
+    found = {v if "." in v else f"{v[0]}.{v[1:]}" for t in _tails(entry) for v in _PYVER.findall(t)}
+    return min(found) if len(found) == 1 else None
+
+
 def platform_of(entry: dict, workers: dict) -> dict:
     """{family, flavor, by, contradiction}: the first tier that yields a value wins (R-family, R-flavor, W);
     contradictory evidence is named, never resolved."""
@@ -588,6 +617,101 @@ def workers_at(root: pathlib.Path, sha: str) -> tuple[dict, list[str]]:
     return out, refused
 
 
+def tree_digest(root: pathlib.Path, sha: str, copy, records) -> str | None:
+    """mutation._pristine's digest of the runner tree commit `sha` gives: sha256 over (path, sha256 of the bytes) of
+    every file under a COPY root, the runner's records and `__pycache__` left out, in pathlib's order (by parts), from
+    git's bytes. None when those are not what a copy of a clean checkout holds (a symlink or a submodule under COPY)."""
+    rec = {posixpath.normpath(r) for r in records}
+    items = []
+    for line in _git(root, "ls-tree", "-r", "-z", "--full-tree", sha, "--", *copy).split(b"\0"):
+        if not line:
+            continue
+        meta, _, path = line.decode("utf-8", "surrogateescape").partition("\t")
+        mode, typ, obj = meta.split()
+        if "__pycache__" in path.split("/") or path in rec:
+            continue
+        if typ != "blob" or mode not in ("100644", "100755"):
+            return None
+        items.append((path, obj))
+    h = hashlib.sha256()
+    with subprocess.Popen(["git", "-C", str(root), "cat-file", "--batch"], stdin=subprocess.PIPE,
+                          stdout=subprocess.PIPE) as cat:
+        for path, obj in sorted(items, key=lambda x: x[0].split("/")):
+            cat.stdin.write(obj.encode() + b"\n")
+            cat.stdin.flush()
+            head = cat.stdout.readline().split()
+            if len(head) != 3 or head[1] != b"blob":
+                raise GitError(f"git cat-file: {obj} is not a blob")
+            data = cat.stdout.read(int(head[2]))
+            cat.stdout.read(1)
+            h.update(path.encode("utf-8", "surrogateescape") + b"\0" + hashlib.sha256(data).digest())
+        cat.stdin.close()
+        if cat.wait() != 0:
+            raise GitError("git cat-file --batch failed")
+    return h.hexdigest()
+
+
+def string_constants(tree: ast.AST) -> list[str]:
+    """Every str constant of a parsed file but the docstrings (no run reads a docstring as a path)."""
+    docs = {id(n.body[0].value) for n in ast.walk(tree)
+            if isinstance(n, ast.Module | ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef) and n.body
+            and isinstance(n.body[0], ast.Expr) and isinstance(n.body[0].value, ast.Constant)}
+    return [n.value for n in ast.walk(tree) if isinstance(n, ast.Constant) and isinstance(n.value, str) and id(n) not in docs]
+
+
+_JOIN = {"join", "joinpath", "Path", "PurePath", "PosixPath", "PurePosixPath", "WindowsPath", "PureWindowsPath"}
+
+
+def _operands(n: ast.AST) -> list | None:
+    """A path construction flattened to [(part, separator before it)]: "/" for `/`, os.path.join, Path(...) and
+    joinpath; "" for `+` and f-string parts. None when `n` is not one."""
+    if isinstance(n, ast.BinOp) and isinstance(n.op, ast.Div | ast.Add):
+        sep = "/" if isinstance(n.op, ast.Div) else ""
+        right = _operands(n.right) or [(n.right, "")]
+        return (_operands(n.left) or [(n.left, "")]) + [(right[0][0], sep)] + right[1:]
+    if isinstance(n, ast.JoinedStr):
+        return [(v, "") for v in n.values]
+    if isinstance(n, ast.Call) and (getattr(n.func, "attr", None) or getattr(n.func, "id", None)) in _JOIN:
+        head = [(n.func.value, "")] if getattr(n.func, "attr", None) == "joinpath" else []
+        return head + [(a, "/" if head or i else "") for i, a in enumerate(n.args)]
+    return None
+
+
+def _literal_text(ops: list, bound: dict) -> tuple[str, bool] | None:
+    """(the literal text of a construction after its leading non-literal parts — an anchor such as ROOT —, whether a
+    computed part follows it); None when no literal part follows the anchor."""
+    text, started = "", False
+    for node, sep in ops:
+        lit = (node.value if isinstance(node, ast.Constant) and isinstance(node.value, str)
+               else bound.get(node.id) if isinstance(node, ast.Name) else None)
+        if lit is not None:
+            text += (sep if started else "") + lit
+            started = True
+        elif started:
+            return (text if sep == "/" else text.rsplit("/", 1)[0] if "/" in text else ""), True
+    return (text, False) if started else None
+
+
+def computed_dirs(tree: ast.AST) -> set[str]:
+    """R2 (static): the literal directory of every path built from literal and computed parts in one file
+    (`ROOT / "aisef2" / name`, `f"{ROOT}/docs/{x}.json"`, `os.path.join(HERE, "fixtures", n)`, `DATA / n` where
+    `DATA = ROOT / "aisef2"`): any file under it may be the one a run reads."""
+    bound: dict[str, str] = {}
+    for _ in range(2):   # names bound to a literal path (one level, in either order)
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name):
+                v = n.value
+                got = (v.value, False) if isinstance(v, ast.Constant) and isinstance(v.value, str) else (
+                    _literal_text(ops, bound) if (ops := _operands(v)) else None)
+                if got and not got[1] and SD._norm(got[0]):
+                    bound[n.targets[0].id] = SD._norm(got[0])
+    out = set()
+    for n in ast.walk(tree):
+        if (ops := _operands(n)) and (got := _literal_text(ops, bound)) and got[1] and (d := SD._norm(got[0])):
+            out.add(d)
+    return out
+
+
 # ------------------------------------------------------------------------------------------------- the engine
 
 
@@ -609,6 +733,97 @@ class _Ctx:
 
     def _in_copy(self, p: str) -> bool:
         return any(p == c or p.startswith(c + "/") for c in self.copy)
+
+    @functools.cached_property
+    def head_tree(self) -> str | None:
+        """R0: the digest of head's runner tree (mutation._pristine's rule, from git)."""
+        return tree_digest(self.root, self.H.sha, self.H.copy, self.H.m.RECORDS.values())
+
+    def blob_sha(self, path: str) -> str | None:
+        return self.cache(("blobsha", path), lambda: _sha(b) if (b := _blob(self.root, self.H.sha, path)) is not None
+                          else None)
+
+    def kind(self, R, p: str) -> str | None:
+        """What `p` is in the runner tree of commit R: "file", "dir" (a file lies under it) or None."""
+        files = self.copy_files(R)
+        i = bisect.bisect_left(files, p)
+        if i < len(files) and files[i] == p:
+            return "file"
+        d = "" if p in ("", ".") else p + "/"
+        i = bisect.bisect_left(files, d)
+        return "dir" if i < len(files) and files[i].startswith(d) else None
+
+    def admissible(self, F: str, O: dict, claim: str, plat: dict, entry_py: str | None) -> tuple[str | None, list]:
+        """R0: why O(F) is not admissible for an entry measured on `plat` with interpreter `entry_py`, or None; and
+        R1: what its witness lacks (observe.verify)."""
+        refused, gaps = self.cache(("verify", F), lambda: OBS.verify(O))
+        kf, p, tc = O.get("kill_file") or {}, O.get("platform") or {}, O.get("toolchain") or {}
+        m = self.H.m
+        env, given = set(O.get("env") or {}), {*m._FRESH, m.TOKEN, "PYTHONPATH", OBS.MARK}
+        allowed = given | set(m.ENV_KEEP)
+        checks = (
+            (O.get("format") == OBS.FORMAT, "it is not an observation record"),
+            (refused is None, refused),
+            (O.get("commit") == self.H.sha, f"it observed another tree: commit {O.get('commit')} is not head"),
+            (kf.get("path") == F and kf.get("sha256") == self.blob_sha(F), "the kill file it ran is not head's bytes"),
+            (O.get("tree_sha256") is not None and O.get("tree_sha256") == self.head_tree,
+             "its tree_sha256 is not head's runner tree"),
+            (O.get("runner_sha256") == self.blob_sha(MUTATION_REL), "it was not run by head's runner"),
+            (O.get("observe_sha256") == self.blob_sha(OBS.TOOL) == OBS.own_sha256(),
+             "it was not recorded by head's recorder (or the engine's recorder is not head's)"),
+            (O.get("outcome") == "PASS", f"its outcome is not PASS ({O.get('outcome')})"),
+            (p.get("family") == claim, f"it ran on {p.get('family')}, the claim is {claim}"),
+            (claim != "posix" or plat.get("flavor") is not None, "the entry's own flavor is unproven"),
+            (p.get("flavor") == plat.get("flavor"),
+             f"it ran on {p.get('flavor')}, the entry was measured on {plat.get('flavor')}"),
+            (entry_py is not None, "the entry's own interpreter is unproven"),
+            (O.get("python") == entry_py and tc.get("implementation") == "cpython",
+             f"python {O.get('python')} ({tc.get('implementation')}) is not the entry's CPython {entry_py}"),
+            (given <= env <= allowed, f"its environment is not the runner's: {sorted((given - env) | (env - allowed))}"),
+            (not O.get("outside_tree"), "a process opened the checkout outside the run's tree"),
+        )
+        return next((why for ok, why in checks if not ok), None), gaps
+
+    def named(self, F: str) -> dict[str, str]:
+        """R2 (static): the Δ paths a file of S(F) names by a literal path or reaches by a computed one."""
+        def compute():
+            out: dict[str, str] = {}
+            for g in sorted(x for x in self.S(F) if x.endswith(".py") and self._in_copy(x)):
+                for R in (self.B, self.H):
+                    for p, how in self._names(R, g).items():
+                        out.setdefault(p, f"{g} names it by {how}")
+            return out
+        return self.cache(("named", F), compute)
+
+    def _names(self, R, g: str) -> dict[str, str]:
+        def compute():
+            src = R.text(g)
+            if src is None:
+                return {}
+            try:
+                tree = ast.parse(_lf(src))
+            except SyntaxError:
+                return dict.fromkeys(self.delta, "an unparsable file")
+            consts = string_constants(tree)
+            short = frozenset(SD._norm(c) for c in consts if c and len(c) < 300 and "\n" not in c
+                              and not any(w in c for w in SD._WILD))
+            info = ("\n".join(consts), short, SD._info(self.root, R.sha, g)[2])
+            up = g.split("/")
+            anchors = sorted({"/".join(up[:k]) for k in range(len(up))})
+            dirs = sorted(computed_dirs(tree))
+            out = {}
+            for p in self.delta:
+                if p == g:
+                    continue
+                how = SD._names(info, g, p)
+                under = [d for d in short if "/" in d for a in anchors if p.startswith((f"{a}/{d}" if a else d) + "/")]
+                how = how or (f"a directory constant {under[0]!r}" if under else None)
+                comp = [d for d in dirs for a in anchors if p.startswith((f"{a}/{d}" if a else d) + "/")]
+                how = how or (f"a computed path under {comp[0]!r}" if comp else None)
+                if how:
+                    out[p] = how
+            return out
+        return self.cache(("names", R.sha, g), compute)
 
     def _delta(self) -> dict[str, str]:
         """D1: path -> A/D/M, every path under a COPY root added, removed, or whose LF-sha256 differs."""
@@ -880,7 +1095,7 @@ class _Ctx:
         # §2.9
         if not self.delta:
             return done("VERIFIED_REUSE")
-        fired = self.rules(name, kill, claim, ev)
+        fired = self.rules(name, kill, claim, ev, plat, python_of(entry))
         if fired:
             return done(*fired)
         return done("VERIFIED_REUSE")
@@ -925,8 +1140,10 @@ class _Ctx:
         ]
         return next((why for ok, why in checks if not ok), None)
 
-    def rules(self, name: str, kill: list[str], claim: str, ev: dict) -> tuple | None:
-        """§2.9 R4, R5, R6; R0/D2/R1/R2/R3 (or the no-observation default); R8, R7. None: nothing fires."""
+    def rules(self, name: str, kill: list[str], claim: str, ev: dict, plat: dict | None = None,
+              entry_py: str | None = None) -> tuple | None:
+        """§2.9 R4, R5, R6, R2 (static); R0/D2/R1/R2/R3 (or the no-observation default); R8, R7. None: nothing
+        fires."""
         delta = self.delta
         # R4 discovery
         for F in kill if _on("R4") else ():
@@ -940,6 +1157,12 @@ class _Ctx:
             for F in kill:
                 if fired := self._static(rule, F, code):
                     return fired
+        # R2 (static; `_OFF` key R2S): a Δ path S(F) names by a literal or computed path — what a mutant's branch may
+        # read although the unmutated run did not
+        for F in kill if _on("R2S") else ():
+            if hit := sorted(self.named(F).items()):
+                p, how = hit[0]
+                return "INVALIDATED", "R2", f"S({F}) reaches {p} by a path ({how}): any run of F, a mutant's included, may read it"
         # R0, D2, R1, R2, R3
         data_tokens: set[str] = set()
         ran: dict[str, frozenset[str]] = {}
@@ -949,21 +1172,15 @@ class _Ctx:
             ran = {F: self.S(F) for F in kill}
         else:
             ev["observation"] = {}
-        py = f"{sys.version_info.major}.{sys.version_info.minor}"
         for F in kill if self.obs is not None else ():
             O = self.obs.get(F)
             if not isinstance(O, dict) and _on("R0"):
                 return "UNRESOLVED", "R0", f"no admissible observation of {F}"
             O = O if isinstance(O, dict) else {}
-            bad = ("it observed another tree" if O.get("commit") != self.H.sha else
-                   "its outcome is not PASS" if O.get("outcome") != "PASS" else
-                   "it has no witness" if not O.get("witness") else
-                   f"it ran on {O.get('platform')}, the claim is {claim}" if O.get("platform") != claim else
-                   f"python {O.get('python')} is not the runner's {py}" if O.get("python") != py else
-                   "a process opened the checkout outside the run's tree" if O.get("outside_tree") else None)
+            bad, gaps = self.admissible(F, O, claim, plat or {}, entry_py)
             if bad and _on("R0"):
                 return "UNRESOLVED", "R0", f"no admissible observation of {F}: {bad}"
-            ev["observation"][F] = _sha(canonical(O))
+            ev["observation"][F] = _sha(canonical(OBS.public(O)))
             opened = O.get("opened") or {}
             opened = dict(opened) if isinstance(opened, dict) else dict.fromkeys(opened, "data")
             loads = {p for p, tag in opened.items() if tag == "load" and p.endswith(".py")}   # the import system's reads
@@ -978,14 +1195,19 @@ class _Ctx:
             why = ([f"lost {O['lost']}"] if O.get("lost") else []) + (
                 [f"unparsed_lines {O['unparsed_lines']}"] if O.get("unparsed_lines") else []) + (
                 [f"{unseen} unhooked or other children"] if unseen and not O.get("os_trace") else []) + (
-                [f"static scan: {static[0]}"] if static else [])
+                [f"static scan: {static[0]}"] if static else []) + gaps + [
+                f"{k} {v}" for k, v in sorted((O.get("completeness") or {}).items())
+                if v and k not in ("lost", "unparsed_lines")]
             if why and _on("R1"):
-                n = unseen + (1 if static or O.get("lost") or O.get("unparsed_lines") else 0)
+                n = unseen + (1 if len(why) > bool(unseen and not O.get("os_trace")) else 0)
                 return ("INVALIDATED", "R1",
                         f"{F} has {n} unobserved processes: any path of the tree may be read or run ({'; '.join(why)})")
             for p in sorted(delta) if _on("R2") else ():
                 if p in data or (delta[p] == "D" and p in opened):
                     return "INVALIDATED", "R2", f"{F} reads {p} as data" if delta[p] != "D" else f"{F} opened {p}, now removed"
+            for p in sorted(data) if _on("R2") and delta else ():   # a lookup's answer: existence and kind
+                if (was := self.kind(self.B, p)) != (now := self.kind(self.H, p)):
+                    return "INVALIDATED", "R2", f"{F} looked up {p}, which was {was or 'absent'} and is {now or 'absent'}"
             listed = {SD._norm(x) for x in O.get("listed") or []}
             by = {SD._norm(k): frozenset(v) for k, v in (O.get("listed_by") or {}).items()}
             registry_changed = SD.REGISTRY in delta
@@ -1225,7 +1447,8 @@ def report(states: Run, observations=None) -> dict:
                    "calibration (the basis is not the pinned v2.2.0 commit)" if base_sha else "no basis commit resolved",
             "rules_off": sorted(_OFF),
             "generated_by": {"tool": TOOL, "sha256": _sha(_lf(me.read_text(encoding="utf-8")).encode())},
-            "observations": None if observations is None else {k: _sha(canonical(v)) for k, v in sorted(observations.items())},
+            "observations": None if observations is None else {k: _sha(canonical(OBS.public(v)))
+                                                                for k, v in sorted(observations.items())},
             "counts": counts, "by_component": dict(sorted(by.items())), "platform": dict(sorted(plat.items())),
             "states": [dataclasses.asdict(s) for s in states]}
 
@@ -1237,10 +1460,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--head", default="HEAD")
     ap.add_argument("--json", type=pathlib.Path, help="write the state table here (the only write)")
     ap.add_argument("--affected", action="store_true", help="print only INVALIDATED and UNRESOLVED, with reasons")
+    ap.add_argument("--observations", type=pathlib.Path, metavar="DIR",
+                    help="observe.py records (an input only: each is verified and bound to head and the entry)")
     a = ap.parse_args(argv)
     begun = time.monotonic()
-    states = classify(ROOT, a.base, a.head)
-    doc = report(states)
+    obs = OBS.load(a.observations) if a.observations else None
+    states = classify(ROOT, a.base, a.head, observations=obs)
+    doc = report(states, obs)
     if a.json:
         with open(a.json, "x", encoding="utf-8") as f:   # never overwrites
             f.write(json.dumps(doc, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
