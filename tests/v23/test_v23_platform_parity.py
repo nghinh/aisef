@@ -1,5 +1,5 @@
 """Platform-parity preflight (W1-DESIGN §7, L1-TESTENV): the W1 targeted tests (tests/v23) run on macOS, Linux and
-Windows before integration. The runs are a measurement (closure-evidence/v2.3/l1-testenv/); these checks pin what makes
+Windows before integration. The runs are a measurement (docs/v2.3/evidence/l1-testenv/); these checks pin what makes
 the CI legs of it real, so the W1 tests cannot drop out of a platform silently:
 
 * the job of tests.yml that runs the whole suite covers ubuntu, macOS and Windows and discovers from `tests`, which

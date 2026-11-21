@@ -7,6 +7,11 @@ aisef2/app/client.py `session`: `shutil.which("opencode", ...)`), and the kill-t
 paid client wherever one is installed. `mutation.main` refuses (exit 3) before any `run_target` when an executable
 `opencode` is resolvable on PATH; that hunk is L1-F5's (W1-DESIGN §7, §8). Red-before: at 1e25ef84 `t0` and `run` reach
 `run_target` with a client on PATH.
+V21-36 OPEN until that hunk lands: the guard test carries an explicit `@unittest.expectedFailure` (reported as "expected
+failures=1", never skipped). It cannot outlive the fix: once the guard exists it is an unexpected success, which fails
+the raw discover and release_qualify (`unexpectedSuccesses` count as failing), so the hunk's commit must drop the
+marker. An unmarked test pins that the expected failure is exactly the measured red-before and nothing else.
+Evidence: docs/v2.3/evidence/l1-testenv/README.md.
 
 #34: `_ARMED` (the tiers) and `_RUNTIME_ARMED` (`arm_runtime()`) are process globals of aisef2/invariants/registry.py,
 and `require_armed` passes when either holds the invariant. A test that clears the tiers alone still runs armed once any
@@ -23,6 +28,7 @@ import io
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -37,6 +43,9 @@ from validation.v2 import mutation  # noqa: E402
 
 
 # ------------------------------------------------------------------------------------------------ V21-36
+
+MODES = ("t0", "run")   # L1-F5's --run-affected joins the guard's modes and this tuple once it exists
+
 
 class _Ran(BaseException):
     """run_target was reached. A BaseException, so main's `except Exception` around a target never makes a record of it."""
@@ -66,19 +75,50 @@ class RealClientGuard(unittest.TestCase):
                 code = "reached run_target"
         return code, run_target.call_count, out.getvalue()
 
-    def test_a_client_resolvable_on_path_stops_t0_and_run_before_any_target(self):
+    def with_client(self) -> dict:
         with tempfile.TemporaryDirectory() as empty, tempfile.TemporaryDirectory() as bin_:
             path = os.pathsep.join([empty, _with_client(pathlib.Path(bin_))])   # not the first entry: any entry counts
-            for mode in ("t0", "run"):
-                with self.subTest(mode=mode):
-                    code, calls, out = self.main(mode, path)
-                    self.assertEqual((code, calls), (3, 0), out)
-                    self.assertIn("opencode", out)
+            return {mode: self.main(mode, path) for mode in MODES}
+
+    # V21-36 OPEN — guard hunk owned by L1-F5. Drop this marker, and test_the_open_marker_turns_red_once_the_guard_
+    # exists, in the commit that lands the hunk: until then a pass here is an unexpected success, which fails the run.
+    @unittest.expectedFailure
+    def test_a_client_resolvable_on_path_stops_t0_and_run_before_any_target(self):
+        for mode, (code, calls, out) in self.with_client().items():
+            with self.subTest(mode=mode):
+                self.assertEqual((code, calls), (3, 0), out)
+                self.assertIn("opencode", out)
+
+    def test_v21_36_is_open_exactly_as_measured_or_closed(self):
+        # unmarked: the expected failure above may only be the measured red-before. A third outcome (an error, another
+        # exit code, a refusal that does not name the client, one mode guarded and the other not) fails here.
+        def state(code, calls, out):
+            return "open" if (code, calls) == ("reached run_target", 1) else \
+                "guarded" if (code, calls) == (3, 0) and "opencode" in out else f"neither {(code, calls, out)!r}"
+        states = {mode: state(*got) for mode, got in self.with_client().items()}
+        self.assertIn(set(states.values()), ({"open"}, {"guarded"}), states)
+
+    def test_the_open_marker_turns_red_once_the_guard_exists(self):
+        # L1-F5's hunk, simulated around mutation.main: the marked test then passes, i.e. it is an unexpected success
+        real = mutation.main
+
+        def guarded(argv):
+            if argv[:1] in (["t0"], ["run"]) and (exe := shutil.which("opencode")):
+                print(f"STOPPED before the first target: an executable opencode is resolvable on PATH ({exe})")
+                return 3
+            return real(argv)
+
+        result = unittest.TestResult()
+        with mock.patch.object(mutation, "main", guarded):
+            RealClientGuard("test_a_client_resolvable_on_path_stops_t0_and_run_before_any_target").run(result)
+        self.assertEqual((len(result.unexpectedSuccesses), result.failures, result.errors, result.expectedFailures),
+                         (1, [], [], []))
+        self.assertFalse(result.wasSuccessful())
 
     def test_with_no_client_on_path_t0_and_run_reach_the_target(self):
         # the control: the stand-ins above do reach run_target, so the refusal is the guard's and nothing else's
         with tempfile.TemporaryDirectory() as empty:
-            for mode in ("t0", "run"):
+            for mode in MODES:
                 with self.subTest(mode=mode):
                     self.assertEqual(self.main(mode, empty)[:2], ("reached run_target", 1))
 
