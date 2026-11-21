@@ -16,7 +16,11 @@ This is not published text until it lands. W1-DESIGN.md §6 (lane D5) applies:
 
 * the contract's interpreter list is staging.yml's `repro` matrix;
 * the backend pin is `pyproject.toml`'s;
-* every clause below has its CI step.
+* every clause below has its CI step;
+* no leg can be skipped or have its failure swallowed, and each leg builds in the tree it names.
+
+`PinsBite.REFERENCE` in that module is a `build` + `repro` pair that passes every pin. `PinsBite.VARIANTS` lists 23
+negative fixtures, each failing at least one pin. L1-CIGOV's job may differ from the reference; the pins decide.
 
 A clause changes only by an explicit amendment of this text and of that test, never by a silent edit. A diverging CI
 leg is a measurement: fix it, or amend the contract explicitly and narrow the matrix.
@@ -40,16 +44,17 @@ How each clause is tested:
 
 | clause | tested by |
 |---|---|
-| `release_rc.py --epoch` + `python -m build` + `repro_dist.py` | every `repro` leg (pinned: `test_the_repro_job_runs_every_clause`) |
+| `release_rc.py --epoch` + `python -m build` + `repro_dist.py` | `build` and every `repro` leg run `repro_dist.py dist/*.tar.gz dist/*.whl` after `python -m build`, so both published files are normalised (pinned: `test_the_repro_job_runs_every_clause`, `test_each_rebuild_leg_builds_where_it_claims_and_checks_both_files`) |
 | `setuptools==84.0.0` | `pyproject.toml` `[build-system].requires == ["setuptools==84.0.0"]` (`test_the_build_backend_is_pinned_as_the_contract_states`) |
 | `ubuntu-latest` CPython 3.11, 3.12, 3.13, 3.14 | the `repro` matrix equals this list, the job runs on `ubuntu-latest` and `needs: build` (`test_the_repro_job_runs_the_contract_s_interpreters_after_build`) |
 | each build records its interpreter and runtime zlib | `repro_dist.py --toolchain` in `build` and in `repro`. It prints one JSON object: `sys.version`, `zlib.ZLIB_RUNTIME_VERSION`, `zlib.ZLIB_VERSION`, the `build` frontend version, the runner image (`ImageOS` `ImageVersion`) and OS/kernel/arch, with no host name (`ToolchainRecord`) |
-| from a fresh checkout | `repro` builds in the checkout and runs `sha256sum -c` against `build`'s `SHA256SUMS` (artifact `dist-sha256`) |
-| from a perturbed copy at another path | `repro_dist.py --perturb SRC DST` (`PerturbedCopy`); the build runs there and is checked by `sha256sum -c` against the same digests. The copy: files `0600`, or `0700` if they have an execute bit; directories `0700`; `__pycache__/` from `compileall`; a stale `aisef.egg-info/` (`Version: 0.0.0`, a `SOURCES.txt` naming a file a later commit removed); `dist/` and `build/` debris; no `.git` |
-| independence from permission bits | `repro_dist.normalize` writes git's mode: `0755` for a directory or any execute bit, else `0644` (`ModeNormalisation`). Red before the fix: three mode variants of one sdist gave three digests |
+| from a fresh checkout | `repro` builds in the checkout (no `cd` before `python -m build`) and runs `sha256sum -c` against `build`'s `SHA256SUMS` (artifact `dist-sha256`) |
+| from a perturbed copy at another path | `repro_dist.py --perturb SRC DST` (`PerturbedCopy`); the build runs there (the last `cd` before `python -m build` is `cd DST`) and is checked by `sha256sum -c` against the same digests. The copy: files `0600`, or `0700` if they have an execute bit; directories `0700`; `__pycache__/` from `compileall`; a stale `aisef.egg-info/` (`Version: 0.0.0`, a `SOURCES.txt` naming a file a later commit removed); `dist/` and `build/` debris (the stale wheel is a real zip, so `dist/*.whl` reads it); no `.git` |
+| independence from permission bits | `repro_dist.normalize` writes git's mode into the sdist: `0755` for a directory or any execute bit, else `0644` (`ModeNormalisation`; red before the fix: three mode variants of one sdist gave three digests). `repro_dist.normalize_wheel` does the same for the wheel. It rewrites only each member's mode in the zip central directory, and leaves `RECORD` on the wheel writer's constant. A wheel already on git's modes keeps every byte (`WheelModeNormalisation`; red before: the CLI could not read a wheel) |
+| no leg skipped or swallowed | no `if:` and no `continue-on-error` in `build` or `repro`; no matrix `exclude:`; no `\|\|`, pipe, background `&`, `set +…` or `exit 0` in a `repro` run. Every rebuild leg starts with `set -eu` and runs build, then normalise, then check (`test_no_leg_can_be_skipped_or_its_failure_swallowed`, `test_each_rebuild_leg_builds_where_it_claims_and_checks_both_files`) |
 | the frozen digests are the CPython 3.12 staging build's | staging `build` runs `python-version: "3.12"` on `ubuntu-latest` (`test_the_contract_claims_the_four_interpreters_and_the_3_12_staging_build_freezes`) |
-| the published 2.2.0 files rebuilt from tag `v2.2.0` | `repro` rebuilds the tag with `SOURCE_DATE_EPOCH` = `V2.2.0-RC2-FREEZE.json` `rc.source_date_epoch` and compares the result to its `artifacts.sha256` (`8c94dd6b…` / `102cda44…`). Unit half, CT-8 (`FreshCheckoutBytesUnchanged`): tag `v2.2.0` holds the RC2 shipped trees; on fresh-checkout modes the v2.3 `repro_dist` writes the v2.2.0 one's bytes, and also on perturbed modes, where the v2.2.0 one did not |
-| a changed execute bit is a different source | `test_a_changed_execute_bit_is_a_different_source` |
+| the published 2.2.0 files rebuilt from tag `v2.2.0` | `repro` checks the tag out (`git worktree add … v2.2.0`, then `cd` into it), rebuilds it with `SOURCE_DATE_EPOCH` = `V2.2.0-RC2-FREEZE.json` `rc.source_date_epoch` and compares the result to its `artifacts.sha256` (`8c94dd6b…` / `102cda44…`). Unit half, CT-8 (`FreshCheckoutBytesUnchanged`): tag `v2.2.0` holds the RC2 shipped trees; on fresh-checkout modes the v2.3 `repro_dist` writes the v2.2.0 one's bytes, and also on perturbed modes, where the v2.2.0 one did not |
+| a changed execute bit is a different source | `test_a_changed_execute_bit_is_a_different_source`, for the sdist (`ModeNormalisation`) and the wheel (`WheelModeNormalisation`) |
 | (CR-17) the 2.2 kernel digest is unchanged | CT-9 (`KernelDigestOfTheReleasedKernel`): `aisef2.app.run.kernel_digest` and `release_rc.kernel_digest_at` both give `c2d356b1…` on tree `e865d65c` |
 
 Measured locally on 2026-11-21. The raw record stays out of the tree (sha256
@@ -61,9 +66,37 @@ Toolchain: CPython 3.14.7, zlib 1.2.12, macOS arm64. Input: the published 2.2.0 
 * a copy of them with perturbed member modes also re-packs to `102cda44…`;
 * the v2.2.0 `repro_dist` re-packs that perturbed copy to `7a6cc804…`.
 
-This measures only the re-pack. No local setuptools rebuild was run: no network, and setuptools is not installed. The
-setuptools rebuilds on the four interpreters are the `repro` job's, and this draft claims nothing for them until that
-job has run.
+This measures only the re-pack. No local setuptools 84.0.0 rebuild was run: no network, and setuptools 84.0.0 is not
+installed. The setuptools rebuilds on the four interpreters are the `repro` job's, and this draft claims nothing for
+them until that job has run.
+
+**The wheel (review finding L1B-R1, measured 2026-11-21).** The wheel also takes member modes from the build tree.
+setuptools' `build_py` copies package data with `preserve_mode`, and `bdist_wheel` copies `dist-info/LICENSE` with
+`shutil.copy`. A `.py` module is written afresh, so it does not keep its mode. RISK-REGISTER.md:11's "The wheel is
+immune" is therefore wrong; correct it at W1 adjudication.
+
+The measurement used two proxy toolchains: setuptools 58.0.4 with wheel 0.37.0 on CPython 3.9.6, and setuptools 65.5.0
+with wheel 0.37.0 on CPython 3.11.4. Each tree went through sdist, extract, then a wheel from the extracted sdist,
+under `SOURCE_DATE_EPOCH`. Before the fix:
+
+* the fresh checkout and the `--perturb` copy gave different wheels;
+* 13 of 221 members differed, by mode only (`0o100644` vs `0o100600`).
+
+`repro_dist.normalize_wheel` on those same wheels:
+
+* the fresh wheel keeps every byte (setuptools 58: `f722aa53…`; setuptools 65: `ab3e337f…`);
+* the perturbed wheel becomes the fresh one, byte for byte, on both toolchains.
+
+The record stays out of the tree (sha256 `9d9f47f26290b7958b1871f0f8c9d4d16c15938070e401536a1cd11afc8334c6`; its script `ed221a9ac79f388c…`).
+
+Two things are not measured here:
+
+* setuptools 84.0.0 itself;
+* the published `8c94dd6b…` wheel. Its bytes are not available offline, so `normalize_wheel` being a no-op on it is
+  measured only by the `repro` tag leg.
+
+`RECORD` keeps its mode because the wheel writer sets it from a constant (`0o664` in the proxies). If 84.0.0 writes
+another constant mode into some other member, the tag leg goes red, loudly, and the rule is amended explicitly.
 
 To check in the first `repro` run (not measured here): setuptools' `manifest_maker` re-reads an existing
 `SOURCES.txt` when no VCS file finder is installed. A stale `SOURCES.txt` that names a file which exists outside the

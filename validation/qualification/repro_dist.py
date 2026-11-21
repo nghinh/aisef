@@ -2,17 +2,23 @@
 rebuild of the exact RC must give them again).
 
     SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python -m build
-    python -P validation/qualification/repro_dist.py dist/*.tar.gz
+    python -P validation/qualification/repro_dist.py dist/*.tar.gz dist/*.whl
     python -P validation/qualification/repro_dist.py --toolchain             # the build's toolchain record, JSON
     python -P validation/qualification/repro_dist.py --perturb SRC DST      # the contract's perturbed copy
 
-The wheel is already reproducible under SOURCE_DATE_EPOCH (setuptools clamps its zip timestamps; measured: two builds,
-one digest). The sdist is not: setuptools writes the build time into its members (PKG-INFO, egg-info, directories) and
-into the gzip header. This re-packs it with every member sorted by name, its mtime set to SOURCE_DATE_EPOCH, its
-owner fields cleared, no pax extras, its contents unchanged (checked), and a gzip header carrying the epoch and no
-file name. Each member's mode is git's: 0755 for a directory or a file with any execute bit, else 0644. setuptools
-takes the mode from the filesystem and git records only 100644 / 100755, so keeping it made the sdist depend on the
-build tree's permission bits (BUILD-REPRO-01; docs/v2.3/drafts/BUILD-REPRO-CONTRACT.md is the contract).
+Both files take each member's mode from the build tree, and git records only 100644 / 100755, so a tree whose files
+carry other permission bits built other bytes (BUILD-REPRO-01; docs/v2.3/drafts/BUILD-REPRO-CONTRACT.md is the
+contract). Each member's mode is therefore rewritten to git's: 0755 for a directory or a file with any execute bit,
+else 0644.
+
+The sdist: setuptools also writes the build time into its members (PKG-INFO, egg-info, directories) and into the gzip
+header. It is re-packed with every member sorted by name, its mtime set to SOURCE_DATE_EPOCH, its owner fields cleared,
+no pax extras, git's mode, its contents unchanged (checked), and a gzip header carrying the epoch and no file name.
+
+The wheel: setuptools clamps its zip timestamps to SOURCE_DATE_EPOCH, but package data and dist-info/LICENSE keep their
+file mode (build_py copies package data with preserve_mode; a .py module is written afresh, which is why it looked
+immune). A zip holds the mode only in its central directory, so only those 4 bytes per member are rewritten: a wheel
+already on git's modes, a fresh checkout's, keeps every byte. RECORD keeps its mode, a constant of the wheel writer.
 """
 
 from __future__ import annotations
@@ -27,8 +33,11 @@ import os
 import pathlib
 import platform
 import shutil
+import stat
+import struct
 import sys
 import tarfile
+import zipfile
 import zlib
 
 
@@ -53,6 +62,33 @@ def normalize(path: pathlib.Path, epoch: int) -> str:
         gz.write(tar)
     path.write_bytes(out_bytes.getvalue())
     return hashlib.sha256(out_bytes.getvalue()).hexdigest()
+
+
+def normalize_wheel(path: pathlib.Path) -> str:
+    """Rewrite each wheel member's mode (external_attr's high 16 bits, central directory only) to git's, in place;
+    the new sha256. Every other byte is unchanged."""
+    data = bytearray(path.read_bytes())
+    with zipfile.ZipFile(io.BytesIO(bytes(data))) as z:
+        before = [(i.filename, i.CRC, i.file_size) for i in z.infolist()]
+    end = data.rfind(b"PK\x05\x06")
+    count, _, at = struct.unpack_from("<HLL", data, end + 10) if end >= 0 else (0xFFFF, 0, 0)
+    if count == 0xFFFF or at == 0xFFFFFFFF:
+        raise SystemExit(f"{path}: no end of central directory, or zip64 (not a wheel this handles)")
+    for _ in range(count):
+        if data[at:at + 4] != b"PK\x01\x02":
+            raise SystemExit(f"{path}: no central directory entry at offset {at}")
+        n, extra, comment = struct.unpack_from("<3H", data, at + 28)
+        if not data[at + 46:at + 46 + n].endswith(b".dist-info/RECORD"):
+            attr = struct.unpack_from("<L", data, at + 38)[0]
+            mode = attr >> 16
+            git = 0o755 if stat.S_ISDIR(mode) or mode & 0o111 else 0o644
+            struct.pack_into("<L", data, at + 38, (mode & ~0o7777 | git) << 16 | attr & 0xFFFF)
+        at += 46 + n + extra + comment
+    with zipfile.ZipFile(io.BytesIO(bytes(data))) as z:   # the same members, the same contents
+        if [(i.filename, i.CRC, i.file_size) for i in z.infolist()] != before or z.testzip() is not None:
+            raise SystemExit(f"{path}: the rewritten wheel does not hold the same files")
+    path.write_bytes(data)
+    return hashlib.sha256(data).hexdigest()
 
 
 def toolchain() -> dict:
@@ -84,7 +120,8 @@ def perturb(src: pathlib.Path, dst: pathlib.Path) -> None:
     (egg / "PKG-INFO").write_text("Metadata-Version: 2.1\nName: aisef\nVersion: 0.0.0\n", encoding="utf-8")
     (egg / "SOURCES.txt").write_text("README.md\npyproject.toml\naisef/removed_by_a_later_commit.py\n", encoding="utf-8")
     (dst / "dist").mkdir(exist_ok=True)
-    (dst / "dist" / "aisef-0.0.0-py3-none-any.whl").write_bytes(b"stale")
+    with zipfile.ZipFile(dst / "dist" / "aisef-0.0.0-py3-none-any.whl", "w") as stale:   # a zip: `repro_dist.py dist/*.whl` reads it
+        stale.writestr("aisef-0.0.0.dist-info/RECORD", "")
     (dst / "build" / "lib" / "aisef").mkdir(parents=True, exist_ok=True)
     (dst / "build" / "lib" / "aisef" / "removed_by_a_later_commit.py").write_text("", encoding="utf-8")
     for p in [*dst.rglob("*"), dst]:
@@ -106,8 +143,8 @@ def main(argv: list[str]) -> int:
     if not epoch or not epoch.isdigit():
         print("repro_dist: SOURCE_DATE_EPOCH (the commit time) is required", file=sys.stderr)
         return 2
-    for p in argv:
-        print(f"{normalize(pathlib.Path(p), int(epoch))}  {pathlib.Path(p).name}")
+    for p in map(pathlib.Path, argv):
+        print(f"{normalize_wheel(p) if p.suffix == '.whl' else normalize(p, int(epoch))}  {p.name}")
     return 0
 
 
