@@ -1,14 +1,19 @@
-# ROUND-AUTH parity — the evidence for ledger seq 13 (draft R4; R3 and R2 superseded), items 1–8
+# ROUND-AUTH parity — the evidence for ledger seq 13 (draft R5; R4, R3 and R2 superseded), items 1–9
 
 Owner status: **CONDITIONAL HOLD**. The principle of a separate v2.3 qualification round is approved. The seq 13 draft
 is not authorized for the ledger. This page is the evidence the owner asked for before any ratification request. It
 is a draft and authorizes nothing.
 
 Code commit: `f237ad14` on `v23/roundauth`, based on `release/v2.3-big` at `1e25ef84`; review-finding fix commit
-`5a0b1c24` (§7); Q0-1 commit (§8, the distinct v2.3 Q0 round, draft R4) on top of `0a034025`.
+`5a0b1c24` (§7); Q0-1 commit `860dcbe6` (§8, the distinct v2.3 Q0 round, draft R4) on top of `0a034025`; Q0-1
+review-fix commit `29c40b07` (§9, draft R5) on top of `860dcbe6`.
 v2.2.0 = `da3ea33f3b695aaca73e87a704145a0193aced23`.
 
-**What R4 supersedes (§8).** R4 supersedes R3: the current draft is `LEDGER-SEQ-13-DRAFT-R4.md` with
+**What R5 supersedes (§9).** R5 supersedes R4: the current draft is `LEDGER-SEQ-13-DRAFT-R5.md` with
+`SEQ13-WIRING-R5.patch`. R4 and its patch (`a0f79fc1…`) must not be ratified or applied. Five review findings against
+R4 were each reproduced by a verifier and are fixed fail-closed in `29c40b07`; §8 is kept as measured history.
+
+**What R4 superseded (§8).** R4 superseded R3: the current draft is `LEDGER-SEQ-13-DRAFT-R4.md` with
 `SEQ13-WIRING-R4.patch`. R3 and its patch (`40e6b57a…`) must not be ratified or applied. The R3 rows of §4b and §7 are
 kept as measured history. Their mechanisms (the pins and the round check) carry over to R4 unchanged, extended by Q0.
 Host for every measurement: Darwin 25.5.0 arm64, CPython 3.14.7, git 2.53.0.
@@ -312,8 +317,10 @@ GATED is byte-identical, as checked by AST, and `test_sealing_gate.py` is unedit
 
 ## 6. The revised drafts
 
-* `docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R4.md` — the current draft (§8); its ruling digest is in §8.7. Changes vs
-  R3 and their reasons are in R4.
+* `docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R5.md` — the current draft (§9); its ruling digest is in §9.5. Changes vs
+  R4 and their reasons are in R5.
+* `LEDGER-SEQ-13-DRAFT-R4.md` — unchanged, `8db40e8c65c0094b36812ff6338819e8afbe91388e8f058647ae935a6978d63b`, pinned
+  by `tests/v23/test_v23_ledger_digest.py`. **Superseded by R5; not to be ratified** (§9).
 * `LEDGER-SEQ-13-DRAFT-R3.md` — unchanged, `72e296b6b2f991e7f66a82bcebb9baff3bf337954b722316defa16db94a2dd9f`,
   now pinned by `tests/v23/test_v23_ledger_digest.py`. **Superseded by R4; not to be ratified** (§8).
 * `LEDGER-SEQ-13-DRAFT-R2.md` — unchanged, `a7fa9f97c6a324f3f1d53df2ca42cd8c46135751977bcdafa5c3d63716daa940`,
@@ -413,7 +420,7 @@ plus one appended entry and the R3 draft).
 * W1-DESIGN §7 says `sealing_gate.py` changes "only for V22_REPLAYED". R2's patch already went beyond that (`sealing`
   became a function), and R3 adds the pins that guard the skip. The integrator should confirm this reading.
 
-## 8. Q0-1: the distinct v2.3 Q0 round (draft R4)
+## 8. Q0-1: the distinct v2.3 Q0 round (draft R4; superseded by R5, §9)
 
 The owner, 2026-11-22: approve the architectural direction of a distinct v2.3 Q0 qualification round, without modifying
 or invalidating the historical v2.2 Q0 record. Before the final ruling the owner asked for six things: a byte-identical
@@ -596,7 +603,7 @@ that asks for the owner's own words quoting the digest; there is no signature an
 field by field, are in R4.
 
 **R4 supersedes R3** (and R3's patch `40e6b57a…`): neither is to be ratified or applied. R1–R3 are unchanged and
-digest as recorded.
+digest as recorded. **R5 supersedes R4 (§9).**
 
 ### 8.8 NOT_DONE (stated)
 
@@ -609,6 +616,146 @@ digest as recorded.
   L1-F5's round path. **Final E5 qualification waits at this boundary.**
 * Measured after the evidence was written, so recorded here only: on an APFS clone of the final tree of this commit (everything above committed in the clone, the patch not applied), Q0 regenerates **57/57, byte-identical** (`714625b1…`), 230.5 s, with `problems_of` = [] and `history_problems` = []. Targeted tests in the worktree (unsealed, env guard): `discover -s tests/v23` ran 73, OK, 26 skipped (gated); `tests/v2/test_sealing_gate.py` 3 OK; `tests/v2/test_v1_evidence_guard.py` 26 OK; `tests/v2/p0/test_checker_calibration.py` 13 ran, OK, 9 skipped (gated). ruff clean.
 
+## 9. The Q0-1 review findings and draft R5 (fixed fail-closed in `29c40b07`)
+
+A review of R4 (`860dcbe6`) found five defects, and a verifier reproduced each one. Each is fixed fail-closed, none by
+an allowlist or an exception. The design and the corrected delta are in `docs/v2.3/amendments/Q0-1-R5.md`;
+`Q0-1-V23-ROUND.md` is unchanged. Nothing here applies a patch, writes the ledger or writes the round-v2.3 Q0 record.
+`tests/v2/**`, `validation/v2/**`, `closure-evidence/**`, `aisef2/**`, R1–R4 and their patches, and the evidence files
+are unchanged versus `860dcbe6`. `tests/v23/__init__.py` is still 0 bytes.
+
+### 9.1 Findings and fixes
+
+| ID | Severity | Defect (as reproduced) | Fix | Regression tests | Status |
+|---|---|---|---|---|---|
+| Q0P-1 | HIGH | Weakening the b1 fixture's `"expect"` to `""` before the first write: the writer wrote 57/57 and the restricted sealing run was green (ran 40, 0 failures). The same edit fails v2.2.0's gate. | `q0_round.contract_problems`, in `problems`: each v2.2 checker keeps `package`, `fixture` and `expected`, and its fixture file keeps its v2.2.0 LF bytes. No exception list. `delta` prints the per-checker change against the v2.2 record. | `Q0Contract` (5), `Q0Rules` | FIXED, measured (§9.2 F2, F2h) |
+| Q0P-2 | MEDIUM | A new `validation/v23` checker module with an unledgered `os.kill` and an encoding defect: Q0 stayed 57/57 with no problem. Widened scopes found 6 unledgered sites. | `q0_round.v23_scope_problems`, in `problems`: a `validation/v23` module is a registered source or in the closed `NOT_CHECKERS_V23`; destructive_authority `SCOPES` covers `validation/v23` and `tests/v23`; the calibrated encoding scan runs over `validation/v23`. | `Q0Scope` (4), `Q0Rules` | FIXED in round v2.3's rule, measured (§9.2 F3, §9.3). Ledgering the 6 sites and registering `impact.py` stay with L1-AUTHCHK and L1-F5. |
+| Q0P-3 | MEDIUM | `p5_acceptance` `GUARDS` runs the v2.2 `checker_calibration.py --check`, which no v2.3 tree passes (measured: exit 1 after edit A). So a re-derived P5 record could never be green. W1-DESIGN.md:266's VR justification pointed at an impossible gate. | `q0_round.CHECK_ARGV` = `validation/v23/q0_round.py --check`, which now also needs the round open. `test_v23_rounds.p5_q0_guard_problems`, asserted in `RoundV23.test_P5_REVERIFICATION`: a re-derived P5 record must record that guard. Affected consumers listed; VR and gate 3 restated (amendment §3). | `Q0Guard`; `Q0Record` (closed round makes `--check` red) | FIXED in the counterpart and the ruling. Unit-measured only: the real round-v2.3 P5 record needs L1-F5 and L1-QUAL's round-aware `GUARDS`. |
+| Q0R-INT-1 | MEDIUM | A merge (resolved by hand, or `-X theirs`) or a `--depth 1` clone hid the reviewed draft's add commit, so a rewritten R4 opened the round. | `reviewed_draft`: `--full-history`; refuses a shallow repository; `GIT_NO_REPLACE_OBJECTS=1`. R5 tells the owner to digest through `reviewed_draft`. | `LedgerSeq13`: both merges refused, a benign merge opens; a shallow clone refused, a full clone opens | FIXED, measured (real git, throwaway repositories) |
+| Q0R-INT-2 | MEDIUM | R4 named the Q0-1 amendment by path only, on a "hash cycle" reason that holds only for this page. The amendment could be edited after approval with nothing turning red. | R5's `BOUND_SHA256` binds both amendments and the 8 evidence files by LF sha256. `ledger_seq13_problems` keeps the round closed while any differs. The reason is corrected: only this page is unbound. | `LedgerSeq13.test_every_bound_file_must_stay_as_reviewed`; `Digest.test_R5_binds_…` | FIXED, measured (throwaway repositories) |
+
+### 9.2 Measured end to end (R5 applied in an APFS clone)
+
+**Setup.**
+
+* An APFS clone of the worktree at `860dcbe6` plus this pass, committed in the clone. The clone's `.git` was replaced by
+  a new repository that borrows the main object store read-only; it is not shallow.
+* The R5 patch applied and committed in the clone only.
+* `AISEF_SEALING=1 python -P validation/v2/owned_run.py -- python -P run_ids.py <clone>`: the sealing job restricted
+  as in §8.5, under the env guard.
+* Run 2026-11-21T20:39Z–21:10Z (UTC, system clock).
+
+**Harness stubs (labelled).**
+
+* Round-open stub: a no-op `in_round`, a `validate(round=)`, and a seq 13 that is R5's entry with a "SCRATCH-COPY STUB"
+  authority quoting R5's digest. It is committed in the clone only.
+* `STUB_SCOPE=1`: `v23_scope_problems` returns `[]`. It stands in for L1-F5's registered `impact.py` and L1-AUTHCHK's
+  widened `SCOPES`. It is used in F1, F2 and F2h only. F3 runs the real rule.
+
+| Scenario | Writer (`q0_round.py --write`) | Restricted sealing run | Gate | Log sha256 |
+|---|---|---|---|---|
+| S1: R5 applied, no seq 13 | — | ran 186: 20 failures (the 11 RoundV23 and 9 Q0RoundV23 counterparts, "round v2.3 is not open"), 20 skipped (the 11 and the Q0 class, naming the replay) | **red** | `d11359975ca571908e908d83824b68c62a38861f7454f248a4b8938d432b5654` |
+| F1: round and scope stubbed (control) | rc 0, 57/57, "0 change(s)" against the v2.2 record, record written | Q0 set: ran 25, 0 failures, 9 skipped (the v2.2 class) | **green** | writer `54352cd12db3e4b0d88a05b9c09e2157a56a8b3fc405405b64f48b066227d13c`, run `568b9c7926a13de723e5fb925a186c13285392a1342fb0ee9b2a1f6411862f5c` |
+| F2: the verifier's Q0P-1 edit (b1 `"expect": ""`) before the first write | **rc 1, no record**: `DELTA b1_bindings.expected: 'moved since the manifest froze' -> ''`; FAIL expected `''` is not its v2.2 contract; FAIL the fixture is not its v2.2.0 bytes | — | **refused** | `456102aec3f4a3893e939a125656ca57675036f8f386d8de910dd917d203edff` |
+| F2h: the same edit, the record hand-sealed (`render(run())`, bypassing the writer) and committed | hand: 57/57 | ran 25, 1 failure: Q0RoundV23 test 1 names the two contract problems, and only those (the record is current) | **red** | hand `28a506ce41227af5cfe978b94eb9d7ed6580790c519c11ce2dd8825871a13f42`, run `b27bda528dd02d9d91923b0b824a0437a00eaa13ec3070b312183a234dd23f8c` |
+| F3: round stubbed, scope rule real | **rc 1, no record**: `validation/v23/impact.py` has no calibration; `SCOPES` does not cover `validation/v23` or `tests/v23`; 57/57, 0 changes | — | **refused** | `5b112dcd08a328fd18227e9093e59704c8b42aa64ba1af68fa2537ded082f3af` |
+
+**Reading.**
+
+* Under R4 the verifier measured F2's edit as writer rc 0 and run exit 0 (ran 40, 0 failures). Under R5 the writer
+  refuses it (F2). A record sealed by hand is red at the gate (F2h), even though the record itself is current.
+* With the stand-ins for the lanes' deliverables, the gate can still go green (F1).
+* F1's writer measured 0 changes against the v2.2 record at this tree. This pass moves nothing in the v2.2 Q0: 57/57,
+  with a calibration body equal to `714625b1…`'s.
+* With the real scope rule, round v2.3 Q0 is red today on `impact.py` and `SCOPES` (F3), beside the closed round and
+  the missing record.
+
+Before the scenarios, the clone's sealed wiring and regression tests were run:
+`ONLY="Seq13Wiring|Q0Wiring|test_sealing_gate|WiringR5|LedgerSeq13|Digest"` ran 31, 0 failures. Raw logs and the harness
+(`e2e_r5.py` `28086444…`, `run_ids.py` `f04f4642…`, `stub_write.py` `9dd452a3…`, `guard.sh` `507ae907…`,
+`mkcopy.sh` `96576d62…`) stay in scratch. The clone was deleted afterwards.
+
+### 9.3 Measured in the worktree (no copy, env guard)
+
+* `v23_scope_problems()` at `29c40b07` returns 3 problems: `validation/v23/impact.py` has no calibration, and
+  `SCOPES` does not cover `validation/v23`, nor `tests/v23` (0.3 s).
+* `contract_problems(<the v2.2 record>)` returns `[]`: all 57 fixtures equal v2.2.0's (0.6 s).
+* `discover -s tests/v23`: ran 90, OK, 26 skipped (gated).
+* `tests/v2/test_sealing_gate.py`: 3 OK.
+* `tests/v2/test_v1_evidence_guard.py`: 26 OK.
+* `tests/v2/p0/test_checker_calibration.py`: 13 ran, OK, 9 skipped (gated).
+* `tests/test_meta.py` encoding scan: 2 OK.
+* `ruff check tests/v23 validation/v23`: clean.
+* `git apply --check docs/v2.3/drafts/SEQ13-WIRING-R5.patch`: passes.
+
+### 9.4 The wiring: `SEQ13-WIRING-R5.patch` (sha256 `ceab41236847845be64831b16966fd1eecfbc120771372678eb02543595a91b3`)
+
+It uses R4's mechanism, unchanged, on `tests/v2/sealing_gate.py` only, with GATED byte-identical (`WiringR5`). Only the
+pins are re-taken:
+
+| Pinned file | sha256 (LF) | vs R4 |
+|---|---|---|
+| `tests/v23/__init__.py` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | same |
+| `tests/v23/test_v23_q0_round.py` | `653c06423a4eeaac7888a26c593f900eff8755a915ff64a57398f4e4a0048b86` | changed |
+| `tests/v23/test_v23_rounds.py` | `ddef983626724a35a83c499d731f049641e92d2c566fd49d44c7b25d8e6b7cbc` | changed |
+| `validation/v23/ledger_digest.py` | `660624c01b47811b8b9d2f41f371d4b721bb8b7c802eaa87b656c05f99ee3df9` | same |
+| `validation/v23/q0_round.py` | `038906381a500a0c40e179803078c471527f960b884644d34eea64b4ff85fccf` | changed |
+| `validation/v23/replay_v22.py` | `3f54e22b0f201072be279c058381e2dee3726bd86ac09bc52b3a09bbb788f87e` | same |
+
+R4's patch applied to this tree skips none of the 12, because its pins no longer hold
+(`WiringR5.test_R4s_patch_on_this_tree_skips_nothing`).
+
+### 9.5 The revised seq-13 object
+
+`docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R5.md` (file sha256 `d94a08bbc788b9324aae390c9ebb38cb23a344c5f19095c6ee53433c17c02d79`),
+**canonical ruling digest `44d73a7851e08eb08b57c96a3b6fe7f03b74dc180a9bda6e6c90a0715b3224f5`**.
+
+* The authority stays a placeholder that asks for the owner's own words quoting the digest. There is no signature and
+  no approval date.
+* R5 extends each of R4's `SCOPE`, `Q0_ROUND`, `SEALING_GATE`, `EVIDENCE_REVIEWED`, `NOT_AUTHORIZED` and `subject_to`
+  by appending to it, so R4's text is a prefix of each (tested).
+* `GATED_TEST_WIRING` names the R5 patch.
+* The one new field is `BOUND_SHA256`:
+
+| Bound file | LF sha256 |
+|---|---|
+| `docs/v2.3/amendments/Q0-1-V23-ROUND.md` | `0e0d0fbf822861134a073dac7da1be3ae2b2329c77ebf803ab7774809a7f8178` |
+| `docs/v2.3/amendments/Q0-1-R5.md` | `d34e34b211bd0127af4a19964d98483ae005947f235f4a45624eeba6142130da` |
+| `docs/v2.3/evidence/q0-round/COVERAGE-MAP-2026-11-21.json` | `644d874c610a8c8315554db2e402ac8bad9fa51d6006aaa902680714e054fc2c` |
+| `docs/v2.3/evidence/q0-round/NEGATIVE-CONTROLS-2026-11-21.json` | `6ee4f872d35da24fb5c1ff6027584d22208e97f74f4ff3b107d3d9571550bea8` |
+| `docs/v2.3/evidence/q0-round/Q0-DELTA-2026-11-21.json` | `f885b37454f99fa51c332c46fab9ee54b6e84876c5654a9ac4697d94f582ad54` |
+| `docs/v2.3/evidence/q0-round/REPLAY-V22-Q0-2026-11-21.json` | `0f8bd55cd078e38115976c0c3d68fcf89f70fa37698654e048d5457e886e513c` |
+| `docs/v2.3/evidence/round-auth/COVERAGE-MAP-2026-11-21.json` | `2bb5b5501b7ab966cef61ca13ca5bbbe4c40f9692284bce037e21ef4e9bd8c8d` |
+| `docs/v2.3/evidence/round-auth/HISTORY-IDENTITY-2026-11-21.json` | `cc18861af3712821335c16ebbdc31604cef974d7006f726ab840dad2d9dad91f` |
+| `docs/v2.3/evidence/round-auth/NEGATIVE-CONTROLS-2026-11-21.json` | `15087001cd877db180ea51f72be8db7b34aa103b99ac3fd4ea0e7ee013270969` |
+| `docs/v2.3/evidence/round-auth/REPLAY-V22-2026-11-21.json` | `e7ef54c745b35ae709cc6fd591e9a42767899956defc4db1688c4ac48f33f8ae` |
+
+This page quotes the digest, so it is the only page named by path alone. No bound file quotes the digest (tested).
+
+### 9.6 NOT_DONE and residuals (stated)
+
+**NOT_DONE.**
+
+* Full suite and full sealing job: not run (project rule; the integrator's batch).
+* `RoundV23.test_replay_v22` was not run in the patched clone, because of the one-copy rule. `replay_v22.py` is
+  unchanged since R4 (its pin `3f54e22b…` is the same), so §8.2's replay of all 12 at v2.2.0 still applies to these
+  bytes.
+* Q0P-3 is measured on unit fakes only. The real round-v2.3 P5 record needs L1-F5's round selection and L1-QUAL's
+  round-aware `GUARDS` / `guard_problems`.
+* F1's green stands on the two labelled stubs. The real green needs the owner's seq 13, L1-F5 (`in_round`,
+  `validate(round=)`, `impact.py` as a registered source), and L1-AUTHCHK (`SCOPES` widened, the 6 sites ledgered).
+* The round-v2.3 Q0 record is not committed: the writer refuses it on this tree (F3).
+
+**Residuals.**
+
+* A checker's code can be weakened while it still fails its unchanged fixture for the named reason. This is Q0's own
+  limit, the same in v2.2.
+* `NOT_CHECKERS_V23` (`__init__`, `q0_round`, `replay_v22`, `ledger_digest`) is a ruling choice. If the owner wants
+  `replay_v22.py` or `ledger_digest.py` calibrated as Q0 checkers, that is R6.
+* `BOUND_SHA256` checks the working-tree bytes the sealing job sees.
+* Two things are not detectable in-tree, as before: owner words the owner did not write, and a rewrite of the
+  repository's own history.
+
 ## Reproduce
 
     python3 -P validation/v23/replay_v22.py                       # fresh clone at v2.2.0, all 11, exit 0 = PASS
@@ -618,3 +765,4 @@ digest as recorded.
     AISEF_SEALING=1 python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q -p test_v23_rounds.py   # red today: round not open
     python3 -P validation/v23/q0_round.py --check                  # round-v2.3 Q0 vs this tree (red today: no record)
     python3 -P -m unittest discover -s tests/v23 -t . -p test_v23_q0_round.py   # Q0-1 controls (Q0RoundV23/Q0Wiring gated)
+    python3 -P -c "import sys; sys.path.insert(0, '.'); from tests.v23.test_v23_rounds import reviewed_draft; from validation.v23.ledger_digest import digest; print(digest(reviewed_draft()))"   # R5's digest, from the draft as first committed (§9)
