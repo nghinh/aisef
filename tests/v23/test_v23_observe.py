@@ -60,8 +60,10 @@ def record(t: TI.Toy, kills, backend: str = "auto", hook: str | None = None) -> 
     return OBS.load(out)
 
 
-def state(t: TI.Toy, base: str, head: str, obs, target: str = TGT, off=()) -> impact.State:
-    with mock.patch.object(impact, "_OFF", frozenset(off)):
+def state(t: TI.Toy, base: str, head: str, obs, target: str = TGT, off=(), hook: str | None = None) -> impact.State:
+    """`hook`: the engine verifies with that hook (red-before only: what a recorder variant's records would be judged
+    by an engine that took that variant for its own; the intact engine refuses them, R0)."""
+    with mock.patch.object(impact, "_OFF", frozenset(off)), mock.patch.object(OBS, "HOOK", hook or OBS.HOOK):
         return next(s for s in impact.classify(t.root, base, head, observations=obs) if s.target == target)
 
 
@@ -115,10 +117,11 @@ class OwnerNegatives(Base):
     def test_1_missing_child_process_tracing(self):
         """A non-Python child reads toy.py through a path no literal names (the static boundary cannot see it); a
         comment appended to toy.py changes no segment and no layout. Audit: the child is untraced (R1). strace: the
-        child is traced and its read of toy.py is data (R2). Red-before: a hook that records no launch — reuse."""
+        child is traced and its read of toy.py is data (R2). Red-before: a hook that records no launch — reuse (with
+        R8 off: since Review 1 the computed argv refuses tier S for any Δ ≠ ∅)."""
         t = self.t
         TI.add_test(t, K, "test_inc", "    def test_child(self):\n"
-                    "        p = os.path.join(os.path.dirname(toy.__file__), 'to' + 'y' + '.py')\n"
+                    "        p = os.path.join(os.path.dirname(toy.__file__), ''.join(['to', 'y.py']))\n"
                     "        out = subprocess.run(['wc', '-l', p], capture_output=True, text=True, check=True).stdout\n"
                     "        self.assertGreater(int(out.split()[0]), 0)\n", "import os\nimport subprocess\n")
         b = t.commit()
@@ -127,13 +130,16 @@ class OwnerNegatives(Base):
         guarded = state(t, b, h, record(t, [K]))
         self.assertNonReuse(guarded, "INVALIDATED", "R2" if STRACE else "R1",
                             "reads aisef2/toy.py as data" if STRACE else "untraced_children 1")
-        red = state(t, b, h, record(t, [K], "audit", without("launch")))
+        red = state(t, b, h, record(t, [K], "audit", hook := without("launch")), hook=hook,
+                    off={"R8"})   # the computed argv is an open R8 site: since Review 1 it refuses for any Δ ≠ ∅
         self.assertEqual(red.state, "VERIFIED_REUSE", red)
 
     # 2 ------------------------------------------------------------------------------------------------------------
     def test_2a_dynamic_import(self):
         """importlib.import_module of a computed name loads a module S(F) does not hold: the D2 check refuses the
-        observation. Red-before: a hook without open/exec/import events — the load is unseen, reuse."""
+        observation. Red-before: a hook without open/exec/import events — the load is unseen, reuse (with R8 and
+        R1 off: since Review 1 the open R8 site refuses tier S for any Δ ≠ ∅, and R1 a run whose kill file was not
+        seen running)."""
         t = self.t
         t.files["aisef2/plug_a.py"] = "def value():\n    return 1\n"
         TI.add_test(t, K, "test_inc", "    def test_plugin(self):\n"
@@ -144,7 +150,9 @@ class OwnerNegatives(Base):
         h = t.commit()
         self.assertNotIn("aisef2/plug_a.py", impact.kill_closure(t.root, b, h, K))
         self.assertNonReuse(state(t, b, h, record(t, [K])), "UNRESOLVED", "D2", "misses aisef2/plug_a.py")
-        red = state(t, b, h, record(t, [K], "audit", without("open", "exec", "import")))
+        red = state(t, b, h, record(t, [K], "audit", hook := without("open", "exec", "import")), hook=hook,
+                    off={"R8", "R1"})   # since Review 1: R8 refuses the computed import too, and a hook that sees no
+        # exec event does not see the kill file's own code run either (kill_file_unseen, R1)
         self.assertEqual(red.state, "VERIFIED_REUSE", red)
 
     def test_2b_runtime_path_construction(self):
@@ -159,7 +167,7 @@ class OwnerNegatives(Base):
         t.files["aisef2/data.txt"] = "beta\n"
         h = t.commit()
         self.assertNonReuse(state(t, b, h, record(t, [K])), "INVALIDATED", "R2", "reads aisef2/data.txt as data")
-        red = state(t, b, h, record(t, [K], "audit", without("open")))
+        red = state(t, b, h, record(t, [K], "audit", hook := without("open")), hook=hook)
         self.assertEqual(red.state, "VERIFIED_REUSE", red)
 
     # 3 ------------------------------------------------------------------------------------------------------------
@@ -175,7 +183,7 @@ class OwnerNegatives(Base):
         h = t.commit()
         self.assertNotIn("tests/v2/test_new.py", impact.kill_closure(t.root, b, h, K))
         self.assertNonReuse(state(t, b, h, record(t, [K])), "INVALIDATED", "R3", "lists tests/v2")
-        red = state(t, b, h, record(t, [K], "audit", without("listing")))
+        red = state(t, b, h, record(t, [K], "audit", hook := without("listing")), hook=hook)
         self.assertEqual(red.state, "VERIFIED_REUSE", red)
 
     # 4 ------------------------------------------------------------------------------------------------------------
@@ -405,11 +413,14 @@ class StraceParser(unittest.TestCase):
         for pid, lines in procs.items():
             (w / "hook" / f"{pid}-x.ev").write_text("".join(x + "\n" for x in lines), encoding="utf-8")
         (w / "manifest.json").write_text(json.dumps({"tree": "/w/tree", "checkout": "/w/checkout", "backend": backend,
-                                                     "row": {"outcome": "PASS", "exit": 0, "ran": 1}}), encoding="utf-8")
+                                                     "kill_file": {"path": K}, "row": {"outcome": "PASS", "exit": 0,
+                                                                                       "ran": 1, "pid": 100}}),
+                                         encoding="utf-8")
+        (w / "log.txt").write_text("test_x (v2.test_k.T.test_x) ... ok\n", encoding="utf-8")
         return w
 
     def test_reconciliation(self):
-        root = ('openat(AT_FDCWD</w/tree>, "aisef2/toy.py", O_RDONLY|O_CLOEXEC) = 3</w/tree/aisef2/toy.py>\n'
+        root = (TI.EXECVE + 'openat(AT_FDCWD</w/tree>, "aisef2/toy.py", O_RDONLY|O_CLOEXEC) = 3</w/tree/aisef2/toy.py>\n'
                 'newfstatat(AT_FDCWD</w/tree>, "aisef2/toy.py", {st_mode=S_IFREG|0644, ...}, 0) = 0\n'
                 'newfstatat(AT_FDCWD</w/tree>, "aisef2/data.txt", {st_mode=S_IFREG|0644, ...}, 0) = 0\n'
                 'openat(AT_FDCWD</w/tree>, "aisef2/link", O_RDONLY) = 4</w/tree/aisef2/target.txt>\n'
@@ -418,13 +429,15 @@ class StraceParser(unittest.TestCase):
                 'vfork() = 101\nvfork() = 102\n+++ exited with 0 +++\n')
         kid = ('execve("/usr/bin/wc", ["wc", "-l", "aisef2/toy.py"], 0x1 /* 9 vars */) = 0\n'
                'openat(AT_FDCWD</w/tree>, "aisef2/toy.py", O_RDONLY) = 3</w/tree/aisef2/toy.py>\n')   # no +++: cut
-        hook = ["S\t100\t1", "o\tload\t/w/tree/aisef2/toy.py", "m\t/w/tree/aisef2/toy.py", "l\town\t/w/tree/aisef2\t<native>",
+        hook = ["S\t100\t1", "o\tload\t/w/tree/aisef2/toy.py", "m\t/w/tree/aisef2/toy.py", "m\t/w/tree/" + K,
+                "l\town\t/w/tree/aisef2\t<native>",
                 "C\tsubprocess.Popen\t0\t0\t['wc']", "E\t0"]
         rec = OBS.derive(self.witness({100: root, 101: kid}, {100: hook}))
-        self.assertEqual(rec["opened"], {"aisef2/data.txt": "data", "aisef2/link": "data", "aisef2/target.txt": "data",
-                                         "aisef2/toy.py": "data"})   # the child's read makes toy.py data
+        self.assertEqual(rec["opened"], {"aisef2": "data", "aisef2/data.txt": "data", "aisef2/link": "data",
+                                         "aisef2/target.txt": "data", "aisef2/toy.py": "data"})   # the child's read
+        # makes toy.py data; the directory's open is a lookup of its existence (Review 1, BOTH-1)
         self.assertEqual(rec["listed"], [])   # the import system's own listing, accounted for by the hook
-        self.assertEqual(rec["loaded"], ["aisef2/toy.py"])
+        self.assertEqual(rec["loaded"], ["aisef2/toy.py", K])
         c = rec["completeness"]
         self.assertEqual((c["untraced_children"], c["missing_trace_files"], c["truncated_trace_files"]), (1, 1, 1))
         self.assertEqual((rec["children"]["traced"], rec["os_trace"]), (1, True))
@@ -436,7 +449,7 @@ class StraceParser(unittest.TestCase):
         self.assertEqual((hook_only["completeness"]["fd_relative"], hook_only["completeness"]["untraced_children"]), (1, 1))
         untraced = OBS.derive(self.witness({100: root.replace("vfork() = 102\n", "") + ""}, {100: hook, 200: ["S\t200\t100"]}))
         self.assertGreaterEqual(untraced["completeness"]["unaccounted_processes"], 1)   # a hooked pid no trace shows
-        listed = OBS.derive(self.witness({100: root}, {100: hook[:3] + hook[4:]}))   # the hook did not make the listing
+        listed = OBS.derive(self.witness({100: root}, {100: hook[:4] + hook[5:]}))   # the hook did not make the listing
         self.assertEqual((listed["listed"], listed["listed_by"]), (["aisef2"], {"aisef2": ["<native>"]}))
 
     def test_recorded_fixture(self):
@@ -460,7 +473,7 @@ class StraceBackend(Base):
         t = self.t
         TI.add_test(t, K, "test_inc", "    def test_kids(self):\n"
                     "        threading.Thread(target=lambda: os.stat(os.path.dirname(toy.__file__))).start()\n"
-                    "        p = os.path.join(os.path.dirname(toy.__file__), 'to' + 'y' + '.py')\n"
+                    "        p = os.path.join(os.path.dirname(toy.__file__), ''.join(['to', 'y.py']))\n"
                     "        subprocess.run(['wc', '-l', p], check=True, capture_output=True)\n"
                     "        subprocess.run([sys.executable, '-c', 'pass'], check=True, env={'PATH': os.environ['PATH']})\n"
                     "        with tempfile.TemporaryDirectory() as d:   # removed through fds (shutil.rmtree on Linux)\n"

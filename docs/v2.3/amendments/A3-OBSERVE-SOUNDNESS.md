@@ -146,7 +146,7 @@ or engine variant lacking the guard would have given (red-before).
 No observation of a repository kill file has been recorded in this increment. R2S can only add INVALIDATED states.
 
 Measured on the repository at `75080a80` against the v2.2.0 basis, with no observation
-([`R2S-REPOSITORY-EFFECT.json`](../../../closure-evidence/v2.3/f5-observe/R2S-REPOSITORY-EFFECT.json)):
+([`R2S-REPOSITORY-EFFECT.json`](../evidence/f5-observe/R2S-REPOSITORY-EFFECT.json)):
 667 INVALIDATED (R2) / 17,322 mutants, 327 UNRESOLVED (I6) / 10,078, 0 VERIFIED_REUSE — the same states and totals as
 disposition 2. The component moved from R6 to R2: the impact tests left `tests/v2` (A2), so Δ holds no `.py`, and R2S
 fires before R1. Δ is 9 evidence files added under `closure-evidence/v2` since v2.2.0; `tests/v2/test_p9_reproduction.py`
@@ -156,4 +156,62 @@ holds the constant `"closure-evidence/v2"` and lies in every S(F) (registry's `T
 I6 INVALIDATED even with complete, admissible observations. Narrowing it (for example, judging only constants of
 code F's processes can execute) is the same question Amendment A1 failed on (mutant-only execution of literal-named
 files) and needs its own amendment and soundness argument; none is made here. New evidence goes to
-`closure-evidence/v2.3/` (A2), outside COPY, so it does not add to Δ.
+`docs/v2.3/evidence/` (A2 as corrected 2026-11-22), outside COPY, so it does not add to Δ.
+
+## Review 1 (2026-11-22)
+
+*One bounded, fail-closed fix pass over the review of 2026-11-21 (13 CONFIRMED findings, A3-SND-8 reproduced by its
+verifier, 10 LOW). The owner ruling is unchanged: the recorder is a development tool, not a VERIFIED_REUSE authority,
+and nothing here is wired into `mutation.py check()` or any gate. Every change below can only turn a reuse into a
+non-reuse (or a record into a refused one). Each finding has a regression test in `tests/v23/test_v23_review1.py`
+(and, where an existing test changed, the reason is given there); every one of those tests was run against the
+`8a31f7c8` recorder and engine and fails there (21 tests: 32 failures and 4 errors, every test and every subtest
+red), and passes here (`tests/v23`: 110 tests, darwin/audit; Linux/strace in the report of this pass).*
+
+### Confirmed findings
+
+| Finding | What changed | Test | Residual |
+|---|---|---|---|
+| A3-SND-1 (HIGH) namespace package invisible | R5 judges a directory under COPY that exists (holds a file) at only one of basis and head like an added/removed module file: INVALIDATED when S(F), or what F ran, imports its dotted name. Static, before any observation, both backends; appearance and vanishing. | `test_snd1_a_namespace_package_that_appears_or_vanishes` | A directory reached by a computed import name is R8's (below). A directory decided by a C-level stat in a hooked process and imported by no name is still the C6 discount. |
+| A3-SND-2 (HIGH) R8 gated on changed defs | With Δ ≠ ∅, any open R8 site (not in RESOLVED_SITES) in what F ran is INVALIDATED R8, whether or not a Δ `.py` of S(F) changed defs and whether or not Δ holds a `.py`. C9's assumption ("a mutant runs only code of S(F)") now holds by refusal, and C10 covers mutant-only loads. | `test_snd2_a_computed_import_only_a_mutant_takes` (B, B2) | **Cost:** every repository S(F) holds registry.py's `import_module` sites, so no repository target can be reused on an observation while RESOLVED_SITES is empty. `test_n13_comment` now expects R8 for the toy's `dyn.py` target. |
+| A3-SND-3 (HIGH) R2S anchors only the naming file's ancestors | R2S matches the literal text of every path construction, after any non-literal anchor (`Path(m.__file__).parent`, a parameter, ROOT), against every Δ path that holds it as whole components at any depth (case-folded): `data/one.txt` names `aisef2/data/one.txt`; a computed construction's literal directory names every path under it. | `test_snd3_a_literal_path_anchored_at_another_modules_file` | A path with no literal part (C9's residual) is unchanged. Precision: a one-component literal (`"x.json"`) names every Δ path with that component. `test_1` of the owner negatives now hides its file name with `''.join`, which the static rule cannot read. |
+| A3-SND-4 (HIGH) load_tests taken for unittest's walk | `_own`: a call is the walk's only when it is made by `importlib`'s `_fill_cache` or by `unittest/loader.py`'s `_find_tests`/`_find_test_path` themselves, or through stdlib path helpers only (`genericpath`, `posixpath`, `ntpath`, frozen or not); any other frame in between (tree code: a `load_tests`, a test) makes it a run (`l run`, `s`). Those stdlib frames must lie outside the tree. | `test_snd4_the_kill_files_own_load_tests_is_not_unittests_walk` (L, S) | A `load_tests` that calls `loader.discover()` itself has that walk dropped as the walk's; what it loads is still recorded (D2) and Δ `.py` files of S(F) are R5/R6's. |
+| A3-SND-5 (MEDIUM) a `__pycache__`-only directory passes C1 | The recorder refuses a runner tree (the `_pristine` copy) holding any directory that no file of HEAD under COPY implies (an empty directory, or one with only an ignored `__pycache__`). Also closes PROV-6's recorder half. | `test_snd5_a_directory_head_does_not_have_is_refused_by_the_recorder` | `impact._dirty` and the runner's own measurements still do not see such directories (pre-existing runner behaviour, PROV-6); changing that would make `classify` UNRESOLVED on such checkouts and is left to the owner. |
+| A3-SND-6 (MEDIUM) annotated/other bindings | Every single-name binding of a literal path is substituted: `=` (each target; a tuple unpacked pairwise), annotated assignment, walrus (a walrus inside a construction stands for its value). A literal path bound any other way (an attribute, several targets, `+=`) counts as a construction text when it is a construction or a constant of two or more components. | `test_snd6_annotated_walrus_and_unpacked_bindings` | A one-component constant bound to an attribute, a dict or a parameter and used later. |
+| A3-SND-7 / STR-1 (MEDIUM) strace discount survives execve | strace events carry their segment (the part of a task one image ran; a successful exec starts the next). The import-system discount and the hook reconciliation apply only to a segment whose image ran the hook: before any exec, a forked child with an `F` record; after exactly one exec, an interpreter start `S`; a thread follows its leader's last image. Every other segment is observed for data only. | `test_snd7_str1_an_image_exec_d_in_a_hooked_pid_is_observed_for_data_only` | After two or more execs in one task no segment is discounted (precision only). In a hooked image the discount still covers a C-level stat of a directory or of its own loaded code (C6). |
+| BOTH-1 (MEDIUM) chdir / directory opens / statvfs / pathconf | strace: `chdir` (done or failed) and every `O_DIRECTORY` open (done or failed) are lookups, never discounted. audit: the `os.chdir` audit event, a `subprocess.Popen` `cwd`, and wrapped `os.statvfs`/`os.pathconf` are lookups. | `test_both1_chdir_directory_opens_statvfs_and_pathconf_are_lookups` | `DirEntry.stat` and C-level calls under audit (C5's residual). |
+| AUD-1 (MEDIUM) launch accounting netted | `_posixsubprocess.fork_exec` is a launch (not counted twice for `subprocess.Popen`); `_isolated` reads the values of `-W`, `-X`, `--check-hash-based-pycs`; each `S` record carries `sys.orig_argv[1:]`; records are matched to launches by identity (`observe._accounting`): a record to a hooked launch in its parent's record (an exec: in its own pid's) with the same argv, a fork child to a fork; surplus and deficit are counted separately, never netted. | `test_aud1_launch_accounting_by_identity` (fork_exec, `-W` value), `test_aud1_accounting_unit` | A launched program that reads the tree and then execs an interpreter in place with the same argv tail is taken for that interpreter (audit only; strace traces it). A child whose parent died first, or a `preexec_fn` fork record, is refused (precision only). |
+| A3-SND-8 (MEDIUM) aliases and a fake python (audit) | (C) R2's data/opened sets, the kind check and R3's listed directories compare case- and NFKC-folded paths. (S) A new name made for a tree path — `os.symlink`/`os.link` (hook `a` lines), `symlink`/`link` syscalls (strace), any path through `/proc/<pid>/cwd`, `/proc/<pid>/root` or an fd directory — is the completeness counter `aliases`: R1. (D) identity accounting (AUD-1): the shell named `python-sh` is a launch with no record of its own pid, and its hooked grandchild no launch of its parent's. | `test_snd8_reads_through_another_name_or_a_fake_python` | Alias targets are judged lexically (a link made through a symlinked directory is resolved by text). C5 as written in the claims above is replaced by: "a launch is accounted for only by a record of the launched pid (or, for an exec, of the same pid) with the same argv". |
+| PROV-1 (MEDIUM) observation reuse labelled v2.2.0-accepted | A reuse that needed an observation (Δ ≠ ∅) carries basis `observation:<sha256 of the observation digests>@<basis sha>` and `evidence.authority` = none (owner ruling 2026-11-21); `report()` says the same (`observation_authority`). A reuse with Δ = ∅ keeps its label. | `test_prov1_an_observation_based_reuse_carries_no_acceptance_basis`; `test_f3`, `test_n2`, `test_d2` updated | — |
+| PROV-2 (MEDIUM) the hook that ran is not bound | The witness holds the hook every observed process imported (`sitecustomize.py`); the manifest names its events directory, the tree's spellings and the nonce; `verify()` recomputes the hook with the engine's own `HOOK` and refuses (R0) any byte difference. Recorder variants in the tests now need an explicit test-only bypass (`state(..., hook=)`). | `test_prov2_the_hook_that_ran_is_bound` | The engine's own code, in memory, is trusted (F1). A same-uid run can still rewrite its witness (PROV-5). |
+| PROV-3 (MEDIUM) a child's record passed for the root | The root is the one `S` record whose pid is the pid the runner launched (`ProcessRange.target_pid`, now in the manifest row; audit), or the single top task's `S` record (strace); else `missing_trace_files`. New completeness counters: `kill_file_unseen` (F's own code is not in `loaded`) and `tests_unparsed` (no parsed test, or fewer than ran). | `test_prov3_the_root_record_is_identified` | — |
+
+### LOW findings
+
+| Finding | Disposition | Test |
+|---|---|---|
+| A3-SND-9 mode-only change dropped from Δ | FIXED: D1 reads `git diff --raw`; a mode change is in Δ (the runner's copy keeps modes). The tree digest still ignores modes (residual: C1 binds bytes, not modes). | `test_snd9_a_mode_change_is_in_delta` |
+| AUD-2 posix_spawn file actions | FIXED: `os.posix_spawn`/`posix_spawnp` are wrapped; each `POSIX_SPAWN_OPEN` path is a data read. | `test_aud2_posix_spawn_file_actions` |
+| STR-2 chained relative chdirs | FIXED: the cwd closure is iterated to a fixpoint (beyond 4096 candidates: `cwd_unresolved`, R1). Residual: the strace version is not bound (R0 does not compare `tools.strace`). | `test_str2_chained_relative_chdirs` |
+| STR-3 a tree path through another name | FIXED: the `aliases` counter (A3-SND-8). | `test_str3_a_tree_path_through_another_name` |
+| STR-4 calls outside the traced channel | FIXED in part: `io_uring_setup`, `pidfd_getfd`, `process_vm_readv` are traced and any occurrence is `unobservable_calls` (R1). Residual: `recvmsg` with `SCM_RIGHTS`. | `test_str4_calls_outside_the_traced_channel` |
+| STR-5 listing de-duplication by fd number | FIXED: a done open that returns an fd number resets that number's listing state. Residual: an fd number reused through `dup`/`fcntl` (not traced). | `test_str5_a_reused_fd_number_is_a_new_listing` |
+| PROV-4 forgery is cheap; impossible combinations admitted | FIXED in part: a strace record must have been taken with this recorder's syscall set (`tools.strace_events`, R0); F must be in `loaded` (PROV-3). Residual (C2, unchanged): a consistent forgery, including a strace claim on a non-Linux host, is not detected; observations need an attested, isolated recorder before they could ever be an authority. | `test_prov4_the_trace_set_is_bound` |
+| PROV-5 the run can silence its hook / reach its witness | RESIDUAL, declared here as an addition to "cannot prove" #4: the observed code runs with the recorder's uid; it can set the hook's busy flag (audit: events lost silently) and write its own witness files before `finish()`. | — |
+| PROV-6 `__pycache__`-only directory | FIXED in the recorder (A3-SND-5); the runner/engine half is a residual (above). | (A3-SND-5) |
+| PROV-7 F1: head's harness runs in the judging process | RESIDUAL (F1 stays open): head's `mutation.py` can still switch rules off in process. | — |
+
+### Changed claims, plainly
+
+* C5 (audit): "accounted for" now means matched by identity (pid, parent pid, argv), not by count; the root is the
+  runner's launched pid. A non-Python child started by `_posixsubprocess.fork_exec` is a launch.
+* C6/C7: the discount needs an image that ran the hook (strace segments); the walk is recognised only when no tree
+  frame stands between it and the call; `chdir` and directory opens are never discounted.
+* C8: paths are compared folded; a new name for a tree path is an incompleteness, not a read under another name.
+* C9/C10: construction texts match at any depth; with Δ ≠ ∅ any open R8 site refuses tier S.
+* C1: the recorder refuses a runner tree with a directory HEAD does not imply; the hook that ran is bound (R0).
+* Reuse on an observation never carries an acceptance basis.
+
+Not measured in this pass: the engine on the repository (the states without observations cannot become reuse — R1
+and the static rules only grew — but components may move from R2/R6 to R5 or R2 for other reasons); an observation of
+any repository kill file.

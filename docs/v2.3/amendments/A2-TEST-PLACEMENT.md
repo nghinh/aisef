@@ -10,7 +10,7 @@ This file records the rationale and the measured proof; it changes no rule of §
 | New test modules | `tests/v23/` — a package whose `__init__.py` is an empty, 0-byte file (identical in every track) |
 | New code | `validation/v23/` |
 | New design text | a new file `docs/v2.3/amendments/<ID>.md` (never appended to W1-DESIGN.md) |
-| New evidence | a new file under `closure-evidence/v2.3/<topic>/` (outside the `closure-evidence/v2` COPY root) |
+| New evidence | a new file under `docs/v2.3/evidence/<topic>/` — never under `closure-evidence/v2.3/` (tests/v2/test_v1_evidence_guard.py protects every tracked file under `closure-evidence/` except `closure-evidence/v2/`) and never under `closure-evidence/v2/` (a COPY root: a new file there is in Δ) |
 
 An existing test or code file is edited only where W1-DESIGN §8 / DEPENDENCY-DAG §4 assigns it to the lane.
 `tests/v2/test_v23_impact.py` moved to `tests/v23/test_v23_impact.py` (`git mv`, commit `164081cf`); it needed no
@@ -40,7 +40,7 @@ passes I6, exactly as the frozen R6 says, and §2.8 still governs edits of exist
 
 Computed with `validation/v23/impact.py` `_Ctx.S(F)` for every distinct kill file of `mutation.TARGETS` at head, with
 basis `da3ea33f3b695aaca73e87a704145a0193aced23` (v2.2.0). Record:
-[`closure-evidence/v2.3/f5-observe/A2-SF-TESTS-V23.json`](../../../closure-evidence/v2.3/f5-observe/A2-SF-TESTS-V23.json).
+[`docs/v2.3/evidence/f5-observe/A2-SF-TESTS-V23.json`](../evidence/f5-observe/A2-SF-TESTS-V23.json).
 
 | Head | Probe | Kill files whose S(F) holds it | Δ paths that match |
 |---|---|--:|---|
@@ -58,3 +58,7 @@ files outside every COPY root that no kill file imports (`validation/v23/observe
   through the s2 closure; it would still not be in Δ nor in the runner's tree, and the run would fail in the runner
   (the module is not there). The decoupling holds as long as `tests/v23` stays outside COPY (W1-DESIGN §8 adds
   `validation/v23`, not `tests/v23`, for new runs).
+
+## Correction (2026-11-22)
+
+The evidence row is corrected as above (the integrator's corrected A2). The three records this lane had written under `closure-evidence/v2.3/f5-observe/` were moved with `git mv` to `docs/v2.3/evidence/f5-observe/` (bytes unchanged); every reference was updated.

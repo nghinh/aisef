@@ -173,10 +173,11 @@ class Toy:
             py = sorted(p for p in S2.closure(self.root, over.get("commit", head), (kill,)) if p.endswith(".py"))
             ops = {**dict.fromkeys(py, "load"), **dict.fromkeys((data or {}).get(kill, ()), "data"),
                    **(opened or {}).get(kill, {})}
-            out[kill] = synthetic(self, head, kill, ops, py + list((loaded or {}).get(kill, ())), over)
+            out[kill] = synthetic(self, head, kill, ops, [*py, kill, *(loaded or {}).get(kill, ())], over)
         return out
 
 
+EXECVE = 'execve("/usr/bin/python3", ["python3"], 0x1 /* 1 vars */) = 0\n'   # a traced task's interpreter image
 RUNNER_ENV = sorted({*(k for k in M.ENV_KEEP if k in os.environ), *M._FRESH, M.TOKEN, "PYTHONPATH", OBS.MARK})
 
 
@@ -200,15 +201,19 @@ def synthetic(t: Toy, head: str, kill: str, ops: dict, mods: list, over: dict) -
            "kill_file": {"path": kill, "sha256": impact._sha(blob)}, "module": kill[len("tests/"):-3].replace("/", "."),
            "runner_sha256": impact._sha(impact._blob(t.root, commit, impact.MUTATION_REL) or b""),
            "observe_sha256": OBS.own_sha256(), "backend": "strace" if trace else "audit",
-           "tools": {"strace": "strace -- version 6.8" if trace else None, "git": "git version 2", "strace_events": None},
+           "hook": {"events": str(w / "hook"), "roots": list(OBS.RS._roots(tree)), "nonce": "0" * 24},
+           "tools": {"strace": "strace -- version 6.8" if trace else None, "git": "git version 2",
+                     "strace_events": OBS.STRACE_EVENTS if trace else None},
            "platform": plat, "python": over.get("python", ident["python"]), "toolchain": ident["toolchain"],
            "env": dict.fromkeys(RUNNER_ENV, "0" * 64),
-           "row": {"outcome": over.get("outcome", "PASS"), "exit": 0, "ran": 1}}
+           "row": {"outcome": over.get("outcome", "PASS"), "exit": 0, "ran": 1, "pid": 100}}
     (w / "hook").mkdir()
+    (w / OBS.SITE).write_text(OBS.hook_source(w / "hook", man["hook"]["roots"], man["hook"]["nonce"]), encoding="utf-8")
     (w / "manifest.json").write_text(json.dumps(man, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     (w / "log.txt").write_text(f"test_x ({man['module']}.T.test_x) ... ok\n\nRan 1 test in 0.001s\n\nOK\n", encoding="utf-8")
     at = {p: posixpath.normpath(posixpath.join(str(tree), p)) for p in {*ops, *mods}}
-    lines = ["S\t100\t1"] + [f"o\t{tag}\t{at[p]}" for p, tag in sorted(ops.items())] + [f"m\t{at[p]}" for p in sorted(set(mods))]
+    lines = ["S\t100\t1\t['-m', 'unittest']"] + [f"o\t{tag}\t{at[p]}" for p, tag in sorted(ops.items())] + [
+        f"m\t{at[p]}" for p in sorted(set(mods))]
     listed_by = over.get("listed_by") or {}
     for d in over.get("listed") or []:
         callers = [posixpath.normpath(posixpath.join(str(tree), c)) for c in listed_by.get(d, [kill])]
@@ -223,13 +228,13 @@ def synthetic(t: Toy, head: str, kill: str, ops: dict, mods: list, over: dict) -
     lines += ["?garbage"] * (over.get("unparsed_lines") or 0)
     (w / "hook" / "100-root.ev").write_text("\n".join([*lines, "E\t0"]) + "\n", encoding="utf-8")
     for i in range(kids["hooked"]):
-        (w / "hook" / f"{101 + i}-kid.ev").write_text(f"S\t{101 + i}\t100\nE\t0\n", encoding="utf-8")
+        (w / "hook" / f"{101 + i}-kid.ev").write_text(f"S\t{101 + i}\t100\t[]\nE\t0\n", encoding="utf-8")
     if trace:
         (w / "strace").mkdir()
         forks = "".join(f"vfork() = {101 + i}\n" for i in range(kids["hooked"]))
-        (w / "strace" / "tr.100").write_text(forks + "+++ exited with 0 +++\n", encoding="utf-8")
+        (w / "strace" / "tr.100").write_text(EXECVE + forks + "+++ exited with 0 +++\n", encoding="utf-8")
         for i in range(kids["hooked"]):
-            (w / "strace" / f"tr.{101 + i}").write_text("+++ exited with 0 +++\n", encoding="utf-8")
+            (w / "strace" / f"tr.{101 + i}").write_text(EXECVE + "+++ exited with 0 +++\n", encoding="utf-8")
     rec = OBS.finish(w)
     if over.get("witness") is False:
         rec.pop("witness")
@@ -913,7 +918,7 @@ class ImpactTest(unittest.TestCase):
     def test_n2_unreferenced_helper(self):
         s = self.run_case(n2)
         self.assertEqual(s.evidence["unreferenced_changes"], ["aisef2/toy.py::helper"])
-        self.assertEqual(s.basis, f"calibration@{self.case.base}")   # not the pinned v2.2.0 commit
+        self.assertTrue(s.basis.startswith("observation:") and s.basis.endswith(f"@{self.case.base}"), s.basis)
         self.assertEqual(s.compared, ["I7", "I6", "I1", "I3", "I4", "I5", "I9"])
         # red-before: today's whole-file rule calls it stale
         self.assertNotEqual(M.source_digest(self.toy.files["aisef2/toy.py"]), self.toy.entries[TGT]["source_sha256"])
@@ -1025,7 +1030,8 @@ class ImpactTest(unittest.TestCase):
                          _git(self.toy.root, "cat-file", "blob", f"{h}:{RECORD}"))
 
     def test_d2_v220_label_only_for_the_pinned_full_sha(self):
-        c = n2(self.toy)
+        b = self.toy.commit()   # Δ = ∅: a reuse that rests on no observation (an observation-based one never carries
+        c = Case(b, self.toy.commit(), None, TGT, "VERIFIED_REUSE", "")   # this label: Review 1, PROV-1)
         self.assertEqual(state_of(self.toy, c).basis, f"calibration@{c.base}")
         with mock.patch.object(impact, "BASE", c.base):
             self.assertEqual(state_of(self.toy, c).basis, f"v2.2.0-accepted@{c.base}")
@@ -1043,7 +1049,8 @@ class ImpactTest(unittest.TestCase):
         c = n2(self.again())
         with mock.patch.object(impact, "BASE", c.base):
             r = state_of(self.toy, c)
-        self.assertEqual((r.state, r.basis), ("VERIFIED_REUSE", f"v2.2.0-accepted@{c.base}"))
+        self.assertEqual(r.state, "VERIFIED_REUSE")   # it rests on an observation: no acceptance basis (PROV-1)
+        self.assertTrue(r.basis.startswith("observation:") and "accepted" not in r.basis, r.basis)
         self.assertNotIn("run_base", r.evidence)
 
     def test_f2_report_uses_the_shas_the_run_resolved(self):
@@ -1140,7 +1147,7 @@ class ImpactTest(unittest.TestCase):
         """A failing git diff reads neither as a clean tree nor as Δ = ∅."""
         c = n2(self.toy)
         real = S2._git
-        for marker, component in (("--name-only", "dirty"), ("--name-status", "basis")):
+        for marker, component in (("--name-only", "dirty"), ("--raw", "basis")):
             def failing(root, *args, marker=marker):
                 if args[:1] == ("diff",) and marker in args:
                     return subprocess.CompletedProcess(args, 128, b"", b"fatal: injected")
@@ -1163,7 +1170,10 @@ class ImpactTest(unittest.TestCase):
         t.files["aisef2/toy.py"] += "# note\n"
         h = t.commit()
         for s in impact.classify(t.root, b, h, observations=t.observe(h)):   # R6/R7 fire on nothing
-            self.assertEqual(s.state, "VERIFIED_REUSE", s)
+            if s.target == DYN:   # its S(F) holds an open R8 site: with observations, any Δ ≠ ∅ (Review 1, A3-SND-2)
+                self.assertEqual((s.state, s.component), ("INVALIDATED", "R8"), s)
+            else:
+                self.assertEqual(s.state, "VERIFIED_REUSE", s)
         self.again()
         self.run_case(n13_data_reader)
 
