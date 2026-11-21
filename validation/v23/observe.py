@@ -589,7 +589,10 @@ def derive(wdir) -> dict:
         for x in p["m"]:
             if (r := rel(x)) is not None:
                 loaded.add(r)
-    comp = {"lost": sum(p["lost"] for p in procs), "unparsed_lines": hook_bad, "fd_relative": sum(p["fd"] for p in procs),
+    # fd-relative access: unknown paths for the hook alone; under strace -y the trace names every such fd's path
+    # (an fd it cannot name is counted below), so the hook's `d` lines are not an incompleteness there
+    comp = {"lost": sum(p["lost"] for p in procs), "unparsed_lines": hook_bad,
+            "fd_relative": 0 if strace else sum(p["fd"] for p in procs),
             "untraced_children": 0, "unaccounted_processes": 0, "missing_trace_files": 0, "truncated_trace_files": 0,
             "truncated_strings": 0, "unterminated_processes": 0,
             "tracer_errors": sum(1 for x in log.splitlines() if x.startswith("strace: ")),

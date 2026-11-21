@@ -143,7 +143,17 @@ or engine variant lacking the guard would have given (red-before).
 
 ## Precision (no reuse is claimed)
 
-No observation of a repository kill file has been recorded in this increment, so every repository target with
-Δ ≠ ∅ still stops at R1 or earlier. R2S can only add INVALIDATED states (it may change the component a target
-reports, never its state). Measured on toys only: tests/v23/test_v23_observe.py (owner's nine cases) and
-tests/v23/test_v23_impact.py.
+No observation of a repository kill file has been recorded in this increment. R2S can only add INVALIDATED states.
+
+Measured on the repository at `75080a80` against the v2.2.0 basis, with no observation
+([`R2S-REPOSITORY-EFFECT.json`](../../../closure-evidence/v2.3/f5-observe/R2S-REPOSITORY-EFFECT.json)):
+667 INVALIDATED (R2) / 17,322 mutants, 327 UNRESOLVED (I6) / 10,078, 0 VERIFIED_REUSE — the same states and totals as
+disposition 2. The component moved from R6 to R2: the impact tests left `tests/v2` (A2), so Δ holds no `.py`, and R2S
+fires before R1. Δ is 9 evidence files added under `closure-evidence/v2` since v2.2.0; `tests/v2/test_p9_reproduction.py`
+holds the constant `"closure-evidence/v2"` and lies in every S(F) (registry's `TESTS_V2`).
+
+**Cost, stated plainly:** against the v2.2.0 basis, while those 9 files are in Δ, R2S keeps every target that passes
+I6 INVALIDATED even with complete, admissible observations. Narrowing it (for example, judging only constants of
+code F's processes can execute) is the same question Amendment A1 failed on (mutant-only execution of literal-named
+files) and needs its own amendment and soundness argument; none is made here. New evidence goes to
+`closure-evidence/v2.3/` (A2), outside COPY, so it does not add to Δ.

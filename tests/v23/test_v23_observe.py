@@ -394,7 +394,7 @@ class StraceParser(unittest.TestCase):
         self.assertIn(("cd", None, None, "sub"), kinds)
         self.assertEqual(OBS._c(r"a\303\251\x41\"\\\n"), 'aéA"\\\n')
 
-    def witness(self, files: dict, procs: dict) -> pathlib.Path:
+    def witness(self, files: dict, procs: dict, backend: str = "strace") -> pathlib.Path:
         """A witness with the given strace files {tid: text} and hook records {pid: lines} under tree /w/tree."""
         w = pathlib.Path(tempfile.mkdtemp(prefix="aisef-strace-"))
         self.addCleanup(shutil.rmtree, w, True)
@@ -404,7 +404,7 @@ class StraceParser(unittest.TestCase):
             (w / "strace" / f"tr.{tid}").write_text(text, encoding="utf-8")
         for pid, lines in procs.items():
             (w / "hook" / f"{pid}-x.ev").write_text("".join(x + "\n" for x in lines), encoding="utf-8")
-        (w / "manifest.json").write_text(json.dumps({"tree": "/w/tree", "checkout": "/w/checkout", "backend": "strace",
+        (w / "manifest.json").write_text(json.dumps({"tree": "/w/tree", "checkout": "/w/checkout", "backend": backend,
                                                      "row": {"outcome": "PASS", "exit": 0, "ran": 1}}), encoding="utf-8")
         return w
 
@@ -428,9 +428,12 @@ class StraceParser(unittest.TestCase):
         c = rec["completeness"]
         self.assertEqual((c["untraced_children"], c["missing_trace_files"], c["truncated_trace_files"]), (1, 1, 1))
         self.assertEqual((rec["children"]["traced"], rec["os_trace"]), (1, True))
-        alone = OBS.derive(self.witness({100: root.replace("vfork() = 101\nvfork() = 102\n", "")}, {100: hook}))
+        fd = hook[:-1] + ["d\tos.scandir", hook[-1]]   # an fd-relative listing: the trace names its path (-y)
+        alone = OBS.derive(self.witness({100: root.replace("vfork() = 101\nvfork() = 102\n", "")}, {100: fd}))
         self.assertEqual(alone["opened"]["aisef2/toy.py"], "load")   # matched by the hook's own load: not data
         self.assertEqual({k: v for k, v in alone["completeness"].items() if v}, {})
+        hook_only = OBS.derive(self.witness({}, {100: fd}, "audit"))   # the hook alone cannot name that fd's path
+        self.assertEqual((hook_only["completeness"]["fd_relative"], hook_only["completeness"]["untraced_children"]), (1, 1))
         untraced = OBS.derive(self.witness({100: root.replace("vfork() = 102\n", "") + ""}, {100: hook, 200: ["S\t200\t100"]}))
         self.assertGreaterEqual(untraced["completeness"]["unaccounted_processes"], 1)   # a hooked pid no trace shows
         listed = OBS.derive(self.witness({100: root}, {100: hook[:3] + hook[4:]}))   # the hook did not make the listing
@@ -459,8 +462,10 @@ class StraceBackend(Base):
                     "        threading.Thread(target=lambda: os.stat(os.path.dirname(toy.__file__))).start()\n"
                     "        p = os.path.join(os.path.dirname(toy.__file__), 'to' + 'y' + '.py')\n"
                     "        subprocess.run(['wc', '-l', p], check=True, capture_output=True)\n"
-                    "        subprocess.run([sys.executable, '-c', 'pass'], check=True, env={'PATH': os.environ['PATH']})\n",
-                    "import os\nimport subprocess\nimport sys\nimport threading\n")
+                    "        subprocess.run([sys.executable, '-c', 'pass'], check=True, env={'PATH': os.environ['PATH']})\n"
+                    "        with tempfile.TemporaryDirectory() as d:   # removed through fds (shutil.rmtree on Linux)\n"
+                    "            pathlib.Path(d, 'x').write_text('x')\n",
+                    "import os\nimport pathlib\nimport subprocess\nimport sys\nimport tempfile\nimport threading\n")
         b = t.commit()
         t.files["aisef2/toy.py"] += "# one more line\n"
         h = t.commit()
