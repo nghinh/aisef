@@ -1,4 +1,4 @@
-"""V2.1.0 scoped release qualification (owner RELEASE-DECISIONS seq 7, Option 1, 2026-11-01).
+"""Release qualification: V2.1.0 scoped (owner RELEASE-DECISIONS seq 7, Option 1, 2026-11-01); v2.3 F2 test markers.
 
 Runs the real unit suite — in process, exactly as `python -m unittest discover -s tests` does (the release path
 wraps THIS in validation/v2/owned_run.py, so the process-leak discipline still holds) — keeps every test's authentic
@@ -11,17 +11,26 @@ Qualification PASSES only when, for the current platform:
   * every allowlisted test that protects security, isolation, destructive authority, or process safety carries
     clean-environment evidence (otherwise that exception is itself a blocker), and
   * all non-excepted tests pass.
-It applies the allowlist ONLY to the version the manifest is written for (2.1.0). For any other version the allowlist
-is empty, so the gate is the ordinary "the whole suite is green". Raw verdicts are printed and never rewritten.
+Where the exceptions come from depends on the version (raw verdicts are printed and never rewritten):
+  * 2.1.0 (HISTORY): the hand-authored closure-evidence/v2/release/V2.1.0-QUALIFICATION-ALLOWLIST.json, exactly as
+    before. It is history and is never reused for another version (W1-DESIGN §7).
+  * any other version below 2.3 (the v2.2 rule): no exceptions; the gate is "the whole suite is green".
+  * 2.3 and later (F2): only typed test markers (validation/qualification/test_markers.py), category sealing or
+    platform-harness, each with a checklist ID, a reason and a positive assertion that must have passed in the same
+    run. A refused marker is a blocker. An `AISEF_SEALING=1` run never excepts a sealing-category test: the sealing
+    tier's verdict is not masked (RELEASE-CHARTER §2).
+For every version other than 2.1.0, an exception in a hand-authored V<version>-QUALIFICATION-ALLOWLIST.json is an
+unmarked exception: a blocker, never honoured.
 
-The allowlist is closure-evidence/v2/release/V<version>-QUALIFICATION-ALLOWLIST.json; its schema is RELEASE_ALLOWLIST
-below. The mandatory build / install / integrity / release checks (lint, wheel, staging, v2_release_gate) stay their
+The mandatory build / install / integrity / release checks (lint, wheel, staging, v2_release_gate) stay their
 own jobs and must pass on their own — this gate covers the unit suite only.
 """
 
 from __future__ import annotations
 
+import dataclasses
 import json
+import os
 import pathlib
 import re
 import sys
@@ -29,8 +38,19 @@ import tomllib
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from validation.qualification import test_markers  # noqa: E402
 
 SAFETY_CATEGORIES = {"security", "isolation", "destructive-authority", "process-safety"}
+HISTORY = "2.1.0"   # the one hand-authored allowlist (RELEASE-DECISIONS seq 7)
+
+
+def markers_apply(version: str) -> bool:
+    """F2 markers decide the exceptions from 2.3 on; anything unparsable gets none (the whole suite must pass)."""
+    m = re.match(r"(\d+)\.(\d+)", version)
+    return bool(m) and (int(m[1]), int(m[2])) >= (2, 3)
 
 
 def base_id(test_id: str) -> str:
@@ -61,14 +81,30 @@ def load_allowlist(version: str, root: pathlib.Path = ROOT) -> dict:
     return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
 
 
-def decide(version: str, measured_fail: set[str], manifest: dict, token: str) -> dict:
-    """The release-qualification decision for one platform. Pure, so it is unit-testable without running the suite."""
+def decide(version: str, measured_fail: set[str], manifest: dict, token: str, markers=(), marker_problems=(),
+           passed: set[str] = frozenset(), sealing_run: bool = False) -> dict:
+    """The release-qualification decision for one platform. Pure, so it is unit-testable without running the suite.
+    `markers`/`marker_problems` are test_markers.collect()'s result, `passed` the test ids that ran and passed."""
     scoped = manifest.get("version") == version          # the allowlist is honoured only for its own version
     exceptions = manifest.get("exceptions", []) if scoped else []
-    applicable = [e for e in exceptions if token in e.get("platforms", [])]
+    measured_base = {base_id(t) for t in measured_fail}  # a failing subTest is matched by its method identity
+    blockers: list[str] = []
+    if version == HISTORY:
+        source = "allowlist"
+        applicable = [e for e in exceptions if token in e.get("platforms", [])]
+    else:
+        source = "markers" if markers_apply(version) else "none"
+        blockers += [f"unmarked exception, not honoured for {version} (only a test marker excepts a failure, F2): "
+                     f"{e.get('test')}" for e in exceptions]
+        applicable = []
+        if source == "markers":
+            blockers += [f"test marker refused: {p}" for p in marker_problems]
+            applicable = [dataclasses.asdict(m) for m in markers
+                          if token in m.platforms and not (sealing_run and m.category == "sealing")]
+            blockers += [f"positive assertion {e['positive']} of the excepted {e['test']} did not pass in this run"
+                         for e in applicable if e["test"] in measured_base and e["positive"] not in passed]
     allowed = {e["test"] for e in applicable}
 
-    measured_base = {base_id(t) for t in measured_fail}  # a failing subTest is matched by its method identity
     unexpected = sorted(measured_base - allowed)
     stale = sorted(allowed - measured_base)              # excepted but passed now — fine, just unused
     missing_evidence = sorted(
@@ -78,8 +114,10 @@ def decide(version: str, measured_fail: set[str], manifest: dict, token: str) ->
 
     problems = [f"unexpected/unclassified failure, not in the {version} allowlist: {t}" for t in unexpected]
     problems += [f"safety-sensitive exception without clean-environment evidence (blocker): {t}" for t in missing_evidence]
+    problems += blockers
     return {
-        "version": version, "platform": token, "scoped_to_version": scoped,
+        "version": version, "platform": token, "scoped_to_version": scoped, "exception_source": source,
+        "exceptions": sorted(applicable, key=lambda e: e["test"]),
         "raw_failing": sorted(measured_fail), "raw_fail_count": len(measured_fail),
         "failing_methods": sorted(measured_base), "failing_method_count": len(measured_base),
         "allowlisted_applicable": sorted(allowed),
@@ -90,14 +128,28 @@ def decide(version: str, measured_fail: set[str], manifest: dict, token: str) ->
     }
 
 
-def run_suite() -> set[str]:
-    """Run the suite in process, exactly as the CI unit step does, and return the authentic failing-test id set."""
+class Result(unittest.TextTestResult):
+    """TextTestResult that also records each test that ran to the end and passed (a failing subTest, a skip or an
+    unrun test is never in `passed`)."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.passed: set[str] = set()
+
+    def addSuccess(self, test):
+        super().addSuccess(test)
+        self.passed.add(test.id())
+
+
+def run_suite() -> tuple[set[str], set[str]]:
+    """Run the suite in process, exactly as the CI unit step does; return the authentic failing-test id set and the
+    ids that passed."""
     sys.path.insert(0, str(ROOT))
     suite = unittest.TestLoader().discover(str(ROOT / "tests"))
-    res = unittest.TextTestRunner(verbosity=1, resultclass=unittest.TextTestResult).run(suite)
+    res = unittest.TextTestRunner(verbosity=1, resultclass=Result).run(suite)
     return ({tc.id() for tc, _ in res.failures}
             | {tc.id() for tc, _ in res.errors}
-            | {tc.id() for tc in getattr(res, "unexpectedSuccesses", [])})
+            | {tc.id() for tc in getattr(res, "unexpectedSuccesses", [])}), res.passed
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -107,14 +159,21 @@ def main(argv: list[str] | None = None) -> int:
 
     token = platform_token()
     manifest = load_allowlist(version)
-    measured_fail = run_suite()
-    d = decide(version, measured_fail, manifest, token)
+    markers, marker_problems = test_markers.collect(ROOT) if markers_apply(version) else ([], [])
+    measured_fail, passed = run_suite()
+    d = decide(version, measured_fail, manifest, token, markers, marker_problems, passed,
+               sealing_run=os.environ.get("AISEF_SEALING") == "1")
 
     print("\n=== RAW SUITE VERDICT (authentic, never rewritten) ===")
     print(f"failing/errored tests: {d['raw_fail_count']}")
     for t in d["raw_failing"]:
         print(f"  FAIL  {t}")
-    print(f"\n=== RELEASE QUALIFICATION ({version}, platform {token}, scoped={d['scoped_to_version']}) ===")
+    print(f"\n=== RELEASE QUALIFICATION ({version}, platform {token}, scoped={d['scoped_to_version']}, "
+          f"exceptions from {d['exception_source']}) ===")
+    for e in d["exceptions"]:
+        if e["test"] in d["excepted_and_observed"]:
+            print(f"  EXCEPTED  {e['test']}  [{e.get('category')} {e.get('id', '-')}] {e.get('reason', '')}"
+                  + (f" (positive: {e['positive']}; {e['where']})" if "positive" in e else ""))
     print(f"failing methods: {d['failing_method_count']} (from {d['raw_fail_count']} failing tests/subTests)  "
           f"excepted & observed: {len(d['excepted_and_observed'])}  "
           f"excepted but now passing: {len(d['excepted_but_passed'])}  unexpected: {len(d['unexpected'])}")
