@@ -1,0 +1,69 @@
+{
+ "about": "W1 platform-parity preflight (W1-DESIGN §7, lane L1-TESTENV): tests/v23 run at the lane's test commit on darwin and on a Linux host before integration; the Windows leg is the tests.yml unit job, which needs a push. Raw logs stay in scratch, named here by sha256; host identity is OS/kernel/arch/python/git versions only.",
+ "command": "python3 -P -m unittest discover -v -s tests/v23 -t .",
+ "commit": "45c87bc4",
+ "env_guard": "PATH without any directory holding an opencode executable; XDG_DATA_HOME, XDG_STATE_HOME, XDG_CACHE_HOME in scratch; no network from the tests, no paid provider, opencode never run",
+ "lane_tests": {
+  "red_by_design": {
+   "test_v23_testenv.RealClientGuard.test_a_client_resolvable_on_path_stops_t0_and_run_before_any_target": "V21-36 red-before (subtests t0 and run): validation/v2/mutation.py main has no PATH guard yet; the hunk is L1-F5's (W1-DESIGN §7 'guard hunk via L1-F5'). With that hunk applied to a scratch copy of the commit the three RealClientGuard tests pass on both hosts (with_hunk below)."
+  },
+  "passed_on_both_hosts": [
+   "test_v23_c4_noop.CandidateEqualsBase.test_a_candidate_equal_to_its_base_makes_no_reviewer_scanner_or_quality_call",
+   "test_v23_c4_noop.CandidateEqualsBase.test_disclosed_a_story_with_no_developer_work_is_reviewed_and_scanned_at_its_parent",
+   "test_v23_c4_noop.CandidateEqualsBase.test_the_control_a_developer_that_writes_the_story_is_assessed_reviewed_and_scanned",
+   "test_v23_platform_parity.PlatformParity.test_tests_v23_is_a_package_with_an_empty_init",
+   "test_v23_platform_parity.PlatformParity.test_tests_v23_loads_alike_under_the_ci_and_the_lanes_discovery",
+   "test_v23_platform_parity.PlatformParity.test_the_suite_job_discovers_tests_v23_on_linux_macos_and_windows",
+   "test_v23_testenv.ArmingNeverLeaks.test_no_test_in_tests_patches_the_tiers_without_the_runtime_arming",
+   "test_v23_testenv.ArmingNeverLeaks.test_the_named_refusals_hold_in_one_interpreter_after_arm_runtime",
+   "test_v23_testenv.ArmingNeverLeaks.test_the_scan_refuses_every_known_bad_shape_and_accepts_every_paired_one",
+   "test_v23_testenv.RealClientGuard.test_a_kill_test_gets_fresh_xdg_directories_never_the_workers",
+   "test_v23_testenv.RealClientGuard.test_with_no_client_on_path_t0_and_run_reach_the_target"
+  ]
+ },
+ "other_lanes_not_passed": {
+  "test_v23_repro_contract.ContractPinnedToCi (4 tests, both hosts)": "L1-BUILD's staging.yml repro-job pins, red until L1-CIGOV adds the job (stated in commit 04802164)",
+  "test_v23_repro_contract.FreshCheckoutBytesUnchanged.test_the_v2_2_0_trees_re_pack_as_v2_2_0_did_and_perturbed_modes_no_longer_matter (linux only)": "environment: the archive has no git history, so tag v2.2.0 does not resolve (git rev-parse exit 128)",
+  "test_v23_repro_contract.KernelDigestOfTheReleasedKernel.test_both_implementations_give_the_frozen_digest (linux only)": "environment: the same missing v2.2.0 tag"
+ },
+ "runs": [
+  {
+   "errors": 0,
+   "failures": 6,
+   "failures_note": "6 = the 4 ContractPinnedToCi tests + the 2 V21-36 subtests",
+   "host": {"arch": "arm64", "git": "2.53.0", "os": "Darwin", "python": "CPython 3.14.7", "release": "25.5.0"},
+   "log_sha256": "85af9a2c97e4d568ecaf31e92e137e328db61f17b29dfe2ee883d8b733cdc8e8",
+   "ran": 52,
+   "seconds": 17.8,
+   "skipped": 0,
+   "tree": "the lane's worktree at the commit, clean"
+  },
+  {
+   "errors": 2,
+   "failures": 6,
+   "failures_note": "6 = the 4 ContractPinnedToCi tests + the 2 V21-36 subtests; the 2 errors are the missing v2.2.0 tag",
+   "host": {"arch": "x86_64", "git": "2.43.0", "os": "Linux", "python": "CPython 3.12.3", "release": "6.8.0-147-generic"},
+   "log_sha256": "21500a6fc79e7e07269a0331d443b0b9f500937eac9a1ab8b8ac717d717fdaec",
+   "ran": 52,
+   "seconds": 11.0,
+   "skipped": 0,
+   "tree": "git archive of the commit without closure-evidence/ except closure-evidence/v2/release, extracted into a new scratch directory (no .git), removed after the run"
+  }
+ ],
+ "windows": {
+  "state": "NOT_RUN",
+  "why": "the Windows leg is the tests.yml unit job (windows-latest, CPython 3.11), which runs on a push; this lane never pushes (integrator, DISC-1). test_the_suite_job_discovers_tests_v23_on_linux_macos_and_windows pins that the job covers windows and discovers tests/v23."
+ },
+ "with_hunk": {
+  "about": "the V21-36 guard hunk proposed for L1-F5 (6 lines at the top of mutation.main: refuse t0/run with exit 3 when shutil.which('opencode') resolves), applied to a scratch copy of the commit; only RealClientGuard run",
+  "darwin_log_sha256": "793e5582a8154008ed29ce2ca1e6cb58ab71e2f8560d58ebe8228a4c30eeaede",
+  "diff_sha256": "126ed7ee7b8cb781447ccfc08849ef2e6026546a9206bbf5039557e1744c1938",
+  "linux_log_sha256": "daf986cf8869b45c2572dc7d2ecb45fdc26c0959c17826e3e4748deb7ae60b1d",
+  "result": "3 ran, 3 passed on each host"
+ },
+ "c4_hand_mutants": {
+  "about": "test_v23_c4_noop on a scratch copy of the commit with one story_runner gate removed at a time (darwin): the review gate ('if failure is None:' before confine -> 'if True:') and the quality gate ('if failure is None and not no_work:' -> 'if not no_work:'); the unmutated copy passes",
+  "log_sha256": "e77838904c267782a7cdbe7eb09383c3bc5bb454eedd03bafad4fc0202b5ee26",
+  "result": {"quality_gate": "FAIL: quality assessments 2 != 0", "review_gate": "FAIL: reviewer calls 2 != 0", "unmutated": "3 passed"}
+ }
+}

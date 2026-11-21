@@ -62,6 +62,23 @@ jobs:
       # the detective layer and runs AFTER the suite, on every OS, so a test that rewrote V1 evidence by any
       # route (including a subprocess) fails the build. Compares git objects, so Windows autocrlf is safe.
       - run: python -P validation/v2/v1_evidence_guard.py --check
+      # CODE-AUDIT #52 (b), COMPATIBILITY-MATRIX CT-6: the released V2 records (every closure-evidence/v2 file at tag
+      # v2.2.0 and at the v2.3 branch base) are checked the V1 way: baseline == the tag, HEAD keeps every blob, and the
+      # working tree does not change one. Additions are allowed (not released records); the next step sees them.
+      - run: python -P validation/v23/released_evidence_guard.py --check
+      # CODE-AUDIT #52 (a): the suite must leave closure-evidence/ exactly as committed. A test that rewrote, deleted or
+      # added an evidence file by any route turns this leg red, instead of a manual `git status` after the suite
+      # (CLAUDE.md). Git-ignored local artefacts are not tracked evidence and do not count.
+      - name: the suite left closure-evidence/ exactly as committed
+        shell: bash
+        run: |
+          set -eu
+          dirty="$(git status --porcelain=v1 --untracked-files=all -- closure-evidence/)"
+          if [ -n "$dirty" ]; then
+            echo "::error::the suite changed closure-evidence/ (CODE-AUDIT #52):"
+            echo "$dirty"
+            exit 1
+          fi
 
   # ROADMAP-2.2 F1 — the sealing tier. Record-currency tests assert that committed evidence records are what the tree
   # re-derives: on every unsealed branch they are red BY DESIGN (re-sealing is the owner's act), and until 2.2 those

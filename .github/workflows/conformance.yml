@@ -1,13 +1,15 @@
 # Hợp quy client — chạy tạo tác biên dịch trên client THẬT (lớp lỗi D2:
-# hook/plugin sinh ra đúng cú pháp mà chưa từng chạy). Theo lịch tuần và
-# khi gọi tay. Cả hai cột claude và opencode quyết định phát hành (ADR-006 §4).
+# hook/plugin sinh ra đúng cú pháp mà chưa từng chạy). Chỉ khi gọi tay. Cả
+# hai cột claude và opencode quyết định phát hành (ADR-006 §4).
 # Job này chỉ chạy phép thử trên claude: cột opencode được `merge_into_report`
 # giữ lại từ bảng đã commit, nên ngày `generated` mới không có nghĩa là cột ấy
 # vừa chạy — xem báo cáo G3 trong PROJECT-CLOSURE-GATE.
+#
+# CODE-AUDIT #29 (W1-DESIGN §7): the weekly `schedule:` is removed — it spent the paid ANTHROPIC_API_KEY with no
+# owner-approved cap or spend ledger (charter §4). A scheduled workflow may reference no secret but GITHUB_TOKEN
+# (tests/v23/test_v23_release_governance.py). Until this lands on master, master's own copy keeps its weekly cron.
 name: conformance
 on:
-  schedule:
-    - cron: "0 3 * * 1"     # thứ hai hằng tuần, 03:00 UTC
   workflow_dispatch:
 jobs:
   claude:

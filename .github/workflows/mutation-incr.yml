@@ -1,0 +1,70 @@
+# CI-INCR-JOB (docs/v2.3/W1-DESIGN.md §7; DEPENDENCY-DAG `F5 -> CI-INCR-JOB`): incremental qualification on every push.
+# The F5 engine (validation/v23/impact.py) states each live mutation target's evidence on the pushed commit —
+# MEASURED / VERIFIED_REUSE / INVALIDATED / UNRESOLVED, with the rule that decided it. It runs the ENGINE ONLY: it
+# reads git and the tree and executes no mutant, no kill test and no mutation campaign. (A job re-measuring the
+# INVALIDATED set needs a runner path the engine does not have yet; it is not here, and adding one is its own change.)
+#
+# The b1-linux.yml pattern: no opencode on the runner (refused if present), XDG dirs in runner scratch, a read-only
+# token, no secret, and the full history — a shallow clone has no basis commit, so every target is UNRESOLVED (N10).
+# Never runs b1_bindings_check.
+#
+# `gate` (release/** pushes, PRs) FAILs while any target is INVALIDATED or UNRESOLVED, truthfully and with no allowlist
+# (W1-DESIGN §11 gate 2: the 327 legacy targets without platform evidence stay UNRESOLVED until they are measured or an
+# owner ruling covers them). `plan` (manual) lists those targets with their reasons. Free GitHub-hosted runners only.
+name: mutation-incr
+
+on:
+  push:
+    branches: ["release/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+      XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+      XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: every target's evidence state (F5); fails on any INVALIDATED or UNRESOLVED
+        run: |
+          if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi
+          echo "opencode ABSENT (guard OK)"
+          mkdir -p "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+          git rev-parse HEAD
+          python -P validation/v23/impact.py --classify
+
+  plan:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+      XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+      XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: the INVALIDATED and UNRESOLVED targets, with their reasons (F5)
+        run: |
+          if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi
+          echo "opencode ABSENT (guard OK)"
+          mkdir -p "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+          git rev-parse HEAD
+          python -P validation/v23/impact.py --classify --affected

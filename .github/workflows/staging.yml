@@ -8,6 +8,10 @@
 # Triggers: RC / prerelease tags, pushes to release/** (the V2.0-RC1 staging build of the exact candidate, no tag needed)
 # and manual runs. A stable vX.Y.Z tag goes to release.yml instead.
 # TestPyPI is not wired (an owner decision: account + trusted publisher, and TestPyPI never accepts a version twice).
+#
+# BUILD-REPRO-01 (docs/v2.3/W1-DESIGN.md §6; the contract text is docs/v2.3/drafts/BUILD-REPRO-CONTRACT.md, its clauses
+# pinned to this file by tests/v23/test_v23_repro_contract.py): `repro` rebuilds the candidate on CPython 3.11-3.14 from
+# the fresh checkout and from a perturbed copy, and tag v2.2.0, and checks each against the digests it must give.
 name: staging
 
 on:
@@ -29,6 +33,12 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install build twine
+      # BUILD-REPRO-01: every build records its interpreter, runtime and compiled zlib, frontend and runner image
+      - name: record the toolchain
+        run: |
+          set -eu
+          python -P validation/qualification/repro_dist.py --toolchain > "$RUNNER_TEMP/toolchain.json"
+          cat "$RUNNER_TEMP/toolchain.json"
       # Reproducible (charter G2, §18): SOURCE_DATE_EPOCH is the commit's time, so a rebuild of the exact RC gives the
       # frozen digests again — the wheel by setuptools itself, the sdist re-packed deterministically (repro_dist.py)
       - name: build the sdist, then the wheel FROM it, reproducibly
@@ -36,7 +46,7 @@ jobs:
           set -eu
           export SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"   # the frozen RC's once frozen
           python -m build
-          python -P validation/qualification/repro_dist.py dist/*.tar.gz
+          python -P validation/qualification/repro_dist.py dist/*.tar.gz dist/*.whl
       - run: python -m twine check dist/*
       - name: the wheel and the sdist hold exactly aisef + aisef2
         run: python -P validation/v2/packaging_check.py --artifacts dist
@@ -108,3 +118,75 @@ jobs:
           set -eu
           cd "$SMOKE_DIR"
           "$SMOKE_PY" -I "$GITHUB_WORKSPACE/tests/installed_product_smoke.py"
+      # CODE-AUDIT #6 (non-A2 part), W1-DESIGN §7 — the historical-2.2 read: a run written by the PUBLISHED 2.2.0 wheel
+      # (pip --require-hashes on its frozen sha256, V2.2.0-RC2-FREEZE.json) verifies with this candidate, and its RUN.json
+      # carries the 2.2.0 kernel digest. POSIX runners only, like the product smoke.
+      - name: historical 2.2 read — a run the published aisef 2.2.0 wrote verifies with the installed candidate
+        if: runner.os != 'Windows'
+        run: |
+          set -eu
+          freeze="$GITHUB_WORKSPACE/closure-evidence/v2/release/V2.2.0-RC2-FREEZE.json"
+          sha="$(python -c "import json,sys;print(json.load(open(sys.argv[1]))['artifacts']['sha256']['aisef-2.2.0-py3-none-any.whl'])" "$freeze")"
+          echo "aisef==2.2.0 --hash=sha256:$sha" > "$SMOKE_DIR/aisef-2.2.0.txt"
+          python -m venv "$SMOKE_DIR/v2.2.0"
+          "$SMOKE_DIR/v2.2.0/bin/python" -m pip install --no-deps --only-binary=:all: --require-hashes -r "$SMOKE_DIR/aisef-2.2.0.txt"
+          cd "$SMOKE_DIR"
+          "$SMOKE_PY" -I "$GITHUB_WORKSPACE/tests/installed_product_smoke.py" --writer "$SMOKE_DIR/v2.2.0/bin/aisef"
+
+  # BUILD-REPRO-01 (W1-DESIGN §6): the reproducibility contract's clauses, each run on GitHub-hosted ubuntu-latest:
+  # rebuilt on every interpreter it names, from the fresh checkout and from a copy at another path whose files carry
+  # non-git permission bits and build debris, both files must equal the 3.12 `build` job's digests; tag v2.2.0 rebuilt
+  # with the current repro_dist.py must give its frozen, published digests. A diverging leg is a measurement: fix it,
+  # or amend the contract and narrow the matrix explicitly — never drop a leg silently. ~3 runner-minutes per leg.
+  repro:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # the tag v2.2.0 leg checks the tag out
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install build
+      - name: record the toolchain
+        run: |
+          set -eu
+          python -P validation/qualification/repro_dist.py --toolchain > "$RUNNER_TEMP/toolchain.json"
+          cat "$RUNNER_TEMP/toolchain.json"
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-sha256
+          path: ${{ runner.temp }}/sums
+      - name: the fresh checkout rebuilds the 3.12 build's files
+        run: |
+          set -eu
+          export SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"
+          python -m build
+          python -P validation/qualification/repro_dist.py dist/*.tar.gz dist/*.whl
+          (cd dist && sha256sum -c "$RUNNER_TEMP/sums/SHA256SUMS")
+      - name: a copy at another path, non-git permission bits and build debris, rebuilds them too
+        run: |
+          set -eu
+          export SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"
+          python -P validation/qualification/repro_dist.py --perturb "$GITHUB_WORKSPACE" "$RUNNER_TEMP/perturbed"
+          cd "$RUNNER_TEMP/perturbed"
+          python -m build
+          python -P validation/qualification/repro_dist.py dist/*.tar.gz dist/*.whl
+          (cd dist && sha256sum -c "$RUNNER_TEMP/sums/SHA256SUMS")
+      - name: tag v2.2.0 rebuilt with the current repro_dist.py gives the published 2.2.0 files
+        run: |
+          set -eu
+          freeze="$GITHUB_WORKSPACE/closure-evidence/v2/release/V2.2.0-RC2-FREEZE.json"
+          export SOURCE_DATE_EPOCH="$(python -c "import json,sys;print(json.load(open(sys.argv[1]))['rc']['source_date_epoch'])" "$freeze")"
+          python -c "import json,sys;[print(v+'  '+k) for k,v in json.load(open(sys.argv[1]))['artifacts']['sha256'].items()]" "$freeze" > "$RUNNER_TEMP/v220.sums"
+          repro="$GITHUB_WORKSPACE/validation/qualification/repro_dist.py"
+          git worktree add --detach "$RUNNER_TEMP/v2.2.0" v2.2.0
+          cd "$RUNNER_TEMP/v2.2.0"
+          python -m build
+          python -P "$repro" dist/*.tar.gz dist/*.whl
+          (cd dist && sha256sum -c "$RUNNER_TEMP/v220.sums")
