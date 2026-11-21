@@ -1,5 +1,5 @@
 """validation/v23/impact.py (F5 static impact engine) on toy git repositories: the W1-DESIGN §9 negatives N1-N33, the
-adversarial-review regressions D1-D5 (each mirrors the reviewer's probe), and N14: every rule is load-bearing — with
+adversarial-review regressions D1-D5 and the re-review's A1/D4/I4/F2 (each mirrors the reviewer's probe), and N14: every rule is load-bearing — with
 that one rule switched off, at least one negative case becomes VERIFIED_REUSE, while the intact engine keeps every
 negative case non-reuse. Each toy holds the real generator and runner-settings segments of validation/v2/mutation.py
 (copied into the toy at test time, so the toy follows the real harness), toy tables, toy targets and one committed
@@ -7,6 +7,8 @@ record. Nothing is measured; no kill test runs. Not a kill file."""
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import os
 import pathlib
@@ -549,7 +551,9 @@ def n20(t: Toy) -> Case:   # test_k lists aisef2 -> a new aisef2/new.py
     return Case(b, h, t.observe(h, listed=["aisef2"], listed_by={"aisef2": [K]}), TGT, "INVALIDATED", "R3")
 
 
-def n20_new_test(t: Toy, rel: str = NEW_TEST, state: str = "VERIFIED_REUSE", component: str = "") -> Case:
+def n20_new_test(t: Toy, rel: str = NEW_TEST, state: str = "INVALIDATED", component: str = "R6") -> Case:
+    """Amendment A1 withdrawn: the new file is in S(F) (registry's TESTS_V2), so R6 (module new) fires before the
+    R3 registry discount is reached."""
     with_registry(t)
     b = t.commit()
     t.files[rel] = NEW_TEST_SRC
@@ -558,7 +562,7 @@ def n20_new_test(t: Toy, rel: str = NEW_TEST, state: str = "VERIFIED_REUSE", com
 
 
 def n20_new_dir(t: Toy) -> Case:   # a new test directory changes test_directories(): the discount does not hold
-    return n20_new_test(t, "tests/v2/newdir/test_x.py", "INVALIDATED", "R3")
+    return n20_new_test(t, "tests/v2/newdir/test_x.py", "INVALIDATED", "R6")
 
 
 def n21(t: Toy) -> Case:
@@ -638,18 +642,18 @@ def n28(t: Toy) -> Case:   # kill file F2 counts `def test_` in every tests/v2 t
     t.set_targets({**TARGETS, INC: kill})
     t.entries[INC] = entry(t.files, INC, kill=kill)
     b = t.commit()
-    t.files[K] += "\n\ndef test_extra():\n    pass\n"   # added-only: I4 additive
+    t.files[K] += "# def test_extra(self): counted, not run\n"   # no segment changes: I4 additive, R6 silent
     h = t.commit()
     return Case(b, h, t.observe(h, {"tests/v2/test_count.py": [K]}), INC, "INVALIDATED", "R2")
 
 
-def n29(t: Toy) -> Case:
+def n29(t: Toy) -> Case:   # a new def changes the module layout: R6 fires first (R8, dir(), is the backstop)
     add_test(t, K, "test_inc", "    def test_dir(self):\n"
              "        self.assertEqual([n for n in dir(toy) if n.startswith('check_')], [])\n")
     b = t.commit()
     t.files["aisef2/toy.py"] += "\n\ndef check_b():\n    pass\n"
     h = t.commit()
-    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R8")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R6")
 
 
 def n30(t: Toy, loaded: str = "aisef2/plug.py", state: str = "VERIFIED_REUSE", component: str = "") -> Case:
@@ -686,19 +690,19 @@ def n33b(t: Toy) -> Case:
     return Case(b, h, None, INC, "INVALIDATED", "I9")
 
 
-def new_test_file(t: Toy) -> Case:   # §2.8: a NEW test file in a directory a code file names (registry's TESTS_V2)
+def new_test_file(t: Toy) -> Case:   # §2.8: a NEW test file in a directory a code file names: in S(F), R6 (A1 withdrawn)
     t.files["aisef2/reg.py"] = 'TESTS_V2 = "tests/v2"\n'
     t.edit(K, "from aisef2 import toy, util\n", "from aisef2 import reg, toy, util\n")
     b = t.commit()
     t.files[NEW_TEST] = NEW_TEST_SRC
     h = t.commit()
-    return Case(b, h, t.observe(h), TGT, "VERIFIED_REUSE", "")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R6")
 
 
-def new_test_file_loaded(t: Toy) -> Case:   # the same file, observed loaded by the kill file's process: code, R6
+def new_test_file_loaded(t: Toy) -> Case:   # the same file, observed loaded by the kill file's process: R6
     c = new_test_file(t)
     c.obs[K]["loaded"].append(NEW_TEST)
-    return c._replace(state="INVALIDATED", component="R6")
+    return c
 
 
 def no_observation(t: Toy) -> Case:   # N2's edit with no observation: R1 cannot be excluded
@@ -717,12 +721,104 @@ def unobserved_child(t: Toy) -> Case:   # R1 with an observation that has an unh
                       state="INVALIDATED", component="R1")
 
 
+# ---- re-review regressions (each mirrors the confirmed probe; each gave VERIFIED_REUSE on the dcaebab7 engine)
+
+DISPATCH = ('import importlib.util\nimport pathlib\n\nHERE = pathlib.Path(__file__).resolve().parent\n'
+            'DESCRIBERS = {"exact": HERE / "describers" / "exact.py", "other": HERE / "describers" / "other.py"}\n\n\n'
+            'def describe(value):\n    kind = "exact" if value == 3 else "other"\n'
+            '    spec = importlib.util.spec_from_file_location("aisef2_describer_" + kind, DESCRIBERS[kind])\n'
+            '    mod = importlib.util.module_from_spec(spec)\n    spec.loader.exec_module(mod)\n'
+            '    return mod.describe(value)\n')
+OTHER = 'PREFIX = "value "\n\n\ndef describe(value):\n    return PREFIX + str(value)\n'
+DISPATCH_KILL = ("import unittest\n\nfrom aisef2 import dispatch, toy, util\n\n\nclass T(unittest.TestCase):\n"
+                 "    def test_target(self):\n        self.assertTrue(dispatch.describe(toy.target(2)).startswith(\"three\"))\n"
+                 "        self.assertEqual(toy.called_by_test(), 7)\n\n"
+                 "    def test_inc(self):\n        self.assertEqual(util.inc(1), 2)\n")
+
+
+def a1_loader(t: Toy, old: str = 'PREFIX = "value "', new: str = 'PREFIX = "three "', component: str = "R6") -> Case:
+    """A1-MUTANTONLY: a Δ file named only by literal path parts (D2 b) and loaded through a computed-name loader on a
+    path only a mutant takes; the unmutated run executes exact.py. A1 (code(F) ∪ ran(F)) judged neither R6 nor R8."""
+    t.files.update({"aisef2/dispatch.py": DISPATCH, "aisef2/describers/exact.py": 'def describe(value):\n    return "three"\n',
+                    "aisef2/describers/other.py": OTHER, K: DISPATCH_KILL})
+    b = t.commit()
+    t.edit("aisef2/describers/other.py", old, new)
+    h = t.commit()
+    obs = t.observe(h)
+    obs[K]["opened"]["aisef2/describers/exact.py"] = "load"
+    return Case(b, h, obs, TGT, "INVALIDATED", component)
+
+
+def a1_loader_body(t: Toy) -> Case:   # a def-body change of other.py: R8 at the loader site in S(F)
+    return a1_loader(t, "return PREFIX + str(value)", 'return "three " + str(value)', "R8")
+
+
+D4_KILL = ("import unittest\n\nfrom aisef2 import toy, util\n\n\nclass T(unittest.TestCase):\n"
+           "    def test_target(self):\n"
+           "        self.assertEqual(toy.target(1), 0)\n        self.assertEqual(toy.called_by_test(), 7)\n\n"
+           "    def test_inc(self):\n        self.assertEqual(util.inc(5), 6)\n")
+GOOD, BAD = "    return x + 1\n", "    return x + 1 if x > 1 else x - 1\n"
+TRY = "try:\n    HOOK = _small\nexcept NameError:\n    HOOK = None\n\n\n"
+SMALL = "def _small(x):\n    return x - 1\n\n\n"
+HOOK_INC = "def inc(x):\n    if x > 1 or HOOK is None:\n        return x + 1\n    return HOOK(x)\n"
+CLS = ("class Impl:\n    def run(self, x):\n        return {a}\n\n    def run(self, x):  # noqa: F811\n        return {b}\n\n\n"
+       "def inc(x):\n    return x + 1 if x > 1 else Impl().run(x)\n")
+
+
+def _impl_swap(first: str, second: str) -> str:
+    return f"def _impl(x):\n{first}\n\ndef _impl(x):  # noqa: F811\n{second}\n\ndef inc(x):\n    return _impl(x)\n"
+
+
+D4_LAYOUT = {   # D4-PARTIAL (a), (b), (c): util.py at the basis, at head; inc(1) goes from 2 to 0 in each
+    "noqa_swap": (_impl_swap(BAD, GOOD), _impl_swap(GOOD, BAD)),
+    "def_moved": (TRY + SMALL + HOOK_INC, SMALL + TRY + HOOK_INC),
+    "method_swap": (CLS.format(a="x - 1", b="x + 1"), CLS.format(a="x + 1", b="x - 1")),
+}
+
+
+def d4_layout(t: Toy, kind: str = "noqa_swap") -> Case:
+    base_src, head_src = D4_LAYOUT[kind]
+    t.files.update({"aisef2/util.py": base_src, K: D4_KILL})
+    b = t.commit()
+    t.files["aisef2/util.py"] = head_src
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R6")
+
+
+def d4_def_moved(t: Toy) -> Case:
+    return d4_layout(t, "def_moved")
+
+
+def d4_method_swap(t: Toy) -> Case:
+    return d4_layout(t, "method_swap")
+
+
+I4_HOOKS = {
+    "load_tests": ("\n\ndef load_tests(loader, tests, pattern):\n    return unittest.TestSuite(t for s in tests for t in s "
+                   "if t._testMethodName != \"test_target\")\n"),
+    "setUpModule": "\n\ndef setUpModule():\n    toy.target = lambda x: 3 if x == 2 else 0\n",
+}
+
+
+def i4_hook(t: Toy, hook: str = "load_tests") -> Case:   # I4-HOOKS: a new unittest protocol def in the kill file
+    b = t.commit()
+    t.files[K] += I4_HOOKS[hook]
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I4")
+
+
+def i4_setupmodule(t: Toy) -> Case:
+    return i4_hook(t, "setUpModule")
+
+
 NEGATIVE = [n1, n1_comment, n3, n3b, n4, i4_comment, n5, n6, n6b, n7a_windows_for_posix, n7a_posix_for_windows, n7c,
             n7d_separators, n7d_flavors, n7e, n7f, n7g, d1_history_after_basis, d1_history_not_sibling, n8,
             d2_shadowed_base, d2_replaced_blob, d3_not_live, d4_order, d4_order_r6, d5_loader, d5_load_tag_data,
-            n9_table, n9_ruling, n10, n13_data_reader, n13b, n15, n16, n16_trace, n17, n17_trace, n18, n20, n20_new_dir,
-            n21, n21b, n21c, n22, r5_extension, n23, n24, n25_python, n25_platform, n26, n26_trace, n27, n28, n29,
-            n30_miss, n31, n33, n33b, no_observation, wrong_tree_observation, unobserved_child, new_test_file_loaded]
+            n9_table, n9_ruling, n10, n13_data_reader, n13b, n15, n16, n16_trace, n17, n17_trace, n18, n20, n20_new_test,
+            n20_new_dir, n21, n21b, n21c, n22, r5_extension, n23, n24, n25_python, n25_platform, n26, n26_trace, n27,
+            n28, n29, n30_miss, n31, n33, n33b, no_observation, wrong_tree_observation, unobserved_child,
+            new_test_file, new_test_file_loaded, a1_loader, a1_loader_body, d4_layout, d4_def_moved, d4_method_swap,
+            i4_hook, i4_setupmodule]
 
 
 class ImpactTest(unittest.TestCase):
@@ -867,9 +963,63 @@ class ImpactTest(unittest.TestCase):
         self.assertEqual(state_of(self.toy, c).basis, f"calibration@{c.base}")
         with mock.patch.object(impact, "BASE", c.base):
             self.assertEqual(state_of(self.toy, c).basis, f"v2.2.0-accepted@{c.base}")
-            self.assertEqual(impact.report([], self.toy.root, c.base, c.head)["run"], "v2.2.0-accepted")
-            self.assertTrue(impact.report([], self.toy.root, c.head, c.head)["run"].startswith("calibration"))
+            run = impact.classify(self.toy.root, c.base, c.head, observations=c.obs)
+            self.assertEqual(impact.report(run)["run"], "v2.2.0-accepted")
+            self.assertTrue(impact.report(impact.classify(self.toy.root, c.head, c.head))["run"].startswith("calibration"))
         self.assertEqual(impact.BASE, "da3ea33f3b695aaca73e87a704145a0193aced23")
+
+    def test_f3_acceptance_basis_only_on_reuse(self):
+        """F3: a non-reuse state claims no acceptance; it names the run's basis commit as evidence.run_base."""
+        c = n1(self.toy)
+        with mock.patch.object(impact, "BASE", c.base):
+            s = state_of(self.toy, c)
+        self.assertEqual((s.state, s.basis, s.evidence["run_base"]), ("INVALIDATED", "", c.base))
+        c = n2(self.again())
+        with mock.patch.object(impact, "BASE", c.base):
+            r = state_of(self.toy, c)
+        self.assertEqual((r.state, r.basis), ("VERIFIED_REUSE", f"v2.2.0-accepted@{c.base}"))
+        self.assertNotIn("run_base", r.evidence)
+
+    def test_f2_report_uses_the_shas_the_run_resolved(self):
+        """F2 (probe_report_toctou / verify_f2_main): a ref that moves after classify() resolved it does not move
+        the report. A: a tampering commit lands on HEAD; B: --base is a tag moved from a calibration commit to BASE."""
+        t = self.toy
+        t.entries[TGT] = e = entry(t.files, TGT, survivor=True)
+        b = t.commit()
+        real = impact.classify
+        moved = {}
+
+        def tamper_after(root, base, head, **kw):
+            run = real(root, base, head, **kw)
+            e2 = json.loads(json.dumps(e))
+            e2["results"][1] = {**e["results"][0], "mutant": "L2 b"}
+            e2.update(killed=2, survivors=[])
+            t.entries[TGT] = e2
+            moved["head"] = t.commit()
+            return run
+
+        def retag_after(root, base, head, **kw):
+            run = real(root, base, head, **kw)
+            _git(t.root, "tag", "-f", "rel", b)
+            return run
+
+        def main(wrap, *argv):
+            out = pathlib.Path(self._tmp.name) / f"{len(moved)}-{wrap.__name__}.json"
+            with mock.patch.object(impact, "classify", wrap), contextlib.redirect_stdout(io.StringIO()), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                impact.main(["--classify", *argv, "--json", str(out)])
+            return json.loads(out.read_text())
+
+        with mock.patch.object(impact, "ROOT", t.root), mock.patch.object(impact, "BASE", b):
+            doc = main(tamper_after)
+            self.assertEqual((doc["head"]["sha"], doc["base"]["sha"], doc["run"]), (b, b, "v2.2.0-accepted"))
+            self.assertEqual(state_of(t, Case(b, moved["head"], None, TGT, "", "")).component, "I7")   # the moved head
+            h = moved["head"]
+            _git(t.root, "tag", "rel", h)
+            doc = main(retag_after, "--base", "rel", "--head", h)
+            self.assertEqual((doc["base"]["sha"], doc["head"]["sha"]), (h, h))
+            self.assertTrue(doc["run"].startswith("calibration"), doc["run"])
+            self.assertEqual({x["basis"] for x in doc["states"] if x["state"] == "VERIFIED_REUSE"}, {f"calibration@{h}"})
 
     def test_d3_entry_must_be_live_at_the_basis(self):
         s = self.run_case(d3_not_live)
@@ -974,14 +1124,19 @@ class ImpactTest(unittest.TestCase):
         self.run_case(n20)
 
     def test_n20_registry_discount(self):
-        s = self.run_case(n20_new_test)   # positive: a new tests/v2 test module, listed by the registry only
+        """Amendment A1 withdrawn: a new tests/v2 module is in S(F) (TESTS_V2) and new, so R6 fires before R3; the N20
+        positive does not hold under the frozen letter. The R3 registry discount itself, with R6 switched off: the
+        new module is discounted (a later rule decides), a new test directory is not (R3)."""
+        s = self.run_case(n20_new_test)
         self.assertEqual(s.evidence["additive_test_changes"], [NEW_TEST])
         b, h = _last(self.toy)
-        # Amendment A1, red-before under the frozen R6 letter: the file is in S(F) (TESTS_V2) and its module is new
         self.assertIn(NEW_TEST, impact.kill_closure(self.toy.root, b, h, K))
-        self.assertEqual(impact.reach.changed(None, NEW_TEST_SRC)["module"], "new")
-        self.again()
-        self.run_case(n20_new_dir)
+        with mock.patch.object(impact, "_OFF", frozenset({"R6"})):
+            self.assertNotEqual(state_of(self.toy, self.case).component, "R3")
+            self.again()
+            c = n20_new_dir(self.toy)
+            self.assertEqual(state_of(self.toy, c).component, "R3")
+        self.assertEqual(check(self.toy, c), [])
 
     def test_n21_discovery(self):
         self.run_case(n21)
@@ -1026,14 +1181,23 @@ class ImpactTest(unittest.TestCase):
         self.assertEqual(state_of(self.toy, c._replace(obs=obs)).component, "R0")
 
     def test_r1_incomplete_observations(self):
-        t = self.toy
+        """Each R1 clause decides alone (T1): lost and unparsed_lines with os_trace and no R1_UNSEEN word in S(F), so
+        the static scan is off; then the static scan alone, without os_trace."""
+        c = n2(self.toy)
+        for over, why in (({"lost": 1}, "(lost 1)"), ({"unparsed_lines": 2}, "(unparsed_lines 2)")):
+            with self.subTest(why):
+                s = state_of(self.toy, c._replace(obs=self.toy.observe(c.head, os_trace=True, **over)))
+                self.assertEqual((s.state, s.component), ("INVALIDATED", "R1"), s.reason)
+                self.assertIn(why, s.reason)
+        s = state_of(self.toy, c._replace(obs=self.toy.observe(c.head, os_trace=True)))
+        self.assertEqual((s.state, s.component), ("VERIFIED_REUSE", ""), s.reason)
+        t = self.again()
         t.edit("aisef2/util.py", "def inc(x):\n", "# no multiprocessing here\ndef inc(x):\n")   # an R1_UNSEEN word
         t.reentry()
         c = n2(t)
-        for over in ({"lost": 1}, {"unparsed_lines": 2}, {}):
-            with self.subTest(over):
-                s = state_of(t, c._replace(obs=t.observe(c.head, **over)))
-                self.assertEqual((s.state, s.component), ("INVALIDATED", "R1"), s.reason)
+        s = state_of(t, c._replace(obs=t.observe(c.head)))
+        self.assertEqual((s.state, s.component), ("INVALIDATED", "R1"), s.reason)
+        self.assertIn("(static scan: multiprocessing)", s.reason)
         s = state_of(t, c._replace(obs=t.observe(c.head, os_trace=True)))   # os_trace covers what the hook misses
         self.assertEqual((s.state, s.component), ("VERIFIED_REUSE", ""), s.reason)
 
@@ -1053,6 +1217,45 @@ class ImpactTest(unittest.TestCase):
 
     def test_n29_enumeration(self):
         self.run_case(n29)
+        with mock.patch.object(impact, "_OFF", frozenset({"R6"})):   # R8 (dir()) still holds behind R6
+            self.assertEqual(state_of(self.toy, self.case).component, "R8")
+
+    def test_a1_withdrawn_mutant_only_loader(self):
+        """A1-MUTANTONLY (probe_a1_mutant_loader): R5-R8 judge Δ ∩ S(F) again, so a Δ file the unmutated run never
+        executes is judged: R6 for an import-time change, R8 (the computed loader site) for a def-body change."""
+        s = self.run_case(a1_loader)
+        self.assertIn("aisef2/describers/other.py", s.reason)
+        self.again()
+        self.assertIn("aisef2/dispatch.py:10", self.run_case(a1_loader_body).reason)
+        b, h = _last(self.toy)
+        self.assertNotIn("aisef2/describers/other.py", S2.closure(self.toy.root, h, (K,)))   # not import-reached
+
+    def test_d4_module_layout(self):
+        """D4-PARTIAL (verify_d4_partial a-c): a redefinition swap the noqa comment hid, a plain def moved relative
+        to the statement that reads it, and swapped same-name methods; reach.changed() sees none of them."""
+        for kind, fn in (("noqa_swap", d4_layout), ("def_moved", d4_def_moved), ("method_swap", d4_method_swap)):
+            with self.subTest(kind):
+                self.run_case(fn)
+                got = impact.reach.changed(*D4_LAYOUT[kind])   # red-before: reach sees nothing
+                self.assertEqual((got["names"], got["module"]), ({}, "unchanged"))
+                self.again()
+        shifted = "def f():\n    y = 1\n    return y\n\n\nX = 1\n"
+        self.assertTrue(impact.layout_changed("def f():\n    return 1\n\n\nX = 1\n", shifted))   # X moved down
+        self.assertIsNone(impact.layout_changed("def f():\n    return 1\n\n\nX = 1\n", "def f():\n    return 2\n\n\nX = 1\n"))
+        self.assertIsNone(impact.layout_changed("X = 1\n", "X = 1\n# a comment after the last statement\n"))
+
+    def test_i4_protocol_hooks_are_not_additive(self):
+        """I4-HOOKS (probe_i4_hooks): a new load_tests or setUpModule decides which tests run and what they see."""
+        self.assertIn("load_tests", self.run_case(i4_hook).reason)
+        self.again()
+        self.assertIn("setUpModule", self.run_case(i4_setupmodule).reason)
+        old = set(impact.segment_texts(FILES[K]))
+        plain = "\n\nclass N(unittest.TestCase):\n    def test_n(self):\n        pass\n"
+        self.assertEqual(impact.not_additive(old, FILES[K] + plain), [])
+        for extra in ("    @classmethod\n    def setUpClass(cls):\n        pass\n", "    X = 1\n",
+                      "    def setUp(self):\n        pass\n", "    def __init_subclass__(cls):\n        pass\n"):
+            self.assertEqual(impact.not_additive(old, FILES[K] + plain + extra), ["N"], extra)
+        self.assertEqual(impact.not_additive(old, FILES[K] + "\n\ndef tearDownModule():\n    pass\n"), ["tearDownModule"])
 
     def test_n30_d2_check(self):
         self.run_case(n30)
@@ -1112,6 +1315,7 @@ class ImpactTest(unittest.TestCase):
     def test_new_test_file_named_by_a_directory_constant(self):
         s = self.run_case(new_test_file)
         self.assertEqual(s.evidence["additive_test_changes"], [NEW_TEST])
+        self.assertIn(NEW_TEST, s.reason)
 
     def test_new_test_file_observed_loaded(self):
         self.run_case(new_test_file_loaded)

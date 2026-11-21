@@ -1328,3 +1328,78 @@ Corrected figures:
 - Calibration run at W1a increment 1 (Δ = ∅): 667 VERIFIED_REUSE / 17,322 mutants (625 via the basis, 42 via the
   ruling), 327 UNRESOLVED (I6) / 10,078, 0 INVALIDATED.
 - Flavor is provenance only, never a gate input (§2.4.2).
+
+## Amendment A1 WITHDRAWN (2026-11-21)
+
+*Appended under the freeze rule (line 3). It withdraws A1.1 and keeps A1.2. Nothing above is edited.*
+
+**What is withdrawn.** A1.1's narrowed scope of R5, R6, R7 and R8 (code(F) ∪ ran(F)).
+- A1.1's soundness argument covers only the observed, unmutated run. A mutation verdict also depends on what the
+  kill file executes under each mutant.
+- A Δ file in S(F) that only a mutant's path loads, through a loader whose module name or path is not a literal,
+  lies outside ran(F). Under the narrowing no rule judged it: R6 never saw its import-time statements, and R8 was
+  consulted only for changed defs inside ran(F). A1.1's residual list called such a loader "an R8 site", which
+  overstated what the narrowed scope covered.
+
+**What applies again: the frozen §2.9 letter.**
+- R5, R6, R7 and R8 judge Δ ∩ S(F): the full static closure, D2 (b) literal paths included.
+- They also judge what O(F) saw loaded or load-opened. The D2 check already requires that to lie inside S(F).
+- R5 and R6 are judged before any observation, as rule order step 1 says.
+
+**Precision cost (accepted; it fails safe).**
+- Every S(F) holds every `tests/v2` file, through registry's `TESTS_V2`.
+- So one new or changed `tests/v2` `.py` file re-opens every target that passes I6. The increment's first real run
+  already showed this: 667 / 667 INVALIDATED (R6), all caused by the increment's own new test file.
+- The §9 N20 positive ("adding `tests/v2/test_new.py` gives VERIFIED_REUSE") does not hold under the frozen letter and
+  is withdrawn with A1. The R3 registry discount stays in the engine; it is reached only for a file outside S(F).
+- §2.8's rule that new behaviour gets NEW test files keeps this fan-out cost until an amendment with its own
+  soundness argument (one that also covers mutant-only execution) narrows R6.
+
+**A1.2 stands.** The flavor erratum is a measurement, not a scope change, and is kept unchanged: **63 linux / 140
+flavor-unproven** over the 994 live entries, with the corrected §2.4.4 and §11 exit gate 2 figures as A1.2 states them.
+
+**Fail-closed engine changes made with the withdrawal.** Each one can only turn a reuse into a non-reuse.
+- **R6 layout (D4).** For every Δ `.py` file in S(F), R6 also fires when the module code is not laid out the same.
+  - It compares the exact text of every statement outside function bodies: module level, class bodies and compound
+    statements, with comments inside a statement included.
+  - It compares each such statement's start line.
+  - For every name defined more than once in one module or class scope, it compares the full text of each
+    definition, in order.
+  - Order, text, a moved, swapped, added or removed def, class header or class-body statement, and shifted line
+    positions all fire R6. A function-body-only change that keeps the line count stays with I1 and R7.
+- **I4 additive (I4-HOOKS).** A change to an existing tests/ file in S(F) is additive only if its new top-level
+  segments are new `unittest.TestCase` classes made only of plain `test_*` methods.
+  - Any other new or changed segment is INVALIDATED (I4): `load_tests`, `setUpModule`, `tearDownModule`, a class with
+    `setUpClass`, `tearDownClass`, `setUp`, `tearDown`, `__init_subclass__` or an attribute, an import, or a module
+    statement.
+  - Such an additive change still alters the file's layout. When the file is in S(F), R6 then fires, and
+    "additive-test-change" remains evidence only.
+- **Report (F2).** The report is headed by the base and head shas that the run resolved once, at its start. No rev
+  name is resolved again, so a ref that moves during a run cannot rebind the states. The run label is derived from
+  that same basis sha.
+- **Basis label (F3).** Only VERIFIED_REUSE (and MEASURED) carries an acceptance-bearing basis. Every other state
+  names the run's basis commit as `evidence.run_base`, which claims nothing.
+- **R1 reason (T1).** The R1 reason names the clause that fired: `lost`, `unparsed_lines`, unhooked children, or the
+  static scan.
+
+**Consequences for the §9 catalogue.**
+- N20 positive → INVALIDATED (R6).
+- N20 new directory → R6 first. The test checks R3 with R6 switched off.
+- N28: an added test method now stops at I4 or R6 before R2. The test keeps R2 on a bytes-only change of the test
+  file that its data reader counts.
+- N29 → R6 first, with R8 (`dir()`) behind it.
+
+**Carried residuals for the observe.py increment** (not addressed here; one line each):
+- F1: the commits' harness code (`validation/v2`) and `validation/v21` run inside the judging process, so I7 and
+  D1–D3 hold against data-only tampering of a record, not against an edit of that code. Isolate it from the judging
+  process, or declare that code trusted.
+- F4: an observation is not yet bound to evidence. R0 must check its tree digest against head's runner tree, and
+  O(F) must be bound by digest to a committed row.
+- NIT-GITRC: some reads inside the frozen helpers ignore git's exit status, so a missing object reads as an empty
+  file. Check object presence before judging, or refuse partial clones as shallow ones are refused.
+- R8-SPELLINGS: the R8 site detector matches spellings. Computed-name access through aliases, other owners or
+  mapping methods of a namespace is not yet a site.
+- T2: R0–R3, R7 and R8 are judged one kill file at a time rather than one rule at a time. A target's state (both
+  orders fail closed) can therefore depend on the order of its kill set.
+- T3: several fail-closed branches have no regression test yet: a shadowed head, file removals, an unparsable target,
+  a generator failure, and a malformed record.

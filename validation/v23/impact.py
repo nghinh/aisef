@@ -45,13 +45,17 @@ Declared limitations (§2.7, §2.9 residual):
 - RESOLVED_SITES is empty: any dynamic site (R8) in S(F) makes tier S unavailable for that kill file.
 - S(F) literal naming (D2 b) is the static rule of v21_snapshot_delta._info/_names plus whole-constant directories
   of two or more components; data a kill file reaches by other means is R2/R3's (observed), never S(F)'s.
-- W1-DESIGN Amendment A1: R5/R6/R7/R8 read code(F) = the import-reached part of S(F) (s2 closure, D2 c, D2 d) plus
-  what an observation saw loaded or opened with the "load" tag; a file only named by a literal (every tests/v2
-  file, through registry's TESTS_V2) is read, listed or run, which R1-R3 decide. Without an observation that part is
-  never cleared: R1 cannot be excluded. Residual (A1): a Δ file named only by a literal and executed only under a
-  mutant, by a literal-path loader the unmutated run never reached.
-- R6 also fires when the order of a top-level name's bindings changed in a Δ file (the later binding wins, and
-  reach.changed() compares def texts as a sorted multiset).
+- R5-R8 judge Δ ∩ S(F) (the frozen §2.9 letter; W1-DESIGN Amendment A1's narrowing is withdrawn) plus what an
+  observation saw loaded or load-opened. Cost: one new or changed tests/v2 file re-opens every target whose S(F)
+  reaches registry's TESTS_V2, i.e. every target that passes I6.
+- R6 also fires when the layout of a Δ file's module code differs in any way: the exact text of every statement
+  outside function bodies (module level, class bodies, compound statements), each one's start line, and the full
+  text, in order, of every name defined more than once in one module or class scope (the last one binds;
+  reach.changed() compares a name's defs as a sorted multiset). A function-body-only change of the same line count
+  stays with I1 / R7.
+- I4 "additive" is only new TestCase classes made of plain test_* methods; any other new top-level segment of a
+  tests/ file in S(F) (load_tests, setUpModule, a fixture, an import, a module statement) is INVALIDATED (I4).
+Only VERIFIED_REUSE carries an acceptance basis; every other state names the run's basis commit as evidence.run_base.
 Read-only: git and the repository; the only write is --json OUT (and a temporary extraction of each commit's
 aisef2/ and validation/v2/, v21_snapshot_delta.Rev, removed afterwards).
 """
@@ -125,6 +129,16 @@ class State:
     compared: list = dataclasses.field(default_factory=list)
     evidence: dict = dataclasses.field(default_factory=dict)
     mutants: int = 0
+
+
+class Run(list):
+    """classify()'s states, sorted, with the revs it was given and the shas it resolved them to ONCE, at the start of
+    the run (None: not resolved). report() reads these and never resolves a name again, so a ref that moves during a
+    run cannot bind the states to a commit they were not computed on."""
+    base: str = ""
+    head: str = ""
+    base_sha: str | None = None
+    head_sha: str | None = None
 
 
 def canonical(obj) -> bytes:
@@ -272,48 +286,110 @@ def segment_texts(src: str | None) -> dict[str, str]:
         segs = segments(src) if src is not None else []
     except SyntaxError:
         return {"<unparsable>": src or ""}
+    for x, text, _ in _keyed(segs):
+        out[x] = out.get(x, "") + text
+    return out
+
+
+def _keyed(segs):
+    """(I4 segment name, text, node) of each top-level statement: its names, else `<docstring>` / `<other statements>`."""
     for i, (names, text, n) in enumerate(segs):
         doc = i == 0 and isinstance(n, ast.Expr) and isinstance(n.value, ast.Constant)
         for x in names or ("<docstring>" if doc else "<other statements>",):
-            out[x] = out.get(x, "") + text
-    return out
+            yield x, text, n
 
 
-def _bound(n: ast.stmt) -> set[str]:
-    """The module-level names one top-level statement binds (function and class bodies are their own scope)."""
-    out: set[str] = set()
-    todo: list[ast.AST] = [n]
-    while todo:
-        x = todo.pop()
-        if isinstance(x, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
-            out.add(x.name)
-            todo += [*x.decorator_list, *getattr(getattr(x, "args", None), "defaults", ())]
-            continue
-        if isinstance(x, ast.Lambda):
-            continue
-        if isinstance(x, ast.Name) and isinstance(x.ctx, ast.Store):
-            out.add(x.id)
-        elif isinstance(x, ast.alias):
-            out.add((x.asname or x.name).split(".")[0])
-        todo += ast.iter_child_nodes(x)
-    return out
+def _test_class(n: ast.stmt) -> bool:
+    """A plain `unittest.TestCase` subclass whose body is only test_* methods that evaluate nothing where they stand
+    (no decorator, default, annotation or type parameter)."""
+    def plain(f) -> bool:
+        if not isinstance(f, ast.FunctionDef | ast.AsyncFunctionDef):
+            return False
+        a = f.args
+        return (f.name.startswith("test_") and not f.decorator_list and not a.defaults and not any(a.kw_defaults) and f.returns is None
+                and not getattr(f, "type_params", None)
+                and not any(x.annotation for x in (*a.posonlyargs, *a.args, *a.kwonlyargs, a.vararg, a.kwarg) if x))
+    return (isinstance(n, ast.ClassDef) and not n.decorator_list and not n.keywords and not getattr(n, "type_params", None)
+            and [ast.unparse(x) for x in n.bases] in (["unittest.TestCase"], ["TestCase"]) and all(map(plain, n.body)))
 
 
-def binding_order(src: str) -> dict[str, list[str]]:
-    """Top-level name -> the exact texts of the statements that bind it, in source order."""
-    by: dict[str, list[str]] = {}
-    for _, text, n in _parsed(src)[0]:
-        for x in _bound(n):
-            by.setdefault(x, []).append(text)
-    return by
+def not_additive(old: set[str], src: str | None) -> list[str]:
+    """I4 (§2.2): the top-level segments of `src` that are new since the segment names `old` and are not a plain
+    TestCase class of test_* methods. A load_tests, setUpModule or tearDownModule def, a class with setUpClass, setUp,
+    tearDown, __init_subclass__ or an attribute, an import or a module statement decides which tests run and what
+    they see: never an additive test change."""
+    try:
+        segs = segments(src) if src is not None else []
+    except SyntaxError:
+        return ["<unparsable>"]
+    return sorted({k for k, _, n in _keyed(segs) if k not in old and not _test_class(n)})
 
 
-def order_changed(a: str, b: str) -> str | None:
-    """R6 (D4): a top-level name whose binding statements are the same texts in another order (the later binding wins;
-    reach.changed() compares a name's defs as a sorted multiset and leaves plain defs out of the module code)."""
-    x, y = binding_order(a), binding_order(b)
-    return next((k for k in sorted(set(x) | set(y)) if len(x.get(k, ())) > 1
-                 and x.get(k) != y.get(k) and sorted(x.get(k, ())) == sorted(y.get(k, ()))), None)
+def _start(n: ast.stmt) -> tuple[int, int]:
+    """(line, UTF-8 column) where statement `n`'s text starts, its decorators included."""
+    if decs := getattr(n, "decorator_list", None):
+        d = min(decs, key=lambda x: (x.lineno, x.col_offset))
+        return d.lineno, max(d.col_offset - 1, 0)   # the "@"
+    return n.lineno, n.col_offset
+
+
+def layout(src: str) -> tuple[list[tuple[int, bytes]], dict[str, list[bytes]]]:
+    """R6 (D4): ([(start line, exact bytes with every function BODY cut out)] of every statement outside function
+    bodies — module level, class bodies, compound statements —, {scope-qualified name: [exact bytes of each def or
+    class of it, in order]} for every name defined more than once in one module or class scope)."""
+    text = _lf(src)
+    data, tree = text.encode("utf-8"), ast.parse(text)
+    lines = data.splitlines(keepends=True)
+    at = [0]
+    for x in lines:
+        at.append(at[-1] + len(x))
+    cuts = []
+    for f in ast.walk(tree):
+        if isinstance(f, ast.FunctionDef | ast.AsyncFunctionDef):
+            line, col = _start(f.body[0])
+            col = col if lines[line - 1][:col].strip() else 0   # a body on its own lines: cut whole lines
+            cuts.append((at[line - 1] + col, at[f.end_lineno - 1] + f.end_col_offset))
+    kept: list[tuple[int, int]] = []
+    for a, z in sorted(cuts):
+        if not kept or a >= kept[-1][1]:   # a nested def's body lies inside its enclosing body
+            kept.append((a, z))
+
+    def cut(a: int, z: int) -> bytes:
+        out, i = [], a
+        for c0, c1 in kept:
+            if a <= c0 and c1 <= z:
+                out += [data[i:c0], b"\0"]
+                i = c1
+        return b"".join([*out, data[i:z]])
+
+    seq: list[tuple[int, bytes]] = []
+    defs: dict[str, list[bytes]] = {}
+
+    def walk(node: ast.AST, prefix: str) -> None:
+        for n in ast.iter_child_nodes(node):
+            if isinstance(n, ast.excepthandler | ast.match_case):
+                walk(n, prefix)
+            if not isinstance(n, ast.stmt):
+                continue
+            line = _start(n)[0]
+            a, z = at[line - 1], at[n.end_lineno - 1] + n.end_col_offset
+            seq.append((line, cut(a, z)))
+            if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+                defs.setdefault(prefix + n.name, []).append(data[a:z])
+            if not isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef):
+                walk(n, prefix + n.name + "." if isinstance(n, ast.ClassDef) else prefix)
+    walk(tree, "")
+    return seq, {k: v for k, v in defs.items() if len(v) > 1}
+
+
+def layout_changed(a: str, b: str) -> str | None:
+    """R6 (D4): why the module code of two versions of one file is not laid out the same, or None."""
+    (sa, da), (sb, db) = layout(a), layout(b)
+    if sa != sb:
+        i = next((i for i, (x, y) in enumerate(zip(sa, sb, strict=False)) if x != y), min(len(sa), len(sb)))
+        return f"the module-level statements changed at line {(sb[i] if i < len(sb) else sa[i])[0]}"
+    k = next((k for k in sorted(set(da) | set(db)) if da.get(k) != db.get(k)), None)
+    return f"the definitions of {k} changed order or text: another one binds" if k else None
 
 
 def settings_digest(src: str | None) -> dict[str, str]:
@@ -607,18 +683,11 @@ class _Ctx:
                 todo += [x for x in (self._dotted(R, g) | (self._literal(R, g) if literal else set())) if x not in out]
         return out
 
-    def code(self, F: str) -> frozenset[str]:
-        """The import-reached part of S(F) at basis ∪ now: s2 closure, dotted import strings (D2 c) and the discovery
-        set (D2 d), to a fixpoint — what F's process imports. Amendment A1: R5, R6, R7 and R8 read this part plus
-        what an observation saw loaded or load-opened; a file only NAMED by a literal (D2 b, e.g. every tests/v2 file
-        through registry's TESTS_V2) is read, listed or run, which R1-R3 decide."""
-        self.prefetch()
-        return self.cache(("code", F), lambda: frozenset(set().union(*(
-            self._grow(R, set(), [F, *self._discovery(R, F)], False) for R in (self.B, self.H)))))
-
     def S(self, F: str) -> frozenset[str]:
-        """S(F) at basis ∪ now (§2.9 D2): the import-reached part plus literal paths (D2 b), to a fixpoint."""
+        """S(F) at basis ∪ now (§2.9 D2): s2 closure, literal paths (D2 b), dotted import strings (D2 c) and the
+        discovery set (D2 d), to a fixpoint. R4-R8, I4, the D2 check and the R1 scan all read it."""
         if F not in self._S:
+            self.prefetch()
             self._S[F] = frozenset(set().union(*(self._grow(R, set(), [F, *self._discovery(R, F)], True)
                                                  for R in (self.B, self.H))))
         return self._S[F]
@@ -650,9 +719,9 @@ class _Ctx:
                 return f"unparsable {p}: {e}"
         return self.cache(("changed", p), compute)
 
-    def order(self, p: str) -> str | None:
+    def layout(self, p: str) -> str | None:
         a, b = self.B.text(p), self.H.text(p)
-        return self.cache(("order", p), lambda: order_changed(a, b) if a is not None and b is not None else None)
+        return self.cache(("layout", p), lambda: layout_changed(a, b) if a is not None and b is not None else None)
 
     def modules_named(self, R, f: str) -> set[str]:
         """R5: the dotted names `f`'s imports and import strings name. s2_mutation_record.closure cannot be called for
@@ -716,7 +785,9 @@ class _Ctx:
         basis = f"{self.label}@{self.B.sha}"
 
         def done(state, comp="", reason="", **extra):
-            return State(name, state, comp, reason, basis, list(compared), {**ev, **extra}, mut)
+            if state in ("MEASURED", "VERIFIED_REUSE"):   # F3: only a reuse carries an acceptance basis
+                return State(name, state, comp, reason, basis, list(compared), {**ev, **extra}, mut)
+            return State(name, state, comp, reason, "", list(compared), {**ev, **extra, "run_base": self.B.sha}, mut)
 
         # I7 (+ D3: live at the basis)
         if _on("I7"):
@@ -785,7 +856,7 @@ class _Ctx:
             for F in kill:
                 for p in sorted(x for x in self.S(F) if x.startswith("tests/") and self.delta.get(x, "A") != "A"):
                     a, b = segment_texts(self.B.text(p)), segment_texts(self.H.text(p))
-                    gone = sorted(k for k in a if b.get(k) != a[k])
+                    gone = sorted(k for k in a if b.get(k) != a[k]) or not_additive(set(a), self.H.text(p))
                     if (gone or self.delta[p] == "D") and _on("I4"):
                         return done("INVALIDATED", "I4", f"kill test changed: {p} ({', '.join(gone[:3]) or 'removed'})")
                     additive.append(p)
@@ -863,11 +934,11 @@ class _Ctx:
             hit = [p for p in delta if p != F and p.startswith(d + "/") and posixpath.basename(p) in ("__init__.py", base)]
             if hit:
                 return "INVALIDATED", "R4", f"{F} discovers {sorted(hit)[0]} ({delta[sorted(hit)[0]]})"
-        # R5 import resolution, R6 import-time statements, over code(F) (Amendment A1)
+        # R5 import resolution, R6 import-time statements and layout, over Δ ∩ S(F) (the frozen §2.9 letter)
         code = sorted(p for p in delta if p.endswith(".py"))
-        for rule in (lambda F: self._r5(F, self.code(F)), lambda F: self._r6(F, self.code(F), code)):
+        for rule in ("R5", "R6"):
             for F in kill:
-                if fired := rule(F):
+                if fired := self._static(rule, F, code):
                     return fired
         # R0, D2, R1, R2, R3
         data_tokens: set[str] = set()
@@ -875,7 +946,7 @@ class _Ctx:
         if self.obs is None:
             if _on("R1"):
                 return "INVALIDATED", "R1", f"no observation of {kill[0] if kill else '<no kill file>'}; R1 cannot be excluded"
-            ran = {F: self.code(F) for F in kill}
+            ran = {F: self.S(F) for F in kill}
         else:
             ev["observation"] = {}
         py = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -904,9 +975,14 @@ class _Ctx:
             unseen = (ch.get("unhooked_python") or 0) + (ch.get("other") or 0)
             static = [] if O.get("os_trace") else [w for f in sorted(self.S(F)) if f.endswith(".py")
                                                    for w in R1_UNSEEN if w in self.both(f)]
-            if (O.get("lost") or O.get("unparsed_lines") or (unseen and not O.get("os_trace")) or static) and _on("R1"):
+            why = ([f"lost {O['lost']}"] if O.get("lost") else []) + (
+                [f"unparsed_lines {O['unparsed_lines']}"] if O.get("unparsed_lines") else []) + (
+                [f"{unseen} unhooked or other children"] if unseen and not O.get("os_trace") else []) + (
+                [f"static scan: {static[0]}"] if static else [])
+            if why and _on("R1"):
                 n = unseen + (1 if static or O.get("lost") or O.get("unparsed_lines") else 0)
-                return "INVALIDATED", "R1", f"{F} has {n} unobserved processes: any path of the tree may be read or run"
+                return ("INVALIDATED", "R1",
+                        f"{F} has {n} unobserved processes: any path of the tree may be read or run ({'; '.join(why)})")
             for p in sorted(delta) if _on("R2") else ():
                 if p in data or (delta[p] == "D" and p in opened):
                     return "INVALIDATED", "R2", f"{F} reads {p} as data" if delta[p] != "D" else f"{F} opened {p}, now removed"
@@ -918,11 +994,11 @@ class _Ctx:
                 if above and not SD._discounted(p, above, by, None if registry_changed else self.listing_changed()):
                     return "INVALIDATED", "R3", f"{F} lists {above[-1] or '.'}, which holds {p}"
             data_tokens |= {w for p in data for w in _WORD.findall(self.H.text(p) or "")}
-            # what F's processes actually loaded or load-opened is code too (a script run by a path): R5/R6 again
-            ran[F] = self.code(F) | (self.S(F) & (set(O.get("loaded") or []) | loads))
-            if fired := self._r5(F, ran[F] - self.code(F)) or self._r6(F, ran[F] - self.code(F), code):
+            # S(F) plus what F's processes loaded or load-opened (more than S(F) only when the D2 check is off)
+            ran[F] = self.S(F) | set(O.get("loaded") or []) | loads
+            if fired := self._r5(F, ran[F] - self.S(F)) or self._r6(F, ran[F] - self.S(F), code):
                 return fired
-        # R8, then R7 (tier S), over the code F's processes run
+        # R8, then R7 (tier S), over S(F) and what F's processes ran
         unref = []
         for F in kill if code else ():
             S = ran[F]
@@ -968,9 +1044,13 @@ class _Ctx:
                 return "UNRESOLVED", "R6", c
             if c["module"] != "unchanged":
                 return "INVALIDATED", "R6", f"import-time statements of {p} changed ({c['module']}) in S({F})"
-            if k := self.order(p):
-                return "INVALIDATED", "R6", f"the bindings of {k} in {p} changed order in S({F}): another one binds"
+            if why := self.layout(p):
+                return "INVALIDATED", "R6", f"{p}: {why} in S({F})"
         return None
+
+    def _static(self, rule: str, F: str, code: list[str]) -> tuple | None:
+        """R5 or R6 over Δ ∩ S(F), before any observation: one result per (rule, kill file)."""
+        return self.cache((rule, F), lambda: self._r5(F, self.S(F)) if rule == "R5" else self._r6(F, self.S(F), code))
 
     def both(self, f: str) -> str:
         if f not in self._texts:
@@ -1022,17 +1102,20 @@ def kill_closure(root, base: str, head: str, kill_file: str) -> frozenset[str]:
         return _Ctx(root, B, H, None).S(kill_file)
 
 
-def classify(root, base: str = BASE, head: str = "HEAD", *, observations: dict | None = None) -> list[State]:
+def classify(root, base: str = BASE, head: str = "HEAD", *, observations: dict | None = None) -> Run:
     """The F5 state of every live target, sorted. Never raises: what cannot be computed is UNRESOLVED."""
     root = pathlib.Path(root).resolve()
+    run = Run()
+    run.base, run.head = base, head
     with tempfile.TemporaryDirectory(prefix="aisef-f5-") as tmp, _pinned_git(pathlib.Path(tmp)):
         try:
-            return _classify(root, base, head, observations, pathlib.Path(tmp))
+            run += _classify(root, base, head, observations, pathlib.Path(tmp), run)
         except Exception as e:   # noqa: BLE001  — the engine fails closed, never open
-            return [State("<all>", "UNRESOLVED", "engine", f"{type(e).__name__}: {e}")]
+            run[:] = [State("<all>", "UNRESOLVED", "engine", f"{type(e).__name__}: {e}")]
+    return run
 
 
-def _classify(root, base, head, observations, tmp) -> list[State]:
+def _classify(root, base, head, observations, tmp, run: Run) -> list[State]:
     try:
         top = S2._git(root, "rev-parse", "--show-toplevel")
     except OSError as e:
@@ -1044,6 +1127,7 @@ def _classify(root, base, head, observations, tmp) -> list[State]:
         return [State("<all>", "UNRESOLVED", "basis", f"head {head} is not a commit")]
     if why := _shadowed(head, head_sha):
         return [State("<all>", "UNRESOLVED", "basis", f"head {why}")]
+    run.head_sha = head_sha
     try:
         H = SD.Rev(root, head_sha, tmp)
     except SystemExit as e:
@@ -1063,6 +1147,7 @@ def _classify(root, base, head, observations, tmp) -> list[State]:
         return stopped("basis", f"basis commit {base} unavailable")
     if why := _shadowed(base, base_sha):
         return stopped("basis", f"basis {why}")
+    run.base_sha = base_sha
     try:
         dirty = _dirty(root, head_sha, H.copy)
     except GitError as e:
@@ -1117,8 +1202,9 @@ def _dirty(root: pathlib.Path, head_sha: str, copy) -> list[str]:
 # ------------------------------------------------------------------------------------------------------- report
 
 
-def report(states: list[State], root, base: str, head: str, observations=None) -> dict:
-    root = pathlib.Path(root).resolve()
+def report(states: Run, observations=None) -> dict:
+    """The state table of one classify() run, headed by the shas THAT run resolved (F2: no name is resolved here)."""
+    base_sha, head_sha = states.base_sha, states.head_sha
     counts = {s: {"n": 0, "mutants": 0} for s in STATES}
     by: dict[str, dict] = {}
     plat: collections.Counter = collections.Counter()
@@ -1134,9 +1220,9 @@ def report(states: list[State], root, base: str, head: str, observations=None) -
         if p:
             plat[f"{p['family'] or 'unknown'}/{p['flavor'] or 'unproven'}" if not p["contradiction"] else "contradictory"] += 1
     me = pathlib.Path(__file__).resolve()
-    base_sha = _rev(root, base)
-    return {"base": {"rev": base, "sha": base_sha}, "head": {"rev": head, "sha": _rev(root, head)},
-            "run": "v2.2.0-accepted" if base_sha == BASE else "calibration (the basis is not the pinned v2.2.0 commit)",
+    return {"base": {"rev": states.base, "sha": base_sha}, "head": {"rev": states.head, "sha": head_sha},
+            "run": "v2.2.0-accepted" if base_sha == BASE else
+                   "calibration (the basis is not the pinned v2.2.0 commit)" if base_sha else "no basis commit resolved",
             "rules_off": sorted(_OFF),
             "generated_by": {"tool": TOOL, "sha256": _sha(_lf(me.read_text(encoding="utf-8")).encode())},
             "observations": None if observations is None else {k: _sha(canonical(v)) for k, v in sorted(observations.items())},
@@ -1154,8 +1240,7 @@ def main(argv: list[str] | None = None) -> int:
     a = ap.parse_args(argv)
     begun = time.monotonic()
     states = classify(ROOT, a.base, a.head)
-    with tempfile.TemporaryDirectory(prefix="aisef-f5-") as tmp, _pinned_git(pathlib.Path(tmp)):
-        doc = report(states, ROOT, a.base, a.head)
+    doc = report(states)
     if a.json:
         with open(a.json, "x", encoding="utf-8") as f:   # never overwrites
             f.write(json.dumps(doc, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
