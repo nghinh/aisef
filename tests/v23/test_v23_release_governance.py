@@ -3,7 +3,8 @@ CI-INCR job). The workflows are read as text (no YAML dependency in CI), comment
 configuration. Each pin has negative fixtures, so keeping a step while it can no longer fail fails here too.
 
 * REL-GOV-01 / #1: release_governance.problems() FAILs unless `pypi` has a required reviewer and only tag policies; the
-  `governance` job runs it and no publish path in any workflow reaches a publish without it.
+  `governance` job runs it, no publish path in any workflow reaches a publish without it, and every publish job deploys
+  to exactly `pypi`, the environment the guard reads (CIGOV-R2).
 * #6 (non-A2): the installed product smoke asserts `aisef demo`'s three rows and, with `--writer`, verifies a run the
   published 2.2.0 wheel wrote (kernel digest c2d356b1...); staging.yml runs both.
 * #29: no scheduled workflow references a secret other than GITHUB_TOKEN; conformance.yml is dispatch-only.
@@ -12,6 +13,8 @@ configuration. Each pin has negative fixtures, so keeping a step while it can no
   test_v23_released_evidence_guard.py, its CI step is pinned here.
 * CI-INCR: mutation-incr.yml runs the F5 engine only, never a mutation campaign, with the mutation-worker guard.
 * CT-5: the release-decision ledger is append-only; CT-6: every closure-evidence/v2 blob of the branch base is kept.
+  The two conflict on the ledger itself (it lives under closure-evidence/v2/): CIGOV-R1, OPEN, owner/integrator
+  decision in docs/v2.3/amendments/CIGOV-R1.md. Until decided, a seq 13 append turns HistoryKept and the CI guard red.
 """
 
 from __future__ import annotations
@@ -107,9 +110,22 @@ def workflows() -> dict[str, str]:
 PUBLISH = re.compile(r"id-token|pypi-publish|twine +upload|^\s*environment\s*:", re.M)
 
 
+def environments(block: str) -> list[str]:
+    """Every deployment environment a job declares: `environment: X`, or `environment:` over one `name: X` line."""
+    out = []
+    for m in re.finditer(r"(?m)^    environment:[ \t]*(.*)$", block):
+        value = m.group(1).strip()
+        if not value:
+            names = re.findall(r"(?m)^      name:[ \t]*(.*)$", re.match(r"(?:\n      .*)*", block[m.end():]).group(0))
+            value = names[0].strip() if len(names) == 1 else ""
+        out.append(value.strip("'\""))
+    return out
+
+
 def bypasses(wfs: dict[str, str]) -> list[str]:
-    """[] iff no workflow can publish except release.yml's publish jobs, each needing `governance` through jobs that no
-    condition can run past, and `governance` runs the guard and cannot be skipped or swallowed."""
+    """[] iff no workflow can publish except release.yml's publish jobs, each deploying to exactly the environment the
+    guard reads (G.ENV) and needing `governance` through jobs that no condition can run past, and `governance` runs the
+    guard and cannot be skipped or swallowed."""
     out = []
     for name, text in sorted(wfs.items()):
         if PUBLISH.search(code(text).split("\njobs:", 1)[0]):
@@ -144,6 +160,9 @@ def bypasses(wfs: dict[str, str]) -> list[str]:
             out.append(f"release.yml:{j} calls a workflow outside this repository: {m.group(1)}")
         if j == "governance" or not PUBLISH.search(block):
             continue
+        if environments(block) != [G.ENV]:     # CIGOV-R2: else the reviewer `governance` checks never applies
+            out.append(f"release.yml:{j} does not deploy to exactly `{G.ENV}`, the environment `governance` reads: "
+                       f"{environments(block)}")
         up = ancestors(j)
         if "governance" not in up:
             out.append(f"release.yml:{j} can publish without `governance`")
@@ -283,6 +302,11 @@ class PublishNeedsGovernance(unittest.TestCase):
                                  "    environment: pypi\n    steps:\n      - run: echo\n\n  publish:\n"),
         "a remote reusable workflow": ("\n  publish:\n", "\n  other:\n    uses: someone/else/.github/workflows/x.yml@v1\n\n"
                                        "  publish:\n"),
+        # CIGOV-R2: publish must deploy to the environment `governance` reads, or the reviewer it checks never applies
+        "publish loses environment: pypi": ("    environment: pypi\n", ""),
+        "publish targets another environment": ("    environment: pypi\n", "    environment: pypi-fast\n"),
+        "publish environment from an expression": ("    environment: pypi\n", "    environment: ${{ github.ref_name }}\n"),
+        "publish environment mapping names another": ("    environment: pypi\n", "    environment:\n      name: staging\n"),
     }
 
     def test_every_neutralisation_is_found(self):
@@ -291,6 +315,18 @@ class PublishNeedsGovernance(unittest.TestCase):
             with self.subTest(name):
                 self.assertEqual(real["release.yml"].count(old), 1, "the fixture must change release.yml exactly once")
                 self.assertNotEqual(bypasses({**real, "release.yml": real["release.yml"].replace(old, new)}), [])
+
+    def test_publish_deploys_to_the_guarded_environment_in_either_form(self):
+        """CIGOV-R2: the pin is on the environment's name, not its spelling: a quoted scalar or a `name:` mapping of
+        `pypi` passes; a mapping with two names fails closed."""
+        real = workflows()
+        self.assertEqual(environments(jobs(real["release.yml"])["publish"]), [G.ENV])
+        for new, ok in (('    environment: "pypi"\n', True),
+                        ("    environment:\n      name: pypi\n      url: https://pypi.org/p/aisef\n", True),
+                        ("    environment:\n      name: pypi\n      name: staging\n", False)):
+            with self.subTest(new):
+                found = bypasses({**real, "release.yml": real["release.yml"].replace("    environment: pypi\n", new, 1)})
+                self.assertEqual(found == [], ok, found)
 
     def test_the_probe_workflow_never_lands_on_the_branch(self):
         """W1-DESIGN §5: relgov-probe.yml lives only in the owner's probe commit P; on the branch it is a bypass."""
@@ -590,7 +626,8 @@ class LedgerAppendOnly(unittest.TestCase):
 
 class HistoryKept(unittest.TestCase):
     """CT-6 (CR-13): every closure-evidence/v2 blob of the branch base 399b775f, and of tag v2.2.0, is unchanged at HEAD
-    (additions allowed), by git blob. The CI step runs the same check with the working tree."""
+    (additions allowed), by git blob. The CI step runs the same check with the working tree. CIGOV-R1 OPEN: this
+    includes the ledger CT-5 lets grow, so the two cannot both hold after a seq 13 append (amendments/CIGOV-R1.md)."""
 
     def test_committed_v2_history_is_unchanged(self):
         for rev in (RE.BRANCH_BASE, RE.RELEASED):

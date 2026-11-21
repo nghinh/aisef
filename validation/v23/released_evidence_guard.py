@@ -13,6 +13,11 @@ correctly):
 
 Grade: DETECTIVE (no in-process layer for v2/). A detected change fails closed; restoring the file is maintenance.
 
+CIGOV-R1 OPEN (docs/v2.3/amendments/CIGOV-R1.md): the release-decision ledger closure-evidence/v2/cycle2/
+RELEASE-DECISIONS.json is a protected blob here, while CT-5 / CR-14 let it take entries seq 13+. So the planned owner
+appends (ROUND-AUTH seq 13, the v2.3.0 PRODUCTION_PUBLISH entry) FAIL this guard. #52 (b) / CT-6 conflict with CT-5
+until the owner or integrator decides; this guard has no exception for that path, and must not get one.
+
     python -P validation/v23/released_evidence_guard.py --check           # exit 1 on any violation
     python -P validation/v23/released_evidence_guard.py --baseline OUT    # write the baseline (never overwrites)
 """

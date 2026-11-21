@@ -4,6 +4,10 @@ Red-before: closure-evidence/v2/** is outside the V1 guard (tests/v2/test_v1_evi
 under v2/ are ignored), so before this guard a committed edit, a deletion or a baseline edit of a released v2 record
 passed every check. Throwaway-repo tests: each now FAILs, an addition passes. The live half: the committed baseline
 agrees with tag v2.2.0, and HEAD keeps every released blob.
+
+CIGOV-R1 OPEN: the ledger (closure-evidence/v2/cycle2/RELEASE-DECISIONS.json) is a released blob here and append-only
+under CT-5, so a seq 13 append FAILs this guard while CT-5 passes. Pinned below as measured; the decision is the
+owner's or integrator's (docs/v2.3/amendments/CIGOV-R1.md).
 """
 
 from __future__ import annotations
@@ -25,6 +29,12 @@ from validation.v23 import released_evidence_guard as RE  # noqa: E402
 
 BASE = "docs/released-baseline.json"
 QUIET_GIT = {"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
+LEDGER = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"     # the real ledger's path (v2_release_gate.py reads it)
+ENTRIES = [{"seq": 1, "id": "A"}, {"seq": 2, "id": "B"}]
+
+
+def ledger(entries: list[dict], record: str = "ledger") -> str:
+    return json.dumps({"record": record, "entries": entries}, indent=1) + "\n"
 
 
 class ThrowawayRepo(unittest.TestCase):
@@ -41,6 +51,7 @@ class ThrowawayRepo(unittest.TestCase):
         self.write("closure-evidence/v2/release/R.json", "{}\n")
         self.write("closure-evidence/v2/v2.1/MUTATION.json", "[]\n")
         self.write("closure-evidence/hardening/v1.json", "{}\n")
+        self.write(LEDGER, ledger(ENTRIES))
         self.released = self.commit("released")
         (self.d / "docs").mkdir()
         (self.d / BASE).write_text(json.dumps(RE.build_baseline(self.d, self.released)), encoding="utf-8")
@@ -117,6 +128,33 @@ class ThrowawayRepo(unittest.TestCase):
         self.assertEqual(self.check(), [])                     # the tag pin alone does not cover it
         self.assertEqual(self.check(branch_base), [f"committed mutation of released evidence ({branch_base[:12]}): "
                                                    "closure-evidence/v2/cycle2/AUDIT.json"])
+
+    def test_cigov_r1_open_a_ct5_append_to_the_ledger_fails_the_guard(self):
+        """CIGOV-R1 OPEN (docs/v2.3/amendments/CIGOV-R1.md): a whole-entry append keeps CT-5 (entries[:n] equal, seq
+        strictly increasing), yet it changes the ledger's blob, so CT-6 / #52 (b) FAIL it. This pins the measured
+        conflict. Only the decided amendment may change this outcome, and never by an exception for the ledger path."""
+        self.write(LEDGER, ledger([*ENTRIES, {"seq": 3, "id": "C"}]))
+        self.commit("append seq 3")
+        head = json.loads((self.d / LEDGER).read_text(encoding="utf-8"))["entries"]
+        seqs = [e["seq"] for e in head]
+        self.assertEqual((head[:2], seqs), (ENTRIES, sorted(set(seqs))))           # CT-5 holds
+        self.assertEqual(self.check(), [f"committed mutation of released evidence ({self.released[:12]}): {LEDGER}"])
+
+    def test_no_ledger_rewrite_passes(self):
+        """Whatever CIGOV-R1 decides, these stay FAIL: an entry edited, entries reordered, one deleted, another key
+        changed (option (a) of the amendment must keep each of them red)."""
+        for name, text in {"entry 1 edited": ledger([{"seq": 1, "id": "X"}, ENTRIES[1]]),
+                           "entries reordered": ledger(ENTRIES[::-1]),
+                           "an entry deleted": ledger(ENTRIES[:1]),
+                           "another key changed": ledger(ENTRIES, record="other")}.items():
+            with self.subTest(name):
+                self.write(LEDGER, text)
+                self.commit(name)
+                self.assertEqual(self.check(), [f"committed mutation of released evidence ({self.released[:12]}): "
+                                                f"{LEDGER}"])
+                self.write(LEDGER, ledger(ENTRIES))
+                self.commit("restore")
+                self.assertEqual(self.check(), [])
 
 
 class LiveRepository(unittest.TestCase):
