@@ -19,14 +19,21 @@ entry was current at its basis, or the pinned Option C ruling covers it: I8) -> 
 "Now" is `head` read from git; any path under a COPY root whose working-tree bytes differ from `head`, or an
 untracked/ignored file there (the runner copies those too; `__pycache__` excepted), makes every target UNRESOLVED.
 Legacy entries (all of v2.2 and earlier) are never MEASURED: basis `v2.2.0-accepted@<base>`, or
-`ruling:<id>@<sha256>` for the owner's Option C targets.
+`ruling:<id>@<sha256>` for the owner's Option C targets — and only when the basis commit IS the pinned full v2.2.0
+sha (BASE). Any other basis is a calibration run: `calibration@<sha>`, never "v2.2.0-accepted". Every rev is resolved
+with `rev-parse --verify --end-of-options <rev>^{commit}`; an abbreviated hex rev that a ref shadows is refused, and
+every git child runs with GIT_NO_REPLACE_OBJECTS=1 and no graft file. A failing git command is UNRESOLVED, never an
+empty diff or a clean tree. An entry is reused only if the BASIS's own tables (RECORDS, PHASE_TARGETS, SUPERSEDED,
+V21_RETIRED) read it (I7); its source digest is checked with the basis's own `source_digest`; worker (W) platform
+evidence is read at the basis, from histories whose log and record are their own `<stem>.log`/`<stem>.record.json`.
 
 Observations. `observations` maps a kill file F to its O(F) (§2.9 D3) as a dict: commit (the head sha), platform
-(`posix`/`windows`), python (`3.N`), witness, outcome (`PASS`), opened ({path: "load"|"data"}; a list = all data),
-loaded, listed, listed_by ({dir: [files]}), children ({hooked, unhooked_python, other}), lost, unparsed_lines,
-os_trace, outside_tree. With `observations=None` (no recorder exists yet) R0-R3 cannot be excluded: a target is
-INVALIDATED ("no observation of F; R1 cannot be excluded") whenever Δ is not empty — an unobserved process may read
-any path of the tree — and Δ = ∅ gives VERIFIED_REUSE. Tier R (E_full) is not available in this increment.
+(`posix`/`windows`), python (`3.N`), witness, outcome (`PASS`), opened ({path: "load"|"data"}; a list = all data;
+"load" of a non-.py file, or any other tag, is a data read), loaded, listed, listed_by ({dir: [files]}), children
+({hooked, unhooked_python, other}), lost, unparsed_lines, os_trace, outside_tree. With `observations=None` (no
+recorder exists yet) R0-R3 cannot be excluded: a target is INVALIDATED ("no observation of F; R1 cannot be
+excluded") whenever Δ is not empty — an unobserved process may read any path of the tree — and Δ = ∅ gives
+VERIFIED_REUSE. Tier R (E_full) is not available in this increment.
 
 Declared limitations (§2.7, §2.9 residual):
 - C code that reads tree files is seen only through os_trace; a SIGKILLed recorder can lose its `lost` count.
@@ -38,9 +45,13 @@ Declared limitations (§2.7, §2.9 residual):
 - RESOLVED_SITES is empty: any dynamic site (R8) in S(F) makes tier S unavailable for that kill file.
 - S(F) literal naming (D2 b) is the static rule of v21_snapshot_delta._info/_names plus whole-constant directories
   of two or more components; data a kill file reaches by other means is R2/R3's (observed), never S(F)'s.
-- R5/R6/R7/R8 read the import-reached part of S(F) (s2 closure, D2 c, D2 d) plus what an observation saw loaded; a
-  file only named by a literal (every tests/v2 file, through registry's TESTS_V2) is read, listed or run, which
-  R1-R3 decide. Without an observation that part is never cleared: R1 cannot be excluded.
+- W1-DESIGN Amendment A1: R5/R6/R7/R8 read code(F) = the import-reached part of S(F) (s2 closure, D2 c, D2 d) plus
+  what an observation saw loaded or opened with the "load" tag; a file only named by a literal (every tests/v2
+  file, through registry's TESTS_V2) is read, listed or run, which R1-R3 decide. Without an observation that part is
+  never cleared: R1 cannot be excluded. Residual (A1): a Δ file named only by a literal and executed only under a
+  mutant, by a literal-path loader the unmutated run never reached.
+- R6 also fires when the order of a top-level name's bindings changed in a Δ file (the later binding wins, and
+  reach.changed() compares def texts as a sorted multiset).
 Read-only: git and the repository; the only write is --json OUT (and a temporary extraction of each commit's
 aisef2/ and validation/v2/, v21_snapshot_delta.Rev, removed afterwards).
 """
@@ -52,10 +63,12 @@ import ast
 import bisect
 import collections
 import concurrent.futures
+import contextlib
 import dataclasses
 import functools
 import hashlib
 import json
+import os
 import pathlib
 import posixpath
 import re
@@ -73,7 +86,10 @@ from validation.v21 import reach  # noqa: E402  (changed(): own code vs import-t
 
 TOOL = "validation/v23/impact.py"
 STATES = ("MEASURED", "VERIFIED_REUSE", "INVALIDATED", "UNRESOLVED")
-BASE = "da3ea33f"   # v2.2.0: the owner-approved release gate accepted every live entry here
+#: v2.2.0, in full: the owner-approved release gate accepted every live entry here (the only "v2.2.0-accepted" basis)
+BASE = "da3ea33f3b695aaca73e87a704145a0193aced23"
+#: rules switched off — always empty; tests patch it to show that each rule is load-bearing (N14)
+_OFF: frozenset = frozenset()
 MUTATION_REL = "validation/v2/mutation.py"
 #: §2.4.2: the claim belongs to the target; these three are Win32-native, every other target is posix
 WINDOWS_CLAIM = frozenset({"aisef2/app/client.py::_is_gone", "aisef2/runtime/process_range.py::_win_liveness",
@@ -123,16 +139,55 @@ def _lf(text: str) -> str:
     return text.replace("\r\n", "\n")
 
 
+class GitError(RuntimeError):
+    """A git command failed: what it would have said is unknown (never an empty diff or a clean tree)."""
+
+
+def _git(root: pathlib.Path, *args: str) -> bytes:
+    r = S2._git(root, *args)
+    if r.returncode != 0:
+        raise GitError(f"git {' '.join(args[:3])} failed (rc {r.returncode}): {r.stderr.decode('utf-8', 'replace')[:200]}")
+    return r.stdout
+
+
+@contextlib.contextmanager
+def _pinned_git(tmp: pathlib.Path):
+    """Every git child (the frozen s2/v21_snapshot_delta calls included: they inherit os.environ) ignores replace
+    refs and grafts: the bytes of a commit are what its sha names."""
+    pin = {"GIT_NO_REPLACE_OBJECTS": "1", "GIT_GRAFT_FILE": str(tmp / "no-grafts")}   # a file never created
+    saved = {k: os.environ.get(k) for k in pin}
+    os.environ.update(pin)
+    try:
+        yield
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+
 def _blob(root: pathlib.Path, sha: str, path: str) -> bytes | None:
     """`path`'s bytes at commit `sha` (never cached: records reach 100 MB)."""
     if S2.blob(root, sha, path) is None:
         return None
-    return S2._git(root, "cat-file", "blob", f"{sha}:{path}").stdout
+    return _git(root, "cat-file", "blob", f"{sha}:{path}")
 
 
 def _rev(root: pathlib.Path, rev: str) -> str | None:
-    r = S2._git(root, "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}")
+    r = S2._git(root, "rev-parse", "--verify", "--quiet", "--end-of-options", f"{rev}^{{commit}}")
     return r.stdout.decode().strip() if r.returncode == 0 and r.stdout.strip() else None
+
+
+def _shadowed(rev: str, sha: str) -> str | None:
+    """Why `rev` does not name the commit it spells: an abbreviated sha that a ref of the same name shadows."""
+    if re.fullmatch(r"[0-9a-fA-F]{4,40}", rev) and not sha.startswith(rev.lower()):
+        return f"{rev} is shadowed by a ref: it resolves to {sha}, not to the commit it abbreviates"
+    return None
+
+
+def _on(rule: str) -> bool:
+    return rule not in _OFF
 
 
 # ---------------------------------------------------------------------------------------------- source segments
@@ -177,7 +232,8 @@ def _parsed(src: str):
 
 def target_slice(m, src: str, func: str) -> list[str] | None:
     """I1: the target's top-level segment, every same-module segment it reaches by name (transitively), the imports and
-    the module-level statements — as sorted exact source texts. None: unparsable, or the target is not there."""
+    the module-level statements — their exact source texts in statement order (two defs of one name swapped change
+    which one binds). None: unparsable, or the target is not there."""
     try:
         segs, tree = _parsed(src)
     except SyntaxError:
@@ -205,7 +261,59 @@ def target_slice(m, src: str, func: str) -> list[str] | None:
                 if j not in keep:
                     keep.add(j)
                     todo.append(j)
-    return sorted(segs[i][1] for i in keep)
+    return [segs[i][1] for i in sorted(keep)]
+
+
+def segment_texts(src: str | None) -> dict[str, str]:
+    """I4 (§2.2): top-level name -> the exact source texts of its segments; the docstring, imports and every other
+    statement under one bracketed name each."""
+    out: dict[str, str] = {}
+    try:
+        segs = segments(src) if src is not None else []
+    except SyntaxError:
+        return {"<unparsable>": src or ""}
+    for i, (names, text, n) in enumerate(segs):
+        doc = i == 0 and isinstance(n, ast.Expr) and isinstance(n.value, ast.Constant)
+        for x in names or ("<docstring>" if doc else "<other statements>",):
+            out[x] = out.get(x, "") + text
+    return out
+
+
+def _bound(n: ast.stmt) -> set[str]:
+    """The module-level names one top-level statement binds (function and class bodies are their own scope)."""
+    out: set[str] = set()
+    todo: list[ast.AST] = [n]
+    while todo:
+        x = todo.pop()
+        if isinstance(x, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+            out.add(x.name)
+            todo += [*x.decorator_list, *getattr(getattr(x, "args", None), "defaults", ())]
+            continue
+        if isinstance(x, ast.Lambda):
+            continue
+        if isinstance(x, ast.Name) and isinstance(x.ctx, ast.Store):
+            out.add(x.id)
+        elif isinstance(x, ast.alias):
+            out.add((x.asname or x.name).split(".")[0])
+        todo += ast.iter_child_nodes(x)
+    return out
+
+
+def binding_order(src: str) -> dict[str, list[str]]:
+    """Top-level name -> the exact texts of the statements that bind it, in source order."""
+    by: dict[str, list[str]] = {}
+    for _, text, n in _parsed(src)[0]:
+        for x in _bound(n):
+            by.setdefault(x, []).append(text)
+    return by
+
+
+def order_changed(a: str, b: str) -> str | None:
+    """R6 (D4): a top-level name whose binding statements are the same texts in another order (the later binding wins;
+    reach.changed() compares a name's defs as a sorted multiset and leaves plain defs out of the module code)."""
+    x, y = binding_order(a), binding_order(b)
+    return next((k for k in sorted(set(x) | set(y)) if len(x.get(k, ())) > 1
+                 and x.get(k) != y.get(k) and sorted(x.get(k, ())) == sorted(y.get(k, ()))), None)
 
 
 def settings_digest(src: str | None) -> dict[str, str]:
@@ -261,9 +369,23 @@ def _qualdefs(src: str) -> collections.Counter:
 
 
 _DYN_ATTR = {"getattr": 1, "hasattr": 1, "setattr": 1, "delattr": 1, "attrgetter": 0, "methodcaller": 0}
-_DYN_IMPORT = {"import_module", "spec_from_file_location"}
+#: a computed name unless every argument (module name AND file path) is a literal
+_DYN_IMPORT = {"import_module", "spec_from_file_location", "SourceFileLoader", "run_path", "run_module"}
 _DYN_BUILTIN = {"exec", "eval", "compile", "globals", "vars", "locals", "dir", "__import__"}
 _LAUNCH = {"run", "Popen", "call", "check_call", "check_output", "system", "posix_spawn", "spawnv", "execv"}
+
+
+def _module_of(p: str) -> str | None:
+    """The dotted module a tree file provides: `x.py`, `x/__init__.py`, or an extension/bytecode module `x.*.so`,
+    `x.pyd`, `x.dylib`, `x.pyc` (an extension module takes precedence over a source module of the same name)."""
+    d, base = posixpath.split(p)
+    if base.endswith(".py"):
+        stem = base[:-3]
+    elif base.endswith((".so", ".pyd", ".dylib", ".pyc")) and "__pycache__" not in p.split("/"):
+        stem = base.split(".", 1)[0]
+    else:
+        return None
+    return f"{d}/{stem}".lstrip("/").replace("/", ".").removesuffix(".__init__")
 
 
 def _literal(x: ast.AST) -> bool:
@@ -288,7 +410,7 @@ def dynamic_sites(src: str, path: str) -> list[tuple[str, str, int, str]]:
                     i = _DYN_ATTR[name]
                     hit = len(ch.args) <= i or not _literal(ch.args[i])
                 elif name in _DYN_IMPORT:
-                    hit = not ch.args or not _literal(ch.args[0])
+                    hit = not ch.args or not all(_literal(x) for x in [*ch.args, *(k.value for k in ch.keywords)])
                 elif (isinstance(f, ast.Name) and name in _DYN_BUILTIN) or name == "getmembers" or owner == "runpy" \
                         or (owner in ("pickle", "marshal") and name in ("load", "loads")):
                     hit = True
@@ -357,15 +479,20 @@ def platform_of(entry: dict, workers: dict) -> dict:
 
 
 def workers_at(root: pathlib.Path, sha: str) -> tuple[dict, list[str]]:
-    """W: canonical-entry digest -> [(history, families, flavors)] over every committed mutation-workers history whose
-    log and record are the bytes it recorded and whose artifacts carry R markers; and the refused histories."""
+    """W: canonical-entry digest -> [(history, families, flavors)] over every mutation-workers history committed at
+    `sha` (the basis, for legacy entries: a history added later proves nothing about a measurement accepted there)
+    whose log and record are its own siblings `<stem>.log` / `<stem>.record.json`, are the bytes it recorded, and
+    carry R markers; and the refused histories."""
     out: dict[str, list] = {}
     refused = []
     for p in sorted(S2._files(root, sha)):
         if not (p.startswith("closure-evidence/") and "/mutation-workers/" in p and p.endswith(".history.json")):
             continue
+        stem = p.removesuffix(".history.json")
         try:
             h = json.loads(_blob(root, sha, p))
+            if h["log"]["path"] != f"{stem}.log" or (h.get("record") and h["record"]["path"] != f"{stem}.record.json"):
+                raise ValueError("its log or record is not its own sibling file")
             log = _blob(root, sha, h["log"]["path"])
             rec = _blob(root, sha, h["record"]["path"]) if h.get("record") else None
             if log is None or _sha(log) != h["log"]["sha256"] or (h.get("record") and (rec is None or _sha(rec) != h["record"]["sha256"])):
@@ -391,6 +518,7 @@ def workers_at(root: pathlib.Path, sha: str) -> tuple[dict, list[str]]:
 class _Ctx:
     def __init__(self, root: pathlib.Path, B, H, observations):
         self.root, self.B, self.H, self.obs = root, B, H, observations
+        self.label = "v2.2.0-accepted" if B.sha == BASE else "calibration"   # D2: only the pinned full sha
         self.copy = tuple(H.copy)
         self.delta = self._delta()
         self.settings = (settings_digest(B.text(MUTATION_REL)), settings_digest(H.text(MUTATION_REL)))
@@ -401,7 +529,7 @@ class _Ctx:
 
     @functools.cached_property
     def workers(self) -> dict:
-        return workers_at(self.root, self.H.sha)[0]
+        return workers_at(self.root, self.B.sha)[0]   # legacy entries: W evidence as committed at the basis
 
     def _in_copy(self, p: str) -> bool:
         return any(p == c or p.startswith(c + "/") for c in self.copy)
@@ -410,8 +538,8 @@ class _Ctx:
         """D1: path -> A/D/M, every path under a COPY root added, removed, or whose LF-sha256 differs."""
         if self.B.sha == self.H.sha:
             return {}
-        raw = S2._git(self.root, "diff", "--name-status", "--no-renames", "-z", self.B.sha, self.H.sha, "--",
-                      *self.copy).stdout.decode("utf-8", "replace").split("\0")
+        raw = _git(self.root, "diff", "--name-status", "--no-renames", "-z", self.B.sha, self.H.sha, "--",
+                   *self.copy).decode("utf-8", "replace").split("\0")
         out = {}
         for status, path in zip(raw[0::2], raw[1::2], strict=False):
             if status[:1] == "M":
@@ -481,9 +609,9 @@ class _Ctx:
 
     def code(self, F: str) -> frozenset[str]:
         """The import-reached part of S(F) at basis ∪ now: s2 closure, dotted import strings (D2 c) and the discovery
-        set (D2 d), to a fixpoint — what F's process imports. R5, R6, R7 and R8 read this part; a file only NAMED by
-        a literal (D2 b, e.g. every tests/v2 file through registry's TESTS_V2) is read, listed or run, which R2/R3 and
-        an observation's `loaded` decide, never import-time rules."""
+        set (D2 d), to a fixpoint — what F's process imports. Amendment A1: R5, R6, R7 and R8 read this part plus
+        what an observation saw loaded or load-opened; a file only NAMED by a literal (D2 b, e.g. every tests/v2 file
+        through registry's TESTS_V2) is read, listed or run, which R1-R3 decide."""
         self.prefetch()
         return self.cache(("code", F), lambda: frozenset(set().union(*(
             self._grow(R, set(), [F, *self._discovery(R, F)], False) for R in (self.B, self.H)))))
@@ -522,7 +650,15 @@ class _Ctx:
                 return f"unparsable {p}: {e}"
         return self.cache(("changed", p), compute)
 
+    def order(self, p: str) -> str | None:
+        a, b = self.B.text(p), self.H.text(p)
+        return self.cache(("order", p), lambda: order_changed(a, b) if a is not None and b is not None else None)
+
     def modules_named(self, R, f: str) -> set[str]:
+        """R5: the dotted names `f`'s imports and import strings name. s2_mutation_record.closure cannot be called for
+        this: its import loop is inline and yields only the files `_module_file` resolves (a module before a
+        package), so it neither returns names nor sees a package or extension module that would shadow one (N22).
+        The loop below reads the same nodes for their names only."""
         def compute():
             src = R.text(f)
             try:
@@ -570,32 +706,36 @@ class _Ctx:
 
     # ---- the procedure
 
-    def judge(self, rel: str, entry: dict, base_entry: dict | None) -> State:
+    def judge(self, rel: str, entry: dict, base_entry: dict | None, absent: str = "") -> State:
+        """`base_entry`: the same (record, target, k) entry as the BASIS's tables read it, or None (`absent` says why).
+        Each rule is skipped only when the test-only `_OFF` names it (N14)."""
         name = entry["target"]
         mut = entry.get("mutants") if isinstance(entry.get("mutants"), int) else 0
         compared: list[str] = []
         ev: dict = {"record": rel, "entry_sha256": _sha(canonical(entry))}
-        basis = f"v2.2.0-accepted@{self.B.sha}"
+        basis = f"{self.label}@{self.B.sha}"
 
         def done(state, comp="", reason="", **extra):
             return State(name, state, comp, reason, basis, list(compared), {**ev, **extra}, mut)
 
-        # I7
-        if base_entry is None:
-            return done("INVALIDATED", "I7", f"record entry has no committed counterpart in {rel} at the basis")
-        if canonical(base_entry) != canonical(entry):
-            return done("INVALIDATED", "I7", "record entry differs from its committed bytes")
+        # I7 (+ D3: live at the basis)
+        if _on("I7"):
+            if base_entry is None:
+                return done("INVALIDATED", "I7", absent or f"record entry has no committed counterpart in {rel} at the basis")
+            if canonical(base_entry) != canonical(entry):
+                return done("INVALIDATED", "I7", "record entry differs from its committed bytes")
         compared.append("I7")
         # I6
         plat = platform_of(entry, self.workers)
         ev["platform"] = plat
         claim = "windows" if name in WINDOWS_CLAIM else "posix"
-        if plat["contradiction"]:
-            return done("INVALIDATED", "I6", f"contradictory platform evidence: {plat['contradiction']}")
-        if plat["family"] is None:
-            return done("UNRESOLVED", "I6", "no platform evidence")
-        if plat["family"] != claim:
-            return done("INVALIDATED", "I6", f"measured on {plat['family']}, the claim is {claim}")
+        if _on("I6"):
+            if plat["contradiction"]:
+                return done("INVALIDATED", "I6", f"contradictory platform evidence: {plat['contradiction']}")
+            if plat["family"] is None:
+                return done("UNRESOLVED", "I6", "no platform evidence")
+            if plat["family"] != claim:
+                return done("INVALIDATED", "I6", f"measured on {plat['family']}, the claim is {claim}")
         compared.append("I6")
         # I1 (+ I8)
         rel_t, _, func = name.partition("::")
@@ -604,20 +744,23 @@ class _Ctx:
             return done("INVALIDATED", "I1", f"{rel_t} does not exist at the basis")
         if src_h is None:
             return done("INVALIDATED", "I1", f"{rel_t} was removed")
-        if self.H.m.source_digest(src_b) != entry.get("source_sha256"):
+        if self.B.m.source_digest(src_b) != entry.get("source_sha256"):   # the basis's own currency rule
             why = self.option_c(name, entry, src_b, plat)
-            if why:
-                claims = name in getattr(self.H.m, "VERIFIED_REUSE", {}) or name in getattr(self.B.m, "VERIFIED_REUSE", {})
+            claims = name in getattr(self.H.m, "VERIFIED_REUSE", {}) or name in getattr(self.B.m, "VERIFIED_REUSE", {})
+            if why and _on("I8" if claims else "I1"):
                 return done("INVALIDATED", "I8" if claims else "I1",
                             f"entry was not current at its basis and no pinned ruling covers it: {why}")
-            basis = f"ruling:{RULING_ID}@{RULING_SHA256}"
-            compared.append("I8")
+            if not why:
+                basis = (f"ruling:{RULING_ID}@{RULING_SHA256}" if self.label == "v2.2.0-accepted"
+                         else f"calibration@{self.B.sha}+ruling:{RULING_ID}@{RULING_SHA256}")
+                compared.append("I8")
         sb, sh = target_slice(self.B.m, src_b, func), target_slice(self.H.m, src_h, func)
         if sb is None or sh is None:
             return done("UNRESOLVED", "I1", f"target not found or source unparsable at {'basis' if sb is None else 'head'}")
-        if sb != sh:
+        if sb != sh and _on("I1"):
             diff = sorted(set(sb) ^ set(sh))
-            return done("INVALIDATED", "I1", f"target slice changed: {diff[0].splitlines()[0][:80]!r}")
+            return done("INVALIDATED", "I1", f"target slice changed: {diff[0].splitlines()[0][:80]!r}" if diff
+                        else "target slice changed: the same statements in another order")
         compared.append("I1")
         # I3
         current = self.H.m.TARGETS.get(name)
@@ -630,20 +773,20 @@ class _Ctx:
                    if isinstance(r, dict) and r.get("class", "KILLED" if r.get("killed") else "") == "KILLED"
                    and isinstance(r.get("killed_by"), dict) and "file" in r["killed_by"]}
         dropped = sorted((set(recorded) | killers) - set(current))
-        if dropped:
+        if dropped and _on("I3"):
             return done("INVALIDATED", "I3", f"kill file dropped from the kill set: {', '.join(dropped)}")
         if recorded != list(current):
             ev["kill_set"] = "kill-set-superset" if set(recorded) != set(current) else "kill-set-reordered"
         compared.append("I3")
         kill = list(current)
-        # I4
+        # I4: exact segment texts (§2.2)
         additive = sorted(p for p, s in self.delta.items() if p.startswith("tests/") and s == "A")   # no old segment
         if any(p.startswith("tests/") and s != "A" for p, s in self.delta.items()):
             for F in kill:
                 for p in sorted(x for x in self.S(F) if x.startswith("tests/") and self.delta.get(x, "A") != "A"):
-                    a, b = SD._segments(self.B.text(p)), SD._segments(self.H.text(p))
+                    a, b = segment_texts(self.B.text(p)), segment_texts(self.H.text(p))
                     gone = sorted(k for k in a if b.get(k) != a[k])
-                    if gone or self.delta[p] == "D":
+                    if (gone or self.delta[p] == "D") and _on("I4"):
                         return done("INVALIDATED", "I4", f"kill test changed: {p} ({', '.join(gone[:3]) or 'removed'})")
                     additive.append(p)
         compared.append("I4")
@@ -653,12 +796,12 @@ class _Ctx:
             gb, gh = self.generated(self.B, rel_t, func), self.generated(self.H, rel_t, func)
             if isinstance(gb, str) or isinstance(gh, str):   # a failure is an identity not computed
                 return done("UNRESOLVED", "I5", f"generator cannot run: {gb if isinstance(gb, str) else gh}")
-            if gb != gh:
+            if gb != gh and _on("I5"):
                 return done("INVALIDATED", "I5", f"generator output differs: {len(gb)} mutants at the basis, {len(gh)} now")
         compared.append("I5")
         # I9
         sb9, sh9 = self.settings
-        if sb9 != sh9:
+        if sb9 != sh9 and _on("I9"):
             return done("INVALIDATED", "I9", f"runner settings changed: {', '.join(k for k in I9_NAMES if sb9.get(k) != sh9.get(k))}")
         compared.append("I9")
         if additive:
@@ -700,10 +843,10 @@ class _Ctx:
         checks = [
             (entry.get("source_sha256") == scope["measured_source_sha256"] == st["measured_source_sha256"],
              "recorded source is not the ruling's measured digest"),
-            (self.H.m.source_digest(src_b) == scope["current_source_sha256"] == st["current_source_sha256"],
+            (self.B.m.source_digest(src_b) == scope["current_source_sha256"] == st["current_source_sha256"],
              "basis source is not the ruling's current digest"),
             (entry.get("tree_sha256") == scope["worker_tree_sha256"], "recorded tree is not the ruling's worker tree"),
-            (prov is not None and self.H.m.source_digest(prov.decode("utf-8", "replace")) == scope["measured_source_sha256"],
+            (prov is not None and self.B.m.source_digest(prov.decode("utf-8", "replace")) == scope["measured_source_sha256"],
              "the measurement commit's own source is not the measured digest"),
             ([entry.get("mutants"), entry.get("killed"), len(entry.get("survivors") or [])]
              == [out.get("mutants"), out.get("killed"), out.get("survivors")], "outcome is not the ruling's"),
@@ -715,71 +858,69 @@ class _Ctx:
         """§2.9 R4, R5, R6; R0/D2/R1/R2/R3 (or the no-observation default); R8, R7. None: nothing fires."""
         delta = self.delta
         # R4 discovery
-        for F in kill:
+        for F in kill if _on("R4") else ():
             d, base = posixpath.dirname(F), posixpath.basename(F)
             hit = [p for p in delta if p != F and p.startswith(d + "/") and posixpath.basename(p) in ("__init__.py", base)]
             if hit:
                 return "INVALIDATED", "R4", f"{F} discovers {sorted(hit)[0]} ({delta[sorted(hit)[0]]})"
-        # R5 import resolution
-        moved = sorted(p for p, s in delta.items() if s in "AD" and p.endswith(".py"))
-        if moved:
-            for F in kill:
-                named = set().union(*(self.modules_named(R, f) for R in (self.B, self.H) for f in self.code(F) if f.endswith(".py")))
-                for p in moved:
-                    mod = p[:-3].replace("/", ".").removesuffix(".__init__")
-                    if any(x == mod or x.startswith(mod + ".") for x in named):
-                        return "INVALIDATED", "R5", f"{F} imports {mod}, whose file {p} was {'added' if delta[p] == 'A' else 'removed'}"
-        # R6 import-time statements
+        # R5 import resolution, R6 import-time statements, over code(F) (Amendment A1)
         code = sorted(p for p in delta if p.endswith(".py"))
-        for F in kill if code else ():
-            if fired := self._r6(F, self.code(F), code):
-                return fired
+        for rule in (lambda F: self._r5(F, self.code(F)), lambda F: self._r6(F, self.code(F), code)):
+            for F in kill:
+                if fired := rule(F):
+                    return fired
         # R0, D2, R1, R2, R3
-        if self.obs is None:
-            return "INVALIDATED", "R1", f"no observation of {kill[0] if kill else '<no kill file>'}; R1 cannot be excluded"
         data_tokens: set[str] = set()
         ran: dict[str, frozenset[str]] = {}
-        ev["observation"] = {}
+        if self.obs is None:
+            if _on("R1"):
+                return "INVALIDATED", "R1", f"no observation of {kill[0] if kill else '<no kill file>'}; R1 cannot be excluded"
+            ran = {F: self.code(F) for F in kill}
+        else:
+            ev["observation"] = {}
         py = f"{sys.version_info.major}.{sys.version_info.minor}"
-        for F in kill:
+        for F in kill if self.obs is not None else ():
             O = self.obs.get(F)
-            if not isinstance(O, dict):
+            if not isinstance(O, dict) and _on("R0"):
                 return "UNRESOLVED", "R0", f"no admissible observation of {F}"
+            O = O if isinstance(O, dict) else {}
             bad = ("it observed another tree" if O.get("commit") != self.H.sha else
                    "its outcome is not PASS" if O.get("outcome") != "PASS" else
                    "it has no witness" if not O.get("witness") else
                    f"it ran on {O.get('platform')}, the claim is {claim}" if O.get("platform") != claim else
                    f"python {O.get('python')} is not the runner's {py}" if O.get("python") != py else
                    "a process opened the checkout outside the run's tree" if O.get("outside_tree") else None)
-            if bad:
+            if bad and _on("R0"):
                 return "UNRESOLVED", "R0", f"no admissible observation of {F}: {bad}"
             ev["observation"][F] = _sha(canonical(O))
             opened = O.get("opened") or {}
             opened = dict(opened) if isinstance(opened, dict) else dict.fromkeys(opened, "data")
+            loads = {p for p, tag in opened.items() if tag == "load" and p.endswith(".py")}   # the import system's reads
+            data = set(opened) - loads   # everything else, a "load" of a non-.py file included, is read as data
             miss = sorted((set(O.get("loaded") or []) | {p for p in opened if p.endswith(".py")}) - self.S(F))
-            if miss:
+            if miss and _on("D2"):
                 return "UNRESOLVED", "D2", f"S({F}) misses {miss[0]}"
             ch = O.get("children") or {}
             unseen = (ch.get("unhooked_python") or 0) + (ch.get("other") or 0)
             static = [] if O.get("os_trace") else [w for f in sorted(self.S(F)) if f.endswith(".py")
                                                    for w in R1_UNSEEN if w in self.both(f)]
-            if O.get("lost") or O.get("unparsed_lines") or (unseen and not O.get("os_trace")) or static:
+            if (O.get("lost") or O.get("unparsed_lines") or (unseen and not O.get("os_trace")) or static) and _on("R1"):
                 n = unseen + (1 if static or O.get("lost") or O.get("unparsed_lines") else 0)
                 return "INVALIDATED", "R1", f"{F} has {n} unobserved processes: any path of the tree may be read or run"
-            for p in sorted(delta):
-                if opened.get(p) == "data" or (delta[p] == "D" and p in opened):
+            for p in sorted(delta) if _on("R2") else ():
+                if p in data or (delta[p] == "D" and p in opened):
                     return "INVALIDATED", "R2", f"{F} reads {p} as data" if delta[p] != "D" else f"{F} opened {p}, now removed"
             listed = {SD._norm(x) for x in O.get("listed") or []}
             by = {SD._norm(k): frozenset(v) for k, v in (O.get("listed_by") or {}).items()}
             registry_changed = SD.REGISTRY in delta
-            for p in sorted(delta):
+            for p in sorted(delta) if _on("R3") else ():
                 above = [x for x in ("/".join(p.split("/")[:i]) for i in range(len(p.split("/")))) if x in listed]
                 if above and not SD._discounted(p, above, by, None if registry_changed else self.listing_changed()):
                     return "INVALIDATED", "R3", f"{F} lists {above[-1] or '.'}, which holds {p}"
-            data_tokens |= {w for p, tag in opened.items() if tag == "data" for w in _WORD.findall(self.H.text(p) or "")}
-            # what F's processes actually loaded is code too (a script run by a literal path): import-time rule again
-            ran[F] = self.code(F) | (self.S(F) & set(O.get("loaded") or []))
-            if fired := self._r6(F, ran[F] - self.code(F), code):
+            data_tokens |= {w for p in data for w in _WORD.findall(self.H.text(p) or "")}
+            # what F's processes actually loaded or load-opened is code too (a script run by a path): R5/R6 again
+            ran[F] = self.code(F) | (self.S(F) & (set(O.get("loaded") or []) | loads))
+            if fired := self._r5(F, ran[F] - self.code(F)) or self._r6(F, ran[F] - self.code(F), code):
                 return fired
         # R8, then R7 (tier S), over the code F's processes run
         unref = []
@@ -788,31 +929,47 @@ class _Ctx:
             defs = []
             for p in (x for x in code if x in S):
                 c = self.changed(p)
+                if isinstance(c, str):
+                    return "UNRESOLVED", "I2", c
                 defs += [(p, q) for q in [*c["names"], *c["removed"]]]
             if not defs:
                 continue
             open_sites = [s for f in sorted(S) if f.endswith(".py") for R in (self.B, self.H) for s in self.sites(R, f)
                           if (s[0], s[1], s[3]) not in RESOLVED_SITES]
-            if open_sites:
+            if open_sites and _on("R8"):
                 f, q, line, _ = open_sites[0]
                 return "INVALIDATED", "R8", f"S({F}) has a computed-name site at {f}:{line} ({q or '<module>'}): tier S unavailable"
             for p, q in defs:
                 b = q.rsplit(".", 1)[-1]
                 hits = [sum(self.refs(R, f)[b] for f in S if f.endswith(".py")) - self._defs(R, p, q) for R in (self.B, self.H)]
-                if max(hits) > 0 or b in data_tokens:
+                if (max(hits) > 0 or b in data_tokens) and _on("I2"):
                     return "INVALIDATED", "I2", f"{p}::{q} changed and is referenced in S({F})"
                 unref.append(f"{p}::{q}")
         if unref:
             ev["unreferenced_changes"] = sorted(set(unref))
         return None
 
+    def _r5(self, F: str, files) -> tuple | None:
+        """R5: an added or removed module file (source or extension module) whose dotted name `files` import."""
+        moved = sorted(p for p, s in self.delta.items() if s in "AD" and _module_of(p))
+        if not moved or not _on("R5"):
+            return None
+        named = set().union(*(self.modules_named(R, f) for R in (self.B, self.H) for f in files if f.endswith(".py")))
+        for p in moved:
+            mod = _module_of(p)
+            if any(x == mod or x.startswith(mod + ".") for x in named):
+                return "INVALIDATED", "R5", f"{F} imports {mod}, whose file {p} was {'added' if self.delta[p] == 'A' else 'removed'}"
+        return None
+
     def _r6(self, F: str, files, code: list[str]) -> tuple | None:
-        for p in (x for x in code if x in files):
+        for p in (x for x in code if x in files) if _on("R6") else ():
             c = self.changed(p)
             if isinstance(c, str):
                 return "UNRESOLVED", "R6", c
             if c["module"] != "unchanged":
                 return "INVALIDATED", "R6", f"import-time statements of {p} changed ({c['module']}) in S({F})"
+            if k := self.order(p):
+                return "INVALIDATED", "R6", f"the bindings of {k} in {p} changed order in S({F}): another one binds"
         return None
 
     def both(self, f: str) -> str:
@@ -825,19 +982,27 @@ class _Ctx:
         return self.cache(("defs", R.sha, p), lambda: _qualdefs(src) if src is not None else collections.Counter())[q]
 
 
-def _live(root: pathlib.Path, H) -> tuple[list[tuple[str, dict]], list[State]]:
-    """The entries mutation.check() reads at head, and a state for each phase target with no readable entry."""
+def _doc(root: pathlib.Path, sha: str, rel: str, docs: dict) -> dict:
+    """The record `rel` at `sha`, parsed once per blob (the basis and head share most of them)."""
+    bid = S2.blob(root, sha, rel)
+    if bid is None:
+        raise ValueError("missing")
+    if bid not in docs:
+        docs[bid] = json.loads(_blob(root, sha, rel))
+    return docs[bid]
+
+
+def _live(root: pathlib.Path, R, docs: dict) -> tuple[list[tuple[str, dict]], list[State]]:
+    """The entries mutation.check() reads at commit R by R's own tables, and a state for each phase target with no
+    readable entry."""
     live, bad = [], []
-    for phase, rel in H.m.RECORDS.items():
-        targets = H.m.PHASE_TARGETS.get(phase)
+    for phase, rel in R.m.RECORDS.items():
+        targets = R.m.PHASE_TARGETS.get(phase)
         if not targets:
             continue
         try:
-            raw = _blob(root, H.sha, rel)
-            if raw is None:
-                raise ValueError("missing")
-            doc = json.loads(raw)
-            old = set(H.m.superseded(doc, phase))
+            doc = _doc(root, R.sha, rel, docs)
+            old = set(R.m.superseded(doc, phase))
             entries = [t for t in doc["targets"] if t["target"] not in old]
         except (ValueError, KeyError, TypeError) as e:
             bad += [State(t, "UNRESOLVED", "record", f"{rel} is unreadable: {e}") for t in sorted(targets)]
@@ -851,7 +1016,7 @@ def _live(root: pathlib.Path, H) -> tuple[list[tuple[str, dict]], list[State]]:
 def kill_closure(root, base: str, head: str, kill_file: str) -> frozenset[str]:
     """S(F) (§2.9 D2) at `base` ∪ `head`, for inspection."""
     root = pathlib.Path(root).resolve()
-    with tempfile.TemporaryDirectory(prefix="aisef-f5-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="aisef-f5-") as tmp, _pinned_git(pathlib.Path(tmp)):
         H = SD.Rev(root, _rev(root, head), pathlib.Path(tmp))
         B = H if _rev(root, base) == H.sha else SD.Rev(root, _rev(root, base), pathlib.Path(tmp))
         return _Ctx(root, B, H, None).S(kill_file)
@@ -860,7 +1025,7 @@ def kill_closure(root, base: str, head: str, kill_file: str) -> frozenset[str]:
 def classify(root, base: str = BASE, head: str = "HEAD", *, observations: dict | None = None) -> list[State]:
     """The F5 state of every live target, sorted. Never raises: what cannot be computed is UNRESOLVED."""
     root = pathlib.Path(root).resolve()
-    with tempfile.TemporaryDirectory(prefix="aisef-f5-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="aisef-f5-") as tmp, _pinned_git(pathlib.Path(tmp)):
         try:
             return _classify(root, base, head, observations, pathlib.Path(tmp))
         except Exception as e:   # noqa: BLE001  — the engine fails closed, never open
@@ -877,45 +1042,65 @@ def _classify(root, base, head, observations, tmp) -> list[State]:
     head_sha = _rev(root, head)
     if head_sha is None:
         return [State("<all>", "UNRESOLVED", "basis", f"head {head} is not a commit")]
+    if why := _shadowed(head, head_sha):
+        return [State("<all>", "UNRESOLVED", "basis", f"head {why}")]
     try:
         H = SD.Rev(root, head_sha, tmp)
     except SystemExit as e:
         return [State("<all>", "UNRESOLVED", "basis", f"the head's harness cannot be loaded: {e}")]
+    docs: dict = {}
+
     def stopped(component: str, reason: str) -> list[State]:
-        live, bad = _live(root, H)
+        live, bad = _live(root, H, docs)
         out = [State(t["target"], "UNRESOLVED", component, reason, mutants=t.get("mutants") or 0) for _, t in live]
         return sorted(out + [dataclasses.replace(s, state="UNRESOLVED", component=component, reason=reason) for s in bad],
                       key=lambda s: s.target)
+    shallow = S2._git(root, "rev-parse", "--is-shallow-repository")
+    if shallow.returncode != 0 or shallow.stdout.strip() != b"false":
+        return stopped("basis", "shallow clone (or git cannot tell): the basis history cannot be proven")
     base_sha = _rev(root, base)
-    if S2._git(root, "rev-parse", "--is-shallow-repository").stdout.strip() == b"true":
-        return stopped("basis", "shallow clone: the basis history cannot be proven")
     if base_sha is None:
         return stopped("basis", f"basis commit {base} unavailable")
-    if dirty := _dirty(root, head_sha, H.copy):
+    if why := _shadowed(base, base_sha):
+        return stopped("basis", f"basis {why}")
+    try:
+        dirty = _dirty(root, head_sha, H.copy)
+    except GitError as e:
+        return stopped("dirty", f"the working tree's state cannot be read: {e}")
+    if dirty:
         return stopped("dirty", f"dirty tree: {dirty[0]}" + (f" (+{len(dirty) - 1} more)" if len(dirty) > 1 else ""))
     try:
         B = H if base_sha == head_sha else SD.Rev(root, base_sha, tmp)
-    except SystemExit as e:
-        return stopped("basis", f"the basis harness cannot be loaded: {e}")
-    ctx = _Ctx(root, B, H, observations)
+        if not S2._files(root, B.sha) or not S2._files(root, H.sha):
+            raise GitError("git ls-tree listed no file")
+        ctx = _Ctx(root, B, H, observations)
+    except (SystemExit, GitError) as e:
+        return stopped("basis", f"the basis cannot be read: {e}")
     if any(p.endswith(".py") for p in ctx.delta) or (observations is not None and ctx.delta):
         ctx.prefetch()   # before any record is read: each git child is forked from this process, small only now
-    live, bad = _live(root, H)
-    base_entries: dict[str, dict[str, list]] = {}
+    live, bad = _live(root, H, docs)
     out = list(bad)
-    for rel in sorted({r for r, _ in live}):
-        same = S2.blob(root, B.sha, rel) == S2.blob(root, H.sha, rel)
-        base_entries[rel] = {}
-        doc = None if same else json.loads(_blob(root, B.sha, rel) or b'{"targets": []}')
-        for t in (doc["targets"] if doc is not None else [t for r, t in live if r == rel]):
-            base_entries[rel].setdefault(t.get("target"), []).append(t)
+    # D3: the counterpart of a head entry is the same (record, target, k) entry as the BASIS's own tables read it
+    base_entries: dict[str, dict[str, list]] = {}
+    for rel, t in (live if B is H else _live(root, B, docs)[0]):
+        base_entries.setdefault(rel, {}).setdefault(t.get("target"), []).append(t)
+
+    def absent(rel: str, target: str, k: int) -> str:
+        try:
+            held = sum(x.get("target") == target for x in _doc(root, B.sha, rel, docs)["targets"])
+        except (ValueError, KeyError, TypeError):
+            held = 0
+        if held > k:
+            return f"record entry is not live at the basis: the basis's tables do not read it in {rel}"
+        return f"record entry has no committed counterpart in {rel} at the basis"
     taken: collections.Counter = collections.Counter()
     for rel, t in live:
-        cands = base_entries[rel].get(t["target"], [])
+        cands = base_entries.get(rel, {}).get(t["target"], [])
         k = taken[rel, t["target"]]
         taken[rel, t["target"]] += 1
         try:
-            out.append(ctx.judge(rel, t, cands[k] if k < len(cands) else None))
+            out.append(ctx.judge(rel, t, cands[k], "") if k < len(cands) else
+                       ctx.judge(rel, t, None, absent(rel, t["target"], k)))
         except Exception as e:   # noqa: BLE001
             out.append(State(t["target"], "UNRESOLVED", "engine", f"{type(e).__name__}: {e}", mutants=t.get("mutants") or 0))
     return sorted(out, key=lambda s: (s.target, s.evidence.get("record", "")))
@@ -923,9 +1108,9 @@ def _classify(root, base, head, observations, tmp) -> list[State]:
 
 def _dirty(root: pathlib.Path, head_sha: str, copy) -> list[str]:
     """COPY paths whose working-tree bytes are not head's, and untracked or ignored files there (`__pycache__` aside:
-    the runner leaves it out)."""
-    changed = S2._git(root, "diff", "--name-only", "-z", head_sha, "--", *copy).stdout.decode("utf-8", "replace")
-    other = S2._git(root, "ls-files", "--others", "-z", "--", *copy).stdout.decode("utf-8", "replace")
+    the runner leaves it out). A failing git command raises GitError: never read as a clean tree."""
+    changed = _git(root, "diff", "--name-only", "-z", head_sha, "--", *copy).decode("utf-8", "replace")
+    other = _git(root, "ls-files", "--others", "-z", "--", *copy).decode("utf-8", "replace")
     return sorted({p for p in changed.split("\0") + other.split("\0") if p and "__pycache__" not in p.split("/")})
 
 
@@ -949,7 +1134,10 @@ def report(states: list[State], root, base: str, head: str, observations=None) -
         if p:
             plat[f"{p['family'] or 'unknown'}/{p['flavor'] or 'unproven'}" if not p["contradiction"] else "contradictory"] += 1
     me = pathlib.Path(__file__).resolve()
-    return {"base": {"rev": base, "sha": _rev(root, base)}, "head": {"rev": head, "sha": _rev(root, head)},
+    base_sha = _rev(root, base)
+    return {"base": {"rev": base, "sha": base_sha}, "head": {"rev": head, "sha": _rev(root, head)},
+            "run": "v2.2.0-accepted" if base_sha == BASE else "calibration (the basis is not the pinned v2.2.0 commit)",
+            "rules_off": sorted(_OFF),
             "generated_by": {"tool": TOOL, "sha256": _sha(_lf(me.read_text(encoding="utf-8")).encode())},
             "observations": None if observations is None else {k: _sha(canonical(v)) for k, v in sorted(observations.items())},
             "counts": counts, "by_component": dict(sorted(by.items())), "platform": dict(sorted(plat.items())),
@@ -966,15 +1154,17 @@ def main(argv: list[str] | None = None) -> int:
     a = ap.parse_args(argv)
     begun = time.monotonic()
     states = classify(ROOT, a.base, a.head)
-    doc = report(states, ROOT, a.base, a.head)
+    with tempfile.TemporaryDirectory(prefix="aisef-f5-") as tmp, _pinned_git(pathlib.Path(tmp)):
+        doc = report(states, ROOT, a.base, a.head)
     if a.json:
-        a.json.write_text(json.dumps(doc, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+        with open(a.json, "x", encoding="utf-8") as f:   # never overwrites
+            f.write(json.dumps(doc, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     if a.affected:
         for s in states:
             if s.state in ("INVALIDATED", "UNRESOLVED"):
                 print(f"{s.state:<12} {s.component:<7} {s.target}: {s.reason}")
     else:
-        print(f"F5 impact  base {doc['base']['sha']}  head {doc['head']['sha']}")
+        print(f"F5 impact  base {doc['base']['sha']}  head {doc['head']['sha']}  run: {doc['run']}")
         for s, c in doc["counts"].items():
             print(f"  {s:<15} {c['n']:>5} targets {c['mutants']:>7} mutants")
         for k, c in doc["by_component"].items():

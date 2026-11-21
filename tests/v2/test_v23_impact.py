@@ -1,8 +1,9 @@
-"""validation/v23/impact.py (F5 static impact engine) on toy git repositories: the W1-DESIGN §9 negatives N1-N33 and
-the N14 calibration (an always-VERIFIED_REUSE engine is rejected by the same cases). Each toy holds the real
-generator and runner-settings segments of validation/v2/mutation.py (copied into the toy at test time, so the toy
-follows the real harness), toy tables, toy targets and one committed record. Nothing is measured; no kill test runs.
-Not a kill file."""
+"""validation/v23/impact.py (F5 static impact engine) on toy git repositories: the W1-DESIGN §9 negatives N1-N33, the
+adversarial-review regressions D1-D5 (each mirrors the reviewer's probe), and N14: every rule is load-bearing — with
+that one rule switched off, at least one negative case becomes VERIFIED_REUSE, while the intact engine keeps every
+negative case non-reuse. Each toy holds the real generator and runner-settings segments of validation/v2/mutation.py
+(copied into the toy at test time, so the toy follows the real harness), toy tables, toy targets and one committed
+record. Nothing is measured; no kill test runs. Not a kill file."""
 
 from __future__ import annotations
 
@@ -14,12 +15,14 @@ import sys
 import tempfile
 import unittest
 from typing import NamedTuple
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from validation.qualification import s2_mutation_record as S2  # noqa: E402
+from validation.qualification import v21_snapshot_delta as SD  # noqa: E402
 from validation.v2 import mutation as M  # noqa: E402
 from validation.v23 import impact  # noqa: E402
 
@@ -27,18 +30,21 @@ REAL = (ROOT / impact.MUTATION_REL).read_text(encoding="utf-8")
 KEEP = {"source_digest", "_SWAP", "_inert", "_script", "_root", "mutants", "_enum_members", "null_mutant",
         "superseded", *impact.I9_NAMES}
 RECORD = "closure-evidence/v2/T-MUTATION.json"
+TGT, INC, DOC, DYN = "aisef2/toy.py::target", "aisef2/util.py::inc", "aisef2/doc.py::keys", "aisef2/dyn.py::pick"
+K = "tests/v2/test_k.py"
 TARGETS = {
-    "aisef2/toy.py::target": ["tests/v2/test_k.py"],
-    "aisef2/util.py::inc": ["tests/v2/test_k.py"],
+    TGT: [K],
+    INC: [K],
     "aisef2/app/client.py::_is_gone": ["tests/v2/test_client.py"],
-    "aisef2/dyn.py::pick": ["tests/v2/test_dyn.py"],
-    "aisef2/doc.py::keys": ["tests/v2/test_doc.py"],
+    DYN: ["tests/v2/test_dyn.py"],
+    DOC: ["tests/v2/test_doc.py"],
 }
 PY = f"{sys.version_info.major}.{sys.version_info.minor}"
 POSIX_TAIL = 'Traceback (most recent call last):\n  File "<tree>/aisef2/toy.py", line 7, in target\nAssertionError\n'
 WIN_TAIL = 'Traceback (most recent call last):\n  File "<tree>\\aisef2\\app\\client.py", line 2, in _is_gone\nAssertionError\n'
 HOMEBREW = '  File "/opt/homebrew/Cellar/python@3.14/3.14.7/lib/python3.14/unittest/case.py", line 58, in run\n'
 USRLIB = '  File "/usr/lib/python3.12/unittest/case.py", line 58, in run\n'
+RULES = ("I7", "I6", "I1", "I8", "I3", "I4", "I5", "I9", "R4", "R5", "R6", "R0", "D2", "R1", "R2", "R3", "R8", "I2")
 
 FILES = {
     "pyproject.toml": '[project]\nname = "toy"\n',
@@ -57,10 +63,10 @@ FILES = {
     "docs/v2.1/schema.json": '{"a": 1}\n',
     "tests/__init__.py": "",
     "tests/v2/__init__.py": "",
-    "tests/v2/test_k.py": "import unittest\n\nfrom aisef2 import toy, util\n\n\nclass T(unittest.TestCase):\n"
-                          "    def test_target(self):\n        self.assertEqual(toy.target(2), 3)\n"
-                          "        self.assertEqual(toy.called_by_test(), 7)\n\n"
-                          "    def test_inc(self):\n        self.assertEqual(util.inc(1), 2)\n",
+    K: "import unittest\n\nfrom aisef2 import toy, util\n\n\nclass T(unittest.TestCase):\n"
+       "    def test_target(self):\n        self.assertEqual(toy.target(2), 3)\n"
+       "        self.assertEqual(toy.called_by_test(), 7)\n\n"
+       "    def test_inc(self):\n        self.assertEqual(util.inc(1), 2)\n",
     "tests/v2/test_client.py": "import unittest\n\nfrom aisef2.app import client\n\n\nclass T(unittest.TestCase):\n"
                                "    def test_gone(self):\n        self.assertTrue(client._is_gone(-1))\n",
     "tests/v2/test_dyn.py": "import unittest\n\nfrom aisef2 import dyn\n\n\nclass T(unittest.TestCase):\n"
@@ -83,10 +89,10 @@ def harness(targets=None, extra: str = "") -> str:
             "import re\nimport sys\n\n" + "\n".join(keep) + "\n" + tables)
 
 
-def entry(files: dict, target: str, tail: str | None = POSIX_TAIL, survivor: bool = False) -> dict:
+def entry(files: dict, target: str, tail: str | None = POSIX_TAIL, survivor: bool = False, kill=None) -> dict:
     """A runner-2 result with every mutant KILLED by a bracketed kill (mutation._confirmed holds), measured on
     `files`; `survivor` adds a second, SURVIVED mutant."""
-    kill = TARGETS[target]
+    kill = kill or TARGETS[target]
     first = "FAIL: test_x (test_x.T.test_x)"
     row = {"file": kill[0], "outcome": "FAIL", "first": first, **({"tail": tail} if tail else {})}
     rows = [row, {"file": kill[0], "role": "control", "outcome": "PASS"},
@@ -114,11 +120,19 @@ class Toy:
     def __init__(self, root: pathlib.Path):
         self.root = root
         self.files = dict(FILES)
+        self.targets = dict(TARGETS)
         self.harness = harness()
-        self.entries = {t: entry(self.files, t, WIN_TAIL if t in impact.WINDOWS_CLAIM else POSIX_TAIL) for t in TARGETS}
+        self.reentry()
         self.extra: dict[str, bytes] = {}
         root.mkdir(parents=True, exist_ok=True)
         _git(root, "init", "-q")
+
+    def reentry(self) -> None:
+        self.entries = {t: entry(self.files, t, WIN_TAIL if t in impact.WINDOWS_CLAIM else POSIX_TAIL) for t in TARGETS}
+
+    def set_targets(self, targets: dict) -> None:
+        self.targets = targets
+        self.harness = harness(targets)
 
     def edit(self, rel: str, old: str, new: str) -> None:
         assert old in self.files[rel], (rel, old)
@@ -139,7 +153,7 @@ class Toy:
     def observe(self, head: str, data=None, **over) -> dict:
         """A complete, admissible O(F) for every toy kill file: every .py of its static closure loaded."""
         out = {}
-        for kill in {f for k in TARGETS.values() for f in k}:
+        for kill in {f for k in self.targets.values() for f in k}:
             py = sorted(p for p in S2.closure(self.root, head, (kill,)) if p.endswith(".py"))
             out[kill] = {"commit": head, "platform": "windows" if kill == "tests/v2/test_client.py" else "posix",
                          "python": PY, "witness": True, "outcome": "PASS", "opened": dict.fromkeys(py, "load"),
@@ -159,60 +173,89 @@ class Case(NamedTuple):
     component: str
 
 
-def check(classify, toy: Toy, case: Case) -> list[str]:
-    """[] when `classify` gives `case.target` the expected state and component."""
-    got = [s for s in classify(toy.root, case.base, case.head, observations=case.obs) if s.target == case.target]
-    if len(got) != 1:
-        return [f"{case.target}: {len(got)} states"]
-    s = got[0]
+def state_of(toy: Toy, case: Case) -> impact.State:
+    got = [s for s in impact.classify(toy.root, case.base, case.head, observations=case.obs) if s.target == case.target]
+    assert len(got) == 1, (case.target, got)
+    return got[0]
+
+
+def check(toy: Toy, case: Case) -> list[str]:
+    """[] when the engine gives `case.target` the expected state and component."""
+    s = state_of(toy, case)
     if (s.state, s.component) != (case.state, case.component):
         return [f"{case.target}: {s.state} ({s.component}) {s.reason!r}, wanted {case.state} ({case.component})"]
     return []
 
 
-# ---- the cases (each builds its own toy; N14 runs them against an always-reuse engine)
+def rowless(t: Toy, target: str = TGT) -> None:
+    e = t.entries[target]
+    t.entries[target] = {k: e[k] for k in ("target", "kill_tests", "source_sha256", "mutants")} | {
+        "killed": 1, "survivors": [], "results": [{"mutant": "L1 a", "killed": True}]}
+
+
+def add_test(t: Toy, rel: str, before: str, method: str, imports: str = "") -> None:
+    """A test method in `rel`'s class T, placed before the method `before`, plus module imports."""
+    if imports:
+        t.edit(rel, "import unittest\n", imports + "import unittest\n")
+    t.edit(rel, f"    def {before}(self):\n", method + f"\n    def {before}(self):\n")
+
+
+# ---- the cases (each builds its own toy; N14 runs every negative case once more with its own rule switched off)
 
 def n1(t: Toy) -> Case:
     b = t.commit()
     t.edit("aisef2/toy.py", "return Kind.A.value - 1", "return Kind.A.value - 2")
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "INVALIDATED", "I1")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I1")
+
+
+def n1_comment(t: Toy) -> Case:   # I1 is exact text: a comment inside the target is a slice change
+    b = t.commit()
+    t.edit("aisef2/toy.py", "    if x > 1:\n", "    if x > 1:  # the boundary\n")
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I1")
 
 
 def n2(t: Toy) -> Case:
     b = t.commit()
     t.edit("aisef2/toy.py", "return x * 2", "return x * 3")
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "VERIFIED_REUSE", "")
+    return Case(b, h, t.observe(h), TGT, "VERIFIED_REUSE", "")
 
 
 def n3(t: Toy) -> Case:
     b = t.commit()
     t.edit("aisef2/util.py", "return x + 1", "return x + 1 + 0")
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "INVALIDATED", "I2")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I2")
 
 
 def n3b(t: Toy) -> Case:   # a helper only the kill test calls
     b = t.commit()
     t.edit("aisef2/toy.py", "return 7", "return 7 + 0")
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "INVALIDATED", "I2")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I2")
 
 
 def n4(t: Toy) -> Case:
     b = t.commit()
-    t.edit("tests/v2/test_k.py", "self.assertEqual(toy.target(2), 3)\n        self.assertEqual(toy.called_by_test(), 7)",
-           "pass")
+    t.edit(K, "self.assertEqual(toy.target(2), 3)\n        self.assertEqual(toy.called_by_test(), 7)", "pass")
     h = t.commit()
-    return Case(b, h, None, "aisef2/toy.py::target", "INVALIDATED", "I4")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I4")
+
+
+def i4_comment(t: Toy) -> Case:   # §2.2: exact segment text, not ast.dump
+    b = t.commit()
+    t.edit(K, "self.assertEqual(toy.target(2), 3)\n", "self.assertEqual(toy.target(2), 3)  # the same check\n")
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I4")
 
 
 def n5(t: Toy) -> Case:
     b = t.commit()
-    t.harness = harness({**TARGETS, "aisef2/toy.py::target": ["tests/v2/test_doc.py"]})
+    t.set_targets({**TARGETS, TGT: ["tests/v2/test_doc.py"]})
     h = t.commit()
-    return Case(b, h, None, "aisef2/toy.py::target", "INVALIDATED", "I3")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I3")
 
 
 def n6(t: Toy) -> Case:
@@ -220,14 +263,14 @@ def n6(t: Toy) -> Case:
     assert "ast.Gt: ast.LtE" in t.harness
     t.harness = t.harness.replace("ast.Gt: ast.LtE", "ast.Gt: ast.Lt", 1)
     h = t.commit()
-    return Case(b, h, None, "aisef2/toy.py::target", "INVALIDATED", "I5")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I5")
 
 
 def n6b(t: Toy) -> Case:
     b = t.commit()
     t.edit("aisef2/kinds.py", "    B = 2\n", "    B = 2\n    C = 3\n")
     h = t.commit()
-    return Case(b, h, None, "aisef2/toy.py::target", "INVALIDATED", "I5")
+    return Case(b, h, None, TGT, "INVALIDATED", "I5")
 
 
 def _platform(t: Toy, target: str, tail: str | None) -> Case:
@@ -237,7 +280,7 @@ def _platform(t: Toy, target: str, tail: str | None) -> Case:
 
 
 def n7a_windows_for_posix(t: Toy) -> Case:
-    return _platform(t, "aisef2/toy.py::target", WIN_TAIL)
+    return _platform(t, TGT, WIN_TAIL)
 
 
 def n7a_posix_for_windows(t: Toy) -> Case:
@@ -245,86 +288,177 @@ def n7a_posix_for_windows(t: Toy) -> Case:
 
 
 def n7c(t: Toy) -> Case:
-    e = t.entries["aisef2/toy.py::target"]
-    t.entries["aisef2/toy.py::target"] = {k: e[k] for k in ("target", "kill_tests", "source_sha256", "mutants")} | {
-        "killed": 1, "survivors": [], "results": [{"mutant": "L1 a", "killed": True}]}
+    rowless(t)
     b = t.commit()
-    return Case(b, b, None, "aisef2/toy.py::target", "UNRESOLVED", "I6")
+    return Case(b, b, None, TGT, "UNRESOLVED", "I6")
 
 
 def n7d_separators(t: Toy) -> Case:
-    return _platform(t, "aisef2/toy.py::target", POSIX_TAIL + WIN_TAIL)
+    return _platform(t, TGT, POSIX_TAIL + WIN_TAIL)
 
 
 def n7d_flavors(t: Toy) -> Case:
-    return _platform(t, "aisef2/toy.py::target", POSIX_TAIL + HOMEBREW + USRLIB)
+    return _platform(t, TGT, POSIX_TAIL + HOMEBREW + USRLIB)
 
 
 def n7e(t: Toy) -> Case:   # fixture paths only, no frame: no evidence
-    c = _platform(t, "aisef2/toy.py::target", "AssertionError: 'C:\\Users\\x\\run1' != '<run>/tmp/<mkdtemp>/home/.config'\n")
+    c = _platform(t, TGT, "AssertionError: 'C:\\Users\\x\\run1' != '<run>/tmp/<mkdtemp>/home/.config'\n")
     return c._replace(state="UNRESOLVED")
 
 
+def _history(t: Toy, w: str, log: bytes, rec_path: str, rec: bytes, log_sha: str | None = None) -> None:
+    t.extra.update({f"{w}.log": log, f"{w}.history.json": json.dumps(
+        {"log": {"path": f"{w}.log", "sha256": log_sha or impact._sha(log)},
+         "record": {"path": rec_path, "sha256": impact._sha(rec)}}).encode()})
+
+
 def n7f(t: Toy) -> Case:   # a worker history whose log is not the bytes it recorded: W refused
-    e = entry(t.files, "aisef2/toy.py::target", None)
-    t.entries["aisef2/toy.py::target"] = e
+    e = entry(t.files, TGT, None)
+    t.entries[TGT] = e
     w = "closure-evidence/v2/x/mutation-workers/w1"
     rec = (json.dumps({"targets": [e]}) + "\n").encode()
-    log = ("MUTANT " + HOMEBREW).encode()
-    t.extra = {f"{w}.log": log, f"{w}.record.json": rec,
-               f"{w}.history.json": json.dumps({"log": {"path": f"{w}.log", "sha256": "0" * 64},
-                                                "record": {"path": f"{w}.record.json", "sha256": impact._sha(rec)}}).encode()}
+    t.extra[f"{w}.record.json"] = rec
+    _history(t, w, ("MUTANT " + HOMEBREW).encode(), f"{w}.record.json", rec, log_sha="0" * 64)
     b = t.commit()
-    return Case(b, b, None, "aisef2/toy.py::target", "UNRESOLVED", "I6")
+    return Case(b, b, None, TGT, "UNRESOLVED", "I6")
 
 
 def n7g(t: Toy) -> Case:   # shares a tree_sha256 with a linux entry, no evidence of its own
-    t.entries["aisef2/util.py::inc"] = entry(t.files, "aisef2/util.py::inc", POSIX_TAIL + USRLIB)
-    t.entries["aisef2/toy.py::target"] = entry(t.files, "aisef2/toy.py::target", None)
+    t.entries[INC] = entry(t.files, INC, POSIX_TAIL + USRLIB)
+    t.entries[TGT] = entry(t.files, TGT, None)
     b = t.commit()
-    return Case(b, b, None, "aisef2/toy.py::target", "UNRESOLVED", "I6")
+    return Case(b, b, None, TGT, "UNRESOLVED", "I6")
+
+
+FORGED = "closure-evidence/x/mutation-workers/forged"   # outside COPY: Δ stays empty
+DARWIN_LOG = b'note: "/opt/homebrew/bin/python3"\n'
+
+
+def d1_history_after_basis(t: Toy) -> Case:   # probe_w variant B: a sibling record committed after the basis
+    rowless(t)
+    b = t.commit()
+    rec = (json.dumps({"targets": [t.entries[TGT]]}) + "\n").encode()
+    t.extra[f"{FORGED}.record.json"] = rec
+    _history(t, FORGED, DARWIN_LOG, f"{FORGED}.record.json", rec)
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "UNRESOLVED", "I6")
+
+
+def d1_history_not_sibling(t: Toy) -> Case:   # probe_w variant A: the history points at the live phase record
+    for k in list(t.entries):
+        rowless(t, k)
+    t.commit()
+    _history(t, FORGED, DARWIN_LOG, RECORD, (t.root / RECORD).read_bytes())
+    b = t.commit()
+    return Case(b, b, t.observe(b), TGT, "UNRESOLVED", "I6")
 
 
 def n8(t: Toy) -> Case:
-    t.entries["aisef2/toy.py::target"] = e = entry(t.files, "aisef2/toy.py::target", survivor=True)
+    t.entries[TGT] = e = entry(t.files, TGT, survivor=True)
     b = t.commit()
     k = e["results"][0]
     e = json.loads(json.dumps(e))
     e["results"][1] = {**k, "mutant": "L2 b"}
     e.update(killed=2, survivors=[])
-    t.entries["aisef2/toy.py::target"] = e
+    t.entries[TGT] = e
     h = t.commit()
-    return Case(b, h, None, "aisef2/toy.py::target", "INVALIDATED", "I7")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I7")
+
+
+def d2_shadowed_base(t: Toy) -> Case:   # probe_ref: N8, then a tag named like the basis abbreviation, at head
+    c = n8(t)
+    _git(t.root, "tag", c.base[:8], c.head)
+    return c._replace(base=c.base[:8], state="UNRESOLVED", component="basis")
+
+
+def d2_replaced_blob(t: Toy) -> Case:   # N8, then `git replace` makes the basis record's blob read as head's
+    c = n8(t)
+    _git(t.root, "replace", _git(t.root, "rev-parse", f"{c.base}:{RECORD}"), _git(t.root, "rev-parse", f"{c.head}:{RECORD}"))
+    return c
+
+
+def d3_not_live(t: Toy) -> Case:   # probe_live: superseded by the basis's tables, made live at head
+    t.harness = harness({k: v for k, v in TARGETS.items() if k != DOC}, extra=f"SUPERSEDED = {{{DOC!r}: 'U'}}\n")
+    b = t.commit()
+    t.harness = harness()
+    h = t.commit()
+    return Case(b, h, t.observe(h), DOC, "INVALIDATED", "I7")
+
+
+ORDER = ('"""toy."""\nfrom aisef2 import util\nfrom aisef2.kinds import Kind\n\n\n{first}\n\ndef target(x):\n'
+         "    if x > 1:\n        return util.inc(x) + k()\n    return Kind.A.value - 1\n\n\n{second}\n\n"
+         "def helper(x):\n    return x * 2\n\n\ndef called_by_test():\n    return 7\n")
+K1, K2 = "def k():\n    return 1\n", "def k():\n    return 2\n"
+
+
+def d4_order(t: Toy, target: str = TGT, component: str = "I1") -> Case:   # probe_order: two defs of k swapped
+    t.files["aisef2/toy.py"] = ORDER.format(first=K1, second=K2)   # k() is 2 at the basis
+    t.edit(K, "toy.target(2), 3", "toy.target(2), 5")
+    t.reentry()
+    b = t.commit()
+    t.files["aisef2/toy.py"] = ORDER.format(first=K2, second=K1)   # k() is 1 now: target(2) == 4
+    h = t.commit()
+    return Case(b, h, t.observe(h), target, "INVALIDATED", component)
+
+
+def d4_order_r6(t: Toy) -> Case:   # the same swap seen from another target whose kill file imports toy.py
+    return d4_order(t, INC, "R6")
+
+
+LOADER = ('ROOT = pathlib.Path(__file__).resolve().parents[2]\n'
+          'SPEC = importlib.util.spec_from_file_location("doc_script", ROOT / "aisef2" / "doc.py")\n\n\n')
+
+
+def d5_loader(t: Toy) -> Case:   # probe_untested: a kill file runs aisef2/doc.py in-process by path
+    t.edit(K, "import unittest\n", "import importlib.util\nimport pathlib\nimport unittest\n")
+    t.edit(K, "class T(", LOADER + "class T(")
+    add_test(t, K, "test_inc", "    def test_doc(self):\n        m = importlib.util.module_from_spec(SPEC)\n"
+             "        SPEC.loader.exec_module(m)\n        self.assertEqual(m.keys({'b': 1, 'a': 2}), ['a', 'b'])\n")
+    b = t.commit()
+    t.edit("aisef2/doc.py", "return sorted(d)", "return list(d)")
+    h = t.commit()
+    obs = t.observe(h)
+    obs[K]["opened"]["aisef2/doc.py"] = "load"   # module_from_spec raises no import event: not in `loaded`
+    return Case(b, h, obs, INC, "INVALIDATED", "R8")
+
+
+def d5_load_tag_data(t: Toy) -> Case:   # a "load" of a non-.py file is a data read
+    b = t.commit()
+    t.files["docs/v2.1/schema.json"] = '{"a": 2}\n'
+    h = t.commit()
+    obs = t.observe(h)
+    obs["tests/v2/test_doc.py"]["opened"]["docs/v2.1/schema.json"] = "load"
+    return Case(b, h, obs, DOC, "INVALIDATED", "R2")
 
 
 def n9_table(t: Toy) -> Case:   # the target added to mutation.py's Option C table; the pinned ruling intact
     t.extra = {impact.RULING_REL: (ROOT / impact.RULING_REL).read_bytes()}
     t.harness = harness(extra="VERIFIED_REUSE = {'aisef2/toy.py::target': '" + "0" * 64 + "'}\n")
-    t.entries["aisef2/toy.py::target"]["source_sha256"] = "f" * 64
+    t.entries[TGT]["source_sha256"] = "f" * 64
     b = t.commit()
-    return Case(b, b, None, "aisef2/toy.py::target", "INVALIDATED", "I8")
+    return Case(b, b, None, TGT, "INVALIDATED", "I8")
 
 
 def n9_ruling(t: Toy) -> Case:   # the ruling file altered to cover the target
     doc = json.loads((ROOT / impact.RULING_REL).read_bytes())
-    doc["disposition"]["VERIFIED_REUSE"]["aisef2/toy.py::target"] = dict(next(iter(doc["disposition"]["VERIFIED_REUSE"].values())))
+    doc["disposition"]["VERIFIED_REUSE"][TGT] = dict(next(iter(doc["disposition"]["VERIFIED_REUSE"].values())))
     t.extra = {impact.RULING_REL: json.dumps(doc).encode()}
     t.harness = harness(extra="VERIFIED_REUSE = {'aisef2/toy.py::target': '" + "0" * 64 + "'}\n")
-    t.entries["aisef2/toy.py::target"]["source_sha256"] = doc["source_transition"]["measured_source_sha256"]
+    t.entries[TGT]["source_sha256"] = doc["source_transition"]["measured_source_sha256"]
     b = t.commit()
-    return Case(b, b, None, "aisef2/toy.py::target", "INVALIDATED", "I8")
+    return Case(b, b, None, TGT, "INVALIDATED", "I8")
 
 
 def n10(t: Toy) -> Case:
     h = t.commit()
-    return Case("0" * 40, h, None, "aisef2/toy.py::target", "UNRESOLVED", "basis")
+    return Case("0" * 40, h, None, TGT, "UNRESOLVED", "basis")
 
 
 def n13_data_reader(t: Toy) -> Case:   # a comment appended; the kill file reads the module as data
     b = t.commit()
     t.files["aisef2/toy.py"] += "# note\n"
     h = t.commit()
-    return Case(b, h, t.observe(h, {"tests/v2/test_k.py": ["aisef2/toy.py"]}), "aisef2/util.py::inc", "INVALIDATED", "R2")
+    return Case(b, h, t.observe(h, {K: ["aisef2/toy.py"]}), INC, "INVALIDATED", "R2")
 
 
 def n13b(t: Toy) -> Case:
@@ -332,21 +466,106 @@ def n13b(t: Toy) -> Case:
     t.edit("aisef2/toy.py", "from aisef2.kinds import Kind\n", "from aisef2.kinds import Kind\nfrom enum import Enum\n")
     t.files["aisef2/toy.py"] += "\n\nclass New(Enum):\n    X = 1\n"
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/util.py::inc", "INVALIDATED", "R6")
+    return Case(b, h, t.observe(h), INC, "INVALIDATED", "R6")
+
+
+def n15(t: Toy) -> Case:   # the kill test calls helper only on a branch its unmutated run never takes
+    add_test(t, K, "test_inc", "    def test_branch(self):\n        if toy.target(0) > 5:\n            toy.helper(1)\n")
+    c = n2(t)
+    return c._replace(state="INVALIDATED", component="I2")
+
+
+def _child(t: Toy, argv: str, change, trace: bool, children: dict) -> Case:
+    add_test(t, K, "test_inc", f"    def test_child(self):\n        subprocess.run({argv}, check=True)\n",
+             "import subprocess\nimport sys\n")
+    b = t.commit()
+    change(t)
+    h = t.commit()
+    over = {"os_trace": True} if trace else {"children": {"hooked": 0, **children}}
+    obs = t.observe(h, {K: ["aisef2/toy.py"]} if trace else None, **over)   # traced: the child's opens are data
+    return Case(b, h, obs, INC, "INVALIDATED", "R2" if trace else "R1")
+
+
+def _helper_body(t: Toy) -> None:
+    t.edit("aisef2/toy.py", "return x * 2", "return x * 3")
+
+
+def _comment(t: Toy) -> None:
+    t.files["aisef2/toy.py"] += "# one more line\n"
+
+
+def n16(t: Toy, trace: bool = False) -> Case:   # an unhooked Python child changes nothing the parent sees
+    return _child(t, '[sys.executable, "-c", "from aisef2 import toy; toy.helper(1)"], env={"PATH": ""}',
+                  _helper_body, trace, {"unhooked_python": 1, "other": 0})
+
+
+def n16_trace(t: Toy) -> Case:
+    return n16(t, True)
+
+
+def n17(t: Toy, trace: bool = False) -> Case:   # a non-Python child reads toy.py
+    return _child(t, '["wc", "-l", "aisef2/toy.py"]', _comment, trace, {"unhooked_python": 0, "other": 1})
+
+
+def n17_trace(t: Toy) -> Case:
+    return n17(t, True)
+
+
+def n26(t: Toy, trace: bool = False) -> Case:   # the test_v21_confine pattern: copy toy.py, run it with python -I -B
+    argv = ('[sys.executable, "-I", "-B", "-c", "import shutil, sys, tempfile; d = tempfile.mkdtemp(); '
+            'shutil.copy(\'aisef2/toy.py\', d); sys.path.insert(0, d); import toy; toy.helper(1)"]')
+    return _child(t, argv, _helper_body, trace, {"unhooked_python": 1, "other": 0})
+
+
+def n26_trace(t: Toy) -> Case:
+    return n26(t, True)
 
 
 def n18(t: Toy) -> Case:
     b = t.commit()
     t.files["aisef2/util.py"] = "import sys\n\nsys.setrecursionlimit(60)\n\n\n" + t.files["aisef2/util.py"]
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "INVALIDATED", "R6")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R6")
+
+
+REGISTRY = ('import pathlib\n\nTESTS_V2 = "tests/v2"\n\n\ndef test_directories(root):\n'
+            '    return sorted({p.parent for p in (pathlib.Path(root) / TESTS_V2).rglob("test_*.py")})\n')
+REG_LISTING = {"listed": ["tests/v2"], "listed_by": {"tests/v2": [SD.REGISTRY]}}
+NEW_TEST = "tests/v2/test_new.py"
+NEW_TEST_SRC = "import unittest\n\n\nclass N(unittest.TestCase):\n    def test_n(self):\n        pass\n"
+
+
+def with_registry(t: Toy) -> None:
+    """As in the repository: tests/v2/__init__.py imports the registry, whose TESTS_V2 names every tests/v2 file."""
+    t.files["aisef2/invariants/__init__.py"] = ""
+    t.files[SD.REGISTRY] = REGISTRY
+    t.files["tests/v2/__init__.py"] = "from aisef2.invariants import registry  # noqa: F401\n"
+
+
+def n20(t: Toy) -> Case:   # test_k lists aisef2 -> a new aisef2/new.py
+    b = t.commit()
+    t.files["aisef2/new.py"] = "X = 1\n"
+    h = t.commit()
+    return Case(b, h, t.observe(h, listed=["aisef2"], listed_by={"aisef2": [K]}), TGT, "INVALIDATED", "R3")
+
+
+def n20_new_test(t: Toy, rel: str = NEW_TEST, state: str = "VERIFIED_REUSE", component: str = "") -> Case:
+    with_registry(t)
+    b = t.commit()
+    t.files[rel] = NEW_TEST_SRC
+    h = t.commit()
+    return Case(b, h, t.observe(h, **REG_LISTING), TGT, state, component)
+
+
+def n20_new_dir(t: Toy) -> Case:   # a new test directory changes test_directories(): the discount does not hold
+    return n20_new_test(t, "tests/v2/newdir/test_x.py", "INVALIDATED", "R3")
 
 
 def n21(t: Toy) -> Case:
     b = t.commit()
     t.files["tests/v2/zz/__init__.py"] = "raise SystemExit(1)\n"
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "INVALIDATED", "R4")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R4")
 
 
 def n21b(t: Toy) -> Case:
@@ -354,60 +573,131 @@ def n21b(t: Toy) -> Case:
     t.files["tests/v2/p9/__init__.py"] = ""
     t.files["tests/v2/p9/test_k.py"] = "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_x(self):\n        self.fail()\n"
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "INVALIDATED", "R4")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R4")
+
+
+def n21c(t: Toy) -> Case:   # R4 counts bytes: a comment in a package init the discovery imports
+    t.files["tests/v2/sub/__init__.py"] = ""
+    b = t.commit()
+    t.files["tests/v2/sub/__init__.py"] = "# note\n"
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R4")
 
 
 def n22(t: Toy) -> Case:
     b = t.commit()
     t.files["aisef2/toy/__init__.py"] = ""
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "INVALIDATED", "R5")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R5")
+
+
+def r5_extension(t: Toy) -> Case:   # an extension module takes precedence over toy.py
+    b = t.commit()
+    t.extra["aisef2/toy.cpython-314-darwin.so"] = b"\xcf\xfa\xed\xfe"
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R5")
 
 
 def n23(t: Toy) -> Case:
     b = t.commit()
     t.edit("aisef2/dyn.py", "return 2", "return 3")
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/dyn.py::pick", "INVALIDATED", "R8")
+    return Case(b, h, t.observe(h), DYN, "INVALIDATED", "R8")
+
+
+def n24(t: Toy) -> Case:   # the N23 site sits in a def the unmutated run never calls: tier S scopes all of S(F)
+    t.edit("tests/v2/test_dyn.py", "self.assertEqual(dyn.run(dyn.pick(1)), 1)", "self.assertEqual(dyn.pick(1), 'a')")
+    c = n23(t)
+    return c
+
+
+def n25_python(t: Toy) -> Case:
+    c = n2(t)
+    return c._replace(obs=t.observe(c.head, python="3.0"), state="UNRESOLVED", component="R0")
+
+
+def n25_platform(t: Toy) -> Case:   # a darwin/linux record presented for a windows claim (and the reverse)
+    c = n2(t)
+    return c._replace(obs=t.observe(c.head, platform="windows"), state="UNRESOLVED", component="R0")
+
+
+def n27(t: Toy) -> Case:
+    c = n2(t)
+    return c._replace(obs=t.observe(c.head, lost=1), state="INVALIDATED", component="R1")
+
+
+COUNTER = ('import pathlib\nimport unittest\n\nROOT = pathlib.Path(__file__).resolve().parents[2]\n\n\n'
+           'class C(unittest.TestCase):\n    def test_count(self):\n'
+           '        n = sum(p.read_text().count("def test_") for p in (ROOT / "tests" / "v2").glob("test_*.py"))\n'
+           '        self.assertGreater(n, 0)\n')
+
+
+def n28(t: Toy) -> Case:   # kill file F2 counts `def test_` in every tests/v2 test module
+    kill = [K, "tests/v2/test_count.py"]
+    t.files["tests/v2/test_count.py"] = COUNTER
+    t.set_targets({**TARGETS, INC: kill})
+    t.entries[INC] = entry(t.files, INC, kill=kill)
+    b = t.commit()
+    t.files[K] += "\n\ndef test_extra():\n    pass\n"   # added-only: I4 additive
+    h = t.commit()
+    return Case(b, h, t.observe(h, {"tests/v2/test_count.py": [K]}), INC, "INVALIDATED", "R2")
+
+
+def n29(t: Toy) -> Case:
+    add_test(t, K, "test_inc", "    def test_dir(self):\n"
+             "        self.assertEqual([n for n in dir(toy) if n.startswith('check_')], [])\n")
+    b = t.commit()
+    t.files["aisef2/toy.py"] += "\n\ndef check_b():\n    pass\n"
+    h = t.commit()
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "R8")
+
+
+def n30(t: Toy, loaded: str = "aisef2/plug.py", state: str = "VERIFIED_REUSE", component: str = "") -> Case:
+    t.files["aisef2/reg.py"] = 'import importlib\n\n\ndef load():\n    return importlib.import_module("aisef2.plug")\n'
+    t.files["aisef2/plug.py"] = "VALUE = 1\n"
+    t.edit(K, "from aisef2 import toy, util\n", "from aisef2 import reg, toy, util\n")
+    c = n2(t)
+    c.obs[K]["loaded"].append(loaded)
+    return c._replace(state=state, component=component)
+
+
+def n30_miss(t: Toy) -> Case:   # loaded, but not in S(F): the D2 check
+    return n30(t, "aisef2/doc.py", "UNRESOLVED", "D2")
 
 
 def n31(t: Toy) -> Case:
     b = t.commit()
     t.files["docs/v2.1/schema.json"] = '{"a": 2}\n'
     h = t.commit()
-    return Case(b, h, t.observe(h, {"tests/v2/test_doc.py": ["docs/v2.1/schema.json"]}), "aisef2/doc.py::keys",
-                "INVALIDATED", "R2")
+    return Case(b, h, t.observe(h, {"tests/v2/test_doc.py": ["docs/v2.1/schema.json"]}), DOC, "INVALIDATED", "R2")
 
 
 def n33(t: Toy) -> Case:
     b = t.commit()
     t.harness = t.harness.replace("TIMEOUT = 900", "TIMEOUT = 901", 1)
     h = t.commit()
-    return Case(b, h, None, "aisef2/toy.py::target", "INVALIDATED", "I9")
+    return Case(b, h, t.observe(h), TGT, "INVALIDATED", "I9")
 
 
 def n33b(t: Toy) -> Case:
     b = t.commit()
     t.harness = t.harness.replace("def _confirmed(r: dict) -> bool:\n", "def _confirmed(r: dict) -> bool:\n    # edited\n", 1)
     h = t.commit()
-    return Case(b, h, None, "aisef2/util.py::inc", "INVALIDATED", "I9")
-
-
-NEW_TEST = "tests/v2/test_new.py"
+    return Case(b, h, None, INC, "INVALIDATED", "I9")
 
 
 def new_test_file(t: Toy) -> Case:   # §2.8: a NEW test file in a directory a code file names (registry's TESTS_V2)
     t.files["aisef2/reg.py"] = 'TESTS_V2 = "tests/v2"\n'
-    t.edit("tests/v2/test_k.py", "from aisef2 import toy, util\n", "from aisef2 import reg, toy, util\n")
+    t.edit(K, "from aisef2 import toy, util\n", "from aisef2 import reg, toy, util\n")
     b = t.commit()
-    t.files[NEW_TEST] = "import unittest\n\n\nclass N(unittest.TestCase):\n    def test_n(self):\n        pass\n"
+    t.files[NEW_TEST] = NEW_TEST_SRC
     h = t.commit()
-    return Case(b, h, t.observe(h), "aisef2/toy.py::target", "VERIFIED_REUSE", "")
+    return Case(b, h, t.observe(h), TGT, "VERIFIED_REUSE", "")
 
 
 def new_test_file_loaded(t: Toy) -> Case:   # the same file, observed loaded by the kill file's process: code, R6
     c = new_test_file(t)
-    c.obs["tests/v2/test_k.py"]["loaded"].append(NEW_TEST)
+    c.obs[K]["loaded"].append(NEW_TEST)
     return c._replace(state="INVALIDATED", component="R6")
 
 
@@ -427,9 +717,12 @@ def unobserved_child(t: Toy) -> Case:   # R1 with an observation that has an unh
                       state="INVALIDATED", component="R1")
 
 
-NEGATIVE = [n1, n3, n3b, n4, n5, n6, n6b, n7a_windows_for_posix, n7a_posix_for_windows, n7c, n7d_separators, n7d_flavors,
-            n7e, n7f, n7g, n8, n9_table, n9_ruling, n10, n13_data_reader, n13b, n18, n21, n21b, n22, n23, n31, n33, n33b,
-            no_observation, wrong_tree_observation, unobserved_child, new_test_file_loaded]
+NEGATIVE = [n1, n1_comment, n3, n3b, n4, i4_comment, n5, n6, n6b, n7a_windows_for_posix, n7a_posix_for_windows, n7c,
+            n7d_separators, n7d_flavors, n7e, n7f, n7g, d1_history_after_basis, d1_history_not_sibling, n8,
+            d2_shadowed_base, d2_replaced_blob, d3_not_live, d4_order, d4_order_r6, d5_loader, d5_load_tag_data,
+            n9_table, n9_ruling, n10, n13_data_reader, n13b, n15, n16, n16_trace, n17, n17_trace, n18, n20, n20_new_dir,
+            n21, n21b, n21c, n22, r5_extension, n23, n24, n25_python, n25_platform, n26, n26_trace, n27, n28, n29,
+            n30_miss, n31, n33, n33b, no_observation, wrong_tree_observation, unobserved_child, new_test_file_loaded]
 
 
 class ImpactTest(unittest.TestCase):
@@ -440,23 +733,28 @@ class ImpactTest(unittest.TestCase):
     def tearDown(self):
         self._tmp.cleanup()
 
-    def run_case(self, fn) -> impact.State:
-        case = fn(self.toy)
-        self.assertEqual(check(impact.classify, self.toy, case), [])
-        return next(s for s in impact.classify(self.toy.root, case.base, case.head, observations=case.obs)
-                    if s.target == case.target)
+    def again(self) -> Toy:
+        self.toy = Toy(pathlib.Path(tempfile.mkdtemp(dir=self._tmp.name)))
+        return self.toy
+
+    def run_case(self, fn, *args) -> impact.State:
+        case = fn(self.toy, *args)
+        self.case = case
+        self.assertEqual(check(self.toy, case), [])
+        return state_of(self.toy, case)
 
     def test_n1_target_slice(self):
         self.run_case(n1)
+        self.again()
+        self.run_case(n1_comment)
 
     def test_n2_unreferenced_helper(self):
         s = self.run_case(n2)
         self.assertEqual(s.evidence["unreferenced_changes"], ["aisef2/toy.py::helper"])
-        self.assertEqual(s.basis.split("@")[0], "v2.2.0-accepted")
+        self.assertEqual(s.basis, f"calibration@{self.case.base}")   # not the pinned v2.2.0 commit
         self.assertEqual(s.compared, ["I7", "I6", "I1", "I3", "I4", "I5", "I9"])
         # red-before: today's whole-file rule calls it stale
-        self.assertNotEqual(M.source_digest(self.toy.files["aisef2/toy.py"]),
-                            self.toy.entries["aisef2/toy.py::target"]["source_sha256"])
+        self.assertNotEqual(M.source_digest(self.toy.files["aisef2/toy.py"]), self.toy.entries[TGT]["source_sha256"])
 
     def test_n2_without_observation_is_invalidated(self):
         s = self.run_case(no_observation)
@@ -471,7 +769,13 @@ class ImpactTest(unittest.TestCase):
     def test_n4_weakened_kill_test(self):
         self.run_case(n4)
         # red-before: today's verdict on the same record at the same tree finds nothing
-        self.assertEqual(M.target_problems(self.toy.entries["aisef2/toy.py::target"], self.toy.root), [])
+        self.assertEqual(M.target_problems(self.toy.entries[TGT], self.toy.root), [])
+
+    def test_i4_exact_segment_text(self):
+        self.run_case(i4_comment)
+        # red-before: the ast.dump segments of v21_snapshot_delta see no change
+        b, h = _last(self.toy)
+        self.assertEqual(SD._segments(SD._text(self.toy.root, b, K)), SD._segments(SD._text(self.toy.root, h, K)))
 
     def test_n5_dropped_killer(self):
         self.run_case(n5)
@@ -490,9 +794,9 @@ class ImpactTest(unittest.TestCase):
 
     def test_n7b_darwin_passes(self):
         t = self.toy
-        t.entries["aisef2/toy.py::target"] = entry(t.files, "aisef2/toy.py::target", POSIX_TAIL + HOMEBREW)
+        t.entries[TGT] = entry(t.files, TGT, POSIX_TAIL + HOMEBREW)
         b = t.commit()
-        s = next(x for x in impact.classify(t.root, b, b) if x.target == "aisef2/toy.py::target")
+        s = next(x for x in impact.classify(t.root, b, b) if x.target == TGT)
         self.assertEqual((s.state, s.evidence["platform"]["family"], s.evidence["platform"]["flavor"]),
                          ("VERIFIED_REUSE", "posix", "darwin"))
 
@@ -508,20 +812,20 @@ class ImpactTest(unittest.TestCase):
     def test_n7e_fixture_paths(self):
         self.run_case(n7e)
         t = self.toy   # with a frame of its own: posix, and the fixture paths prove no flavor
-        t.entries["aisef2/toy.py::target"] = entry(t.files, "aisef2/toy.py::target",
-                                                   POSIX_TAIL + "'C:\\Users\\x\\run1' != '<run>/tmp/<mkdtemp>/home/.config'\n")
+        t.entries[TGT] = entry(t.files, TGT, POSIX_TAIL + "'C:\\Users\\x\\run1' != '<run>/tmp/<mkdtemp>/home/.config'\n")
         b = t.commit()
-        s = next(x for x in impact.classify(t.root, b, b) if x.target == "aisef2/toy.py::target")
+        s = next(x for x in impact.classify(t.root, b, b) if x.target == TGT)
         self.assertEqual((s.state, s.evidence["platform"]["flavor"]), ("VERIFIED_REUSE", None))
 
     def test_n7f_worker(self):
         self.run_case(n7f)
         t = self.toy   # the same history with the right digest: the worker's darwin marker decides
-        h = json.loads(t.extra[next(k for k in t.extra if k.endswith(".history.json"))])
+        hist = next(k for k in t.extra if k.endswith(".history.json"))
+        h = json.loads(t.extra[hist])
         h["log"]["sha256"] = impact._sha(t.extra[h["log"]["path"]])
-        t.extra[next(k for k in t.extra if k.endswith(".history.json"))] = json.dumps(h).encode()
+        t.extra[hist] = json.dumps(h).encode()
         b = t.commit()
-        s = next(x for x in impact.classify(t.root, b, b) if x.target == "aisef2/toy.py::target")
+        s = next(x for x in impact.classify(t.root, b, b) if x.target == TGT)
         self.assertEqual((s.state, s.evidence["platform"]["family"], s.evidence["platform"]["flavor"]),
                          ("VERIFIED_REUSE", "posix", "darwin"))
         self.assertTrue(s.evidence["platform"]["by"].startswith("W:"))
@@ -529,8 +833,68 @@ class ImpactTest(unittest.TestCase):
     def test_n7g_co_occurrence(self):
         self.run_case(n7g)
 
+    def test_d1_worker_history_after_the_basis(self):
+        self.run_case(d1_history_after_basis)
+        # red-before: read at head, the forged history is admissible W evidence for the entry
+        b, h = _last(self.toy)
+        digest = impact._sha(impact.canonical(self.toy.entries[TGT]))
+        self.assertIn(digest, impact.workers_at(self.toy.root, h)[0])
+        self.assertNotIn(digest, impact.workers_at(self.toy.root, b)[0])
+
+    def test_d1_worker_history_must_name_its_own_siblings(self):
+        self.run_case(d1_history_not_sibling)
+        refused = impact.workers_at(self.toy.root, self.case.base)[1]
+        self.assertTrue(any("sibling" in r for r in refused), refused)
+
     def test_n8_tamper(self):
         self.run_case(n8)
+
+    def test_d2_abbreviated_basis_shadowed_by_a_ref(self):
+        s = self.run_case(d2_shadowed_base)
+        self.assertIn("shadowed by a ref", s.reason)
+        # red-before: git itself prefers the ref, so the abbreviated basis names the tampered head
+        self.assertEqual(_git(self.toy.root, "rev-parse", self.case.base), _last(self.toy)[1])
+
+    def test_d2_replace_refs_are_ignored(self):
+        self.run_case(d2_replaced_blob)
+        # red-before: a git child that honours replace refs reads head's record at the basis
+        b, h = _last(self.toy)
+        self.assertEqual(_git(self.toy.root, "cat-file", "blob", f"{b}:{RECORD}"),
+                         _git(self.toy.root, "cat-file", "blob", f"{h}:{RECORD}"))
+
+    def test_d2_v220_label_only_for_the_pinned_full_sha(self):
+        c = n2(self.toy)
+        self.assertEqual(state_of(self.toy, c).basis, f"calibration@{c.base}")
+        with mock.patch.object(impact, "BASE", c.base):
+            self.assertEqual(state_of(self.toy, c).basis, f"v2.2.0-accepted@{c.base}")
+            self.assertEqual(impact.report([], self.toy.root, c.base, c.head)["run"], "v2.2.0-accepted")
+            self.assertTrue(impact.report([], self.toy.root, c.head, c.head)["run"].startswith("calibration"))
+        self.assertEqual(impact.BASE, "da3ea33f3b695aaca73e87a704145a0193aced23")
+
+    def test_d3_entry_must_be_live_at_the_basis(self):
+        s = self.run_case(d3_not_live)
+        self.assertIn("not live at the basis", s.reason)
+
+    def test_d4_statement_order(self):
+        self.run_case(d4_order)
+        b, h = _last(self.toy)
+        a, z = SD._text(self.toy.root, b, "aisef2/toy.py"), SD._text(self.toy.root, h, "aisef2/toy.py")
+        # red-before: as a sorted multiset the slice is the same, and reach.changed() sees nothing
+        self.assertEqual(sorted(impact.target_slice(M, a, "target")), sorted(impact.target_slice(M, z, "target")))
+        self.assertEqual((impact.reach.changed(a, z)["names"], impact.reach.changed(a, z)["module"]), ({}, "unchanged"))
+        self.again()
+        self.assertIn("changed order", self.run_case(d4_order_r6).reason)
+
+    def test_d5_code_run_by_path_in_process(self):
+        self.run_case(d5_loader)
+        # red-before: the observation never lists doc.py as loaded; only its "load" open says it ran
+        self.assertNotIn("aisef2/doc.py", self.case.obs[K]["loaded"])
+        site = 'spec_from_file_location("doc_script", ROOT / "aisef2" / "doc.py")'
+        self.assertTrue(impact.dynamic_sites(site, "x.py"))
+        self.assertFalse(impact.dynamic_sites('spec_from_file_location("doc_script", "aisef2/doc.py")', "x.py"))
+
+    def test_d5_load_of_a_data_file(self):
+        self.run_case(d5_load_tag_data)
 
     def test_n9_table(self):
         self.assertIn("not in the pinned ruling's scope", self.run_case(n9_table).reason)
@@ -554,6 +918,27 @@ class ImpactTest(unittest.TestCase):
         self.assertEqual({(s.state, s.component) for s in states}, {("UNRESOLVED", "basis")})
         self.assertIn("shallow", states[0].reason)
 
+    def test_git_failure_is_never_clean(self):
+        """A failing git diff reads neither as a clean tree nor as Δ = ∅."""
+        c = n2(self.toy)
+        real = S2._git
+        for marker, component in (("--name-only", "dirty"), ("--name-status", "basis")):
+            def failing(root, *args, marker=marker):
+                if args[:1] == ("diff",) and marker in args:
+                    return subprocess.CompletedProcess(args, 128, b"", b"fatal: injected")
+                return real(root, *args)
+            with self.subTest(marker), mock.patch.object(impact.S2, "_git", failing):
+                states = impact.classify(self.toy.root, c.base, c.head, observations=c.obs)
+                self.assertEqual({(s.state, s.component) for s in states}, {("UNRESOLVED", component)})
+
+    def test_basis_rows_use_the_basis_digest_rule(self):
+        t = self.toy
+        b = t.commit()
+        t.harness = harness(extra="\n\ndef source_digest(text: str) -> str:\n    return 'another rule'\n")
+        h = t.commit()
+        s = state_of(t, Case(b, h, t.observe(h), TGT, "", ""))
+        self.assertEqual((s.state, s.component), ("VERIFIED_REUSE", ""), s.reason)
+
     def test_n13_comment(self):
         t = self.toy
         b = t.commit()
@@ -561,16 +946,42 @@ class ImpactTest(unittest.TestCase):
         h = t.commit()
         for s in impact.classify(t.root, b, h, observations=t.observe(h)):   # R6/R7 fire on nothing
             self.assertEqual(s.state, "VERIFIED_REUSE", s)
-        self.toy = Toy(pathlib.Path(self._tmp.name) / "again")
+        self.again()
         self.run_case(n13_data_reader)
 
     def test_n13b_import_and_class(self):
         self.run_case(n13b)
-        s = next(x for x in impact.classify(self.toy.root, *_last(self.toy)) if x.target == "aisef2/toy.py::target")
+        s = next(x for x in impact.classify(self.toy.root, *_last(self.toy)) if x.target == TGT)
         self.assertEqual((s.state, s.component), ("INVALIDATED", "I1"))
+
+    def test_n15_untaken_branch(self):
+        self.run_case(n15)
+
+    def test_n16_unhooked_child(self):
+        self.run_case(n16)
+        self.again()
+        self.run_case(n16_trace)
+
+    def test_n17_non_python_child(self):
+        self.run_case(n17)
+        self.again()
+        self.run_case(n17_trace)
 
     def test_n18_import_time(self):
         self.run_case(n18)
+
+    def test_n20_listing(self):
+        self.run_case(n20)
+
+    def test_n20_registry_discount(self):
+        s = self.run_case(n20_new_test)   # positive: a new tests/v2 test module, listed by the registry only
+        self.assertEqual(s.evidence["additive_test_changes"], [NEW_TEST])
+        b, h = _last(self.toy)
+        # Amendment A1, red-before under the frozen R6 letter: the file is in S(F) (TESTS_V2) and its module is new
+        self.assertIn(NEW_TEST, impact.kill_closure(self.toy.root, b, h, K))
+        self.assertEqual(impact.reach.changed(None, NEW_TEST_SRC)["module"], "new")
+        self.again()
+        self.run_case(n20_new_dir)
 
     def test_n21_discovery(self):
         self.run_case(n21)
@@ -578,14 +989,78 @@ class ImpactTest(unittest.TestCase):
     def test_n21_discovery_basename(self):
         self.run_case(n21b)
 
+    def test_n21_discovery_bytes(self):
+        self.run_case(n21c)
+
     def test_n22_resolution(self):
         self.run_case(n22)
+
+    def test_r5_extension_module(self):
+        self.run_case(r5_extension)
 
     def test_n23_computed_name(self):
         self.run_case(n23)
         # red-before: by name alone, tier S would clear _do_b (its def is its only occurrence)
         self.assertEqual(impact.name_refs(self.toy.files["aisef2/dyn.py"])["_do_b"], 1)
         self.assertTrue(impact.dynamic_sites(self.toy.files["aisef2/dyn.py"], "aisef2/dyn.py"))
+
+    def test_n24_site_off_the_executed_path(self):
+        self.run_case(n24)
+
+    def test_n25_platform_and_python(self):
+        self.run_case(n25_python)
+        self.again()
+        self.run_case(n25_platform)
+
+    def test_r0_every_inadmissible_observation(self):
+        c = n2(self.toy)
+        for over, why in (({"outcome": "FAIL"}, "outcome"), ({"witness": False}, "witness"),
+                          ({"outside_tree": True}, "outside the run's tree"), ({"python": "3.0"}, "python"),
+                          ({"platform": "windows"}, "the claim is posix"), ({"commit": c.base}, "another tree")):
+            with self.subTest(why):
+                s = state_of(self.toy, c._replace(obs=self.toy.observe(c.head, **over)))
+                self.assertEqual((s.state, s.component), ("UNRESOLVED", "R0"))
+                self.assertIn(why, s.reason)
+        obs = self.toy.observe(c.head)
+        del obs[K]
+        self.assertEqual(state_of(self.toy, c._replace(obs=obs)).component, "R0")
+
+    def test_r1_incomplete_observations(self):
+        t = self.toy
+        t.edit("aisef2/util.py", "def inc(x):\n", "# no multiprocessing here\ndef inc(x):\n")   # an R1_UNSEEN word
+        t.reentry()
+        c = n2(t)
+        for over in ({"lost": 1}, {"unparsed_lines": 2}, {}):
+            with self.subTest(over):
+                s = state_of(t, c._replace(obs=t.observe(c.head, **over)))
+                self.assertEqual((s.state, s.component), ("INVALIDATED", "R1"), s.reason)
+        s = state_of(t, c._replace(obs=t.observe(c.head, os_trace=True)))   # os_trace covers what the hook misses
+        self.assertEqual((s.state, s.component), ("VERIFIED_REUSE", ""), s.reason)
+
+    def test_n26_copy_run(self):
+        self.run_case(n26)
+        self.again()
+        self.run_case(n26_trace)
+
+    def test_n27_lost(self):
+        self.run_case(n27)
+
+    def test_n28_test_read_as_data(self):
+        s = self.run_case(n28)
+        # red-before: I4 alone calls it an additive test change
+        self.assertIn("I4", s.compared)
+        self.assertEqual(s.evidence["additive_test_changes"], [K])
+
+    def test_n29_enumeration(self):
+        self.run_case(n29)
+
+    def test_n30_d2_check(self):
+        self.run_case(n30)
+        # red-before: the s2 closure alone misses the string-imported module (D2 c is what holds it)
+        b, h = _last(self.toy)
+        self.assertNotIn("aisef2/plug.py", S2.closure(self.toy.root, h, (K,)))
+        self.again()
+        self.run_case(n30_miss)
 
     def test_n31_non_code_root(self):
         self.run_case(n31)
@@ -616,17 +1091,27 @@ class ImpactTest(unittest.TestCase):
 
     def test_r0_and_r1_need_admissible_complete_observations(self):
         self.run_case(wrong_tree_observation)
-        self.toy = Toy(pathlib.Path(self._tmp.name) / "again")
+        self.again()
         self.run_case(unobserved_child)
+
+    def test_i3_superset_and_reorder_are_reused(self):
+        t = self.toy
+        for current, note in (([K, "tests/v2/test_doc.py"], "kill-set-superset"),
+                              (["tests/v2/test_doc.py", K], "kill-set-superset")):
+            with self.subTest(note):
+                t.set_targets({**TARGETS, TGT: current})
+                b = t.commit()
+                s = state_of(t, Case(b, b, None, TGT, "", ""))
+                self.assertEqual((s.state, s.evidence.get("kill_set")), ("VERIFIED_REUSE", note), s.reason)
+        t.entries[TGT] = entry(t.files, TGT, kill=[K, "tests/v2/test_doc.py"])
+        t.set_targets({**TARGETS, TGT: ["tests/v2/test_doc.py", K]})
+        b = t.commit()
+        s = state_of(t, Case(b, b, None, TGT, "", ""))
+        self.assertEqual((s.state, s.evidence.get("kill_set")), ("VERIFIED_REUSE", "kill-set-reordered"), s.reason)
 
     def test_new_test_file_named_by_a_directory_constant(self):
         s = self.run_case(new_test_file)
         self.assertEqual(s.evidence["additive_test_changes"], [NEW_TEST])
-        b, h = _last(self.toy)
-        # red-before: the file is in S(F) by D2 (b), and as a new module its import-time statements are "new" —
-        # judged over the whole S(F), R6 would re-open every target the kill file has
-        self.assertIn(NEW_TEST, impact.kill_closure(self.toy.root, b, h, "tests/v2/test_k.py"))
-        self.assertEqual(impact.reach.changed(None, self.toy.files[NEW_TEST])["module"], "new")
 
     def test_new_test_file_observed_loaded(self):
         self.run_case(new_test_file_loaded)
@@ -638,17 +1123,22 @@ class ImpactTest(unittest.TestCase):
         self.assertEqual(len(states), len(TARGETS))
         self.assertNotIn("MEASURED", {s.state for s in states})   # a legacy entry is never MEASURED
 
-    def test_n14_always_reuse_engine_is_rejected(self):
-        def stub(root, base="", head="", *, observations=None):
-            return [impact.State(t, "VERIFIED_REUSE") for t in TARGETS]
-        failed = []
+    def test_n14_every_rule_is_load_bearing(self):
+        """The intact engine gives every negative case its non-reuse state; with one rule switched off, at least one
+        case of that rule becomes VERIFIED_REUSE — so no rule is decoration."""
+        wrong, flipped = [], set()
         for fn in NEGATIVE:
             with tempfile.TemporaryDirectory() as d:
                 toy = Toy(pathlib.Path(d))
                 case = fn(toy)
-                self.assertNotEqual(case.state, "VERIFIED_REUSE")
-                failed += [fn.__name__] if check(stub, toy, case) else []
-        self.assertEqual(failed, [fn.__name__ for fn in NEGATIVE])
+                self.assertNotEqual(case.state, "VERIFIED_REUSE", fn.__name__)
+                wrong += [f"{fn.__name__}: {x}" for x in check(toy, case)]
+                if case.component in RULES:
+                    with mock.patch.object(impact, "_OFF", frozenset({case.component})):
+                        if state_of(toy, case).state == "VERIFIED_REUSE":
+                            flipped.add(case.component)
+        self.assertEqual(wrong, [])
+        self.assertEqual(sorted(set(RULES) - flipped), [])
 
     def test_option_c_honoured_on_the_real_repository(self):
         """I8 positive: the pinned ruling covers a real Option C entry at v2.2.0 (skipped without that history)."""
@@ -661,6 +1151,7 @@ class ImpactTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             R = impact.SD.Rev(ROOT, base, pathlib.Path(d))
             ctx = impact._Ctx(ROOT, R, R, None)
+            self.assertEqual(ctx.label, "v2.2.0-accepted")
             src = R.text(name.split("::")[0])
             plat = {"family": "posix", "flavor": None}
             self.assertIsNone(ctx.option_c(name, e, src, plat))
