@@ -128,3 +128,11 @@ PASS; `test_c2_p5_acceptance` + `test_qualification_release_mode` OK.
 | `ARCHITECTURE.md` | shipped v2.2 architecture + v2.3 target per wave (W1 section amended by W1-DESIGN) |
 | `MUTATION-IMPACT-BASELINE.md` | measured inventory, per-mutant/target/campaign cost, blast radius, cold-vs-incremental protocol |
 | `W1-DESIGN.md` | frozen F5 design + EVID-COUPLING-01, E5 (W1b), REL-GOV-01, BUILD-REPRO-01, F2, AUTHCHK; exact files; negatives N1–N34 + NA1–NA9; measurement protocol; exit gates; STOPs |
+
+## W0 status of record (owner ruling 2026-11-21, "W1a CONTINUATION")
+
+**Frozen, with the narrow-blocker closure verified; the full critic rerun was NOT performed.** The W0 critic ran three
+full rounds (FAIL 9, FAIL 11, FAIL 14). A first narrow check confirmed 10 of the 14 blockers fixed; a second narrow check
+confirmed all 14 (22 items). It also found 2 residual contradictions, which were fixed and grep-verified (0 hits). No
+complete critic run followed those last two corrections. The freeze is commit `e1ce366e` (public, disclosure-reviewed);
+the full-detail freeze stays local and unpushed. W0 history and the audit trail are preserved unchanged.
