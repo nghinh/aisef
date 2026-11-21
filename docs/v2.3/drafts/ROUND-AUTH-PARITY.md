@@ -7,8 +7,20 @@ is a draft and authorizes nothing.
 Code commit: `f237ad14` on `v23/roundauth`, based on `release/v2.3-big` at `1e25ef84`. v2.2.0 = `da3ea33f3b695aaca73e87a704145a0193aced23`.
 Host for every measurement: Darwin 25.5.0 arm64, CPython 3.14.7, git 2.53.0.
 
-Evidence, all new files under `closure-evidence/v2.3/round-auth/`. Each was written once with `open(…, "x")` and
-carries no local path:
+Evidence, all new files under `docs/v2.3/evidence/round-auth/`. Each was written once with `open(…, "x")` and
+carries no local path.
+
+**Placement finding (for the integrator).** The evidence was first committed under `closure-evidence/v2.3/round-auth/`,
+as Amendment A2 directs (`80046dbe`). That location is inside the V1 evidence guard's protected set:
+`validation/v2/v1_evidence_guard.py` protects every tracked file under `closure-evidence/` except `closure-evidence/v2/`.
+Measured at `80046dbe`:
+* `tests/v2/test_v1_evidence_guard.py::Detective.test_repository_matches_the_baseline` FAILS ("committed addition to
+  protected evidence", 4 files);
+* Q0 regenerates as 56/57 (`v1_evidence_guard` not calibrated), so the Q0 record is no longer byte-identical.
+
+The next commit moves the four files, bytes unchanged, to `docs/v2.3/evidence/round-auth/`, beside W1a's
+`docs/v2.3/evidence/F5-*`. Q0 is re-measured there in §5. **Any track that follows A2 literally hits the same red.**
+The integrator decides the final location; the guard is not touched.
 
 | File | sha256 | Item |
 |---|---|---|
@@ -285,7 +297,7 @@ GATED is byte-identical, as checked by AST, and `test_sealing_gate.py` is unedit
 ## 6. The revised draft
 
 `docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R2.md`: canonical ruling digest
-`493fe80680aeb4a4a8d50907c9e5064c648eb8604473dee1009e06620410d246` (`validation/v23/ledger_digest.py`). R1 is unchanged
+`a7fa9f97c6a324f3f1d53df2ca42cd8c46135751977bcdafa5c3d63716daa940` (`validation/v23/ledger_digest.py`). R1 is unchanged
 (`824091110a8bb0fcf8726e889f4ff0c3f11e8f102dfa18f028e343a968caa79b`, recomputed by the same script). The changes and
 their reasons are in R2.
 
