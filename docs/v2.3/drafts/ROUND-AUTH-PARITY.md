@@ -277,7 +277,11 @@ GATED is byte-identical, as checked by AST, and `test_sealing_gate.py` is unedit
 * At v2.2.0: 250.6 s, 57/57 calibrated, `problems_of` = [], `history_problems` = [], bytes sha256 `714625b1…`, equal to
   the committed record.
 * At `d522dd84`: 258.6 s, the same result.
-* The later code commit changes only `tests/v23/test_v23_rounds.py`.
+* At `80046dbe` (evidence under `closure-evidence/v2.3/`): 56/57; `v1_evidence_guard` is not calibrated. See the
+  placement finding at the top.
+* At `f4a530b6` (evidence moved to `docs/v2.3/evidence/round-auth/`): 252.8 s, 57/57, [] / [], bytes sha256
+  `714625b1…`, equal to the committed record. `tests/v2/test_v1_evidence_guard.py` and `tests/test_onboarding_digest.py`
+  pass there. This is measured after `HISTORY-IDENTITY` was written, so it is recorded here only.
 
 **`closure-evidence/v2`** (`git diff --name-status da3ea33f..HEAD`) has only additions, 9 of them, none by this track:
 * `cycle2/C2-CLOSURE-AUDIT.json`, `cycle2/C2-CLOSURE-AUDIT.md`;
