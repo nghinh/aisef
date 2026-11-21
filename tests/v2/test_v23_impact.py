@@ -115,7 +115,7 @@ def _git(root: pathlib.Path, *args: str) -> str:
     env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@x", "GIT_COMMITTER_NAME": "t",
            "GIT_COMMITTER_EMAIL": "t@x"}
     return subprocess.run(["git", "-C", str(root), "-c", "commit.gpgsign=false", *args], check=True,
-                          capture_output=True, text=True, env=env).stdout.strip()
+                          capture_output=True, text=True, encoding="utf-8", env=env).stdout.strip()
 
 
 class Toy:
