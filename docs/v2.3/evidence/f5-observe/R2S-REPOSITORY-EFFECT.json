@@ -1,0 +1,52 @@
+{
+ "about": "validation/v23/impact.py on the repository with no observation (the recorder has observed no repository kill file): the state table at the lane's code head, to show what the static R2 (R2S) changes",
+ "basis": "da3ea33f3b695aaca73e87a704145a0193aced23",
+ "by_component": {
+  "INVALIDATED R2": {
+   "mutants": 17322,
+   "n": 667
+  },
+  "UNRESOLVED I6": {
+   "mutants": 10078,
+   "n": 327
+  }
+ },
+ "command": "python3 -P validation/v23/impact.py --classify --base <basis> --head <head> --json OUT",
+ "compared_with_disposition_2": "same states and mutant totals (667 INVALIDATED / 17,322; 327 UNRESOLVED (I6) / 10,078; 0 VERIFIED_REUSE); the component is R2 (static) instead of R6: the impact tests left tests/v2 (A2), so no .py is in delta, and R2S fires before R1",
+ "counts": {
+  "INVALIDATED": {
+   "mutants": 17322,
+   "n": 667
+  },
+  "MEASURED": {
+   "mutants": 0,
+   "n": 0
+  },
+  "UNRESOLVED": {
+   "mutants": 10078,
+   "n": 327
+  },
+  "VERIFIED_REUSE": {
+   "mutants": 0,
+   "n": 0
+  }
+ },
+ "delta_under_copy": "9 added files, none .py: closure-evidence/v2/cycle2/{C2-CLOSURE-AUDIT.json,C2-CLOSURE-AUDIT.md,C2-HISTORY-FREEZE-CANDIDATE.json,C2-LEDGERLOCK-FAILURE-TRIAGE.json,C2-ORCHESTRATION-CHANGE-REVIEW.json}, closure-evidence/v2/v2.2/{RELEASE-MUTATION-GATE-EVALUATION.json,RELEASE-MUTATION-SCOPE-AMENDMENT.json,V2.2-MUTATION-CAMPAIGN-FREEZE.json,V2.2-RELEASE-GO-NO-GO.md}",
+ "engine_sha256": "6a418d475a82e83ff5f14522cd2a8f20b565f58b52707b598800bf76426210e1",
+ "head": "75080a805bbeeff5021ddb3de395356bebce4cfa",
+ "platform": {
+  "posix/darwin": 461,
+  "posix/linux": 63,
+  "posix/unproven": 140,
+  "unknown/unproven": 327,
+  "windows/unproven": 3
+ },
+ "precision_cost": "tests/v2/test_p9_reproduction.py holds the constant 'closure-evidence/v2' and is in every S(F) (registry's TESTS_V2), so while these 9 files are in delta against this basis, R2S invalidates every target that passes I6 even with complete observations",
+ "r2_first_delta_paths": [
+  "closure-evidence/v2/cycle2/C2-CLOSURE-AUDIT.json"
+ ],
+ "r2_reasons": {
+  "tests/v2/test_p9_reproduction.py names it by a directory constant 'closure-evidence/v2'": 667
+ },
+ "run": "v2.2.0-accepted"
+}

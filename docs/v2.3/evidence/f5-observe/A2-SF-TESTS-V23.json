@@ -1,0 +1,79 @@
+{
+ "about": "Amendment A2 measured proof: which kill files' S(F) (W1-DESIGN \u00a72.9 D2, validation/v23/impact.py _Ctx.S, at basis \u222a head) hold a tests/v23 path, and, for comparison, which held tests/v2/test_v23_impact.py before the move",
+ "basis": "da3ea33f3b695aaca73e87a704145a0193aced23",
+ "runs": [
+  {
+   "copy_roots": [
+    "aisef2",
+    "tests/v2",
+    "validation/v2",
+    "docs/architecture",
+    "docs/implementation/v2",
+    "closure-evidence/v2",
+    "validation/v21",
+    "docs/v2.1",
+    "aisef",
+    "pyproject.toml"
+   ],
+   "delta_paths_matching": [],
+   "examples": [],
+   "head": "164081cf1ab49737f2e78ac0fcb24d4147b45fcc",
+   "kill_files": 262,
+   "kill_files_whose_S_holds_it": 0,
+   "label": "after the move",
+   "probe": "tests/v23/**",
+   "seconds": 734.1
+  },
+  {
+   "copy_roots": [
+    "aisef2",
+    "tests/v2",
+    "validation/v2",
+    "docs/architecture",
+    "docs/implementation/v2",
+    "closure-evidence/v2",
+    "validation/v21",
+    "docs/v2.1",
+    "aisef",
+    "pyproject.toml"
+   ],
+   "delta_paths_matching": [],
+   "examples": [],
+   "head": "75080a805bbeeff5021ddb3de395356bebce4cfa",
+   "kill_files": 262,
+   "kill_files_whose_S_holds_it": 0,
+   "label": "final head of the lane's code",
+   "probe": "tests/v23/**",
+   "seconds": 754.6
+  },
+  {
+   "copy_roots": [
+    "aisef2",
+    "tests/v2",
+    "validation/v2",
+    "docs/architecture",
+    "docs/implementation/v2",
+    "closure-evidence/v2",
+    "validation/v21",
+    "docs/v2.1",
+    "aisef",
+    "pyproject.toml"
+   ],
+   "delta_paths_matching": [
+    "tests/v2/test_v23_impact.py"
+   ],
+   "examples": [
+    "tests/v2/p0/test_destructive_authority.py",
+    "tests/v2/p0/test_invariants_runtime.py",
+    "tests/v2/p1/test_contract.py"
+   ],
+   "head": "1e25ef8453b4bdae60282a4e3232a69652ff0552",
+   "kill_files": 262,
+   "kill_files_whose_S_holds_it": 262,
+   "label": "before the move",
+   "probe": "tests/v2/test_v23_impact.py",
+   "seconds": 473.7
+  }
+ ],
+ "tool": "validation/v23/impact.py (_Ctx.S, _Ctx.delta)"
+}
