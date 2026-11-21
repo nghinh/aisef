@@ -93,12 +93,40 @@ class Markers(unittest.TestCase):
         self.assertRefused(_method(_call(platforms="['solaris']")), "non-empty subset")
         self.assertRefused(_method(_call(platforms="['linux', 'darwin', 'windows']")), "is not a platform limit")
 
-    def test_sealing_only_on_a_test_the_sealing_gate_carries(self):
-        sealing = _call(category="'sealing'", platforms="['linux', 'darwin', 'windows']")
-        self.assertRefused(_method(sealing), "the @sealing gate does not carry")
-        self.assertEqual(_collect(_method(sealing, extra="@sealing\n    "))[1], [])
-        gated_class = _method(sealing).replace("class T(", "@sealing\nclass T(")
-        self.assertEqual(_collect(gated_class)[1], [])
+    def test_sealing_only_on_a_test_in_the_closed_gated_list(self):
+        seal = _call(category="'sealing'", platforms="['linux', 'darwin', 'windows']")
+        gated = _method(seal, extra="@sealing\n    ")
+        self.assertRefused(_method(seal), "the @sealing gate does not carry")
+        self.assertRefused(gated, "the @sealing gate does not carry")       # a decorator's name alone is no gate
+        for entry in ("tests/v9/test_fix.py::T.test_x", "tests/v9/test_fix.py::T"):
+            with self.subTest(entry=entry):
+                self.assertEqual(_collect(gated, {tm.GATE: f"GATED = ({entry!r},)\n"})[1], [])
+        self.assertRefused(gated, "the @sealing gate does not carry", {tm.GATE: "GATED = ('tests/v9/test_fix.py::T.test_y',)\n"})
+
+    def test_a_homemade_sealing_decorator_gates_nothing(self):
+        # red-before (L1F2-R1): on 141f74c5 both were clean markers and excepted a real failure on every platform; the
+        # testX.py file escapes test_sealing_gate's test_*.py closure, the call form escapes its Name/Attribute match
+        seal = _call(category="'sealing'", platforms="['linux', 'darwin', 'windows']")
+        for rel, defn, deco in (("tests/v9/testproduct.py", "def sealing(test):\n    return test\n", "sealing"),
+                                ("tests/v9/test_product.py", "def sealing():\n    return lambda test: test\n",
+                                 "sealing()")):
+            source = ("import unittest\nfrom validation.qualification.test_markers import marker\n\n\n" + defn
+                      + f"\n\nclass T(unittest.TestCase):\n    @{deco}\n    @{seal}\n    def test_x(self):\n"
+                      "        self.fail('PRODUCT DEFECT')\n")
+            with self.subTest(file=rel):
+                markers, problems = _collect(HEAD, {rel: source})
+                self.assertTrue(any("the @sealing gate does not carry" in p for p in problems), problems)
+                failing = {m.test for m in markers}
+                self.assertEqual(len(failing), 1)
+                for token in ("linux", "darwin", "windows"):
+                    d = rq.decide("2.3.0", failing, {}, token, markers, problems, {"v9.test_fix.Pos.test_positive"})
+                    self.assertEqual((d["qualification"], d["unexpected"]), ("FAIL", sorted(failing)), token)
+
+    def test_the_gated_list_is_read_from_the_source_exactly(self):
+        from tests.v2 import sealing_gate
+        self.assertEqual(tm.gated_ids(), frozenset(sealing_gate.GATED))
+        with tempfile.TemporaryDirectory() as d:                         # no list: every sealing marker is refused
+            self.assertEqual(tm.gated_ids(pathlib.Path(d)), frozenset())
 
     def test_the_positive_assertion_is_another_discovered_unmarked_test(self):
         self.assertRefused(_method(_call(positive="'v9.test_fix.Pos.test_missing'")), "positive")
@@ -179,10 +207,12 @@ class Decide(unittest.TestCase):
         self.assertEqual(d["qualification"], "FAIL")
         self.assertTrue(d["problems"][0].startswith("test marker refused: "))
 
-    def test_a_sealing_run_never_excepts_a_sealing_test(self):
-        self.assertEqual(self.q("2.3.0", {X}, {}, "linux", [S], [], {P})["qualification"], "PASS")
-        d = self.q("2.3.0", {X}, {}, "linux", [S], [], {P}, sealing_run=True)
-        self.assertEqual((d["qualification"], d["unexpected"]), ("FAIL", [X]))
+    def test_a_sealing_marker_never_excepts_a_failure(self):
+        # red-before (L1F2-R1): on 141f74c5 a sealing marker excepted its test on every platform outside a sealing run
+        for token in ("linux", "darwin", "windows"):
+            with self.subTest(token=token):
+                d = self.q("2.3.0", {X}, {}, token, [S], [], {P})
+                self.assertEqual((d["qualification"], d["unexpected"], d["exceptions"]), ("FAIL", [X], []))
 
     def test_the_v2_2_rule_is_unchanged_below_2_3_no_exception_at_all(self):
         for version in ("2.2.0", "2.2.1", "2.1.1", "2.0.0", "dev"):
@@ -204,7 +234,7 @@ class Decide(unittest.TestCase):
         for token in ("linux", "darwin", "windows"):
             with self.subTest(token=token):
                 listed = {e["test"] for e in real["exceptions"] if token in e["platforms"]}
-                d = self.q("2.1.0", listed, real, token, [M], ["refused"], set(), sealing_run=True)
+                d = self.q("2.1.0", listed, real, token, [M], ["refused"], set())
                 self.assertEqual((d["exception_source"], d["unexpected"], d["excepted_and_observed"]),
                                  ("allowlist", [], sorted(listed)))
                 self.assertEqual(self.q("2.1.0", {X}, real, token, [M], [], {P})["unexpected"], [X])

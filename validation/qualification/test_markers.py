@@ -18,7 +18,9 @@ exactly what is written. A marker is refused (a problem, and release_qualify FAI
   * `reason` is a non-empty string;
   * `platforms` is a non-empty subset of linux/darwin/windows, and a proper subset for `platform-harness` (a limit
     on every platform is not a platform limit);
-  * the category matches the test: `sealing` only on a test the `@sealing` gate carries (tests/v2/sealing_gate.py);
+  * the category matches the test: `sealing` only on a test named in `GATED`, the closed list of
+    tests/v2/sealing_gate.py, read from its source and matched by test id, never by a decorator's name (a local
+    `def sealing` gates nothing). A sealing marker classifies; release_qualify never excepts a failure by it;
   * `positive` names another test that unittest discovers and that carries no marker. It is the positive assertion
     that the path stays covered (R6). release_qualify also requires it to have passed in the same run.
 A marker anywhere else (a class, a helper, a module-level function), a positional, missing, extra or non-literal
@@ -35,6 +37,7 @@ import re
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CHECKLIST = "docs/v2.3/MASTER-CHECKLIST.md"
+GATE = "tests/v2/sealing_gate.py"
 CATEGORIES = frozenset({"sealing", "platform-harness"})
 PLATFORMS = frozenset({"linux", "darwin", "windows"})
 FIELDS = frozenset({"category", "id", "reason", "platforms", "positive"})
@@ -61,6 +64,17 @@ class Marker:
 def checklist_ids(root: pathlib.Path = ROOT) -> set[str]:
     p = root / CHECKLIST
     return set(_ROW.findall(p.read_text(encoding="utf-8"))) if p.is_file() else set()
+
+
+def gated_ids(root: pathlib.Path = ROOT) -> frozenset[str]:
+    """sealing_gate.GATED as written ("tests/<path>.py::Class[.method]"), never imported. Absent or unreadable reads
+    as empty: every sealing marker is then refused (fail closed)."""
+    try:
+        tree = ast.parse((root / GATE).read_text(encoding="utf-8"))
+        return frozenset(next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
+                              and any(isinstance(t, ast.Name) and t.id == "GATED" for t in n.targets)))
+    except (OSError, SyntaxError, ValueError, TypeError, StopIteration):
+        return frozenset()
 
 
 def _named(node: ast.expr, name: str) -> bool:
@@ -100,7 +114,7 @@ def _check(m: Marker, gated: bool, tests: set[str], marked: set[str], checklist:
     elif m.category == "platform-harness" and set(m.platforms) == PLATFORMS:
         out.append("a platform-harness marker on every platform is not a platform limit")
     if m.category == "sealing" and not gated:
-        out.append("category sealing on a test the @sealing gate does not carry")
+        out.append(f"category sealing on a test the @sealing gate does not carry (not in {GATE} GATED)")
     if m.positive == m.test or m.positive not in tests or m.positive in marked:
         out.append(f"positive {m.positive!r} must name another discovered test that carries no marker")
     return [f"{m.where}: {m.test}: {p}" for p in out]
@@ -112,6 +126,7 @@ def collect(root: pathlib.Path = ROOT) -> tuple[list[Marker], list[str]]:
     found: list[tuple[Marker, bool]] = []
     tests: set[str] = set()
     problems: list[str] = []
+    gate = gated_ids(root)
     for p in sorted(tests_dir.rglob("test*.py")):
         rel = p.relative_to(root).as_posix()
         try:
@@ -130,7 +145,7 @@ def collect(root: pathlib.Path = ROOT) -> tuple[list[Marker], list[str]]:
                 test = f"{module}.{cls.name}.{fn.name}"
                 if discovered:
                     tests.add(test)
-                gated = any(_named(d, "sealing") for d in cls.decorator_list + fn.decorator_list)
+                gated = f"{rel}::{cls.name}" in gate or f"{rel}::{cls.name}.{fn.name}" in gate
                 for d in (d for d in fn.decorator_list if _named(d, "marker")):
                     placed.add(d)
                     m = _read(d, test, f"{rel}:{d.lineno}")

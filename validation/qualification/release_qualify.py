@@ -15,10 +15,10 @@ Where the exceptions come from depends on the version (raw verdicts are printed 
   * 2.1.0 (HISTORY): the hand-authored closure-evidence/v2/release/V2.1.0-QUALIFICATION-ALLOWLIST.json, exactly as
     before. It is history and is never reused for another version (W1-DESIGN §7).
   * any other version below 2.3 (the v2.2 rule): no exceptions; the gate is "the whole suite is green".
-  * 2.3 and later (F2): only typed test markers (validation/qualification/test_markers.py), category sealing or
-    platform-harness, each with a checklist ID, a reason and a positive assertion that must have passed in the same
-    run. A refused marker is a blocker. An `AISEF_SEALING=1` run never excepts a sealing-category test: the sealing
-    tier's verdict is not masked (RELEASE-CHARTER §2).
+  * 2.3 and later (F2): only typed test markers (validation/qualification/test_markers.py), each with a checklist
+    ID, a reason and a positive assertion that must have passed in the same run. A refused marker is a blocker. Only a
+    platform-harness marker excepts a failure: a sealing marker classifies and never excepts. A gated test is skipped
+    outside a sealing run, and inside one its verdict is never masked (RELEASE-CHARTER §2).
 For every version other than 2.1.0, an exception in a hand-authored V<version>-QUALIFICATION-ALLOWLIST.json is an
 unmarked exception: a blocker, never honoured.
 
@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import dataclasses
 import json
-import os
 import pathlib
 import re
 import sys
@@ -82,7 +81,7 @@ def load_allowlist(version: str, root: pathlib.Path = ROOT) -> dict:
 
 
 def decide(version: str, measured_fail: set[str], manifest: dict, token: str, markers=(), marker_problems=(),
-           passed: set[str] = frozenset(), sealing_run: bool = False) -> dict:
+           passed: set[str] = frozenset()) -> dict:
     """The release-qualification decision for one platform. Pure, so it is unit-testable without running the suite.
     `markers`/`marker_problems` are test_markers.collect()'s result, `passed` the test ids that ran and passed."""
     scoped = manifest.get("version") == version          # the allowlist is honoured only for its own version
@@ -99,8 +98,8 @@ def decide(version: str, measured_fail: set[str], manifest: dict, token: str, ma
         applicable = []
         if source == "markers":
             blockers += [f"test marker refused: {p}" for p in marker_problems]
-            applicable = [dataclasses.asdict(m) for m in markers
-                          if token in m.platforms and not (sealing_run and m.category == "sealing")]
+            applicable = [dataclasses.asdict(m) for m in markers  # a sealing marker classifies, never excepts
+                          if token in m.platforms and m.category == "platform-harness"]
             blockers += [f"positive assertion {e['positive']} of the excepted {e['test']} did not pass in this run"
                          for e in applicable if e["test"] in measured_base and e["positive"] not in passed]
     allowed = {e["test"] for e in applicable}
@@ -161,8 +160,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest = load_allowlist(version)
     markers, marker_problems = test_markers.collect(ROOT) if markers_apply(version) else ([], [])
     measured_fail, passed = run_suite()
-    d = decide(version, measured_fail, manifest, token, markers, marker_problems, passed,
-               sealing_run=os.environ.get("AISEF_SEALING") == "1")
+    d = decide(version, measured_fail, manifest, token, markers, marker_problems, passed)
 
     print("\n=== RAW SUITE VERDICT (authentic, never rewritten) ===")
     print(f"failing/errored tests: {d['raw_fail_count']}")
