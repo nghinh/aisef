@@ -372,6 +372,7 @@ def derive() -> tuple[dict, list[str]]:
     blob = rebind.lf_sha_at(V2_0_0, rp.OUT_REL) == _lf(rp.OUT_REL)
     problems += [] if refusal else ["c2_orchestration_repair --write would measure on this tree (q5.CORPUS has every Cycle-1 item)"]
     problems += [] if blob else [f"{rp.OUT_REL} is not its v2.0.0 blob: a cycle-2 record was rewritten"]
+    problems += rc.state_problems()   # v2.3: the behaviour evidence's calibration record is cited only while current
     rec = {
         "record": "AISEF V2.1 — CONFORMANCE RULING (B-03d): 2.1's behaviour changes against the historical "
                   "C2-ORCHESTRATION-CONFORMANCE-REPAIR record",

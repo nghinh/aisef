@@ -1,0 +1,54 @@
+{
+ "record": "AISEF v2.3 — C2-FINAL HISTORY-FREEZE ERRATUM (append-only; the freeze candidate is never edited)",
+ "item": "CODE-AUDIT #17; W1-DESIGN §7",
+ "writer": "validation/qualification/c2_closure_audit.py --erratum",
+ "phase": "C2-FINAL",
+ "state": "INVALIDATED",
+ "state_reason": "the first 43 entries are not the frozen ones (closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json holds 35)",
+ "cause": "history_freeze() counted the history's working-tree entries when the freeze was written; the record's own rule keeps the gate attempts of the commit that carries it out of the record, and those entries were never committed, so no committed version of the history can match the frozen digest",
+ "freeze": {
+  "path": "closure-evidence/v2/cycle2/C2-HISTORY-FREEZE-CANDIDATE.json",
+  "sha256": "397cf6198a1f8ffa1f74d237c058e28c8af664f4171c7cd9b8fed585ef1b5814",
+  "written": "2026-10-01T11:07:24Z",
+  "head_when_written": "3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11",
+  "row": {
+   "entry_count": 43,
+   "last_sequence": 43,
+   "full_history_digest": "7bbee75ae25b3ac10b44e791a9d09c34451bb7591623e3d88a0a76b106f79dc4",
+   "file_sha256_when_written": "e16319c6b6ff8cd8efd92762ef9f760c62f8a88e299acaca5abb6c28e8b967f3"
+  }
+ },
+ "history": {
+  "path": "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json",
+  "sha256": "c765cdc17a06da56b6d09a2f9ec792e5e9fa48e575ade444df88b37a55183864",
+  "entries": 35,
+  "digest": "1cd9c4fda36ea81ff5710871c4be67dadbd8b92f3d2f756af95ecf1eeabf8eb0",
+  "committed_versions": [
+   {
+    "commit": "3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11",
+    "entries": 35,
+    "sha256": "c765cdc17a06da56b6d09a2f9ec792e5e9fa48e575ade444df88b37a55183864"
+   },
+   {
+    "commit": "236b440ff0b3d9811a602c9c61b3b3c769a5a819",
+    "entries": 27,
+    "sha256": "a373b580cd97e21b53a754f0f0c46d6f13724bdc68b212596ca05807c28fec84"
+   },
+   {
+    "commit": "2c3d0f972df48f77e65b504bcc4df8d4ad1dedfd",
+    "entries": 24,
+    "sha256": "cff20606a61262e1e6e391be9fdb81c85cf675f778876f3be9a36a5cd8be900c"
+   },
+   {
+    "commit": "53408cb0bda897e19dba9c725c171d1638ecdd4e",
+    "entries": 13,
+    "sha256": "f1e6f0df87f01586fb81826c9d7c4c277012b74e203e73fbfa2e18b3ac847af3"
+   }
+  ],
+  "entries_at_head_when_written": 35,
+  "head_when_written_committed_at": "2026-10-01T09:33:07Z",
+  "max_committed_entries": 35,
+  "file_sha256_when_written_is_a_committed_version": false
+ },
+ "rule": "check() accepts this row's mismatch only while this file is exactly what the tree derives (state INVALIDATED); the row stays INVALIDATED and cite() refuses it as current evidence; nothing in closure-evidence/ is edited"
+}

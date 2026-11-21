@@ -780,6 +780,11 @@ def reverify(run_guards: bool = True, round: str = "v2.1") -> dict:
     aid = _aid()
     checks: list[tuple[bool, str]] = []
     accepted, prop = _json_or_none(OUT_REL), _json_or_none(PROPOSAL_REL)   # the 2.0 records, through the one reader
+    if accepted is None or prop is None:   # #40: a missing 2.0 record is a problem, never an exception (history_problems)
+        problems = [f"{rel} is missing" for rel, doc in ((OUT_REL, accepted), (PROPOSAL_REL, prop)) if doc is None]
+        return {"record": f"AISEF {'V2.2' if is_v22 else 'V2.1'} — C2-P5 ACCEPTANCE BOUNDARY RE-VERIFICATION (no new owner acceptance)",
+                "id": f"AISEF-{'V2.2' if is_v22 else 'V2.1'}-C2-P5-ACCEPTANCE-REVERIFICATION", "claims_owner_acceptance": False,
+                "new_approvals": [], "problems": problems + history_problems() + proposal_history_problems(), "verdict": "PROBLEMS"}
     if is_v22:   # the round's proposal and falsifiability, resolved for this round+tree (cross-record, no fallback)
         try:
             _, committed_prop_doc = vf.resolve_upstream(ROOT, V21_PROPOSAL_REL, V22_PROPOSAL_REL)
@@ -896,6 +901,7 @@ def reverify(run_guards: bool = True, round: str = "v2.1") -> dict:
     calibrations = {"shipped": _file(rc.SHIPPED_REL),
                     "newest_release_record": _file(rc.RECORD_REL) if (ROOT / rc.RECORD_REL).is_file() else None}
     checks.append((calibrations["newest_release_record"] is not None, f"{rc.RECORD_REL} is missing"))
+    checks += [(False, p) for p in rc.state_problems()]   # v2.3: cited only while MEASURED / VERIFIED_REUSE (by identity)
     if is_v22:
         # a v2.2 re-verification cites a COMMITTED owner decision-ledger entry (as v2.1 cites B-03a). The entry is drafted
         # for owner approval; the record is never accepted on an uncommitted/fabricated authority, so until the owner's

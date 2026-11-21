@@ -939,15 +939,108 @@ def markdown(tri: dict, orch: dict, frz: dict, a: dict) -> str:
     return "\n".join(out) + "\n"
 
 
+#: v2.3 (CODE-AUDIT #17, W1-DESIGN §7): the append-only erratum of the C2-FINAL freeze row (never under closure-evidence/)
+ERRATUM_REL = "docs/v2.3/evidence/l1-qual/C2-FINAL-FREEZE-ERRATUM.json"
+CURRENT = ("MEASURED", "VERIFIED_REUSE")
+
+
+def _digest(entries: list) -> str:
+    return hashlib.sha256(json.dumps(entries, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def freeze_states() -> dict[str, tuple[str, str]]:
+    """Each frozen history row's F5 state, re-derived now: VERIFIED_REUSE while the history's first `entry_count`
+    entries still have the frozen digest (the digest rule), INVALIDATED otherwise. An erratum never changes a state."""
+    out = {}
+    for phase, row in load(FREEZE_REL)["histories"].items():
+        n, e = row["entry_count"], load(row["path"])["entries"]
+        out[phase] = (("VERIFIED_REUSE", f"frozen-prefix:{n}@{row['full_history_digest'][:12]}")
+                      if _digest(e[:n]) == row["full_history_digest"] else
+                      ("INVALIDATED", f"the first {n} entries are not the frozen ones ({row['path']} holds {len(e)})"))
+    return out
+
+
+def cite(phase: str) -> dict:
+    """A frozen history row as CURRENT evidence: only while it re-derives; an INVALIDATED row is refused, erratum or not."""
+    state, why = freeze_states()[phase]
+    if state not in CURRENT:
+        raise LookupError(f"{phase}: {state} — {why}; an INVALIDATED freeze row is never cited as current evidence")
+    return {"phase": phase, "state": state, "basis": why, **load(FREEZE_REL)["histories"][phase]}
+
+
+def erratum(phase: str = "C2-FINAL") -> dict:
+    """The erratum this tree derives for `phase`'s freeze row: the freeze file, the committed history and the timing,
+    each re-derived from the files and HEAD's history (so a stale or edited erratum is not this record)."""
+    frz = load(FREEZE_REL)
+    row, (state, why) = frz["histories"][phase], freeze_states()[phase]
+    hist, head = row["path"], frz["accepted_candidate_identity"]["head_when_written"]
+    entries = load(hist)["entries"]
+    versions = []
+    for c in git("log", "--format=%H", "HEAD", "--", hist).split():
+        blob = subprocess.run(["git", "cat-file", "blob", f"{c}:{hist}"], cwd=ROOT, capture_output=True, check=True).stdout
+        versions.append({"commit": c, "entries": len(json.loads(blob)["entries"]),
+                         "sha256": hashlib.sha256(blob.replace(b"\r\n", b"\n")).hexdigest()})
+    at_head = json.loads(subprocess.run(["git", "cat-file", "blob", f"{head}:{hist}"], cwd=ROOT, capture_output=True,
+                                        check=True).stdout)["entries"]
+    return {
+        "record": "AISEF v2.3 — C2-FINAL HISTORY-FREEZE ERRATUM (append-only; the freeze candidate is never edited)",
+        "item": "CODE-AUDIT #17; W1-DESIGN §7", "writer": "validation/qualification/c2_closure_audit.py --erratum",
+        "phase": phase, "state": state, "state_reason": why,
+        "cause": "history_freeze() counted the history's working-tree entries when the freeze was written; the record's own "
+                 "rule keeps the gate attempts of the commit that carries it out of the record, and those entries were never "
+                 "committed, so no committed version of the history can match the frozen digest",
+        "freeze": {**ident(FREEZE_REL), "written": frz["written"], "head_when_written": head,
+                   "row": {k: row[k] for k in ("entry_count", "last_sequence", "full_history_digest", "file_sha256_when_written")}},
+        "history": {**ident(hist), "entries": len(entries), "digest": _digest(entries), "committed_versions": versions,
+                    "entries_at_head_when_written": len(at_head),
+                    "head_when_written_committed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(int(git("log", "-1", "--format=%ct", head)))),
+                    "max_committed_entries": max(v["entries"] for v in versions),
+                    "file_sha256_when_written_is_a_committed_version": row["file_sha256_when_written"] in {v["sha256"] for v in versions}},
+        "rule": "check() accepts this row's mismatch only while this file is exactly what the tree derives (state INVALIDATED); "
+                "the row stays INVALIDATED and cite() refuses it as current evidence; nothing in closure-evidence/ is edited",
+    }
+
+
+def erratum_problems(phase: str) -> list[str]:
+    """[] when the committed erratum names `phase` INVALIDATED and is exactly what this tree derives."""
+    if not (ROOT / ERRATUM_REL).is_file():
+        return [f"{ERRATUM_REL} is missing"]
+    try:
+        want = erratum(phase)
+    except (subprocess.CalledProcessError, OSError, KeyError, ValueError) as x:
+        return [f"{ERRATUM_REL}: not re-derivable ({type(x).__name__})"]
+    if want["state"] != "INVALIDATED":
+        return [f"{ERRATUM_REL}: {phase} is {want['state']}, nothing to correct"]
+    return [] if load(ERRATUM_REL) == want else [f"{ERRATUM_REL} is not what this tree derives for {phase}"]
+
+
+def write_erratum(phase: str = "C2-FINAL") -> int:
+    """--erratum: the erratum, written once (`open "x"`), only for a row that is INVALIDATED now."""
+    doc = erratum(phase)
+    if doc["state"] != "INVALIDATED":
+        print(f"refused: {phase} is {doc['state']}, nothing to correct", file=sys.stderr)
+        return 1
+    (ROOT / ERRATUM_REL).parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(ROOT / ERRATUM_REL, "x", encoding="utf-8", newline="\n") as f:
+            f.write(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
+    except FileExistsError:
+        print(f"refused: {ERRATUM_REL} exists — a record is never rewritten", file=sys.stderr)
+        return 1
+    print(f"wrote {ERRATUM_REL}: {phase} {doc['state']}")
+    return 0
+
+
 def check() -> list[str]:
-    """The committed records still describe the tree: each frozen history keeps its recorded prefix, the audit binds the
-    three records it names, and the LedgerLock result is the one preserved."""
+    """The committed records still describe the tree: each frozen history keeps its recorded prefix (a row that does not
+    is accepted only with its erratum, and stays INVALIDATED), the audit binds the three records it names, and the
+    LedgerLock result is the one preserved."""
     problems = []
     frz, audit, tri = load(FREEZE_REL), load(AUDIT_REL), load(TRIAGE_REL)
-    for phase, row in frz["histories"].items():
-        e = load(row["path"])["entries"][:row["entry_count"]]
-        if hashlib.sha256(json.dumps(e, sort_keys=True, ensure_ascii=False).encode()).hexdigest() != row["full_history_digest"]:
-            problems.append(f"{phase}: the first {row['entry_count']} entries are not the frozen ones")
+    for phase, (state, _) in freeze_states().items():
+        if state not in CURRENT and (bad := erratum_problems(phase)):
+            problems.append(f"{phase}: the first {frz['histories'][phase]['entry_count']} entries are not the frozen ones")
+            problems += bad if (ROOT / ERRATUM_REL).is_file() else []
     for key, rel in (("8_history_freeze", FREEZE_REL), ("orchestration_review", ORCH_REL)):
         if audit[key] != ident(rel):
             problems.append(f"{rel} is not the record the audit binds")
@@ -969,7 +1062,14 @@ def main(argv: list[str] | None = None) -> int:
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
+    g.add_argument("--erratum", action="store_true", help="v2.3 #17: write the C2-FINAL freeze erratum once")
+    g.add_argument("--states", action="store_true", help="print each frozen history row's state and basis (JSON)")
     a = ap.parse_args(argv)
+    if a.erratum:
+        return write_erratum()
+    if a.states:
+        print(json.dumps({p: {"state": s, "basis": b} for p, (s, b) in freeze_states().items()}, indent=1))
+        return 0
     if a.check:
         problems = check()
         print("\n".join(problems) or "c2 closure audit: the records bind this tree")

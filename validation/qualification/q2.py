@@ -142,6 +142,8 @@ def _calibration_records() -> tuple[str, ...]:
 def _committed_calibration_keys() -> set:
     keys = set()
     for rel in ("closure-evidence/v2/P2-CALIBRATION.json", *_calibration_records()):
+        if rel == release_calibration.RECORD_REL and release_calibration.state_problems():
+            continue      # v2.3: an INVALIDATED / UNRESOLVED release record supplies no key (it is never cited as current)
         doc = json.loads((C.ROOT / rel).read_text(encoding="utf-8"))
         c = doc["calibrations"] if "calibrations" in doc else doc["rows"]   # the release record's rows (release_calibration.py)
         rows = [r for v in c.values() for r in v] if isinstance(c, dict) else c
@@ -189,6 +191,8 @@ def _calibration_cycle2() -> dict:
         problems.append(f"declared but not calibrated fresh: {sorted(in_use - fresh_keys)}")
     if committed != in_use:
         problems.append(f"the committed calibration records differ from the declared classes: {sorted(committed ^ in_use)}")
+    if C.MODE == "release":   # v2.3: the release record is cited only while MEASURED / VERIFIED_REUSE (by identity)
+        problems += release_calibration.state_problems()
     return {"probes": {e.probe_id: {"digest": e.probe_digest, "active": e.active,
                                     "classes": list(importlib.import_module(e.factory.__module__).CLASSES)} for e in catalog.CATALOG},
             "fresh": fresh, "in_use": sorted(in_use), "committed_record_keys": sorted(committed),
