@@ -1207,3 +1207,124 @@ Measured at `1bf5dd2f`.
 * **Q0-1 (immutable evidence contract, conditional):** only if a W1 change cannot keep the Q0 record byte-identical (M6).
 * Not STOPs: the 9 open OWNER_DECISION rows and the 7 W0-closure items (DAG §5a) are asked at their own W2–W5 design
   freezes with defaults already chosen; spending stays 0 (no paid provider call in W1; GitHub CI free on the public repo).
+
+## Amendment A1 (2026-11-21, W1a increment 1) — §2.9 R5–R8 scope; erratum §2.4.4 / §11 exit gate 2
+
+*Appended under the freeze rule (line 3). It amends §2.9 R6 — and, because they share its scope, R5, R7 and R8 — and
+corrects the flavor figures of §2.4.4 and §11 exit gate 2. Nothing above is edited. I4, the D2 check and the R1 static
+scan keep all of S(F) exactly as frozen.*
+
+### A1.1 §2.9 R5–R8 judge the code F's processes run, not every file of S(F)
+
+**Why.** At real scale S(F) is degenerate. D2 (b) adds every file under a directory named by one whole constant, and
+`registry.py`'s `TESTS_V2 = "tests/v2"` lies in every kill file's S(F) (through `tests/v2/__init__.py`). So every S(F)
+holds every `tests/v2` file.
+- Measured at basis `da3ea33f3b69…` ∪ the increment's head: all 262 kill files reach `registry.py` by import, so every
+  S(F) holds all 569 `tests/v2` files.
+- The import-reached part, code(F) below, holds 321–978 files (median 338).
+- The adversarial review measured the exact S(F) of two kill files at 7,547 files.
+
+Under the frozen R6 letter ("f ∈ Δ ∩ S(F)"), any NEW `tests/v2` file has module
+status "new" and re-opens every target. The first real run of this increment showed it: 667 / 667 targets
+INVALIDATED (R6), all because of the increment's own new test file. That letter contradicts two frozen rules, the N20
+positive ("adding `tests/v2/test_new.py` gives VERIFIED_REUSE") and §2.8 ("new behaviour gets NEW test files"). The R3
+registry discount exists to keep exactly those files cheap.
+
+**Rule.** It replaces the scope of R5, R6, R7 and R8 only.
+- **code(F)** is the fixpoint of D2 (a) the s2 closure, (c) dotted import strings and (d) the discovery set, at basis ∪ now.
+  This is what F's process imports. D2 (b) literal paths are not followed.
+- **ran(F)** = code(F) ∪ (S(F) ∩ (`O(F).loaded` ∪ every `.py` path of `O(F).opened` tagged `load`)).
+- R5 and R6 are judged on code(F) before any observation. After R0–R3 they are judged again on ran(F) \ code(F).
+- R7's reference test and R8's tier-S scope are ran(F).
+- With no observation, R1 fires for any Δ ≠ ∅ before R7 and R8 are reached.
+- An `opened` path tagged `load` that is not a `.py` file counts as data for R2, as does a path with any tag other than `load`.
+- R6 also fires when a top-level name's binding statements in f ∈ Δ are the same texts in another order. The later
+  binding wins, and `reach.changed()` cannot see the swap: it compares a name's defs as a sorted multiset and leaves
+  plain defs out of the module code. I1 likewise keeps the slice in statement order.
+
+**Soundness argument (for the observed, unmutated run).** Take f ∈ Δ ∩ S(F) with f ∉ ran(F).
+1. If O(F) is missing, inadmissible or incomplete, R0 or R1 already gives UNRESOLVED or INVALIDATED for any Δ ≠ ∅
+   ("any path of the tree may be read or run"). They fire before R5–R8 decide anything, so the narrowing changes
+   nothing in that case.
+2. Now let O(F) be admissible and complete. R0 passes; `lost = 0`; `unparsed_lines = 0`; every child is hooked or
+   covered by `os_trace`; and, without `os_trace`, no R1_UNSEEN word appears in S(F). Then every process of F's run is
+   observed. Every tree file a hooked process executes as Python source was read by the import system (tagged `load`)
+   or opened some other way (data). The D2 check keeps both inside S(F).
+3. A file read as data and then executed (exec or compile of its text) is caught by R2 whenever it is in Δ, since R2
+   counts bytes.
+4. So suppose f is never imported statically by F (f ∉ code(F)) and no observation saw it loaded or load-opened.
+   Then f was not executed in any process of F's observed run, and its import-time statements and defs cannot have
+   influenced that run.
+
+**Residuals (declared in the engine docstring).**
+- **Mutant-only execution (new with this amendment).** A Δ file named only by a literal (D2 b) could be executed only
+  under a mutant, through a literal-path loader that the unmutated run never reached: `spec_from_file_location`,
+  `SourceFileLoader` or `run_path` with all-literal arguments, or a child `[sys.executable, "<path>"]`. The frozen
+  R6/R7 letter covered this case statically; this amendment does not.
+  - The frozen design already carries the same class for R1–R3, which judge only the unmutated run: a data read,
+    listing or child that only a mutant makes is never observed.
+  - A loader site whose module name or path is not a literal is an R8 site (W1a increment 1 widened R8 to every
+    argument).
+  - A literal dotted module name is D2 (c), so it is in code(F).
+- **The argument rests on the recorder.** It assumes every module whose source a hooked process executes appears in
+  `loaded` or is opened `load`. That includes a script a child runs by path, and a module executed from a bytecode
+  cache whose source the process did not open. The runner's tree is a fresh copy with no `__pycache__`.
+- C code that executes tree files is seen only through `os_trace` (§2.7, unchanged).
+
+**Effect on the measured counts: none in this increment.** No recorder exists yet, so every target with Δ ≠ ∅ under
+COPY stops at R1 before R7 and R8.
+- Real run at W1a increment 1 (basis `da3ea33f3b69…`, the pinned full v2.2.0 sha; head = the increment's engine
+  commit; Δ = 10 added files, no `.py` under `aisef2/`):
+  - 667 INVALIDATED (R1) / 17,322 mutants;
+  - 327 UNRESOLVED (I6) / 10,078 mutants;
+  - 0 VERIFIED_REUSE, 0 MEASURED.
+- The increment's first real run, under the frozen R6 letter, gave the same 667 as INVALIDATED (R6), all because of
+  `tests/v2/test_v23_impact.py`. The state and mutant totals are the same; only the component differs.
+- Calibration (Δ = ∅) is unaffected.
+- With future observations, the frozen letter would re-open every target for every new `tests/v2` file.
+
+**Measured precision cost of keeping I4 and the R1 static scan on all of S(F)** (fail-safe, unchanged; measured at
+basis `da3ea33f3b69…` ∪ the increment's head):
+
+| Change | Frozen rule over S(F): kill files / targets / mutants | Same rule over code(F), for comparison only |
+|---|--:|--:|
+| one changed existing segment of `tests/v2/sealing_gate.py` (I4) | 262 / 994 / 27,400 | 5 / 47 / 1,661 |
+| … of `tests/v2/test_app_run.py` (I4) | 262 / 994 / 27,400 | 81 / 495 / 14,804 |
+| … of `tests/v2/test_v21_mutation_runner.py`, or of `test_c2_p5_acceptance.py` (I4, each) | 262 / 994 / 27,400 | 1 / 5 / 497 |
+| any Δ, complete observation without `os_trace` (R1 static scan) | 262 / 994 / 27,400 | 262 / 994 / 27,400 |
+
+How the figures were computed:
+- The S(F) column is a lower bound: code(F) ∪ every `tests/v2` file, which D2 (b) adds through `TESTS_V2`. It already
+  reaches every target, so it is exact.
+- The code(F) column reproduces the s2-closure figures of §2.8 exactly. §2.8 and §10 used the s2 closure, which has no
+  D2 (b).
+
+What they mean:
+- Under I4 as frozen, a changed segment of any existing `tests/v2` file re-opens every live target: 994, which includes
+  all 667 that pass I6. So W1a's planned `sealing_gate.py` edit re-opens 667 targets, not 47.
+- Without `os_trace`, the R1 static scan alone keeps every target from reuse even with complete observations, and
+  under either scope: `os.readlink` in `aisef2/app/adapters.py` is in every import closure. §10's "version bump:
+  0 mutants" therefore needs `os_trace` for every kill file.
+
+These are the frozen rules' costs, reported and not narrowed, because both rules fail safe. Narrowing I4 or the R1
+scan would need its own amendment and soundness argument, and none is made here.
+
+### A1.2 Erratum §2.4.4 and §11 exit gate 2 (flavor split)
+
+Measured on the engine over the 994 live entries:
+- The total is **63 linux / 140 flavor-unproven** (the frozen text says 62 / 141). Darwin stays 461, windows 3, unknown 327.
+- The extra linux entry is `aisef2/runtime/process_range.py::_Posix.escaped`, which belongs to the B1-era imports and
+  to the 177-target gate. One of its kill rows quotes a genuine host process listing inside an assertion diff. That
+  listing carries a `/home/<u>/` path token at token start. It is a real R-flavor marker, not a fixture string.
+
+Corrected figures:
+- §2.4.4, B1-era row: **63 linux** + 2 darwin, **139** flavor-unproven. The hint sub-split of that column is provenance
+  and is not re-derived.
+- §2.4.4, total row: 461 darwin, **63 linux**, **140** flavor-unproven.
+- §2.4.4, 177-target gate subset: posix 174 = 2 darwin, **50 linux**, **122** flavor-unproven; windows 3.
+- §2.4.4, Option C 42 subset: unchanged (9 linux, 33 unproven, 0 darwin).
+- §11 exit gate 2: "664 are `posix` (flavor: 461 darwin, **63** linux, **140** unproven) and 3 are `windows`". All
+  other figures of the gate stand.
+- Calibration run at W1a increment 1 (Δ = ∅): 667 VERIFIED_REUSE / 17,322 mutants (625 via the basis, 42 via the
+  ruling), 327 UNRESOLVED (I6) / 10,078, 0 INVALIDATED.
+- Flavor is provenance only, never a gate input (§2.4.2).
