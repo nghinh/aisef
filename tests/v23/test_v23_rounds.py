@@ -11,12 +11,17 @@ rule. Its control is kept twice, never weakened:
 
 The round is OPEN only when ledger seq 13 (AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED, the owner's) is committed and
 the round-v2.3 selection exists (lane L1-F5). Until then every counterpart FAILS — never skips — under
-AISEF_SEALING=1, so the sealing gate stays closed. The gate here is AISEF_SEALING=1, exactly as the sealing tier, but
-it is not `sealing` and these classes are not in tests/v2/sealing_gate.py GATED: that wiring is what seq 13 would
-authorize (docs/v2.3/drafts/SEQ13-WIRING.patch), and `Seq13Wiring` is red until it is applied.
+AISEF_SEALING=1, so the sealing gate (the tests.yml `sealing` job, which runs `discover -s tests`) stays closed.
+
+The gate is AISEF_SEALING=1, exactly as the sealing tier's, but it is `round_gate`, not `sealing`: W1-DESIGN.md §7 keeps
+tests/v2/sealing_gate.py GATED byte-identical (the file changes only for V22_REPLAYED) and tests/v2/test_sealing_gate.py
+unedited. The round's own closed list is V23_GATED, and `Coverage.test_the_round_gate_list_is_closed` refuses a
+`round_gate` test missing from it or a listed test missing its gate, so no round-v2.3 check can be dropped silently.
+`Seq13Wiring` is red until the wiring seq 13 would authorize (docs/v2.3/drafts/SEQ13-WIRING.patch) is applied.
 """
 from __future__ import annotations
 
+import ast
 import contextlib
 import copy
 import functools
@@ -51,6 +56,9 @@ V22_HISTORICAL = {
 round_gate = unittest.skipUnless(
     sealing_gate.SEALING, "round-v2.3 currency counterpart: runs with the sealing tier (AISEF_SEALING=1); red until "
                           "ledger seq 13 opens the v2.3 round")
+
+#: every `round_gate` test, closed ("path::Class" gates the class), as sealing_gate.GATED is for `sealing`
+V23_GATED = ("tests/v23/test_v23_rounds.py::RoundV23", "tests/v23/test_v23_rounds.py::Seq13Wiring")
 
 
 def _git(*args: str) -> bytes:
@@ -260,10 +268,6 @@ class Seq13Wiring(unittest.TestCase):
         self.assertEqual(tuple(getattr(sealing_gate, "V22_REPLAYED", ())), RP.V22_REPLAYED)
         self.assertEqual(sorted(set(RP.V22_REPLAYED) - set(sealing_gate.GATED)), [])
 
-    def test_the_counterparts_are_gated(self):
-        self.assertEqual(sorted({f"{RP.COUNTERPARTS_REL}::{c}" for c in ("RoundV23", "Seq13Wiring")}
-                                - set(sealing_gate.GATED)), [])
-
     def test_each_replayed_test_is_skipped_at_head_naming_the_replay(self):
         for tid in RP.V22_REPLAYED:
             path, qual = tid.split("::")
@@ -301,6 +305,23 @@ class Coverage(unittest.TestCase):
         self.assertIn("self.assertEqual(pc.history_problems(), [])", kept)
         weakened = src.replace("            self.assertEqual(pc.history_problems(), [])\n", "", 1)
         self.assertNotIn("self.assertEqual(pc.history_problems(), [])", [a for _, a in RP.assertions(RP._method(weakened, cqual))])
+
+
+    def test_the_round_gate_list_is_closed(self):
+        found = set()
+        for p in sorted((ROOT / "tests").rglob("test_*.py")):
+            tree = ast.parse(p.read_text(encoding="utf-8"))
+            rel = p.relative_to(ROOT).as_posix()
+            for cls in [n for n in tree.body if isinstance(n, ast.ClassDef)]:
+                for node, rid in [(cls, f"{rel}::{cls.name}")] + [(f, f"{rel}::{cls.name}.{f.name}") for f in cls.body
+                                                                 if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+                    names = {d.id if isinstance(d, ast.Name) else d.attr for d in node.decorator_list
+                             if isinstance(d, (ast.Name, ast.Attribute))}
+                    if "round_gate" in names:
+                        found.add(rid)
+                        self.assertNotIn("sealing", names, rid)
+        self.assertEqual(sorted(found), sorted(V23_GATED))
+        self.assertEqual(set(V23_GATED) & set(sealing_gate.GATED), set())
 
 
 class LedgerHistory(unittest.TestCase):
