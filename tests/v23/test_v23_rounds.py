@@ -22,7 +22,9 @@ since R4 (Q0-1), the v2.2 Q0 calibration, whose counterpart is tests/v23/test_v2
 this file, the Q0 counterpart, the replay, q0_round.py, the digest tool and tests/v23/__init__.py are exactly as pinned —
 a deleted or edited one un-skips all 12 — so no round-v2.3 check can be dropped silently. `Seq13Wiring` is red until that patch is applied,
 exactly. The round opens only for the reviewed ruling, by digest, in the owner's own words (RA-INT-2,
-`ledger_seq13_problems`).
+`ledger_seq13_problems`), only while the draft is the one every commit that added it holds — through merges, never in
+a shallow clone (Q0R-INT-1, `reviewed_draft`) — and only while every file the ruling binds by sha256 (BOUND_SHA256:
+the Q0-1 amendments and the evidence) is exactly those bytes (Q0R-INT-2).
 """
 from __future__ import annotations
 
@@ -35,6 +37,7 @@ import inspect
 import json
 import pathlib
 import hashlib
+import os
 import subprocess
 import sys
 import tempfile
@@ -45,14 +48,15 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tests.v2 import sealing_gate  # noqa: E402
+from validation.v23 import q0_round as Q  # noqa: E402
 from validation.v23 import replay_v22 as RP  # noqa: E402
 
 LEDGER_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
 ROUND_ID = "AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED"
 #: the reviewed ruling seq 13 must be, and the wiring it names. Paths, not digests: the ruling names the patch by sha256
 #: and the patch pins this file, so neither digest can be written here (it would be a hash cycle).
-SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R4.md"
-SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R4.patch"
+SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R5.md"
+SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R5.patch"
 OK = ("MEASURED", "VERIFIED_REUSE")
 STALE_SOURCE = ": target changed since the mutation run — re-run it"
 #: the historical phases the v2.2 test reads (m.RECORDS at v2.2.0, minus V2.1 — the runner-2 phase it treats apart)
@@ -74,7 +78,8 @@ V23_GATED = ("tests/v23/test_v23_rounds.py::RoundV23", "tests/v23/test_v23_round
 
 
 def _git(*args: str, root: pathlib.Path = ROOT) -> bytes:
-    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, check=True).stdout
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, check=True,
+                          env=dict(os.environ, GIT_NO_REPLACE_OBJECTS="1")).stdout
 
 
 def _lf(b: bytes) -> bytes:
@@ -83,10 +88,15 @@ def _lf(b: bytes) -> bytes:
 
 def reviewed_draft(root: pathlib.Path = ROOT) -> dict:
     """The entry of SEQ13_DRAFT_REL as committed at HEAD. ValueError unless HEAD's blob is the blob of every commit
-    that added the file: a reviewed draft is never rewritten in place (R1, R2, R3 are each kept as written)."""
+    that added the file: a reviewed draft is never rewritten in place (R1-R4 are each kept as written). Q0R-INT-1:
+    every add commit is seen — `--full-history`, so a merge that resolves to a rewritten draft cannot hide the reviewed
+    one, and never in a shallow clone, whose cut history could hide it."""
     from validation.v23 import ledger_digest as LD
+    if _git("rev-parse", "--is-shallow-repository", root=root).strip() != b"false":
+        raise ValueError(f"{SEQ13_DRAFT_REL}: a shallow clone cannot show every commit that added it")
     head = _git("rev-parse", f"HEAD:{SEQ13_DRAFT_REL}", root=root).strip()
-    added = _git("log", "--no-renames", "--format=%H", "--diff-filter=A", "HEAD", "--", SEQ13_DRAFT_REL, root=root).split()
+    added = _git("log", "--full-history", "--no-renames", "--format=%H", "--diff-filter=A", "HEAD", "--",
+                 SEQ13_DRAFT_REL, root=root).split()
     if not added or any(_git("rev-parse", f"{c.decode()}:{SEQ13_DRAFT_REL}", root=root).strip() != head for c in added):
         raise ValueError(f"{SEQ13_DRAFT_REL} is not the draft as first committed")
     (entry,) = LD.entries(_git("show", f"HEAD:{SEQ13_DRAFT_REL}", root=root).decode("utf-8"))
@@ -96,7 +106,8 @@ def reviewed_draft(root: pathlib.Path = ROOT) -> dict:
 def ledger_seq13_problems(root: pathlib.Path = ROOT) -> list[str]:
     """Why the committed ledger does not open round v2.3 ([] = it does): exactly one seq 13, the owner's, whose canonical
     ruling digest (validation/v23/ledger_digest.py) is the reviewed draft's, and whose `authority` is the owner's own
-    words — not empty, not the draft's `<…>` placeholder, and quoting that digest (RA-INT-2)."""
+    words — not empty, not the draft's `<…>` placeholder, and quoting that digest (RA-INT-2); and every file the
+    ruling binds in BOUND_SHA256 is exactly those LF bytes (Q0R-INT-2: the amendments and evidence it was approved on)."""
     from validation.v23 import ledger_digest as LD
     out = []
     try:
@@ -104,7 +115,8 @@ def ledger_seq13_problems(root: pathlib.Path = ROOT) -> list[str]:
         entries = json.loads(committed)["entries"]
         if _lf((root / LEDGER_REL).read_bytes()) != committed:
             out.append(f"{LEDGER_REL} differs from its committed bytes")
-        want = LD.digest(reviewed_draft(root))
+        draft = reviewed_draft(root)
+        want = LD.digest(draft)
     except (subprocess.CalledProcessError, OSError, ValueError, KeyError, TypeError) as e:
         return out + [f"the ledger or the reviewed draft is unreadable: {type(e).__name__}"]
     e13 = [e for e in entries if isinstance(e, dict) and e.get("seq") == 13]
@@ -124,6 +136,13 @@ def ledger_seq13_problems(root: pathlib.Path = ROOT) -> list[str]:
         out.append("seq 13 authority is empty or the draft's placeholder, not the owner's own words")
     elif got not in a:
         out.append(f"seq 13 authority does not quote its ruling digest {got}")
+    bound = draft["decision"].get("BOUND_SHA256", {})
+    if not isinstance(bound, dict):
+        return out + ["the reviewed ruling's BOUND_SHA256 is not a map of path to sha256"]
+    for rel, sha in sorted(bound.items()):
+        p = root / rel
+        if not (p.is_file() and hashlib.sha256(_lf(p.read_bytes())).hexdigest() == sha):
+            out.append(f"{rel} is not the file the reviewed ruling binds (BOUND_SHA256 {sha})")
     return out
 
 
@@ -148,6 +167,24 @@ def wired_sealing_gate(patch: bytes, root: pathlib.Path = ROOT) -> bytes:
         subprocess.run(["git", "init", "-q", str(t)], capture_output=True, check=True)
         subprocess.run(["git", "-C", str(t), "apply", "wiring.patch"], capture_output=True, check=True)
         return _lf((t / "tests/v2/sealing_gate.py").read_bytes())
+
+
+def p5_q0_guard_problems(A) -> list[str]:
+    """Q0P-3: the P5-REVERIFICATION record round v2.3 selects (`A` = validation/qualification/p5_acceptance). Reused
+    v2.2 history (A.V21_OUT_REL / A.V22_OUT_REL): its guards ran at v2.2, each exit 0, and Q0 is checked live in the same
+    sealing job by Q0RoundV23 — that is the VERIFIED_REUSE justification. Re-derived in round v2.3: its recorded Q0
+    guard MUST be the round-v2.3 Q0 (q0_round.CHECK_ARGV), never `validation/v2/checker_calibration.py --check`, which
+    no v2.3 tree passes."""
+    from validation.v2 import version_forward as vf
+    try:
+        path, rec = vf.resolve_upstream(ROOT, A.V21_OUT_REL, A.V22_OUT_REL)
+    except LookupError as e:
+        return [str(e)]
+    if path in (A.V21_OUT_REL, A.V22_OUT_REL):
+        return []
+    want = "python -P " + " ".join(Q.CHECK_ARGV)
+    got = ((rec.get("guards") or {}).get("checker_calibration") or {}).get("command")
+    return [] if got == want else [f"{path}: its recorded Q0 guard is {got!r}, not the round-v2.3 Q0 {want!r}"]
 
 
 @functools.lru_cache(maxsize=1)
@@ -274,6 +311,7 @@ class RoundV23(unittest.TestCase):
             from validation.qualification import p5_acceptance as A
             self.assertEqual(A.history_problems(), [])
             self.assertEqual(A.reverification_v22_problems(), [])
+            self.assertEqual(p5_q0_guard_problems(A), [])          # Q0P-3: round v2.3's own Q0 guard
 
     def test_P5_PROPOSAL_kernel_provenance(self):
         with self.round_v23("P5-PROPOSAL"):

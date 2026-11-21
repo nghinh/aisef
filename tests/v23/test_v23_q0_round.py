@@ -8,26 +8,33 @@ class at v2.2.0 and requires the record it derives there to be byte-identical to
 * `Q0RoundV23` — the v2.2 class's nine tests, bodies verbatim (replay_v22.coverage proves none is lost), on
   validation/v23/q0_round.run(): the same calibration inside `version_forward.in_round("v2.3")`. The one record
   assertion is rebound to the round's own record, q0_round.V23_REL. Under AISEF_SEALING=1 each test FAILS — never
-  skips — unless ledger seq 13 is committed by the owner (test_v23_rounds.round_v23_missing), the v2.2 record is still
-  its v2.2.0 bytes, no v2.2 checker is dropped, and V23_REL exists and is what this tree derives;
+  skips — unless ledger seq 13 is committed by the owner (test_v23_rounds.round_v23_missing) and every rule of
+  q0_round.problems holds: the v2.2 record is still its v2.2.0 bytes, no v2.2 checker is dropped, each v2.2 checker
+  keeps its contract (Q0P-1), the round's own modules are covered (Q0P-2), and V23_REL exists and is what this tree
+  derives;
 * `Q0Wiring` — the reviewed wiring skips the v2.2 Q0 test at HEAD only together with this file and q0_round.py
-  pinned (SEQ13-WIRING-R4.patch: V22_REPLAYED_Q0, V23_PINNED).
+  pinned (SEQ13-WIRING-R5.patch: V22_REPLAYED_Q0, V23_PINNED).
 
 Both are `round_gate` classes (closed list: test_v23_rounds.V23_GATED). The other classes always run, in seconds, on
 throwaway trees: each way the round-v2.3 record or the v2.2 history can be missing, stale or corrupted is named, and
-the replay names a missing, corrupted or not byte-identical historical Q0 record.
+the replay names a missing, corrupted or not byte-identical historical Q0 record. Since R5 they also show the review
+findings fixed: a weakened contract (Q0Contract), an uncovered validation/v23 module, unscanned destructive or encoding
+scope (Q0Scope), every rule run by `problems` (Q0Rules) and the round-v2.3 Q0 guard of a re-derived P5 record (Q0Guard).
 """
 from __future__ import annotations
 
 import contextlib
+import copy
 import importlib
 import io
 import json
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
 import textwrap
+import types
 import unittest
 from dataclasses import replace
 from unittest import mock
@@ -59,9 +66,9 @@ class Q0RoundV23(unittest.TestCase):
             self.fail("round v2.3 is not open: " + "; ".join(missing))
 
     def test_every_checker_is_calibrated_and_the_committed_record_is_current(self):
-        # round v2.3: authority, history, no checker dropped, its own record — every problem named in one message
-        self.assertEqual(R.round_v23_missing() + Q.history_problems() + Q.dropped(self.result)
-                         + Q.record_problems(self.result), [])
+        # round v2.3: authority, then every q0_round rule — history, no checker dropped, each v2.2 contract (Q0P-1),
+        # the round's own module scope (Q0P-2), its own record — every problem named in one message
+        self.assertEqual(R.round_v23_missing() + Q.problems(self.result), [])
         self.assertEqual(cc.problems_of(self.result), [])
         self.assertEqual(self.result["calibrated_count"], len(cc.REGISTRY))
         self.assertEqual((ROOT / Q.V23_REL).read_text(encoding="utf-8"), Q.render(self.result))
@@ -147,6 +154,14 @@ def _git(root, *a) -> str:
                            "-c", "commit.gpgsign=false", *a], capture_output=True, check=True, encoding="utf-8").stdout.strip()
 
 
+@contextlib.contextmanager
+def _tree_rules_hold():
+    """For tests of the record and writer rules on a throwaway root (no git, no validation/v23): the contract and
+    scope rules, each tested on its own below, hold."""
+    with mock.patch.object(Q, "contract_problems", return_value=[]), mock.patch.object(Q, "v23_scope_problems", return_value=[]):
+        yield
+
+
 class Q0Record(unittest.TestCase):
     """q0_round on throwaway roots: the round-v2.3 record and the v2.2 history, each failure mode named."""
 
@@ -204,12 +219,13 @@ class Q0Record(unittest.TestCase):
         fewer = dict(self.result, checkers=self.result["checkers"][1:], calibrated_count=56)
         self.assertEqual(Q.dropped(fewer, t), [f"v2.2 Q0 checker {self.result['checkers'][0]['checker']} is not "
                                                "calibrated in round v2.3"])
-        self.assertIn("calibrated 56 of 57 registered checkers", Q.problems(fewer, t, record_too=False))
-        self.assertEqual(Q.problems(self.result, t, record_too=False), [])
+        with _tree_rules_hold():
+            self.assertIn("calibrated 56 of 57 registered checkers", Q.problems(fewer, t, record_too=False))
+            self.assertEqual(Q.problems(self.result, t, record_too=False), [])
 
     def test_the_writer_refuses_a_closed_round_writes_once_and_never_rewrites(self):
         t = self.root(v22=self.v22)
-        with mock.patch.object(Q, "ROOT", t), mock.patch.object(Q, "run", return_value=self.result), \
+        with mock.patch.object(Q, "ROOT", t), mock.patch.object(Q, "run", return_value=self.result), _tree_rules_hold(), \
                 contextlib.redirect_stdout(io.StringIO()) as out:
             with mock.patch.object(R, "round_v23_missing", return_value=["no seq 13"]):
                 self.assertEqual(Q.main(["--write"]), 1)
@@ -219,17 +235,21 @@ class Q0Record(unittest.TestCase):
                 self.assertEqual(Q.main(["--write"]), 0)
                 first = (t / Q.V23_REL).read_bytes()
                 self.assertEqual(Q.main(["--write"]), 1)
-            self.assertIn(f"refused: {Q.V23_REL} exists", out.getvalue())
-            self.assertEqual((t / Q.V23_REL).read_bytes(), first)
-            self.assertEqual(Q.main(["--check"]), 0)
-            with mock.patch.object(Q, "run", return_value=dict(self.result, calibrated_count=56)):
-                self.assertEqual(Q.main(["--check"]), 1)
+                self.assertIn(f"refused: {Q.V23_REL} exists", out.getvalue())
+                self.assertEqual((t / Q.V23_REL).read_bytes(), first)
+                self.assertEqual(Q.main(["--check"]), 0)
+                self.assertIn("round v2.3 Q0 against the v2.2 record", out.getvalue())
+                with mock.patch.object(Q, "run", return_value=dict(self.result, calibrated_count=56)):
+                    self.assertEqual(Q.main(["--check"]), 1)
+            with mock.patch.object(R, "round_v23_missing", return_value=["no seq 13"]):      # the Q0P-3 guard: a
+                self.assertEqual(Q.main(["--check"]), 1)                                     # closed round is red
+            self.assertIn("FAIL  round v2.3 is not open: no seq 13", out.getvalue())
         self.assertEqual(Q.record_problems(self.result, t), [])
 
     def test_the_writer_refuses_an_uncalibrated_tree(self):
         t = self.root(v22=self.v22)
         red = dict(self.result, uncovered_checker_modules=["validation/v2/gen_probe_grammar.py"])
-        with mock.patch.object(Q, "ROOT", t), mock.patch.object(Q, "run", return_value=red), \
+        with mock.patch.object(Q, "ROOT", t), mock.patch.object(Q, "run", return_value=red), _tree_rules_hold(), \
                 mock.patch.object(R, "round_v23_missing", return_value=[]), contextlib.redirect_stdout(io.StringIO()) as out:
             self.assertEqual(Q.main(["--write"]), 1)
         self.assertFalse((t / Q.V23_REL).exists())
@@ -249,6 +269,167 @@ class Q0Record(unittest.TestCase):
                 mock.patch.object(cc, "run", side_effect=lambda: seen.append("run") or {}):
             Q.run()
         self.assertEqual(seen, [("enter", "v2.3"), "run", ("exit", "v2.3")])
+
+
+B1 = "b1_bindings"
+B1_FIXTURE = "tests/v2/fixtures/known_bad/b1_bindings.json"
+
+
+class Q0Contract(unittest.TestCase):
+    """Q0P-1: round v2.3 keeps each v2.2 checker's contract — package, fixture, expected, and the fixture file's
+    v2.2.0 bytes — before and after its first write; the writer refuses a weakened one and prints the delta."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.v22 = json.loads((ROOT / Q.V22_REL).read_text(encoding="utf-8"))
+        cls.b1 = next(c for c in cls.v22["checkers"] if c["checker"] == B1)
+
+    def changed(self, **fields) -> dict:
+        r = copy.deepcopy(self.v22)
+        next(c for c in r["checkers"] if c["checker"] == B1).update(fields)
+        return r
+
+    def tree(self) -> tuple[pathlib.Path, str]:
+        """A repository holding the v2.2 record and every known-bad fixture, committed: (root, that commit)."""
+        t = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory(prefix="aisef-q0-contract-")))
+        for rel in [Q.V22_REL] + [c["fixture"] for c in self.v22["checkers"]]:
+            (t / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / rel, t / rel)
+        _git(t, "init", "-q")
+        _git(t, "add", "-A")
+        _git(t, "commit", "-q", "-m", "v2.2.0 contract")
+        return t, _git(t, "rev-parse", "HEAD")
+
+    def test_this_tree_keeps_every_v22_contract(self):
+        self.assertEqual(Q.contract_problems(self.v22), [])
+
+    def test_a_weakened_expected_reason_or_a_changed_package_or_fixture_path_is_named(self):
+        for k, v in (("expected", ""), ("expected", "moved"), ("package", "B1"), ("fixture", "tests/v2/fixtures/known_bad/x.json")):
+            with self.subTest(k=k, v=v):
+                self.assertEqual(Q.contract_problems(self.changed(**{k: v})),
+                                 [f"v2.2 Q0 checker {B1}: {k} {v!r} is not its v2.2 contract {self.b1[k]!r}"])
+
+    def test_a_changed_missing_or_unreadable_fixture_file_is_named(self):
+        t, c = self.tree()
+        self.assertEqual(Q.contract_problems(self.v22, t, c), [])
+        fx = t / B1_FIXTURE
+        fx.write_bytes(fx.read_bytes().replace(b"\n", b"\r\n"))                   # a CRLF checkout is the same bytes
+        self.assertEqual(Q.contract_problems(self.v22, t, c), [])
+        moved = [f"v2.2 Q0 checker {B1}: its known-bad fixture {B1_FIXTURE} is not its v2.2.0 bytes"]
+        doc = json.loads(fx.read_text(encoding="utf-8"))
+        fx.write_text(json.dumps(dict(doc, expect="")), encoding="utf-8")           # the reviewer's weakening
+        self.assertEqual(Q.contract_problems(self.v22, t, c), moved)
+        self.assertEqual(Q.contract_problems(self.changed(expected=""), t, c),
+                         [f"v2.2 Q0 checker {B1}: expected '' is not its v2.2 contract {self.b1['expected']!r}"] + moved)
+        fx.unlink()
+        self.assertEqual(Q.contract_problems(self.v22, t, c), moved)
+        unread = Q.contract_problems(self.v22, t, "0" * 40)                         # no v2.2.0 history: fail closed
+        self.assertEqual(len(unread), len(self.v22["checkers"]))
+        self.assertTrue(all(p.endswith("are unreadable (fail closed)") for p in unread), unread)
+
+    def test_corrupted_history_is_left_to_history_problems(self):
+        t, c = self.tree()
+        (t / Q.V22_REL).write_bytes((ROOT / Q.V22_REL).read_bytes().replace(b"57", b"58", 1))
+        self.assertEqual(Q.contract_problems(self.v22, t, c), [])
+        self.assertIn("is not its v2.2.0 bytes", " ".join(Q.history_problems(t)))
+
+    def test_the_writer_refuses_a_weakened_contract_and_prints_the_delta(self):
+        t, c = self.tree()
+        weak = self.changed(expected="")
+        with mock.patch.object(Q, "ROOT", t), mock.patch.object(Q, "V22_COMMIT", c), mock.patch.object(Q, "run", return_value=weak), \
+                mock.patch.object(Q, "v23_scope_problems", return_value=[]), \
+                mock.patch.object(R, "round_v23_missing", return_value=[]), contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(Q.main(["--write"]), 1)
+        self.assertFalse((t / Q.V23_REL).exists())
+        self.assertIn(f"DELTA {B1}.expected: {self.b1['expected']!r} -> ''", out.getvalue())
+        self.assertIn(f"FAIL  v2.2 Q0 checker {B1}: expected '' is not its v2.2 contract", out.getvalue())
+        self.assertEqual(Q.delta(self.v22), [])
+        added = dict(self.v22, checkers=self.v22["checkers"][1:] + [dict(self.b1, checker="new_one")])
+        self.assertEqual(Q.delta(added)[:2], [f"- {self.v22['checkers'][0]['checker']}", "+ new_one"])
+
+
+class Q0Scope(unittest.TestCase):
+    """Q0P-2: round v2.3 covers its own code — validation/v23 modules calibrated or ruled not checkers, destructive
+    scope widened to validation/v23 and tests/v23, no encoding defect in validation/v23."""
+
+    WIDE = ("aisef2", "validation/v2", "tests/v2", *Q.V23_SCOPES)
+    PROBE = ("import os, subprocess\n\n\ndef kill(pid):\n    os.kill(pid, 9)\n\n\n"
+             "def run():\n    return subprocess.run(['git'], capture_output=True, text=True)\n")
+
+    def root(self, scopes=WIDE, extra=None) -> pathlib.Path:
+        t = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory(prefix="aisef-q0-scope-")))
+        files = {m: "" for m in Q.NOT_CHECKERS_V23} | (extra or {})
+        if scopes is not None:
+            files[Q.DA_REL] = f"SCOPES = {tuple(scopes)!r}\n"
+        for rel, text in files.items():
+            (t / rel).parent.mkdir(parents=True, exist_ok=True)
+            (t / rel).write_text(text, encoding="utf-8")
+        return t
+
+    def test_the_round_modules_alone_with_the_widened_scopes_are_clean(self):
+        self.assertEqual(Q.v23_scope_problems(self.root()), [])
+        self.assertTrue(all((ROOT / m).is_file() for m in Q.NOT_CHECKERS_V23), "the ruled list names this tree's files")
+
+    def test_the_reviewers_probe_module_is_named_for_calibration_and_encoding(self):
+        t = self.root(extra={"validation/v23/zz_probe_checker.py": self.PROBE, "validation/v23/sub/nested.py": ""})
+        self.assertEqual(Q.v23_scope_problems(t), [
+            "round v2.3: validation/v23 module with no calibration: validation/v23/sub/nested.py",
+            "round v2.3: validation/v23 module with no calibration: validation/v23/zz_probe_checker.py",
+            "round v2.3: subprocess text without an encoding: validation/v23/zz_probe_checker.py line 9"])
+
+    def test_a_registered_checkers_source_is_covered(self):
+        t = self.root(extra={"validation/v23/zz.py": ""})
+        mine = lambda: cc.Checker("zz", "t", list, lambda fx: [], ("validation/v23/zz.py",))  # noqa: E731
+        with mock.patch.object(cc, "REGISTRY", [*cc.REGISTRY, mine]):
+            self.assertEqual(Q.v23_scope_problems(t), [])
+        self.assertEqual(len(Q.v23_scope_problems(t)), 1)
+
+    def test_destructive_authority_scopes_must_cover_validation_v23_and_tests_v23(self):
+        want = [f"round v2.3: {Q.DA_REL} SCOPES does not cover {s} (L1-AUTHCHK: widen SCOPES, ledger its sites)"
+                for s in Q.V23_SCOPES]
+        self.assertEqual(Q.v23_scope_problems(self.root(scopes=("aisef2", "validation/v2", "tests/v2"))), want)
+        self.assertEqual(Q.v23_scope_problems(self.root(scopes=None)), want)            # unreadable: fail closed
+        self.assertEqual(Q.v23_scope_problems(self.root(scopes=("aisef2", "validation/v23"))), want[1:])
+
+
+class Q0Rules(unittest.TestCase):
+    """`problems` — what --write, --check and Q0RoundV23's first test rely on — runs every rule, each named."""
+
+    def test_every_rule_reaches_problems(self):
+        rules = ("history_problems", "dropped", "contract_problems", "v23_scope_problems", "record_problems")
+        with contextlib.ExitStack() as st:
+            for r in rules:
+                st.enter_context(mock.patch.object(Q, r, return_value=[r]))
+            st.enter_context(mock.patch.object(cc, "problems_of", return_value=["problems_of"]))
+            got = Q.problems({"calibrated_count": 0, "checkers": []})
+        self.assertEqual(sorted(got), sorted([*rules, "problems_of", f"calibrated 0 of {len(cc.REGISTRY)} registered checkers"]))
+
+
+class Q0Guard(unittest.TestCase):
+    """Q0P-3: a P5-REVERIFICATION record re-derived in round v2.3 records the round-v2.3 Q0 as its Q0 guard."""
+
+    A = types.SimpleNamespace(V21_OUT_REL="closure-evidence/v2/v2.1/P5.json", V22_OUT_REL="closure-evidence/v2/v2.2/P5.json")
+    V22_CMD = "python -P validation/v2/checker_calibration.py --check"
+    V23_CMD = "python -P validation/v23/q0_round.py --check"
+
+    def guard(self, path, rec=None, *, raises=None):
+        from validation.v2 import version_forward as vf
+        with mock.patch.object(vf, "resolve_upstream", side_effect=raises or (lambda *a, **k: (path, rec))):
+            return R.p5_q0_guard_problems(self.A)
+
+    def test_reuse_passes_and_a_re_derived_record_must_name_the_round_v23_q0(self):
+        self.assertEqual(" ".join(["python -P", *Q.CHECK_ARGV]), self.V23_CMD)
+        self.assertTrue((ROOT / Q.CHECK_ARGV[0]).is_file())
+        guards = lambda cmd: {"guards": {"checker_calibration": {"command": cmd, "exit": 0}}}  # noqa: E731
+        self.assertEqual(self.guard(self.A.V22_OUT_REL, guards(self.V22_CMD)), [])      # VERIFIED_REUSE of v2.2
+        v23 = "closure-evidence/v2/v2.3/P5.json"
+        self.assertEqual(self.guard(v23, guards(self.V23_CMD)), [])
+        for name, rec in {"the v2.2 Q0 guard": guards(self.V22_CMD), "no Q0 guard": {"guards": {}}, "no guards": {}}.items():
+            with self.subTest(name):
+                (p,) = self.guard(v23, rec)
+                self.assertIn(f"{v23}: its recorded Q0 guard is", p)
+                self.assertIn(self.V23_CMD, p)
+        self.assertEqual(self.guard(None, raises=LookupError("no round-v2.3 record")), ["no round-v2.3 record"])
 
 
 class Q0Coverage(unittest.TestCase):
