@@ -1,0 +1,318 @@
+"""v2.3 ROUND-AUTH: the round-v2.3 counterparts of the 11 v2.2-round sealing-gated tests (W1-DESIGN.md §2.6).
+
+Each v2.2 test of validation/v23/replay_v22.V22_REPLAYED binds a committed record to the tree by the v2.2 selection
+rule. Its control is kept twice, never weakened:
+
+* history — the test itself, byte-identical, replayed at v2.2.0 (`RoundV23.test_replay_v22`, replay_v22.py);
+* round v2.3 — its counterpart here: the SAME assertions, verbatim, run under `version_forward.in_round("v2.3")`,
+  where the node's own check selects the verified head of its chain; plus the node's round-v2.3 currency state MUST be
+  MEASURED or VERIFIED_REUSE. The one assertion that is not round-aware (the legacy whole-file mutation rule) is
+  rebound to the F5 state of the same targets (replay_v22.REBOUND); the coverage map test proves no assertion is lost.
+
+The round is OPEN only when ledger seq 13 (AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED, the owner's) is committed and
+the round-v2.3 selection exists (lane L1-F5). Until then every counterpart FAILS — never skips — under
+AISEF_SEALING=1, so the sealing gate stays closed. The gate here is AISEF_SEALING=1, exactly as the sealing tier, but
+it is not `sealing` and these classes are not in tests/v2/sealing_gate.py GATED: that wiring is what seq 13 would
+authorize (docs/v2.3/drafts/SEQ13-WIRING.patch), and `Seq13Wiring` is red until it is applied.
+"""
+from __future__ import annotations
+
+import contextlib
+import copy
+import functools
+import importlib.util
+import inspect
+import json
+import pathlib
+import subprocess
+import sys
+import unittest
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tests.v2 import sealing_gate  # noqa: E402
+from validation.v23 import replay_v22 as RP  # noqa: E402
+
+LEDGER_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
+ROUND_ID = "AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED"
+OK = ("MEASURED", "VERIFIED_REUSE")
+STALE_SOURCE = ": target changed since the mutation run — re-run it"
+#: the historical phases the v2.2 test reads (m.RECORDS at v2.2.0, minus V2.1 — the runner-2 phase it treats apart)
+V22_HISTORICAL = {
+    "P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
+    "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json",
+    "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json",
+    "C2-ORCH": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json", "C2-P10": "closure-evidence/v2/cycle2/P10-MUTATION.json",
+}
+
+#: AISEF_SEALING=1 runs these, as the sealing tier; deliberately not named `sealing` (see the module docstring)
+round_gate = unittest.skipUnless(
+    sealing_gate.SEALING, "round-v2.3 currency counterpart: runs with the sealing tier (AISEF_SEALING=1); red until "
+                          "ledger seq 13 opens the v2.3 round")
+
+
+def _git(*args: str) -> bytes:
+    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, check=True).stdout
+
+
+def round_v23_missing() -> list[str]:
+    """Why round v2.3 is not open on this tree ([] = open): the owner's authority, then the round's selection."""
+    out = []
+    try:
+        committed = _git("show", f"HEAD:{LEDGER_REL}")
+        entries = json.loads(committed)["entries"]
+        if (ROOT / LEDGER_REL).read_bytes().replace(b"\r\n", b"\n") != committed:
+            out.append(f"{LEDGER_REL} differs from its committed bytes")
+        e13 = [e for e in entries if e.get("seq") == 13]
+        if not (e13 and e13[0].get("id") == ROUND_ID and e13[0].get("approver") == "human:owner"
+                and (e13[0].get("decision") or {}).get("QUALIFICATION_ROUND") == "v2.3"):
+            out.append(f"the ledger holds no committed owner entry seq 13 {ROUND_ID} (ROUND-AUTH: draft only)")
+    except (subprocess.CalledProcessError, OSError, ValueError, KeyError) as e:
+        out.append(f"the ledger is unreadable: {type(e).__name__}")
+    from validation.v2 import currency_dag, version_forward as vf
+    if not hasattr(vf, "in_round"):
+        out.append("validation/v2/version_forward.py has no in_round (round-v2.3 selection, W1-DESIGN §2.6, L1-F5)")
+    if "round" not in inspect.signature(currency_dag.validate).parameters:
+        out.append("validation/v2/currency_dag.py validate() takes no round (W1-DESIGN §2.6, L1-F5)")
+    return out
+
+
+@functools.lru_cache(maxsize=1)
+def _dag_v23() -> dict:
+    from validation.v2 import currency_dag
+    return currency_dag.validate(ROOT, round="v2.3")
+
+
+@functools.lru_cache(maxsize=1)
+def _f5_states() -> dict:
+    from validation.v23 import impact
+    return {s.target: s for s in impact.classify(ROOT)}
+
+
+def _p10_contracts():
+    name = "aisef_v2_p10_contracts"      # the alias tests/v2/test_p5_plan_v22_proposal.py loads it under
+    if name not in sys.modules:
+        spec = importlib.util.spec_from_file_location(name, ROOT / "validation/qualification/p10_contracts.py")
+        sys.modules[name] = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(sys.modules[name])
+    return sys.modules[name]
+
+
+@round_gate
+class RoundV23(unittest.TestCase):
+    """One counterpart per replayed v2.2 test (replay_v22.COUNTERPART), the replay itself, and the in-tree companion."""
+
+    @contextlib.contextmanager
+    def round_v23(self, node: str | None):
+        missing = round_v23_missing()
+        if missing:
+            self.fail("round v2.3 is not open: " + "; ".join(missing))
+        from validation.v2 import version_forward as vf
+        if node is not None:
+            st = _dag_v23()["nodes"][node]
+            self.assertIn(st.get("state"), OK, f"{node}: round-v2.3 state {st.get('state')}: {st.get('detail', '')}")
+        with vf.in_round("v2.3"):
+            yield
+
+    def f5_problems(self, m, record: dict, phase: str) -> list[str]:
+        """REBOUND m.problems_of: every legacy-rule problem but the whole-file source rule, which F5 replaces — each
+        live entry of the record MUST be MEASURED or VERIFIED_REUSE in round v2.3."""
+        out = [p for p in m.problems_of(record, ROOT, phase) if not p.endswith(STALE_SOURCE)]
+        old = set(m.superseded(record, phase))
+        states = _f5_states()
+        for t in sorted({e["target"] for e in record["targets"] if e["target"] not in old}):
+            s = states.get(t)
+            if s is None or s.state not in OK:
+                out.append(f"{t}: {'no F5 state' if s is None else f'{s.state} ({s.component}: {s.reason})'}")
+        return out
+
+    # ---- the history: the 11 v2.2 tests themselves, byte-identical, at v2.2.0 --------------------------------
+    def test_replay_v22(self):
+        r = subprocess.run([sys.executable, "-P", str(ROOT / RP.TOOL)], capture_output=True, encoding="utf-8", cwd=ROOT)
+        self.assertEqual(r.returncode, 0, r.stdout[-6000:] + r.stderr[-2000:])
+
+    def test_v22_selection_over_the_committed_records_is_intact(self):
+        from validation.v2 import currency_dag
+        kernel = _git("rev-parse", f"{RP.V2_2_0}:aisef2").decode().strip()
+        self.assertEqual(currency_dag.validate(ROOT, kernel_digest=kernel)["problems"], [])
+
+    # ---- the counterparts (bodies verbatim from v2.2.0; see replay_v22.coverage) --------------------------------
+    def test_PLAN(self):
+        with self.round_v23("PLAN"):
+            from validation.qualification import c2_plan_correction as pc
+            self.b = pc.build()
+            self.assertEqual(pc.check_v22(), [])
+            self.assertEqual(pc.record_v22(self.b)["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")
+            self.assertEqual(pc.history_problems(), [])
+            self.assertEqual(json.loads((ROOT / pc.OUT_REL).read_text(encoding="utf-8"))["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")
+
+    def test_K_NOWORK(self):
+        with self.round_v23("K-NOWORK"):
+            from validation.qualification import c2_k_nowork_001 as kn
+            self.assertEqual(kn.check_v22(), [])
+            self.assertIn("closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json", kn.BOUND)
+            self.assertEqual(kn.history_problems(), [])
+
+    def test_ORCH(self):
+        with self.round_v23("ORCH"):
+            from validation.qualification import c2_orchestration_repair as rp
+            self.assertEqual(rp.release_differences_v22(), [])
+            rec = json.loads((ROOT / rp.OUT_REL).read_text(encoding="utf-8"))
+            eq = rec["single_probe_equivalence"]
+            staged = eq["identical_but_the_adequacy_stage_of_a_fully_pre_satisfied_story"]
+            self.assertEqual((eq["items"], eq["identical"], staged), (7, 6, ["pre-satisfied"]))
+            self.assertTrue(all(v["outcomes_identical"] for v in eq["by_item"].values()))
+            self.assertEqual(sorted(i for i, v in eq["by_item"].items() if not v["journal_identical_but_kernel_identity"]), staged)
+            k = eq["by_item"]["pre-satisfied"]["k_presat_001"]
+            self.assertEqual(k["removed_from_the_old_journal"], {"story/resource-acquired": 3, "tests/adequacy": 1,
+                                                                 "story/resource-released": 3, "gate/check": 1})
+            self.assertEqual(k["adequacy_stage_events_in_the_new_journal"], {})
+            self.assertTrue(k["journal_identical_but_kernel_identity_and_the_adequacy_stage"])
+            self.assertTrue(k["subprocesses_identical_but_the_tests_of_the_stage"] and k["other_observations_identical_but_subprocesses"])
+            self.assertEqual((k["subprocesses"]["old"]["tests"], k["subprocesses"]["new"]["tests"]), (3, 0))
+            old, new = rec["defect_reproducer"]["old"], rec["defect_reproducer"]["new"]
+            self.assertEqual(old["raised"], "InvariantError: cycle 1 proves a story with exactly one probe factory")
+            self.assertEqual((new["raised"], new["attempts"]), (None, ["COMMIT"]))
+
+    def test_P10_COHORT(self):
+        with self.round_v23("P10-COHORT"):
+            from validation.qualification import c2_p10_cohort as B
+            self.assertEqual(B.check_version_forward(), [])
+            rec = json.loads((ROOT / B.OUT_REL).read_text(encoding="utf-8"))
+            self.assertEqual((rec["verdict"], rec["census"]["cohort_count"], rec["census"]["cohort_records"]),
+                             ("machinery qualified; cohort count = 0", 0, []))
+            self.assertTrue(all(c["holds"] for c in rec["adversarial"]))
+            broken = copy.deepcopy(rec)
+            broken["adversarial"][0]["holds"] = False
+            self.assertTrue(B.problems_of(broken))
+
+    def test_P10_PROFILE(self):
+        with self.round_v23("P10-PROFILE"):
+            from validation.qualification import c2_p10_profile as B
+            self.assertEqual(B.check_version_forward(), [])
+            rec = json.loads((ROOT / B.OUT_REL).read_text(encoding="utf-8"))
+            self.assertEqual((rec["verdict"], rec["live_provider_calls"]), ("attestation qualified", 0))
+            self.assertEqual({c["id"]: c["grade"] for c in rec["classifications"] if c["id"].startswith("FIX-")}, {
+                "FIX-FIXED": "ATTESTED", "FIX-COMBO": "OPAQUE", "FIX-ALIAS": "OPAQUE", "FIX-ROTATING": "OPAQUE",
+                "FIX-UNLISTED": "OPAQUE", "FIX-UNMEASURED": "OPAQUE"})
+
+    def test_P5_REVERIFICATION(self):
+        with self.round_v23("P5-REVERIFICATION"):
+            from validation.qualification import p5_acceptance as A
+            self.assertEqual(A.history_problems(), [])
+            self.assertEqual(A.reverification_v22_problems(), [])
+
+    def test_P5_PROPOSAL_kernel_provenance(self):
+        with self.round_v23("P5-PROPOSAL"):
+            from validation.qualification import p5_acceptance as A
+            self.assertEqual(A.check_v22_proposal(), [])
+            self.assertEqual(A.proposal_history_problems(), [])
+
+    def test_MUTATION_historical(self):
+        with self.round_v23(None):
+            from validation.v2 import mutation as m
+            self.assertEqual({p: m.RECORDS.get(p) for p in V22_HISTORICAL}, V22_HISTORICAL)
+            for phase, rel in m.RECORDS.items():
+                if phase in V22_HISTORICAL and m.PHASE_TARGETS[phase]:
+                    with self.subTest(phase):
+                        record = json.loads((ROOT / rel).read_text(encoding="utf-8"))
+                        self.assertFalse([t for t in record["targets"] if t.get("runner")])
+                        self.assertEqual(self.f5_problems(m, record, phase), [])
+            t = next(iter(m.V21_TARGETS))
+            legacy = {"target": t, "kill_tests": m.V21_TARGETS[t], "source_sha256": "0", "mutants": 1, "killed": 1, "survivors": [],
+                      "results": [{"mutant": "x", "killed": True}]}
+            problems = m.problems_of({"targets": [legacy]}, ROOT, "V2.1")
+            self.assertIn(f"{t}: measured by a runner that does not classify — re-measure", problems)
+
+    def test_P5_PROPOSAL_P5_8(self):
+        with self.round_v23("P5-PROPOSAL"):
+            from validation.qualification import p5_acceptance as PA
+            A = _p10_contracts()
+            self.assertEqual(PA.proposal_history_problems(), [])
+            self.assertEqual(PA.check_v22_proposal(), [])
+            stale = {f"{rel} is not what the authoring aid derives from this tree" for rel in (A.OUT_REL, A.DOC_REL)}
+            found = [p for p in A.check() if p not in stale]
+            self.assertEqual(found, [])
+            rec = json.loads((ROOT / A.OUT_REL).read_text(encoding="utf-8"))
+            self.assertEqual(rec["approvals"]["given"], [])
+            self.assertFalse(any(m["approved"] for m in rec["decision_3_mappings"]))
+
+    def test_Q5(self):
+        with self.round_v23("Q5"):
+            from validation.qualification import v21_q5_compare
+            self.M = v21_q5_compare
+            self.assertEqual(self.M.check_v22(), [])
+
+    def test_CONFORMANCE_RULING(self):
+        with self.round_v23("CONFORMANCE-RULING"):
+            from validation.qualification import v21_conformance_ruling as R
+            self.assertEqual(R.check_version_forward(), [])
+            self.assertTrue(R.tolerated(), f"{R.OUT_REL} is not committed as it is")
+
+
+@round_gate
+class Seq13Wiring(unittest.TestCase):
+    """Red until the GATED_TEST_WIRING seq 13 would authorize is applied (docs/v2.3/drafts/SEQ13-WIRING.patch)."""
+
+    def test_V22_REPLAYED_is_the_replayed_set_and_each_is_gated(self):
+        self.assertEqual(tuple(getattr(sealing_gate, "V22_REPLAYED", ())), RP.V22_REPLAYED)
+        self.assertEqual(sorted(set(RP.V22_REPLAYED) - set(sealing_gate.GATED)), [])
+
+    def test_the_counterparts_are_gated(self):
+        self.assertEqual(sorted({f"{RP.COUNTERPARTS_REL}::{c}" for c in ("RoundV23", "Seq13Wiring")}
+                                - set(sealing_gate.GATED)), [])
+
+    def test_each_replayed_test_is_skipped_at_head_naming_the_replay(self):
+        for tid in RP.V22_REPLAYED:
+            path, qual = tid.split("::")
+            cls, meth = qual.split(".")
+            mod = importlib.import_module(path[:-3].replace("/", "."))
+            fn = getattr(getattr(mod, cls), meth)
+            with self.subTest(tid):
+                self.assertTrue(getattr(fn, "__unittest_skip__", False))
+                self.assertIn("replayed at v2.2.0", getattr(fn, "__unittest_skip_why__", ""))
+
+
+class Coverage(unittest.TestCase):
+    """Always runs: the parity map is closed and loses no assertion (AST of each v2.2 test at v2.2.0)."""
+
+    def test_every_v22_assertion_has_its_counterpart(self):
+        doc = RP.coverage(ROOT)
+        self.assertEqual(doc["gaps"], [])
+        self.assertEqual([t["id"] for t in doc["tests"] if not t["byte_identical_at_head"]], [])
+        self.assertGreater(doc["assertions"], 0)
+
+    def test_the_counterpart_map_is_closed(self):
+        self.assertEqual(set(RP.COUNTERPART), set(RP.V22_REPLAYED))
+        self.assertEqual(len(RP.V22_REPLAYED), 11)
+        mine = {n for n in vars(RoundV23) if n.startswith("test_")}
+        self.assertEqual(mine - {c.split(".")[1] for _, c in RP.COUNTERPART.values()},
+                         {"test_replay_v22", "test_v22_selection_over_the_committed_records_is_intact"})
+        self.assertEqual(sorted(set(RP.V22_REPLAYED) - set(sealing_gate.GATED)), [])
+
+    def test_a_dropped_assertion_is_a_gap(self):
+        tid = RP.V22_REPLAYED[0]
+        cqual = RP.COUNTERPART[tid][1]
+        src = (ROOT / RP.COUNTERPARTS_REL).read_text(encoding="utf-8")
+        fn = RP._method(src, cqual)
+        kept = [a for _, a in RP.assertions(fn)]
+        self.assertIn("self.assertEqual(pc.history_problems(), [])", kept)
+        weakened = src.replace("            self.assertEqual(pc.history_problems(), [])\n", "", 1)
+        self.assertNotIn("self.assertEqual(pc.history_problems(), [])", [a for _, a in RP.assertions(RP._method(weakened, cqual))])
+
+
+class LedgerHistory(unittest.TestCase):
+    """Always runs: ledger entries 1-12 are v2.2.0's, byte for byte (CT-5); the agent never writes the ledger."""
+
+    def test_entries_1_to_12_are_the_v2_2_0_entries(self):
+        old = json.loads(_git("show", f"{RP.V2_2_0}:{LEDGER_REL}"))["entries"]
+        now = json.loads((ROOT / LEDGER_REL).read_text(encoding="utf-8"))["entries"]
+        self.assertEqual([e["seq"] for e in old], list(range(1, 13)))
+        self.assertEqual(now[:12], old)
+        self.assertTrue(all(e["seq"] > 12 for e in now[12:]))
+
+
+if __name__ == "__main__":
+    unittest.main()
