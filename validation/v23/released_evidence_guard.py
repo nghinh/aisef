@@ -68,7 +68,10 @@ def _strict(pairs: list) -> dict:
 
 def ledger_problems(old: bytes, new: bytes, where: str) -> list[str]:
     """CIGOV-R1 option (a), byte-prefix variant: `new` must be `old` grown by whole appended entries, or `old` itself.
-    `old` is the protected revision's ledger blob; `where` names the comparison for the message."""
+    `old` is the protected revision's ledger blob; `where` names the comparison for the message. Both sides are
+    LF-normalised first: the rule is a content rule, and a Windows checkout (or a text-mode fixture) may hold CRLF —
+    CRLF cannot hide JSON content (raw control characters are invalid inside JSON strings)."""
+    old, new = old.replace(b"\r\n", b"\n"), new.replace(b"\r\n", b"\n")
     tag = f"ledger append-only rule ({where}): {LEDGER_REL}"
     m = _TAIL.search(old)
     try:
