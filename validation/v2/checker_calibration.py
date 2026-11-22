@@ -179,7 +179,9 @@ def _b1_bindings() -> Checker:
     # aisef2/app/calibrations.py (release_calibration --write), so that one line is not a clean-repository defect.
     return Checker("b1_bindings", "B1 risk gate (owner 2026-11-12 section B)",
                    lambda: [x for x in bc.problems(man) if not x.startswith("kernel ")],
-                   lambda fx: bc.problems(fx["manifest"]),
+                   # the known-bad binds the manifest's OWN round tree, not the moving HEAD:aisef2 (W1-DESIGN §2.6):
+                   # its observed problems stay byte-identical across kernel edits, and the fixture keeps rejecting
+                   lambda fx: bc.problems(fx["manifest"], kernel=man["frozen_bindings"]["aisef2_kernel_tree"]),
                    ("validation/v2/b1_bindings_check.py",))
 
 

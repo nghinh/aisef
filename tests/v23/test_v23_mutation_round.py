@@ -128,5 +128,66 @@ class Audits(unittest.TestCase):
         self.assertIn(m.V23_AUDITS_REL, problems[0])
 
 
+class QaAcceptance(unittest.TestCase):
+    """Q0-1 option Q-a (owner ruling 2026-11-22 §D): the B1 moved-source acceptance is LIVE, round-gated and
+    fail-closed — a moved target is accepted only in round v2.3, only with a committed round entry that measured
+    exactly the live bytes and is clean; everything else stays red. Red-before/green-after at the mechanism level
+    (the real green lands with the targeted measurement)."""
+
+    SRC = "aisef2/app/run.py"
+    TGT = "aisef2/app/run.py::execute"
+
+    def man(self):
+        import hashlib
+        from validation.v2 import b1_bindings_check as bc
+        reg = "aisef2/invariants/registry.py"
+        return {"frozen_bindings": {"aisef2_kernel_tree": "k" * 40, "registry_file": reg,
+                                    "registry_sha256": hashlib.sha256((bc.ROOT / reg).read_bytes()).hexdigest()},
+                "targets": {self.TGT: {"source": self.SRC, "source_sha256": "0" * 64}}}
+
+    def probs(self, newest, target_problems=lambda e, r: []):
+        from unittest import mock
+        from validation.v2 import b1_bindings_check as bc
+        from validation.v2 import mutation as mu
+        from validation.v2 import version_forward as vf
+        with mock.patch.object(mu, "v23_newest", return_value=newest), \
+                mock.patch.object(mu, "target_problems", side_effect=target_problems), \
+                vf.in_round("v2.3"):
+            return [x for x in bc.problems(self.man(), kernel="k" * 40) if not x.startswith("kernel ")]
+
+    def entry(self, **over):
+        from validation.v2 import mutation as mu
+        live = mu.source_digest((ROOT / self.SRC).read_text(encoding="utf-8"))
+        return {"target": self.TGT, "runner": 2, "source_sha256": live, **over}
+
+    def test_red_before_no_round_entry_keeps_the_target_red(self):
+        self.assertEqual(self.probs(({}, [])), [f"{self.TGT}: {self.SRC} moved since the manifest froze"])
+
+    def test_red_outside_the_round_whatever_the_entries_say(self):
+        from unittest import mock
+        from validation.v2 import b1_bindings_check as bc
+        from validation.v2 import mutation as mu
+        with mock.patch.object(mu, "v23_newest", return_value=({self.TGT: self.entry()}, [])), \
+                mock.patch.object(mu, "target_problems", return_value=[]):
+            out = [x for x in bc.problems(self.man(), kernel="k" * 40) if not x.startswith("kernel ")]
+        self.assertEqual(out, [f"{self.TGT}: {self.SRC} moved since the manifest froze"])
+
+    def test_green_after_a_committed_clean_entry_at_the_live_digest_is_accepted(self):
+        self.assertEqual(self.probs(({self.TGT: self.entry()}, [])), [])
+
+    def test_fail_closed_on_digest_mismatch_uncommitted_entry_open_problems_or_a_broken_record(self):
+        cases = {
+            "digest mismatch": (({self.TGT: self.entry(source_sha256="f" * 64)}, []), lambda e, r: []),
+            "uncommitted newest (I7)": (({self.TGT: {"target": self.TGT, "error": "UNRESOLVED (I7): uncommitted"}}, []),
+                                        lambda e, r: []),
+            "open problems": (({self.TGT: self.entry()}, []), lambda e, r: ["unaudited survivor"]),
+            "broken round record": (({}, ["not a prefix (fail closed)"]), lambda e, r: []),
+        }
+        for name, (newest, tp) in cases.items():
+            with self.subTest(name):
+                self.assertEqual(self.probs(newest, tp),
+                                 [f"{self.TGT}: {self.SRC} moved since the manifest froze"])
+
+
 if __name__ == "__main__":
     unittest.main()
