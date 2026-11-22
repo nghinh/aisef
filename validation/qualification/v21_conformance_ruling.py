@@ -53,6 +53,9 @@ V21_DIR = "closure-evidence/v2/v2.1"
 #: record and the --write/--check path below are byte-identical and still the v2.1 path; this is a SEPARATE API that
 #: appends under closure-evidence/v2/v2.2 and is SELECTED by (round, tree) — never a global newest, never a fallback.
 V22_REL = "closure-evidence/v2/v2.2/CONFORMANCE-RULING.json"
+#: v2.2.0 — the round-v2.3 base (ledger seq 13): a row whose file changed SINCE this commit needs a round reason
+#: (V23_ROWS below), and the round's record is the chain head under closure-evidence/v2/v2.3/
+V2_2_0 = "da3ea33f3b695aaca73e87a704145a0193aced23"
 V2_0_0 = X.V2_0_0
 #: 2.0.0 plus docs (aisef2 identical to v2.0.0's): the 2.1 commits are the ones after it
 SINCE = "610a5935281fd01a707e035bef33499569fdbb15"
@@ -266,6 +269,29 @@ IDENTITY_WHY = {
     "probe_sources_identical_to_6311254": "as probe_sources_vs_6311254",
 }
 
+#: Round v2.3 (ledger seq 13): the per-file reason for a ROW whose file changed SINCE v2.2.0. A changed row with no
+#: entry here keeps the round red (fail closed); an entry with no changed row is itself a problem (no dead reasons).
+V23_ROWS = {
+    "validation/v2/mutation.py": {
+        "change": "round v2.3 L1-F5 (W1-DESIGN §2.5): read-time supersession by closure-evidence/v2/v2.3/MUTATION.json "
+                  "(--run-affected appends, committed-prefix rule, UNRESOLVED (I7) on an uncommitted newest entry, "
+                  "never a fallback), the --check/--states gate legs, --affected/--run-affected with the trust-critical "
+                  "subset filter (owner 2026-11-22 §C), round survivor audits (v23_audits_at: the key carries "
+                  "source_sha256) and FS-4 exclusion of the round records; RECORDS, PHASE_TARGETS, SUPERSEDED and "
+                  "V21_TARGETS are byte-identical (the import-time tables never move)",
+        "backlog": "docs/v2.3/W1-DESIGN.md §2.5 (F5-MEASURE); docs/v2.3/drafts/ROUND-AUTH-PARITY.md",
+        "owner_approval": "ledger seq 13 (AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED; owner ruling 2026-11-22 §B/§D: "
+                          "the F5-aware mutation checker is live, version-aware and fail-closed)",
+        "requirement": "seq-13 SCOPE: a v2.3 change of a file a v2.2 record binds is re-derived under the round, the "
+                       "v2.2 and v2.1 records kept byte-identical as history",
+        "behaviour_tests": (
+            "tests.v23.test_v23_mutation_round.Newest.test_an_uncommitted_newest_entry_is_unresolved_never_a_fallback",
+            "tests.v23.test_v23_mutation_round.Newest.test_a_rewritten_committed_prefix_fails_closed",
+            "tests.v23.test_v23_mutation_round.Newest.test_the_last_committed_entry_per_target_wins",
+            "tests.v23.test_v23_mutation_round.Fs4.test_pristine_excludes_the_round_records",
+            "tests.v23.test_v23_mutation_round.Audits.test_both_files_are_read_and_the_round_key_carries_the_source")},
+}
+
 
 def _lf(rel: str) -> str | None:
     p = ROOT / rel
@@ -287,14 +313,25 @@ def tolerated() -> dict[str, str]:
 
 
 def tolerated_v22() -> dict[str, str]:
-    """Version-forward (owner Option C / seq 8): like tolerated(), but from the COMMITTED v2.2 CONFORMANCE-RULING
-    (V22_REL) that supersedes OUT_REL on this tree — each row's path -> its sha256_2_1; {} when there is none or the
-    file is not committed as it is. The frozen v2.1 ruling (OUT_REL) is never rewritten."""
-    p = ROOT / V22_REL
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"HEAD:{V22_REL}"], capture_output=True)
+    """Version-forward (owner Option C / seq 8; round v2.3 reads the CHAIN HEAD — W1-DESIGN §2.6): like tolerated(),
+    but from the round's COMMITTED supersession of OUT_REL, selected through the shared version-forward API — each
+    row's path -> its sha256_2_1; {} when there is none, the head is the base, or the selected record is not
+    committed as it is. The frozen v2.1 ruling (OUT_REL) is never rewritten; in the default round the head the API
+    selects is V22_REL, byte for byte the old behaviour."""
+    from validation.v2 import version_forward as vf
+    try:
+        _, tree = vf.current_context(ROOT)
+        rel, rec = vf.select_for_tree(vf.load_series(ROOT, OUT_REL, V22_REL),
+                                      version_context=vf.CURRENT_ROUND, kernel_digest=tree)
+    except (LookupError, ValueError, subprocess.CalledProcessError):
+        return {}
+    if rel == OUT_REL:
+        return {}
+    p = ROOT / rel
+    r = subprocess.run(["git", "-C", str(ROOT), "show", f"HEAD:{rel}"], capture_output=True)
     if r.returncode != 0 or not p.is_file() or rp._lf(r.stdout) != rp._lf(p.read_bytes()):
         return {}
-    return {row["path"]: row["sha256_2_1"] for row in json.loads(p.read_text(encoding="utf-8"))["conformance"]["rows"]}
+    return {row["path"]: row["sha256_2_1"] for row in rec["conformance"]["rows"]}
 
 
 def missing_tests(ids) -> list[str]:
@@ -437,6 +474,37 @@ def derive() -> tuple[dict, list[str]]:
                      "no new owner acceptance of the C2-P5 boundary"],
         "written_at": {"head": _git("rev-parse", "HEAD")},
     }
+    from validation.v2 import version_forward as vf
+    if vf.ROUND.get() == vf.BRANCH_ROUND:   # round v2.3 (ledger seq 13): round reasons + the owner's authority
+        changed = {}
+        for row in rows:
+            was = rebind.lf_sha_at(V2_2_0, row["path"])
+            if was == row["sha256_2_1"]:
+                continue   # unchanged since v2.2.0: the v2.2 row stands as it is
+            changed[row["path"]] = was
+            stated = V23_ROWS.get(row["path"])
+            if stated is None:
+                problems.append(f"{row['path']}: changed since v2.2.0 ({V2_2_0[:12]}) and the round states no reason")
+                continue
+            row["round_v2_3"] = {"sha256_v2_2_0": was, **stated,
+                                 "behaviour_tests": list(stated.get("behaviour_tests", ()))}
+            problems += [f"{row['path']}: round-v2.3 behaviour test {t} does not exist"
+                         for t in missing_tests(stated.get("behaviour_tests", ()))]
+        problems += [f"{p}: in V23_ROWS, but not a row changed since v2.2.0" for p in sorted(set(V23_ROWS) - set(changed))]
+        entry13 = next((e for e in json.loads((ROOT / pa.DECISIONS_REL).read_text(encoding="utf-8"))["entries"]
+                        if e.get("seq") == 13), None)
+        if entry13 is None:
+            problems.append(f"{pa.DECISIONS_REL}: no seq-13 entry — round v2.3 is not authorized")
+        else:
+            from validation.v23 import ledger_digest as LD
+            rec["round_v2_3"] = {
+                "round": "v2.3",
+                "authority": {"ledger": pa.DECISIONS_REL,
+                              **{k: entry13.get(k) for k in ("seq", "id", "approver", "decision", "subject_to", "cost")},
+                              "ruling_digest_sha256": LD.digest(entry13)},
+                "rule": "a (d) finding for a file changed since v2.2.0 is accepted only while the round's committed "
+                        "chain head names it under round_v2_3 at its sha256_2_1; the v2.2 and v2.1 records stay "
+                        "history, byte for byte"}
     return rec, problems
 
 
@@ -527,6 +595,18 @@ def check_version_forward() -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
+    if "--write-v23" in args:   # the round-v2.3 supersession: write_v22's own body/refusals under the round's selection
+        from validation.v2 import version_forward as vf
+        with vf.in_round(vf.BRANCH_ROUND):
+            return write_v22()
+    if "--check-v23" in args:
+        from validation.v2 import version_forward as vf
+        with vf.in_round(vf.BRANCH_ROUND):
+            problems = check_version_forward()
+        for p in problems:
+            print(f"  {p}")
+        print(f"CONFORMANCE-RULING --check-v23 {'PASS' if not problems else 'FAIL'}: the round-v2.3 chain head")
+        return 1 if problems else 0
     if "--write-v22" in args:
         return write_v22()
     if "--check-v22" in args:
