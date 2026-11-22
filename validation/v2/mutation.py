@@ -1471,6 +1471,55 @@ AUDITED: dict[tuple[str, str], str] = {
 AUDITS_REL = "closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json"
 AUDIT_CLASSES = ("EQUIVALENT", "AUDITED")
 
+# ------------------------------------------------------- round v2.3 measurements (W1-DESIGN §2.5; ledger seq 13)
+#: the round-v2.3 record: appended by `--run-affected` only, read-time supersession (phase-record bytes, RECORDS,
+#: PHASE_TARGETS, SUPERSEDED and V21_TARGETS are never touched — the import-time tables stay byte-identical)
+V23_REL = "closure-evidence/v2/v2.3/MUTATION.json"
+#: round-v2.3 survivor audits, append-only beside the v2.1 ones (audits_at reads both; the key carries source_sha256)
+V23_AUDITS_REL = "closure-evidence/v2/v2.3/SURVIVOR-AUDITS.json"
+#: round-v2.3 targets of NEW modules, outside PHASE_TARGETS/TARGETS; check() requires a round-v2.3 entry for each
+V23_NEW_TARGETS: dict[str, list[str]] = {}
+
+
+def entry_sha256(e: dict) -> str:
+    """The canonical-JSON digest of one entry — what a round-v2.3 `supersedes` names and the prefix rule compares."""
+    return hashlib.sha256(json.dumps(e, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+                          .encode("utf-8")).hexdigest()
+
+
+def v23_entries(root: pathlib.Path = ROOT) -> list[dict]:
+    """The working-tree round-v2.3 entries, in file order ([] when the record does not exist yet)."""
+    p = root / V23_REL
+    return json.loads(p.read_text(encoding="utf-8"))["entries"] if p.is_file() else []
+
+
+def v23_newest(root: pathlib.Path = ROOT) -> tuple[dict[str, dict], list[str]]:
+    """Per target, the newest round-v2.3 entry COMMITTED at HEAD (supersession is read-time). The committed entries
+    must be a prefix of the working list (append-only, fail closed); a target whose newest working entry is
+    uncommitted is UNRESOLVED (I7) — an error entry, never a fallback to an older one."""
+    try:
+        working = v23_entries(root)
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        return {}, [f"{V23_REL}: unreadable (fail closed): {e!r}"]
+    r = subprocess.run(["git", "-C", str(root), "show", f"HEAD:{V23_REL}"], capture_output=True, encoding="utf-8")
+    try:
+        committed = json.loads(r.stdout)["entries"] if r.returncode == 0 else []
+    except (ValueError, KeyError, TypeError) as e:
+        return {}, [f"HEAD:{V23_REL}: unreadable (fail closed): {e!r}"]
+    if [entry_sha256(e) for e in committed] != [entry_sha256(e) for e in working[: len(committed)]]:
+        return {}, [f"{V23_REL}: the committed entries are not a prefix of the working list (append-only: fail closed)"]
+    newest = {e.get("target"): e for e in committed}
+    for e in working[len(committed):]:
+        newest[e.get("target")] = {"target": e.get("target"), "error": "UNRESOLVED (I7): the newest round-v2.3 entry "
+                                   f"for the target is uncommitted — commit {V23_REL}"}
+    return newest, []
+
+
+def v23_substituted(record: dict, v23: dict[str, dict]) -> dict:
+    """`record` with each target's entry replaced by its newest round-v2.3 entry, if one exists (the record's own
+    bytes are never touched; replaced entries are history)."""
+    return dict(record, targets=[v23.get(t.get("target"), t) for t in record["targets"]])
+
 
 def _audit_entry_problem(e) -> str | None:
     if not isinstance(e, dict):
@@ -1497,7 +1546,7 @@ _AUDITS_CACHE: dict[tuple[str, int, int], tuple[dict, list[str]]] = {}
 def audits_at(root: pathlib.Path = ROOT) -> tuple[dict[tuple[str, int, str], dict], list[str]]:
     """The positional audits of the tree at `root` (AUDITS_REL): ({(target, index, mutant): entry}, problems). A
     malformed entry, a repeated position or a file that is not an object with `entries` is a problem and counts for
-    nothing; no file is no audits and no problem."""
+    nothing; no file is no audits and no problem. (The round-v2.3 audits live beside these: `v23_audits_at`.)"""
     path = root / AUDITS_REL
     try:
         st = path.stat()
@@ -1532,11 +1581,58 @@ def audits_at(root: pathlib.Path = ROOT) -> tuple[dict[tuple[str, int, str], dic
     return found, problems
 
 
+_V23_AUDITS_CACHE: dict[tuple[str, int, int], tuple[dict, list[str]]] = {}
+
+
+def v23_audits_at(root: pathlib.Path = ROOT) -> tuple[dict[tuple[str, int, str, str], dict], list[str]]:
+    """The round-v2.3 positional audits (V23_AUDITS_REL, W1-DESIGN §2.5), keyed WITH the module digest the audit was
+    written for — (target, index, mutant, source_sha256) — so a round's re-measurement of a target cannot collide
+    with the v2.1 audits of its older source. Same strictness as `audits_at`, in its own file and map (the v2.1 map
+    and its gated readers stay byte-compatible)."""
+    path = root / V23_AUDITS_REL
+    try:
+        st = path.stat()
+    except OSError:
+        return {}, []
+    key = (str(path), st.st_mtime_ns, st.st_size)
+    if key in _V23_AUDITS_CACHE:
+        return _V23_AUDITS_CACHE[key]
+    found: dict[tuple[str, int, str, str], dict] = {}
+    problems: list[str] = []
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        entries = doc["entries"] if isinstance(doc, dict) else None
+        if not isinstance(entries, list):
+            raise ValueError("no `entries` list")
+    except (OSError, ValueError, KeyError) as exc:
+        out = ({}, [f"{V23_AUDITS_REL}: unreadable: {exc}"])
+        _V23_AUDITS_CACHE[key] = out
+        return out
+    for n, e in enumerate(entries):
+        why = _audit_entry_problem(e)
+        if why:
+            problems.append(f"{V23_AUDITS_REL}: entry {n}: {why}")
+            continue
+        k = (e["target"], e["index"], e["mutant"], e["source_sha256"])
+        if k in found:
+            problems.append(f"{V23_AUDITS_REL}: entry {n}: {k[0]} [{k[1]}] is audited twice")
+            continue
+        found[k] = e
+    _V23_AUDITS_CACHE.clear()
+    _V23_AUDITS_CACHE[key] = (found, problems)
+    return found, problems
+
+
 def audit_of(root: pathlib.Path, target: str, index: int, mutant: str, source_sha256: str | None) -> dict | None:
     """The positional audit that covers mutant `index` of `target` (description `mutant`) in a result measured on a
-    module with digest `source_sha256`, or None. The V2.0 entries of AUDITED are by description, and read as before."""
+    module with digest `source_sha256`, or None. The V2.0 entries of AUDITED are by description, and read as before.
+    A round-v2.3 audit (its key carries the digest) counts exactly the same way."""
+    if target in NO_AUDIT:
+        return None
     e = audits_at(root)[0].get((target, index, mutant))
-    return e if e is not None and e["source_sha256"] == source_sha256 and target not in NO_AUDIT else None
+    if e is not None and e["source_sha256"] == source_sha256:
+        return e
+    return v23_audits_at(root)[0].get((target, index, mutant, source_sha256))
 
 
 #: What a run copies into its scratch tree.
@@ -1848,7 +1944,7 @@ def _pristine(root: pathlib.Path, dst: pathlib.Path) -> tuple[pathlib.Path, str]
     """The COPY parts of `root`, taken once (per `main()`, before any record is written) with `__pycache__` and the
     runner's own record files left out — by exact path, never a name pattern — so a live record never enters a tree
     (FS-4); and the tree's digest: sha256 over the sorted (path, sha256 of bytes) pairs, no mtimes."""
-    records = {os.path.normpath(root / r) for r in RECORDS.values()}
+    records = {os.path.normpath(root / r) for r in (*RECORDS.values(), V23_REL, V23_AUDITS_REL)}   # FS-4
 
     def skip(d, names):
         return [n for n in names if n == "__pycache__" or os.path.normpath(os.path.join(d, n)) in records]
@@ -2608,20 +2704,75 @@ def problems_of(record: dict, root: pathlib.Path = ROOT, phase: str = "P1") -> l
     if phase == "V2.1":   # no result of a runner that did not classify enters V2.1 (VS-1, BC-3, ORD-1)
         out += [f"{t['target']}: measured by a runner that does not classify — re-measure" for t in targets
                 if t.get("runner") != 2]
-    if phase == "V2.1":   # a malformed positional audit counts for nothing, and is said so
-        out += audits_at(root)[1]
+    if phase == "V2.1":   # a malformed positional audit counts for nothing, and is said so (both rounds' files)
+        out += audits_at(root)[1] + v23_audits_at(root)[1]
     return out + [p for t in targets for p in target_problems(t, root)]
 
 
 def check(root: pathlib.Path = ROOT) -> list[str]:
-    out = []
+    v23, out = v23_newest(root)
+    known = set(TARGETS) | set(V23_NEW_TARGETS)
+    out += [f"{V23_REL}: {t}: not a mutation target" for t in sorted(v23) if t not in known]
+    out += [f"{t} has no mutation result ({V23_REL})" for t in sorted(V23_NEW_TARGETS) if t not in v23]
+    out += [p for t in sorted(V23_NEW_TARGETS) if t in v23 for p in target_problems(v23[t], root)]
     for phase, rel in RECORDS.items():
         if not PHASE_TARGETS[phase]:
             continue
         path = root / rel
-        out += problems_of(json.loads(path.read_text(encoding="utf-8")), root, phase) if path.exists() \
-            else [f"{rel} is missing"]
+        out += problems_of(v23_substituted(json.loads(path.read_text(encoding="utf-8")), v23), root, phase) \
+            if path.exists() else [f"{rel} is missing"]
     return out
+
+
+def _v23_identity(root: pathlib.Path, result: dict) -> dict:
+    """The provenance of one fresh round-v2.3 measurement (W1-DESIGN §2.5/§2.4.6) — recorded, never a verdict here:
+    the F5 engine reads it. `dirty: true` can never become MEASURED."""
+    import platform as _platform
+    from validation.qualification import s2_mutation_record as s2
+    target = result["target"]
+    rel, func = target.split("::")
+
+    def sha(p: str) -> str:
+        return hashlib.sha256((root / p).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+    head = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, encoding="utf-8",
+                          check=True).stdout.strip()
+    dirty = bool(subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--untracked-files=no"],
+                                capture_output=True, encoding="utf-8").stdout.strip())
+    original = (root / rel).read_text(encoding="utf-8")
+    enum_rels = [rel] + [m for n in ast.parse(original).body if isinstance(n, ast.ImportFrom)
+                         and (n.module or "").startswith("aisef2")
+                         and (root / (m := n.module.replace(".", "/") + ".py")).exists()]
+    slices = [src for _, src in mutants(original, func, _enum_members(original, root))]
+    return {
+        "measured_on": head, "dirty": dirty,
+        "slice": {"func": func, "null_sha256": hashlib.sha256(null_mutant(original, func).encode()).hexdigest()},
+        "closure": {p: sha(p) for p in sorted(s2.closure(root, "HEAD", (rel,)))},
+        "kill_files": {k: sha(k) for k in result.get("kill_tests") or []},
+        "generator": {"descriptions_sha": hashlib.sha256(json.dumps([r["mutant"] for r in result.get("results") or []],
+                                                                    ensure_ascii=False).encode()).hexdigest(),
+                      "mutated_slices_sha": hashlib.sha256("\0".join(slices).encode()).hexdigest()},
+        "enum_modules": {p: sha(p) for p in dict.fromkeys(enum_rels)},
+        "platform": {"family": "windows" if os.name == "nt" else "posix", "sys_platform": sys.platform,
+                     "release": _platform.release(), "machine": _platform.machine()},
+        "env": {"python": sys.version, "implementation": sys.implementation.name, "env_keep": list(ENV_KEEP),
+                "fresh": sorted(_FRESH), "timeout": TIMEOUT, "settle_s": SETTLE_S,
+                "bracket": [list(b) for b in BRACKET], "copy": list(COPY),
+                "tree_sha256": result.get("tree_sha256"), "runner_sha256": sha("validation/v2/mutation.py")},
+    }
+
+
+def _v23_supersedes(root: pathlib.Path, target: str, v23_committed: dict[str, dict]) -> dict | None:
+    """What the fresh entry replaces: the newest committed round-v2.3 entry, else the target's phase-record entry
+    (by canonical digest). A new target replaces nothing."""
+    if target in v23_committed:
+        return {"path": V23_REL, "entry_sha256": entry_sha256(v23_committed[target])}
+    if target in TARGETS:
+        rel = RECORDS[phase_of(target)]
+        old = next((t for t in json.loads((root / rel).read_text(encoding="utf-8"))["targets"]
+                    if t.get("target") == target), None)
+        if old is not None:
+            return {"path": rel, "entry_sha256": entry_sha256(old)}
+    return None
 
 
 def _checkpoint(entry: dict) -> None:
@@ -2632,6 +2783,91 @@ def _checkpoint(entry: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["--check"]:   # the F5 gate's truthful legs (W1-DESIGN §2.5 staged cut-over): the v2.2 rule with
+        states_bad = 0            # round-v2.3 read-time supersession, and with --states the engine's own classification
+        if "--states" in argv[1:]:
+            from validation.v23 import impact
+            states = impact.classify(ROOT, impact.BASE, "HEAD")
+            for s in states:
+                print(f"{s.state:<12} {s.component:<8} {s.target}: {s.reason}")
+            states_bad = sum(s.state not in ("MEASURED", "VERIFIED_REUSE") for s in states)
+            print(f"F5 states: {len(states) - states_bad}/{len(states)} current")
+        problems = check()
+        for p in problems:
+            print(f"FAIL  {p}")
+        print("mutation: " + ("FAIL" if problems or states_bad else "PASS"))
+        return 1 if problems or states_bad else 0
+    if argv[:1] in (["--affected"], ["--run-affected"]):   # §2.5: measure INVALIDATED + UNRESOLVED (I6) + new targets
+        from validation.v23 import impact   # lazy: the engine is the one classification authority, never re-implemented
+        v23, pre = v23_newest(ROOT)
+        states = impact.classify(ROOT, impact.BASE, "HEAD")
+        need = [s for s in states if s.state == "INVALIDATED" or (s.state == "UNRESOLVED" and "I6" in s.reason)]
+        new = [t for t in sorted(V23_NEW_TARGETS) if t not in v23]
+        for s in need:
+            print(f"AFFECTED {s.state:<12} {s.component:<8} {s.target}: {s.reason}")
+        for t in new:
+            print(f"AFFECTED NEW                   {t}: no round-v2.3 entry")
+        for p in pre:
+            print(f"FAIL  {p}")
+        if argv[:1] == ["--affected"]:
+            print(f"{len(need) + len(new)} affected target(s)")
+            return 1 if need or new or pre else 0
+        if pre:
+            return 2
+        if subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain", "--untracked-files=no"],
+                          capture_output=True, encoding="utf-8").stdout.strip():
+            print("FAIL  the working tree is dirty: a round-v2.3 measurement from it can never become MEASURED — "
+                  "commit first")
+            return 2
+        if bad := [t for t, e in v23.items() if "UNRESOLVED (I7)" in (e.get("error") or "")]:
+            print(f"FAIL  uncommitted round-v2.3 entries for {sorted(bad)} — commit {V23_REL} first")
+            return 2
+        chosen = [s.target for s in need] + new
+        if unknown := [t for t in chosen if t not in TARGETS and t not in V23_NEW_TARGETS]:
+            print(f"FAIL  affected target(s) outside the registry: {unknown}")
+            return 2
+        worker = _worker(ROOT)
+        try:
+            left = _earlier(worker)
+        except OSError as e:
+            print(f"STOPPED before the first target: HOST_TABLE_UNREADABLE: {e}", flush=True)
+            return 3
+        if left:
+            print(f"STOPPED before the first target: an earlier run of this worker left {left} alive", flush=True)
+            return 3
+        out_path = ROOT / V23_REL
+        doc = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else \
+            {"record": "AISEF V2.3 — MUTATION (round v2.3, read-time supersession)",
+             "tool": "validation/v2/mutation.py", "entries": []}
+        done: set[str] = set()
+        with tempfile.TemporaryDirectory(prefix=f"aisef-pristine-{worker}-") as p:
+            pristine = _pristine(ROOT, pathlib.Path(p) / "tree")
+            for target in chosen:   # the record is appended after every target: a run that dies keeps what it measured
+                kills = TARGETS.get(target) or V23_NEW_TARGETS[target]
+                try:
+                    t = run_target(ROOT, target, kills, pristine, on_mutant=_checkpoint)
+                except Exception as e:   # outside run_target's own guard: named, never lost
+                    t = _summarise({"target": target, "runner": 2, "kill_tests": list(kills), "mutants": 0,
+                                    "results": [], "error": f"RUNNER_EXCEPTION before the target: {e!r}",
+                                    "stopped": True})
+                done.add(target)
+                entry = {**t, "identity": _v23_identity(ROOT, t)}
+                sup = _v23_supersedes(ROOT, target, v23)
+                if sup is not None:
+                    entry["supersedes"] = sup
+                doc["entries"].append(entry)   # append-only: the committed prefix is never rewritten
+                out_path.parent.mkdir(parents=True, exist_ok=True)
+                out_path.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+                print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; classes {t.get('classes')}; "
+                      f"survivors {t.get('survivors')}" + (f" ERROR {t['error']}" if t.get("error") else ""), flush=True)
+                if t.get("stopped"):
+                    print(f"STOPPED {target}: {t['error']}\nNOT RUN {[x for x in chosen if x not in done]}", flush=True)
+                    return 3
+        problems = check()
+        for p in problems:
+            print(f"FAIL  {p}")
+        print("mutation: " + ("FAIL" if problems else "PASS"))
+        return 1 if problems else 0
     if argv[:1] == ["t0"]:   # T0 only, nothing written: `t0 TARGET... [--tests FILE...]` (--tests: a diagnostic kill set)
         targets, _, files = [x for x in argv[1:]], None, None
         if "--tests" in targets:
