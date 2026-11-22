@@ -602,6 +602,8 @@ class IncrementalQualificationJob(unittest.TestCase):
                 self.assertIn('if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi', runs(block))
                 for var in ("DATA", "STATE", "CACHE"):
                     self.assertIn(f"XDG_{var}_HOME: ${{{{ runner.temp }}}}/xdg/{var.lower()}", block)
+                # GitHub rejects the whole file when a job-level key uses the runner context (run 44974302513)
+                self.assertNotIn("runner.", block.split("steps:", 1)[0])
                 self.assertEqual(re.findall(r"(?m)^ +(?:- +)?if:.*$", block.split("steps:", 1)[1]), [])
                 self.assertNotIn("continue-on-error", block)
                 self.assertEqual([ln for ln in runs(block) if SWALLOW.search(ln)], [])

@@ -27,10 +27,6 @@ jobs:
     if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    env:
-      XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
-      XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
-      XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,6 +35,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: every target's evidence state (F5); fails on any INVALIDATED or UNRESOLVED
+        env:  # step level: the runner context is not available in a job-level env
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+          XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+          XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
         run: |
           if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi
           echo "opencode ABSENT (guard OK)"
@@ -50,10 +50,6 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    env:
-      XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
-      XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
-      XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,6 +58,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: the INVALIDATED and UNRESOLVED targets, with their reasons (F5)
+        env:  # step level: the runner context is not available in a job-level env
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg/data
+          XDG_STATE_HOME: ${{ runner.temp }}/xdg/state
+          XDG_CACHE_HOME: ${{ runner.temp }}/xdg/cache
         run: |
           if command -v opencode; then echo "OPENCODE PRESENT — refusing"; exit 1; fi
           echo "opencode ABSENT (guard OK)"
