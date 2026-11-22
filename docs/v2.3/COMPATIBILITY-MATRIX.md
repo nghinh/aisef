@@ -144,7 +144,7 @@ change; supersession only by a new record that cites the old one by sha256.
 | CT-3 | Every E1/E6/E2/E4 change re-runs CT-1 corpus verdicts (shadow comparator) | CG-2 | W2 |
 | CT-4 | Strip signature / manifest / started file from a v2.3 run → REFUTED | CG-4, CR-7 | W2 |
 | CT-5 | `RELEASE-DECISIONS` entries[:12] equal `git show v2.2.0:…` entries; seq strictly increasing | CG-6, CR-14 | W1 (L1-CIGOV, `test_v23_release_governance.py`) |
-| CT-6 | V2-history guard: every `closure-evidence/v2/**` blob at `399b775f` unchanged at HEAD (additions allowed), git-blob comparison, the V1 guard's method | CG-5, CR-13 | W1 (L1-CIGOV, `test_v23_release_governance.py`) |
+| CT-6 | V2-history guard: every `closure-evidence/v2/**` blob at `399b775f` unchanged at HEAD (additions allowed), git-blob comparison, the V1 guard's method; the one exception-free carve-out is the CT-5 ledger, checked by the typed append-only rule of CIGOV-R1 option (a) (byte-prefix; `released_evidence_guard.ledger_problems`) instead of blob identity | CG-5, CR-13 | W1 (L1-CIGOV, `test_v23_release_governance.py`) |
 | CT-7 | Every committed 2.2 bundle/settings (examples, tests, evidence) loads with equal digest; a `RELEASES["2.2.0"]` entry exists before any capability bump | CG-3, CR-8/9 | W2/W4 |
 | CT-8 | Fresh-checkout rebuild of `da3ea33f` → `8c94dd6b…`/`102cda44…`; v2.3 tree with perturbed modes → same digest | CR-17, BUILD-REPRO-01 | W1 (L1-BUILD, `test_v23_repro_contract.py` + CI `repro` job) |
 | CT-9 | Both `kernel_digest` implementations = `c2d356b1…` on `e865d65c` | CR-17, #41 | W1 (L1-BUILD, `test_v23_repro_contract.py`); the #41 fix itself is W2 L2-RECORD and must keep CT-9 green |

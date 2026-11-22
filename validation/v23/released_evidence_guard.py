@@ -13,10 +13,15 @@ correctly):
 
 Grade: DETECTIVE (no in-process layer for v2/). A detected change fails closed; restoring the file is maintenance.
 
-CIGOV-R1 OPEN (docs/v2.3/amendments/CIGOV-R1.md): the release-decision ledger closure-evidence/v2/cycle2/
-RELEASE-DECISIONS.json is a protected blob here, while CT-5 / CR-14 let it take entries seq 13+. So the planned owner
-appends (ROUND-AUTH seq 13, the v2.3.0 PRODUCTION_PUBLISH entry) FAIL this guard. #52 (b) / CT-6 conflict with CT-5
-until the owner or integrator decides; this guard has no exception for that path, and must not get one.
+CIGOV-R1 DECIDED (docs/v2.3/amendments/CIGOV-R1.md, option (a), byte-prefix variant; integrator ruling 2026-11-22
+under the owner ruling of 2026-11-22 §D: "CIGOV-R1 must preserve ledger authority and mandatory CI enforcement, with
+no authorization cycle or silent bypass"): the release-decision ledger closure-evidence/v2/cycle2/
+RELEASE-DECISIONS.json — that one path, named here, never an exception or allowlist — is checked by `ledger_problems`
+instead of blob identity: the protected bytes up to its final protected entry stay a byte prefix, every other
+top-level value stays equal, protected entries stay value-identical, and entry seqs stay strictly increasing
+integers (CT-5 / CR-14's own contract). The rule is static — it reads no authority from the ledger it checks, so an
+entry cannot authorize its own acceptance. Every other protected path keeps blob identity, and an edit, reorder,
+deletion, re-indentation or non-monotonic append of the ledger still fails.
 
     python -P validation/v23/released_evidence_guard.py --check           # exit 1 on any violation
     python -P validation/v23/released_evidence_guard.py --baseline OUT    # write the baseline (never overwrites)
@@ -27,11 +32,14 @@ from __future__ import annotations
 import hashlib
 import json
 import pathlib
+import re
 import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SCOPE = "closure-evidence/v2"
+LEDGER_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"   # the one append-only path (CT-5 / CR-14)
+_TAIL = re.compile(rb"\s*\]\s*\}\s*$")                             # the ledger's bytes after its final entry
 RELEASED = "da3ea33f3b695aaca73e87a704145a0193aced23"      # tag v2.2.0, the last released record set
 BRANCH_BASE = "399b775f420870f0d085022ad0a3f561f73839ab"   # origin/master the v2.3 branch is based on (CT-6)
 BASELINE_REL = "docs/v2.3/evidence/released-evidence/V2.2.0-RELEASED-EVIDENCE-BASELINE.json"
@@ -40,6 +48,49 @@ RULE = "sha256 over sorted lines '<path>\\t<blob>\\n'"
 
 def _git(root: pathlib.Path, *args: str) -> str:
     return subprocess.run(["git", *args], cwd=root, capture_output=True, encoding="utf-8", check=True).stdout
+
+
+def _blob(root: pathlib.Path, blob_id: str) -> bytes:
+    return subprocess.run(["git", "cat-file", "blob", blob_id], cwd=root, capture_output=True, check=True).stdout
+
+
+def _strict(pairs: list) -> dict:
+    """json object_pairs_hook: a duplicate key at any depth is refused — json.loads alone is last-key-wins, so a file
+    whose BYTES hold a forged entry displaced by a second `entries` key would otherwise parse as the unchanged ledger
+    (adversarial finding, 2026-11-22)."""
+    out = {}
+    for k, v in pairs:
+        if k in out:
+            raise ValueError(f"duplicate JSON key {k!r}")
+        out[k] = v
+    return out
+
+
+def ledger_problems(old: bytes, new: bytes, where: str) -> list[str]:
+    """CIGOV-R1 option (a), byte-prefix variant: `new` must be `old` grown by whole appended entries, or `old` itself.
+    `old` is the protected revision's ledger blob; `where` names the comparison for the message."""
+    tag = f"ledger append-only rule ({where}): {LEDGER_REL}"
+    m = _TAIL.search(old)
+    try:
+        o, n = json.loads(old, object_pairs_hook=_strict), json.loads(new, object_pairs_hook=_strict)
+        shaped = (isinstance(o, dict) and isinstance(n, dict) and isinstance(o.get("entries"), list)
+                  and isinstance(n.get("entries"), list) and o["entries"]
+                  and all(isinstance(e, dict) for e in (*o["entries"], *n["entries"])))
+    except ValueError:
+        return [f"{tag}: not valid JSON"]
+    if m is None or not shaped:
+        return [f"{tag}: not a ledger object with a list of entry objects"]
+    found = []
+    if not new.startswith(old[: m.start()]):
+        found.append(f"{tag}: the protected bytes up to the final protected entry are not a byte prefix")
+    if {k: v for k, v in o.items() if k != "entries"} != {k: v for k, v in n.items() if k != "entries"}:
+        found.append(f"{tag}: a top-level value other than entries changed")
+    if n["entries"][: len(o["entries"])] != o["entries"]:
+        found.append(f"{tag}: a protected entry changed")
+    seqs = [e.get("seq") for e in n["entries"]]
+    if not all(isinstance(s, int) and not isinstance(s, bool) for s in seqs) or seqs != sorted(set(seqs)):
+        found.append(f"{tag}: entry seqs are not strictly increasing integers")
+    return found
 
 
 def entries(rev: str, root: pathlib.Path = ROOT) -> dict[str, str]:
@@ -67,11 +118,39 @@ def build_baseline(root: pathlib.Path = ROOT, source: str = RELEASED) -> dict:
 
 
 def committed_changes(source: str, root: pathlib.Path = ROOT, at_source: dict[str, str] | None = None) -> list[str]:
-    """Every SCOPE blob at `source` edited or deleted at HEAD (additions allowed)."""
+    """Every SCOPE blob at `source` edited or deleted at HEAD (additions allowed; the ledger by its typed rule)."""
     at_source = entries(source, root) if at_source is None else at_source
     at_head = entries("HEAD", root)
-    return [f"committed {'deletion' if p not in at_head else 'mutation'} of released evidence ({source[:12]}): {p}"
-            for p, b in sorted(at_source.items()) if at_head.get(p) != b]
+    out = []
+    for p, b in sorted(at_source.items()):
+        if at_head.get(p) == b:
+            continue
+        if p == LEDGER_REL and p in at_head:
+            out += ledger_problems(_blob(root, b), _blob(root, at_head[p]), f"HEAD vs {source[:12]}")
+        else:
+            out.append(f"committed {'deletion' if p not in at_head else 'mutation'} of released evidence ({source[:12]}): {p}")
+    return out
+
+
+def ledger_worktree_problems(source: str, root: pathlib.Path, at_source: dict[str, str]) -> list[str]:
+    """The index and working-tree ledger under the same typed rule. The index is a commit-in-waiting (adversarial
+    finding, 2026-11-22: a rewrite staged with `git add` and hidden by restoring the working tree must stay red); the
+    working-tree bytes are LF-normalised, so an autocrlf checkout is not a change."""
+    blob_id = at_source.get(LEDGER_REL)
+    if blob_id is None:
+        return []
+    old = _blob(root, blob_id)
+    found = []
+    staged = _git(root, "ls-files", "-s", "--", LEDGER_REL).split()
+    if not staged:
+        found.append(f"the ledger is not tracked in the index (fail closed): {LEDGER_REL}")
+    elif staged[1] != blob_id:
+        found += ledger_problems(old, _blob(root, staged[1]), f"index vs {source[:12]}")
+    try:
+        now = (root / LEDGER_REL).read_bytes().replace(b"\r\n", b"\n")
+    except OSError as e:
+        return found + [f"working-tree ledger is missing or unreadable (fail closed): {e}"]
+    return found + ([] if now == old else ledger_problems(old, now, f"working tree vs {source[:12]}"))
 
 
 def working_tree_changes(protected: set[str], root: pathlib.Path = ROOT) -> list[str]:
@@ -85,7 +164,8 @@ def working_tree_changes(protected: set[str], root: pathlib.Path = ROOT) -> list
         if rec[0] in "RC":          # a rename or copy: the next record is its source path
             paths.append(recs[i])
             i += 1
-        out += [f"working-tree change to released evidence: {rec[:2]} {p}" for p in paths if p in protected]
+        out += [f"working-tree change to released evidence: {rec[:2]} {p}" for p in paths if p in protected
+                and not (p == LEDGER_REL and len(paths) == 1 and set(rec[:2]) <= set("MA "))]  # typed rule in check()
     return out
 
 
@@ -103,6 +183,7 @@ def check(root: pathlib.Path = ROOT, baseline_rel: str = BASELINE_REL, source: s
     except (OSError, ValueError, KeyError, TypeError) as e:
         found.append(f"{baseline_rel} is missing or unreadable: {e}")
     found += committed_changes(source, root, at_source)
+    found += ledger_worktree_problems(source, root, at_source)
     protected = set(at_source)
     if base is not None:
         try:
@@ -110,6 +191,7 @@ def check(root: pathlib.Path = ROOT, baseline_rel: str = BASELINE_REL, source: s
         except subprocess.CalledProcessError:
             return found + [f"branch base {base[:12]} is not available (shallow clone?): cannot verify (fail closed)"]
         found += committed_changes(base, root, at_base)
+        found += ledger_worktree_problems(base, root, at_base)
         protected |= set(at_base)
     return found + working_tree_changes(protected, root)
 

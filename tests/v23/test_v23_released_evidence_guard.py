@@ -5,9 +5,11 @@ under v2/ are ignored), so before this guard a committed edit, a deletion or a b
 passed every check. Throwaway-repo tests: each now FAILs, an addition passes. The live half: the committed baseline
 agrees with tag v2.2.0, and HEAD keeps every released blob.
 
-CIGOV-R1 OPEN: the ledger (closure-evidence/v2/cycle2/RELEASE-DECISIONS.json) is a released blob here and append-only
-under CT-5, so a seq 13 append FAILs this guard while CT-5 passes. Pinned below as measured; the decision is the
-owner's or integrator's (docs/v2.3/amendments/CIGOV-R1.md).
+CIGOV-R1 DECIDED (docs/v2.3/amendments/CIGOV-R1.md, option (a), byte-prefix variant, 2026-11-22): the ledger
+(closure-evidence/v2/cycle2/RELEASE-DECISIONS.json) alone is checked by the typed append-only rule — a whole-entry
+append passes, while an edit, reorder, deletion, re-indentation, top-level change or non-monotonic seq stays red.
+Red-before: the superseded pin `test_cigov_r1_open_a_ct5_append_to_the_ledger_fails_the_guard` (measured at 57f9d68e
+and in every CI run up to it) showed the append failing the old blob-identity rule while CT-5 passed.
 """
 
 from __future__ import annotations
@@ -15,6 +17,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -129,32 +132,90 @@ class ThrowawayRepo(unittest.TestCase):
         self.assertEqual(self.check(branch_base), [f"committed mutation of released evidence ({branch_base[:12]}): "
                                                    "closure-evidence/v2/cycle2/AUDIT.json"])
 
-    def test_cigov_r1_open_a_ct5_append_to_the_ledger_fails_the_guard(self):
-        """CIGOV-R1 OPEN (docs/v2.3/amendments/CIGOV-R1.md): a whole-entry append keeps CT-5 (entries[:n] equal, seq
-        strictly increasing), yet it changes the ledger's blob, so CT-6 / #52 (b) FAIL it. This pins the measured
-        conflict. Only the decided amendment may change this outcome, and never by an exception for the ledger path."""
+    def test_cigov_r1_decided_an_append_only_growth_of_the_ledger_passes(self):
+        """CIGOV-R1 DECIDED, option (a) byte-prefix (green-after; the red-before is the superseded pin named in the
+        module docstring): a whole-entry append keeps CT-5 AND passes CT-6 / #52 (b) — uncommitted, committed, twice
+        over, with a seq gap, and against a later branch base. Never by an exception: the rule still checks the path."""
         self.write(LEDGER, ledger([*ENTRIES, {"seq": 3, "id": "C"}]))
-        self.commit("append seq 3")
-        head = json.loads((self.d / LEDGER).read_text(encoding="utf-8"))["entries"]
-        seqs = [e["seq"] for e in head]
-        self.assertEqual((head[:2], seqs), (ENTRIES, sorted(set(seqs))))           # CT-5 holds
-        self.assertEqual(self.check(), [f"committed mutation of released evidence ({self.released[:12]}): {LEDGER}"])
+        self.assertEqual(self.check(), [])                                          # working-tree append
+        appended = self.commit("append seq 3")
+        self.assertEqual(self.check(), [])                                          # committed append
+        self.write(LEDGER, ledger([*ENTRIES, {"seq": 3, "id": "C"}, {"seq": 5, "id": "D"}]))
+        self.commit("append seq 5")
+        self.assertEqual(self.check(), [])                                          # grown again; gap in seq is fine
+        self.assertEqual(self.check(appended), [])                                  # a base that already holds seq 3
 
     def test_no_ledger_rewrite_passes(self):
-        """Whatever CIGOV-R1 decides, these stay FAIL: an entry edited, entries reordered, one deleted, another key
-        changed (option (a) of the amendment must keep each of them red)."""
+        """The red set every CIGOV-R1 outcome must keep (the amendment's option (a) list): an entry edited, entries
+        reordered, one deleted, another top-level key changed, the old entries re-indented (byte-prefix variant), a
+        non-integer / boolean / non-increasing seq, a non-object entry — uncommitted and committed alike."""
+        reindented = json.dumps({"record": "ledger", "entries": ENTRIES}, indent=2) + "\n"
+        nonobject = json.dumps({"record": "ledger", "entries": [*ENTRIES, 7]}, indent=1) + "\n"
         for name, text in {"entry 1 edited": ledger([{"seq": 1, "id": "X"}, ENTRIES[1]]),
                            "entries reordered": ledger(ENTRIES[::-1]),
                            "an entry deleted": ledger(ENTRIES[:1]),
-                           "another key changed": ledger(ENTRIES, record="other")}.items():
-            with self.subTest(name):
+                           "another key changed": ledger(ENTRIES, record="other"),
+                           "old entries re-indented": reindented,
+                           "a non-integer seq appended": ledger([*ENTRIES, {"seq": "3", "id": "C"}]),
+                           "a boolean seq appended": ledger([*ENTRIES, {"seq": True, "id": "C"}]),
+                           "a non-increasing seq appended": ledger([*ENTRIES, {"seq": 2, "id": "C"}]),
+                           "a repeated seq appended": ledger([*ENTRIES, {"seq": 2, "id": "B"}]),
+                           "a non-object entry appended": nonobject,
+                           "not JSON at all": "}{not json\n"}.items():
+            with self.subTest(name + ", working tree"):
                 self.write(LEDGER, text)
+                self.assertTrue(any("ledger append-only rule (working tree" in p for p in self.check()), self.check())
+            with self.subTest(name + ", committed"):
                 self.commit(name)
-                self.assertEqual(self.check(), [f"committed mutation of released evidence ({self.released[:12]}): "
-                                                f"{LEDGER}"])
+                self.assertTrue(any("ledger append-only rule (HEAD" in p for p in self.check()), self.check())
                 self.write(LEDGER, ledger(ENTRIES))
                 self.commit("restore")
                 self.assertEqual(self.check(), [])
+
+    def test_a_duplicate_json_key_smuggle_stays_red(self):
+        """Adversarial finding (2026-11-22): json.loads alone is last-key-wins, so a file whose BYTES hold a forged
+        entry displaced by a second `entries` key parses as the unchanged ledger and passed every typed check. The
+        duplicate-key-rejecting parse keeps it red — at the top level and at entry depth, uncommitted and committed."""
+        old = ledger(ENTRIES)
+        m = re.search(r"\s*\]\s*\}\s*$", old)
+        smuggle = old[: m.start()] + ',\n  {"seq": 99, "id": "EVIL"}\n ],\n "entries": ' + json.dumps(ENTRIES) + "\n}\n"
+        self.assertEqual(json.loads(smuggle)["entries"], ENTRIES)      # a last-wins parse sees no change at all
+        self.assertIn("EVIL", smuggle)                                 # yet the bytes carry a forged entry
+        depth = ledger([*ENTRIES, {"seq": 3, "id": "C"}]).replace('"id": "C"', '"id": "EVIL", "id": "C"')
+        self.assertEqual(json.loads(depth)["entries"][2]["id"], "C")   # same trick inside one entry
+        for name, text in {"a second top-level entries key": smuggle, "a duplicate key inside an entry": depth}.items():
+            with self.subTest(name + ", working tree"):
+                self.write(LEDGER, text)
+                self.assertTrue(any("ledger append-only rule (working tree" in p for p in self.check()), self.check())
+            with self.subTest(name + ", committed"):
+                self.commit(name)
+                self.assertTrue(any("ledger append-only rule (HEAD" in p for p in self.check()), self.check())
+                self.write(LEDGER, ledger(ENTRIES))
+                self.commit("restore")
+                self.assertEqual(self.check(), [])
+
+    def test_a_staged_rewrite_behind_a_clean_worktree_stays_red(self):
+        """Adversarial finding (2026-11-22): the index is a commit-in-waiting. A rewrite staged with `git add` and
+        hidden by restoring the working-tree bytes (porcelain MM) — or hidden under a valid working-tree append — must
+        stay red; a staged valid append is green."""
+        self.write(LEDGER, ledger([{"seq": 1, "id": "X"}, ENTRIES[1]]))
+        self.git("add", LEDGER)
+        self.write(LEDGER, ledger(ENTRIES))                            # working tree restored, index holds the rewrite
+        self.assertTrue(any("ledger append-only rule (index" in p for p in self.check()), self.check())
+        self.write(LEDGER, ledger([*ENTRIES, {"seq": 3, "id": "C"}]))  # a valid append on top changes nothing
+        self.assertTrue(any("ledger append-only rule (index" in p for p in self.check()), self.check())
+        self.git("add", LEDGER)                                        # the staged state becomes the valid append
+        self.assertEqual(self.check(), [])
+
+    def test_deleting_or_renaming_the_ledger_still_fails(self):
+        """Option (a) item 4: the append-only rule never excuses the ledger going missing."""
+        self.git("mv", LEDGER, "closure-evidence/v2/cycle2/MOVED.json")
+        self.assertTrue(any("working-tree change to released evidence: R" in p for p in self.check()), self.check())
+        self.commit("rename the ledger")
+        found = self.check()
+        self.assertTrue(any(f"committed deletion of released evidence ({self.released[:12]}): {LEDGER}" == p
+                            for p in found), found)
+        self.assertTrue(any("missing or unreadable" in p for p in found), found)
 
 
 class LiveRepository(unittest.TestCase):

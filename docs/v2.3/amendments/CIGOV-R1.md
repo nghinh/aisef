@@ -1,6 +1,6 @@
 # CIGOV-R1: the release-decision ledger under the released-evidence guard
 
-**Status: PROPOSED. Decision OPEN. The owner or the integrator decides.**
+**Status: DECIDED 2026-11-22 — option (a), byte-prefix variant. See the Decision section.**
 
 This came out of the L1-CIGOV review: finding CIGOV-R1, HIGH, reproduced. This file decides nothing on its own. Until
 a decision is recorded at the end, the guard stays as it is and fails closed.
@@ -114,5 +114,31 @@ Option (b) needs more owner authority, and it changes the release gate.
 
 ## Decision
 
-None recorded. Fill in: the option, the date, and the authority (the owner's words, or the integrator's ruling, with
-the date and channel).
+**Option (a), byte-prefix variant. 2026-11-22.**
+
+Authority: integrator ruling, taken under — and constrained by — the owner ruling of 2026-11-22 (pasted verbatim by
+the owner into the working session; preserved outside the public repository), whose §D rules: "CIGOV-R1 must preserve
+ledger authority and mandatory CI enforcement, with no authorization cycle or silent bypass." The same ruling's §B
+approves the exact seq-13 R6 proposal (canonical ruling digest
+`a1469d009f2456fccde4a3b3e3706a993e6bc1524b5512873dbcefe6ccec01f0`), which appends to the ledger at its charter-G9
+path, so option (b) — moving the ledger — would move the approved draft's bytes and its digest, and is foreclosed.
+
+How option (a) meets §D, point by point:
+
+- **Ledger authority preserved**: the ledger alone may grow by whole appended entries (CT-5 / CR-14's own released
+  contract); its protected bytes up to the final protected entry stay a byte prefix, every other top-level value stays
+  equal, and entry seqs stay strictly increasing integers.
+- **Mandatory CI enforcement preserved**: the guard step still runs on all 6 unit legs and in `HistoryKept`; it is
+  never skipped or conditioned; every other `closure-evidence/v2/**` path keeps git-blob identity; an edit, reorder,
+  deletion, re-indentation, rename or non-monotonic append of the ledger stays red (the full red set is pinned in
+  `tests/v23/test_v23_released_evidence_guard.py::ThrowawayRepo.test_no_ledger_rewrite_passes` and
+  `test_deleting_or_renaming_the_ledger_still_fails`).
+- **No authorization cycle**: the rule is static and structural — `ledger_problems` reads no authority field and no
+  content of the ledger it checks beyond shape, prefix and seqs, so no entry can authorize its own acceptance.
+- **No silent bypass**: there is no allowlist and no exception — the one path is named in the module and checked by a
+  stricter typed rule, with the red-before kept as the superseded pin
+  (`test_cigov_r1_open_a_ct5_append_to_the_ledger_fails_the_guard`, measured at `57f9d68e` and in every CI run to it).
+
+Implemented in `validation/v23/released_evidence_guard.py` (`ledger_problems`, ledger-aware `committed_changes`,
+`ledger_worktree_problems`); CT-6's row and CODE-AUDIT #52 (b) are amended to name this rule for this one file. The
+`v2_release_gate.py` reader and the seq-13 draft are unchanged, exactly as option (a) requires.

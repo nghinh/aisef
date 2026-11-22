@@ -647,8 +647,9 @@ class LedgerAppendOnly(unittest.TestCase):
 
 class HistoryKept(unittest.TestCase):
     """CT-6 (CR-13): every closure-evidence/v2 blob of the branch base 399b775f, and of tag v2.2.0, is unchanged at HEAD
-    (additions allowed), by git blob. The CI step runs the same check with the working tree. CIGOV-R1 OPEN: this
-    includes the ledger CT-5 lets grow, so the two cannot both hold after a seq 13 append (amendments/CIGOV-R1.md)."""
+    (additions allowed), by git blob. The CI step runs the same check with the working tree. CIGOV-R1 DECIDED
+    (amendments/CIGOV-R1.md, option (a), byte-prefix, 2026-11-22): the ledger alone is checked by the guard's typed
+    append-only rule instead of blob identity, so CT-5 and CT-6 both hold after a whole-entry seq 13+ append."""
 
     def test_committed_v2_history_is_unchanged(self):
         for rev in (RE.BRANCH_BASE, RE.RELEASED):
