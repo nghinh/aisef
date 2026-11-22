@@ -24,6 +24,8 @@ The one helper that reads git (`current_context`) is the only impure edge and de
 
 from __future__ import annotations
 
+import contextlib
+import contextvars
 import hashlib
 import json
 import subprocess
@@ -35,6 +37,43 @@ BLOCK = "version_forward"
 #: version is the RELEASE (2.1.0, patch lane); the ROUND is the re-qualification identity after a wave divergence.
 #: A checker verifies the record DECLARED for this round, bound to this tree — never a global "newest".
 CURRENT_ROUND = "v2.2"
+
+#: the v2.3 branch round (W1-DESIGN §2.6, authorized by ledger seq 13). In this round a record is the VERIFIED HEAD
+#: of its own chain — selection by (round, kernel tree) stays the v2.2 rule, under ROUND's default.
+BRANCH_ROUND = "v2.3"
+
+#: the round the CALLER is verifying for. The default keeps every existing v2.2 path byte-identical; a round-v2.3
+#: checker wraps its work in `in_round(BRANCH_ROUND)`.
+ROUND: contextvars.ContextVar[str] = contextvars.ContextVar("round", default=CURRENT_ROUND)
+
+#: the directory a round-v2.3 record series continues in: <stem of the v2.2 rel>-<k>.json, k = 1…
+V23_DIR = "closure-evidence/v2/v2.3"
+
+
+@contextlib.contextmanager
+def in_round(r: str):
+    """Run the body with ROUND set to `r` (restored on exit, exceptions included)."""
+    token = ROUND.set(r)
+    try:
+        yield
+    finally:
+        ROUND.reset(token)
+
+
+def _v23_series(root, v22_rel: str) -> list[str]:
+    """The committed round-v2.3 rels continuing `v22_rel`'s series, in k order. The ks must be exactly 1..n — a gap,
+    a leading zero or a non-numeric suffix is a broken series and raises (fail closed), never a silent skip."""
+    stem = v22_rel.rsplit("/", 1)[-1][: -len(".json")]
+    d = root / V23_DIR
+    found: dict[int, str] = {}
+    for p in sorted(d.glob(f"{stem}-*.json")) if d.is_dir() else []:
+        suffix = p.name[len(stem) + 1: -len(".json")]
+        if not (suffix.isdigit() and suffix == str(int(suffix))):
+            raise ValueError(f"{V23_DIR}/{p.name}: not a -<k>.json member of the {stem} series (fail closed)")
+        found[int(suffix)] = f"{V23_DIR}/{p.name}"
+    if sorted(found) != list(range(1, len(found) + 1)):
+        raise ValueError(f"the {stem} series under {V23_DIR} has ks {sorted(found)}, not 1..{len(found)} (fail closed)")
+    return [found[k] for k in sorted(found)]
 
 
 def _lf(b: bytes) -> bytes:
@@ -112,11 +151,18 @@ def validate_chain(series: list[tuple[str, dict, bytes]]) -> list[str]:
             problems.append(f"{path}: supersedes a digest that is not its predecessor {prev_path} (broken chain)")
         # one record per (declared round, tree): a repeated pair is a duplicate head — the ambiguity, replay and
         # rollback-onto-a-sealed-(round,tree) cases all reduce to this, and the linear supersede link above stops an
-        # old record being re-spliced as head.
-        pair = (b.get("version_context"), b.get("kernel_digest"))
-        if pair in seen_pair:
-            problems.append(f"{path}: duplicate (version_context, kernel_digest) {pair} — two records bind one "
-                            f"(round, tree) (ambiguous head / replay / rollback)")
+        # old record being re-spliced as head. A v2.3 record binds the COMMIT it was derived on, not a sealed kernel
+        # tree (the branch round re-measures on a moving tree), so its key is (round, source_commit).
+        if b.get("version_context") == BRANCH_ROUND:
+            pair = (b.get("version_context"), b.get("source_commit"))
+            if pair in seen_pair:
+                problems.append(f"{path}: duplicate (version_context, source_commit) {pair} — two v2.3 records "
+                                f"bind one (round, commit) (ambiguous derivation / replay)")
+        else:
+            pair = (b.get("version_context"), b.get("kernel_digest"))
+            if pair in seen_pair:
+                problems.append(f"{path}: duplicate (version_context, kernel_digest) {pair} — two records bind one "
+                                f"(round, tree) (ambiguous head / replay / rollback)")
         seen_pair.add(pair)
     return problems
 
@@ -152,6 +198,17 @@ def select_for_tree(series: list[tuple[str, dict, bytes]], *, version_context: s
     chain_problems = validate_chain(series)
     if chain_problems:
         raise LookupError("chain invalid: " + "; ".join(chain_problems))
+    if ROUND.get() == BRANCH_ROUND:
+        # round v2.3 (W1-DESIGN §2.6): the record is the VERIFIED HEAD of its own chain — the arguments are ignored.
+        # A head is never chosen across series; a base-only series has no round record and refuses.
+        path, doc, _ = series[-1]
+        b = _binding(doc)
+        if b is None:
+            raise LookupError(f"no record in the series of {path} for round {BRANCH_ROUND!r}; "
+                              f"missing supersession — refusing to fall back")
+        if b.get("record_digest") != body_digest(doc):
+            raise LookupError(f"{path}: record_digest does not recompute (tampered)")
+        return path, doc
     want = (version_context, kernel_digest)
     matches: list[tuple[str, dict]] = []
     for path, doc, _ in series:
@@ -185,9 +242,13 @@ def current_context(root) -> tuple[str, str]:
 
 def load_series(root, legacy_rel: str, v22_rel: str) -> list[tuple[str, dict, bytes]]:
     """The record series for one logical id, base-first: the legacy record then its v2.2 supersession (each only
-    if present)."""
+    if present). In round v2.3 the series continues with the committed round records
+    closure-evidence/v2/v2.3/<stem>-<k>.json in k order (fail closed on a broken k sequence)."""
+    rels = [legacy_rel, v22_rel]
+    if ROUND.get() == BRANCH_ROUND:
+        rels += _v23_series(root, v22_rel)
     out = []
-    for rel in (legacy_rel, v22_rel):
+    for rel in rels:
         p = root / rel
         if p.exists():
             b = p.read_bytes()
@@ -199,10 +260,28 @@ def write_supersession(root, legacy_rel: str, v22_rel: str, body: dict, *, rende
     """Append the CURRENT_ROUND supersession of `legacy_rel` at `v22_rel`, bound to this round + tree, superseding
     the legacy record by digest. `body` is the already-built record body (no block). Append-only: refuses to
     rewrite an existing v2.2 record with other bytes; a no-op if it already records this derivation. The legacy
-    record is never touched. Returns (rc, message)."""
+    record is never touched. Returns (rc, message). In round v2.3 the predecessor is the chain HEAD and the output
+    is the next closure-evidence/v2/v2.3/<stem>-<k>.json, opened "x" (append-only); the binding's kernel_digest is
+    provenance only — v2.3 selection is by chain head, never by tree."""
     base = root / legacy_rel
     if not base.exists():
         return 1, f"{legacy_rel} (the base record) is missing"
+    if ROUND.get() == BRANCH_ROUND:
+        series = load_series(root, legacy_rel, v22_rel)
+        head_rel, head_doc, head_bytes = series[-1]
+        if {k: v for k, v in head_doc.items() if k != BLOCK} == body:
+            return 0, f"{head_rel} already records this derivation: nothing written"
+        stem = v22_rel.rsplit("/", 1)[-1][: -len(".json")]
+        k = sum(1 for rel, _, _ in series if rel.startswith(V23_DIR + "/")) + 1
+        out_rel = f"{V23_DIR}/{stem}-{k}.json"
+        commit, tree = current_context(root)
+        rec = bind(body, version_context=BRANCH_ROUND, source_commit=commit, kernel_digest=tree,
+                   predecessor_path=head_rel, predecessor_bytes=head_bytes)
+        out = root / out_rel
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with open(out, "x", encoding="utf-8", newline="\n") as f:
+            f.write(render(rec))
+        return 0, f"wrote {out_rel}: round {BRANCH_ROUND}, kernel {tree[:12]}"
     base_bytes = base.read_bytes()
     out = root / v22_rel
     if out.exists():

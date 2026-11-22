@@ -23,6 +23,7 @@ import hashlib
 import json
 import pathlib
 import re
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -47,7 +48,17 @@ def sweep_record(jsonl: pathlib.Path, measured_on: str) -> dict:
             "rows": [json.loads(x) for x in jsonl.read_text(encoding="utf-8").splitlines() if x.strip()]}
 
 
-def table(root: pathlib.Path, sweep_rel: str, targets: dict[str, list[str]] | None = None) -> dict:
+def _source(root: pathlib.Path, rel: str, at: str | None) -> str:
+    """The target's source: the working tree, or its bytes at commit `at` (round v2.3, W1-DESIGN §2.6: the table is
+    verified against the round its sweep served, not against a later tree whose edits the F5 states account for)."""
+    if at is None:
+        return (root / rel).read_text(encoding="utf-8")
+    return subprocess.run(["git", "-C", str(root), "show", f"{at}:{rel}"], capture_output=True,
+                          encoding="utf-8", check=True).stdout
+
+
+def table(root: pathlib.Path, sweep_rel: str, targets: dict[str, list[str]] | None = None, *,
+          at: str | None = None) -> dict:
     """The table RULE derives from the record at `root / sweep_rel` for `targets` (default: mutation.V21_TARGETS)."""
     raw = (root / sweep_rel).read_bytes()
     rec, src = json.loads(raw), {"path": sweep_rel, "sha256": hashlib.sha256(raw).hexdigest()}
@@ -61,7 +72,7 @@ def table(root: pathlib.Path, sweep_rel: str, targets: dict[str, list[str]] | No
     orders, declared = {}, {}
     for target, kill in sorted((m.V21_TARGETS if targets is None else targets).items()):
         rel, func = target.split("::")
-        null = hashlib.sha256(m.null_mutant((root / rel).read_text(encoding="utf-8"), func).encode()).hexdigest()
+        null = hashlib.sha256(m.null_mutant(_source(root, rel, at), func).encode()).hexdigest()
         if missing := [f for f in kill if t0.get((rel, null, f)) is None]:
             declared[target] = f"no PASS T0 row on its null mutant {null[:16]} for {missing}"
             continue
@@ -78,14 +89,15 @@ def _committed_record(path: pathlib.Path) -> str:
     return rel
 
 
-def check(table_path: pathlib.Path) -> list[str]:
-    """[] when the table's sweep record is committed at HEAD and the table is byte for byte what it derives now."""
+def check(table_path: pathlib.Path, *, at: str | None = None) -> list[str]:
+    """[] when the table's sweep record is committed at HEAD and the table is byte for byte what it derives now
+    (`at`: derive the null mutants from the sources at that commit — the round the table serves)."""
     try:
         rel = _committed_record(ROOT / json.loads(table_path.read_text(encoding="utf-8"))["from"]["path"])
-        derived = render(table(ROOT, rel))
+        derived = render(table(ROOT, rel, at=at))
     except SystemExit as e:
         return [str(e)]
-    except (OSError, ValueError, KeyError, TypeError, AttributeError) as e:
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, subprocess.CalledProcessError) as e:
         return [f"{table_path} or its sweep record cannot be read: {e!r}"]
     return [] if table_path.read_text(encoding="utf-8") == derived else \
         [f"{table_path} is not what {rel} derives now — re-run --write"]

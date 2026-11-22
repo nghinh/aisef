@@ -84,7 +84,7 @@ class Erratum(unittest.TestCase):
                 self.assertEqual(c2.main(["--erratum"]), 1)
                 self.assertIn("never rewritten", err.getvalue())
                 with mock.patch.object(c2, "freeze_states", return_value={"C2-FINAL": ("VERIFIED_REUSE", "x")}):
-                    at.unlink()
+                    at.rename(at.with_suffix(".aside"))   # the record gone (a rename, not a host deletion)
                     self.assertEqual(c2.main(["--erratum"]), 1)
                     self.assertFalse(at.exists())
 

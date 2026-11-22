@@ -10,7 +10,6 @@ file (tests/v23 is outside every mutation.COPY root: Amendment A2)."""
 
 from __future__ import annotations
 
-import contextlib
 import json
 import os
 import pathlib
@@ -50,12 +49,12 @@ def toy(self, target: str, kill: str, files: dict, change) -> tuple[TI.Toy, str,
     return t, b, t.commit()
 
 
-def remove(t: TI.Toy, rel: str) -> None:
-    """`rel` deleted from the toy, and its directory when that leaves it empty (as a checkout of head would)."""
+def drop(t: TI.Toy, rel: str) -> None:
+    """`rel` deleted from the toy exactly as a checkout of head would delete it: git removes the file, and its
+    directory when that leaves it empty (no direct host deletion — INV-MUTATION-AUTHORITY keeps the test surface
+    free of unlink/rmdir sites the ledger would have to carry)."""
     del t.files[rel]
-    (t.root / rel).unlink()
-    with contextlib.suppress(OSError):
-        (t.root / rel).parent.rmdir()
+    TI._git(t.root, "rm", "-q", rel)
 
 
 def cfg_toy(self, method: str, change=None):
@@ -94,7 +93,7 @@ class Review1(TO.Base):
                  "        self.assertIn(opt.pick(2), (True, None))\n"}
         readme = "aisef2/plugins/README.txt"
         for how, before, change in (("added", {}, lambda t: t.files.update({readme: "x\n"})),
-                                    ("removed", {readme: "x\n"}, lambda t: remove(t, readme))):
+                                    ("removed", {readme: "x\n"}, lambda t: drop(t, readme))):
             with self.subTest(how):
                 t, b, h = toy(self, "aisef2/opt.py::pick", kill, {**files, **before}, change)
                 s = self.obs_state(t, b, h, kill, "aisef2/opt.py::pick")

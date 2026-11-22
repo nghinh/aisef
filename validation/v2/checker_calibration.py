@@ -421,6 +421,9 @@ def _execution_order() -> Checker:
     edited — a table that no longer is the record's derivation."""
     eo = _load("aisef_v21_execution_order", V2 / "execution_order.py")
     table = ROOT / "closure-evidence/v2/v2.1/EXECUTION-ORDER-9.json"   # campaign 8's (two pairs measured again over -8); -8 is campaign 7's, -7 campaign 6's, -6 campaign 5's; -3, -4, -5 and the unnumbered one are history
+    # the -9 table serves the v2.2.0 round: its null mutants derive from the sources at that commit (W1-DESIGN §2.6);
+    # a later tree's target edits are accounted for by the F5 states, never by rewriting a committed table
+    at = "da3ea33f3b695aaca73e87a704145a0193aced23"
 
     def bad(fx):
         with tempfile.TemporaryDirectory() as t:
@@ -428,8 +431,8 @@ def _execution_order() -> Checker:
             edited.write_text(_edit(table.read_text(encoding="utf-8"), fx), encoding="utf-8")
             # the record keeps what was observed: not the run's temporary directory (a record that names it cannot be
             # reproduced, so its own --check could never pass on another run)
-            return [x.replace(str(edited), "<the edited EXECUTION-ORDER.json>") for x in eo.check(edited)]
-    return Checker("execution_order", "V2.1 (B-03b)", lambda: eo.check(table), bad, ("validation/v2/execution_order.py",))
+            return [x.replace(str(edited), "<the edited EXECUTION-ORDER.json>") for x in eo.check(edited, at=at)]
+    return Checker("execution_order", "V2.1 (B-03b)", lambda: eo.check(table, at=at), bad, ("validation/v2/execution_order.py",))
 
 
 def _owned_run() -> Checker:
@@ -568,6 +571,71 @@ def _profile_freeze() -> Checker:
                    ("validation/v2/profile_freeze.py",))
 
 
+def _f5_gate() -> Checker:
+    """Round v2.3 (ledger seq 13, L1-F5): the two-tier F5 CI gate and the engine it wraps. Clean runs the gate's four
+    PINNED negative controls — real impact-engine refusal tests, each building its own toy repository (inadmissible
+    observation, incomplete observation, static directory-constant hit, dirty tree). Known bad: a malformed state
+    table (an unknown state, counts that do not match the rows) must be named, never summarised away."""
+    from validation.v23 import ci_gate as cg
+    return Checker("f5_gate", "round v2.3 (ledger seq 13, L1-F5)", cg.run_controls,
+                   lambda fx: cg.table_problems(fx["doc"], frozenset(fx["registry"])),
+                   ("validation/v23/impact.py", "validation/v23/ci_gate.py"))
+
+
+def _f5_recorder() -> Checker:
+    """Round v2.3 (ledger seq 13, L1-F5): the F5 observation recorder's derivation. Clean: a complete synthetic
+    witness (strace + hook under tree /w/tree) derives with every completeness counter zero and the hook's loads as
+    recorded. Known bad: a witness with an untraced child, a missing trace file and a truncated trace must name each
+    gap — a recorder that cannot say what it did not see is not a recorder."""
+    from validation.v23 import observe as obs
+    kill = "tests/v2/test_k.py"
+
+    def derive(strace: dict, hook: dict) -> dict:
+        with tempfile.TemporaryDirectory(prefix="aisef-q0-f5-recorder-") as t:
+            w = pathlib.Path(t)
+            (w / "strace").mkdir()
+            (w / "hook").mkdir()
+            for tid, text in strace.items():
+                (w / "strace" / f"tr.{tid}").write_text(text, encoding="utf-8", newline="\n")
+            for pid, lines in hook.items():
+                (w / "hook" / f"{pid}-x.ev").write_text("".join(x + "\n" for x in lines),
+                                                        encoding="utf-8", newline="\n")
+            (w / "manifest.json").write_text(json.dumps(
+                {"tree": "/w/tree", "checkout": "/w/checkout", "backend": "strace", "kill_file": {"path": kill},
+                 "row": {"outcome": "PASS", "exit": 0, "ran": 1, "pid": 100}}), encoding="utf-8")
+            (w / "log.txt").write_text("test_x (v2.test_k.T.test_x) ... ok\n", encoding="utf-8")
+            return obs.derive(w)
+
+    def gaps(rec: dict) -> list[str]:
+        return [f"{k}: {v}" for k, v in rec["completeness"].items() if v]
+
+    def clean():
+        root_trace = ('execve("/usr/bin/python3", ["python3", "-m", "x"], 0x1 /* 9 vars */) = 0\n'
+                      'openat(AT_FDCWD</w/tree>, "aisef2/toy.py", O_RDONLY|O_CLOEXEC) = 3</w/tree/aisef2/toy.py>\n'
+                      '+++ exited with 0 +++\n')
+        hook = ["S\t100\t1", "o\tload\t/w/tree/aisef2/toy.py", "m\t/w/tree/aisef2/toy.py", "m\t/w/tree/" + kill, "E\t0"]
+        rec = derive({100: root_trace}, {100: hook})
+        out = gaps(rec)
+        if rec.get("loaded") != ["aisef2/toy.py", kill]:
+            out.append(f"loaded {rec.get('loaded')!r} is not the hook's loads")
+        return out
+    return Checker("f5_recorder", "round v2.3 (ledger seq 13, L1-F5)", clean,
+                   lambda fx: gaps(derive({int(k): v for k, v in fx["strace"].items()},
+                                          {int(k): v for k, v in fx["hook"].items()})),
+                   ("validation/v23/observe.py",))
+
+
+def _released_evidence() -> Checker:
+    """Round v2.3 (CIGOV-R1, CODE-AUDIT #52 (b)): the released-V2 evidence guard. Clean: the full guard on this tree
+    (baseline, committed blobs, the ledger's typed append-only rule, the working tree). Known bad: a rewritten
+    protected ledger entry must be named by the typed rule."""
+    from validation.v23 import released_evidence_guard as re_guard
+    return Checker("released_evidence", "round v2.3 (ledger seq 13, CIGOV-R1)", re_guard.check,
+                   lambda fx: re_guard.ledger_problems(fx["old"].encode("utf-8"), fx["new"].encode("utf-8"),
+                                                       "calibration"),
+                   ("validation/v23/released_evidence_guard.py",))
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
@@ -599,6 +667,15 @@ REGISTRY: list[Callable[[], Checker]] = [
     # Cycle 2, C2-P10 (WP-2.10.2): model / profile freezing
     _profile_freeze,
 ]
+
+#: Round v2.3 (owner ruling 2026-11-22 §D: every new validation/v23 checker registered and calibrated): the three
+#: checkers covering validation/v23/{impact,ci_gate,observe,released_evidence_guard}.py, built and calibrated
+#: (fixtures committed) but NOT YET in REGISTRY — the pinned tests/v23/test_v23_q0_round.py asserts the registry
+#: count 57 against the v2.2 record (its own amendment Q0-1 §2.2 row "registry" prescribes growth, so the pin and
+#: the mandate conflict), and ledger seq 13 forbids re-pinning V23_PINNED. Registration is one line
+#: (`REGISTRY += V23_CHECKERS`) under the owner's pin ruling; until then q0_round's scope rule names the four
+#: modules uncovered, truthfully red.
+V23_CHECKERS: tuple[Callable[[], Checker], ...] = (_f5_gate, _f5_recorder, _released_evidence)
 
 
 # --------------------------------------------------------------------------------------- calibration

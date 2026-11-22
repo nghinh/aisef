@@ -426,7 +426,7 @@ def identity() -> dict:
 
 def _version(argv: list[str]) -> str | None:
     try:
-        r = subprocess.run(argv, capture_output=True, text=True, timeout=30)
+        r = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30)
     except (OSError, subprocess.SubprocessError):
         return None
     return (r.stdout or r.stderr).splitlines()[0].strip() if r.returncode == 0 and (r.stdout or r.stderr) else None

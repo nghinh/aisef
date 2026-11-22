@@ -686,6 +686,141 @@
    "authority_source": "TEST_CREATED_PATH",
    "justification": "self.t = pathlib.Path(tempfile.mkdtemp(prefix='aisef-p1-')) one line above the cleanup registration",
    "enforcement": "static: bound from tempfile.mkdtemp in the same setUp"
+  },
+  {
+   "path": "tests/v23/test_v23_observe.py",
+   "scope": "refinish",
+   "callable": "(w / OBS.RECORD).unlink",
+   "target": "w / OBS.RECORD",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "w is the witness directory of the record being re-finished; the function rewrites w's manifest.json before the record is removed for OBS.finish (write-once) to derive it again — the witness was built by the test's own builders (StraceParser.witness / observe.record under the test's temporary tree)",
+   "enforcement": "static: the enclosing function writes into w before unlinking the derived record"
+  },
+  {
+   "path": "tests/v23/test_v23_observe.py",
+   "scope": "OwnerNegatives.test_7_missing_or_truncated_trace_files",
+   "callable": "(w / OBS.RECORD).unlink",
+   "target": "w / OBS.RECORD",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "w = the witness directory of a record the test itself recorded (observe.record under self.t, Base.setUp's temporary tree); the derived record is removed so OBS.finish (write-once) can derive it again after the damage",
+   "enforcement": "static: the test writes the witness's files in the same function before the unlink",
+   "occurrences": 2
+  },
+  {
+   "path": "tests/v23/test_v23_observe.py",
+   "scope": "StraceParser.witness",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "w",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "w = pathlib.Path(tempfile.mkdtemp(prefix='aisef-strace-')) one line above the cleanup registration",
+   "enforcement": "static: bound from tempfile.mkdtemp in the same method"
+  },
+  {
+   "path": "tests/v23/test_v23_q0_round.py",
+   "scope": "Q0Contract.test_a_changed_missing_or_unreadable_fixture_file_is_named",
+   "callable": "fx.unlink",
+   "target": "fx",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "fx is the fixture copy inside the throwaway tree this test class created; the test writes fx in the same function before removing it to prove contract_problems names a missing fixture",
+   "enforcement": "static: the function writes fx (fx.write_text) before the unlink"
+  },
+  {
+   "path": "tests/v23/test_v23_q0_round.py",
+   "scope": "Q0Replay.test_a_missing_record_fails_closed_naming_it",
+   "callable": "(t / RP.Q0_RECORD_REL).unlink",
+   "target": "t / RP.Q0_RECORD_REL",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "t = self.tree(): a clone this test class creates under a temporary directory; the committed Q0 record copy is removed to prove the replay fails closed naming it",
+   "enforcement": "static: t is bound from the class's own creating helper (tree)"
+  },
+  {
+   "path": "tests/v23/test_v23_release_governance.py",
+   "scope": "EvidenceUntouchedBySuite.test_the_clean_step_fails_on_a_changed_or_added_evidence_file_only",
+   "callable": "pathlib.Path(d, 'closure-evidence/v2/x.json').unlink",
+   "target": "pathlib.Path(d, 'closure-evidence/v2/x.json')",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d is a throwaway clone this test created under a temporary directory; an evidence copy inside it is removed to prove the CI clean step fails on a deleted evidence file",
+   "enforcement": "static: d is bound from the test's own creating helper"
+  },
+  {
+   "path": "tests/v23/test_v23_release_governance.py",
+   "scope": "EvidenceUntouchedBySuite.test_the_clean_step_fails_on_a_changed_or_added_evidence_file_only",
+   "callable": "pathlib.Path(d, 'closure-evidence/v2/r.json').unlink",
+   "target": "pathlib.Path(d, 'closure-evidence/v2/r.json')",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d is a throwaway clone this test created under a temporary directory; an evidence copy inside it is removed to prove the CI clean step fails on a deleted evidence file",
+   "enforcement": "static: d is bound from the test's own creating helper"
+  },
+  {
+   "path": "tests/v23/test_v23_replay_v22.py",
+   "scope": "Replay.test_an_untracked_or_ignored_file_is_refused",
+   "callable": "p.unlink",
+   "target": "p",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "p is a file this test wrote into its own throwaway clone; it is removed between the two refusal probes",
+   "enforcement": "static: the function writes p (p.write_text) before the unlink"
+  },
+  {
+   "path": "tests/v23/test_v23_seq13_wiring.py",
+   "scope": "WiringR6.test_a_dropped_or_edited_pinned_file_un_skips_all_12.delete",
+   "callable": "(t / rel).unlink",
+   "target": "t / rel",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "t is the throwaway v2.3-tree clone WiringR6.setUpClass created under a temporary directory; a pinned file copy is deleted inside it to prove a broken pin un-skips all 12 replayed tests",
+   "enforcement": "static: the deleting closure takes t as its parameter; setUpClass holds the creating mkdtemp",
+   "derivation_via": "setUpClass"
+  },
+  {
+   "path": "tests/v23/test_v23_seq13_wiring.py",
+   "scope": "WiringR6.test_without_the_sealing_tier_a_broken_pin_is_the_ordinary_visible_skip",
+   "callable": "(t / 'tests/v23/test_v23_rounds.py').unlink",
+   "target": "t / 'tests/v23/test_v23_rounds.py'",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "t is the throwaway clone WiringR6.setUpClass created; the pinned counterpart copy is deleted inside it",
+   "enforcement": "static: t derives from setUpClass's temporary-directory clone",
+   "derivation_via": "setUpClass"
+  },
+  {
+   "path": "tests/v23/test_v23_seq13_wiring.py",
+   "scope": "WiringR6.test_R2s_patch_would_have_skipped_with_the_counterparts_deleted",
+   "callable": "(t / 'tests/v23/test_v23_rounds.py').unlink",
+   "target": "t / 'tests/v23/test_v23_rounds.py'",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "t is the throwaway clone WiringR6.setUpClass created; the counterpart copy is deleted inside it to show R2's rejected patch shape would have skipped silently",
+   "enforcement": "static: t derives from setUpClass's temporary-directory clone",
+   "derivation_via": "setUpClass"
+  },
+  {
+   "path": "tests/v23/test_v23_seq13_wiring.py",
+   "scope": "LedgerSeq13.test_every_bound_file_must_stay_as_reviewed",
+   "callable": "(root / evidence).unlink",
+   "target": "root / evidence",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "root is the throwaway clone LedgerSeq13.setUpClass created under a temporary directory; a BOUND_SHA256 evidence copy is deleted inside it to prove ledger_seq13_problems fails closed on a missing bound file",
+   "enforcement": "static: root derives from setUpClass's temporary-directory clone",
+   "derivation_via": "setUpClass"
+  },
+  {
+   "path": "validation/v23/replay_v22.py",
+   "scope": "v22_clone",
+   "callable": "shutil.rmtree",
+   "target": "t",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "t = pathlib.Path(tempfile.mkdtemp(...)): the replay tool's own throwaway v2.2.0 clone, removed by the tool itself when the replay ends (TEST_CREATED_PATH is the closest closed class: the owner of the path is the creating scope itself; nothing outside the tool ever sees the directory)",
+   "enforcement": "static: bound from tempfile.mkdtemp in the same function"
   }
  ]
 }

@@ -98,11 +98,81 @@ def graph() -> dict[str, list[str]]:
     return {nid: list(n.deps) for nid, n in NODES.items()}
 
 
-def validate(root: pathlib.Path = ROOT, *, kernel_digest: str | None = None) -> dict:
+def _checks() -> dict:
+    """The owner check function per node, run in round v2.3 (W1-DESIGN §2.6). Imports are lazy: the qualification
+    modules are heavy and the v2.2 path never needs them."""
+    from validation.qualification import (c2_k_nowork_001, c2_orchestration_repair, c2_p10_cohort, c2_p10_profile,
+                                          c2_plan_correction, p5_acceptance, p5_falsifiability,
+                                          v21_conformance_ruling, v21_q5_compare)
+    return {
+        "P5-PROPOSAL": p5_acceptance.check_v22_proposal,
+        "P5-FALSIFIABILITY": p5_falsifiability.check_v22,
+        "P5-REVERIFICATION": p5_acceptance.reverification_v22_problems,
+        "PLAN": c2_plan_correction.check_v22,
+        "K-NOWORK": c2_k_nowork_001.check_v22,
+        "CONFORMANCE-RULING": v21_conformance_ruling.check_version_forward,
+        "ORCH": c2_orchestration_repair.release_differences_v22,
+        "P10-PROFILE": c2_p10_profile.check_version_forward,
+        "P10-COHORT": c2_p10_cohort.check_version_forward,
+        "Q5": v21_q5_compare.check_v22,
+    }
+
+
+def _validate_v23(root: pathlib.Path) -> dict:
+    """Round v2.3 (W1-DESIGN §2.6, ledger seq 13): visit the DAG in topological order and run each node's own
+    UNCHANGED v2.2 check under `vf.in_round("v2.3")`, where selection is the verified head of the node's chain.
+    States: MEASURED (the head is a committed v2.3 round record), VERIFIED_REUSE (the v2.2.0-accepted record,
+    re-checked in this round), INVALIDATED (the check found problems, or an upstream is not current), UNRESOLVED
+    (the check raised). Every non-OK state is a problem — fail closed, no fallback."""
+    order = vf.toposort(graph())
+    checks = _checks()
+    nodes, problems, ok = {}, [], set()
+    for nid in order:
+        n = NODES[nid]
+        entry = {"owner": n.owner, "deps": list(n.deps), "gated_tests": list(n.gated_tests), "note": n.note,
+                 "legacy": n.legacy, "v22": n.v22}
+        bad = [d for d in n.deps if d not in ok]
+        if bad:
+            entry["state"] = "INVALIDATED"
+            entry["detail"] = f"upstream not current for round 'v2.3': {bad}"
+        else:
+            try:
+                with vf.in_round(vf.BRANCH_ROUND):
+                    found = checks[nid]()
+                    if found:
+                        entry["state"], entry["detail"] = "INVALIDATED", str(found[0])
+                    else:
+                        head = vf.load_series(root, n.legacy, n.v22)[-1][0] if n.v22 is not None else n.legacy
+                        if head.startswith(vf.V23_DIR + "/"):
+                            entry["state"] = "MEASURED"
+                            entry["head"] = head
+                        else:
+                            entry["state"] = "VERIFIED_REUSE"
+                            entry["basis"] = "v2.2.0-accepted@da3ea33f; re-checked in round v2.3"
+                        ok.add(nid)
+            except Exception as e:                                       # noqa: BLE001 — any raise = fail closed
+                entry["state"], entry["detail"] = "UNRESOLVED", f"{type(e).__name__}: {e}"
+        if nid not in ok:
+            problems.append(f"{nid}: {entry['state']}: {entry.get('detail', '')}")
+        nodes[nid] = entry
+    return {"round": "v2.3", "topological_order": order, "nodes": nodes, "owner_gated": OWNER_GATED,
+            "problems": problems}
+
+
+def validate(root: pathlib.Path = ROOT, *, kernel_digest: str | None = None, round: str | None = None) -> dict:
     """Topologically order the DAG (a cycle / unknown dep fails here) and, for each node in that order, resolve its
     own v2.2 supersession (if it has one) and each upstream dependency for this round+tree — context-bound and
     provenance-verified, no fallback. Returns the per-node report and the problems; an empty `problems` means every
-    declared edge resolves to a current-round, provenance-verified record."""
+    declared edge resolves to a current-round, provenance-verified record. With `round` unset, a caller passing a
+    `kernel_digest` is verifying v2.2 selection and a caller passing nothing gets the v2.3 branch round."""
+    round = round or ("v2.2" if kernel_digest is not None else "v2.3")
+    if round == "v2.3":
+        return _validate_v23(root)
+    with vf.in_round(vf.CURRENT_ROUND):      # the v2.2 path selects by (round, tree) whatever the ambient round
+        return _validate_v22(root, kernel_digest)
+
+
+def _validate_v22(root: pathlib.Path, kernel_digest: str | None) -> dict:
     if kernel_digest is None:
         _, kernel_digest = vf.current_context(root)
     order = vf.toposort(graph())          # raises ValueError on a cycle / unknown dependency
@@ -148,15 +218,25 @@ def rec_kernel(root: pathlib.Path, v22_rel: str) -> str | None:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--json", action="store_true", help="emit the full DAG report as JSON")
+    ap.add_argument("--round", choices=("v2.2", "v2.3"), default=None,
+                    help="the round to validate for (default: v2.2 with --kernel, else v2.3)")
+    ap.add_argument("--kernel", default=None, metavar="TREE", help="verify v2.2 selection against this aisef2 tree")
+    ap.add_argument("--affected", action="store_true", help="print only the non-current nodes with reasons")
     a = ap.parse_args(argv)
-    rep = validate()
+    rep = validate(kernel_digest=a.kernel, round=a.round)
     if a.json:
         print(json.dumps(rep, indent=1, ensure_ascii=False))
         return 1 if rep["problems"] else 0
-    print(f"currency DAG — kernel {rep['kernel_digest'][:12]}; topological order:")
+    head = f"round {rep['round']}" if "round" in rep else f"kernel {rep['kernel_digest'][:12]}"
+    if a.affected:
+        for p in rep["problems"]:
+            print(f"AFFECTED  {p}")
+        print(f"currency DAG ({head}): {len(rep['problems'])} affected node(s)")
+        return 1 if rep["problems"] else 0
+    print(f"currency DAG — {head}; topological order:")
     for nid in rep["topological_order"]:
         e = rep["nodes"][nid]
-        print(f"  {e['status']:28} {nid:20} deps={e['deps']}")
+        print(f"  {e.get('state') or e.get('status'):28} {nid:20} deps={e['deps']}")
     for p in rep["problems"]:
         print(f"PROBLEM  {p}")
     print("currency DAG: " + ("SOUND" if not rep["problems"] else f"{len(rep['problems'])} problem(s)"))

@@ -1,0 +1,18 @@
+{
+ "expect": "unknown state",
+ "comment": "a state table carrying a state the engine does not produce, with counts that do not match the rows",
+ "registry": [
+  "aisef2/x.py"
+ ],
+ "doc": {
+  "states": [
+   {
+    "target": "aisef2/x.py",
+    "state": "QUALIFIED",
+    "component": "static",
+    "reason": "relabelled as qualified without evidence"
+   }
+  ],
+  "counts": {}
+ }
+}

@@ -30,7 +30,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 LEDGER_REL = "validation/v2/destructive_sites.json"
-SCOPES = ("aisef2", "validation/v2", "tests/v2")
+SCOPES = ("aisef2", "validation/v2", "tests/v2", "validation/v23", "tests/v23")
 
 #: destructive callables, by the kind of target they act on
 TAXONOMY = {

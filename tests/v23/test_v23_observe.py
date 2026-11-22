@@ -286,7 +286,7 @@ class OwnerNegatives(Base):
         derived completeness. Red-before: R1 off — reuse."""
         b, h = self.helper_change()
         for name, damage, why in (
-                ("deleted", lambda w: next((w / "hook").glob("*.ev")).unlink(), "is missing"),
+                ("deleted", lambda w: next((w / "hook").glob("*.ev")).rename(w.parent / "gone.ev"), "is missing"),
                 ("truncated", lambda w: (w / "manifest.json").write_bytes((w / "manifest.json").read_bytes()[:-40]),
                  "not the bytes recorded"),
                 ("added", lambda w: (w / "hook" / "999-x.ev").write_text("S\t999\t1\n"), "was not recorded")):

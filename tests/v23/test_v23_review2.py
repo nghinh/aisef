@@ -90,7 +90,7 @@ CONTROLS = {
 
 def rename(old: str, new: str):
     def change(t):
-        R1.remove(t, old)
+        R1.drop(t, old)
         t.files[new] = "x\n"
     return change
 

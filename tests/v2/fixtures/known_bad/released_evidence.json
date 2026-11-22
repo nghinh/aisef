@@ -1,0 +1,6 @@
+{
+ "expect": "a protected entry changed",
+ "comment": "a rewritten protected ledger entry (CIGOV-R1 typed append-only rule)",
+ "old": "{\n \"record\": \"R\",\n \"id\": \"X\",\n \"rule\": \"append-only\",\n \"entries\": [\n  {\n   \"seq\": 1,\n   \"id\": \"A\",\n   \"decision\": \"D1\"\n  }\n ]\n}\n",
+ "new": "{\n \"record\": \"R\",\n \"id\": \"X\",\n \"rule\": \"append-only\",\n \"entries\": [\n  {\n   \"seq\": 1,\n   \"id\": \"A\",\n   \"decision\": \"REWRITTEN\"\n  }\n ]\n}\n"
+}

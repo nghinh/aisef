@@ -104,7 +104,7 @@ class ThrowawayRepo(unittest.TestCase):
                 self.assertIn("the baseline itself was altered", self.check()[0])
                 (self.d / BASE).write_text(json.dumps(doc), encoding="utf-8")
                 self.commit("restore")
-        (self.d / BASE).unlink()
+        (self.d / BASE).rename(self.d / (BASE + ".aside"))   # the baseline gone (a rename, not a host deletion)
         self.assertIn("missing or unreadable", self.check()[0])
 
     def test_a_working_tree_change_fails_and_v1_files_are_out_of_scope(self):
