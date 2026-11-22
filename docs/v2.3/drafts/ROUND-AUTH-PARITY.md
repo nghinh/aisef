@@ -842,3 +842,29 @@ On this POSIX host F1 and F2 are no-ops and F3 equals the raw-bytes comparison, 
 * Negative control: in a scratch APFS copy, the R6 draft committed and then rewritten in place is refused by
   `reviewed_draft` ("is not the draft as first committed"), and `ledger_seq13_problems` returns
   "the ledger or the reviewed draft is unreadable: ValueError". The real tree is never touched.
+
+## 11. Seq 13 committed (ROUND-AUTH R6 ratified; measured 2026-11-22, 14:54 UTC)
+
+The owner's 2026-11-22 ruling ("W1a ACCEPTANCE AND W1b AUTHORIZATION", section B) approved the exact R6 proposal by
+its canonical ruling digest `a1469d009f2456fccde4a3b3e3706a993e6bc1524b5512873dbcefe6ccec01f0` and the wiring patch
+by sha256 `25e7fc47b8e8bdde6f246daf68445dba5119c56cc`-prefixed identity stated in full in the ruling, and instructed
+the append. Executed and measured at the commits below.
+
+* `6910810d` — CIGOV-R1 decided first (option (a), byte-prefix; the amendment's Decision section), so the ledger
+  append passes the released-evidence guard by the typed append-only rule, never an exception. Two defects of the
+  rule's first draft (duplicate-JSON-key smuggle; index-only rewrite) were found by independent adversarial
+  verification and fixed fail-closed with regression tests before the commit.
+* `fd3b842c` — entry 13 appended (authority: the owner's section-B words verbatim with date and channel, quoting the
+  digest; approver `human:owner`; entries 1–12 byte-identical), and `SEQ13-WIRING-R6.patch` applied, nothing else.
+* Pre-append verification, each green before the write: both digests recomputed from the committed files (file and
+  `reviewed_draft` paths agree); the complete proposed JSON matches R6 (the entry is the draft object, only the
+  placeholder replaced); V23_PINNED all hold; `tests/v2/sealing_gate.py` byte-identical to v2.2.0's; the historical
+  v2.2 replay PASS live (11 tests + the Q0 class, every record byte-identical at v2.2.0, the Q0 record regenerated
+  `714625b1…`); the Q0 negative controls green (36 tests).
+* Gate parity after the commit: `ledger_seq13_problems() == []`; `Seq13Wiring` (3 tests) and `Q0Wiring` (1 test)
+  PASS under `AISEF_SEALING=1`; the 12 replayed v2.2 tests are skipped at HEAD naming the replay, and only while
+  every pin holds; `LedgerHistory`, `LedgerAppendOnly` (CT-5), `HistoryKept` (CT-6) and the released-evidence guard
+  all PASS on the committed tree.
+* The round is NOT open: `round_v23_missing()` names exactly the two L1-F5 edges (`version_forward.in_round`,
+  `currency_dag.validate(round=…)`), and a counterpart run under `AISEF_SEALING=1` FAILS with that same message —
+  never skips. That red is the designed, truthful state until lane L1-F5 lands.
