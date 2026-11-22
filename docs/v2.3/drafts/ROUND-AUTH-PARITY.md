@@ -847,8 +847,7 @@ On this POSIX host F1 and F2 are no-ops and F3 equals the raw-bytes comparison, 
 
 The owner's 2026-11-22 ruling ("W1a ACCEPTANCE AND W1b AUTHORIZATION", section B) approved the exact R6 proposal by
 its canonical ruling digest `a1469d009f2456fccde4a3b3e3706a993e6bc1524b5512873dbcefe6ccec01f0` and the wiring patch
-by sha256 `25e7fc47b8e8bdde6f246daf68445dba5119c56cc`-prefixed identity stated in full in the ruling, and instructed
-the append. Executed and measured at the commits below.
+by sha256 `25e7fc47b8e8bdde6f246daf68445dba5119c56cf3e6e3054c86e84fe45e8758`, and instructed the append. Executed and measured at the commits below.
 
 * `6910810d` — CIGOV-R1 decided first (option (a), byte-prefix; the amendment's Decision section), so the ledger
   append passes the released-evidence guard by the typed append-only rule, never an exception. Two defects of the
