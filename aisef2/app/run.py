@@ -690,7 +690,10 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
                     delivered[story] = all(git(repo, "cat-file", "-e", f"main:{p}").returncode == 0 for p in tests)
             except Exception as e:  # noqa: BLE001 — a typed refusal of one story is recorded; the run goes on
                 errors.append({"story": story, "error": f"{type(e).__name__}: {e}"[:2000]})
-                results[story] = [f"REFUSED: {type(e).__name__}"]
+                # E5 (W1-DESIGN §4.4): an attempt the handler closed has its outcome in the journal — the record says
+                # the journal's words (verify compares them exactly); only a story with no journaled outcome is REFUSED
+                journaled = outcomes_from([{"type": ev.type, "data": ev.data} for ev in run.events]).get(story)
+                results[story] = journaled or [f"REFUSED: {type(e).__name__}"]
                 if run._state != "RUNNING":
                     break
         rec["stage"] = "finished"

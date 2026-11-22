@@ -272,6 +272,26 @@ IDENTITY_WHY = {
 #: Round v2.3 (ledger seq 13): the per-file reason for a ROW whose file changed SINCE v2.2.0. A changed row with no
 #: entry here keeps the round red (fail closed); an entry with no changed row is itself a problem (no dead reasons).
 V23_ROWS = {
+    "aisef2/orchestrate/story_runner.py": {
+        "change": "E5, the typed stage lifecycle (W1-DESIGN §4, W1b L1-LIFECYCLE): Stage/_Stages and the attempt "
+                  "handler H1-H9 — a foreign fault now CLOSES the attempt in the journal (synthetic closer, one "
+                  "constant-label row, a false decision citing every check, UNKNOWN, rollback, dispose, end) and "
+                  "re-raises the same object; a fault while the repository state is unknown (H3), a refused closure "
+                  "(H5/H6) and every BaseException still propagate with nothing written. Imports only added; every "
+                  "success-path journal is byte-identical to v2.2.0's (tests/v23/test_v23_story_golden.py, measured)",
+        "backlog": "docs/v2.3/W1-DESIGN.md §4 (frozen); CODE-AUDIT #2 (P1), #39a",
+        "owner_approval": "ledger seq 13 (AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED; owner ruling 2026-11-22 §E: "
+                          "implement the typed lifecycle, exception-safe closure and fault-injection matrix from the "
+                          "frozen design)",
+        "requirement": "seq-13 SCOPE: the W1b kernel change is re-derived under the round; truthful terminal states, "
+                       "journal authority and historical compatibility kept (R6/R3/authority inventory unchanged, H9)",
+        "behaviour_tests": (
+            "tests.v2.test_v23_story_lifecycle.Contained.test_f5_a_developer_fault_closes_its_open_request_first",
+            "tests.v2.test_v23_story_lifecycle.Contained.test_f6_a_range_escape_is_contained_and_every_writable_resource_is_residual",
+            "tests.v2.test_v23_story_lifecycle.Propagated.test_f12_a_merge_fault_propagates_with_no_outcome",
+            "tests.v2.test_v23_story_lifecycle.Propagated.test_f23_a_keyboard_interrupt_writes_nothing_and_the_run_interrupts",
+            "tests.v2.test_v23_story_lifecycle.Guard.test_g1_the_guard_refuses_a_backwards_move_and_a_second_dispose",
+            "tests.v2.test_v23_story_lifecycle.RunExecute.test_r1_execute_records_the_journals_words_for_a_closed_raising_story")},
     "validation/v2/mutation.py": {
         "change": "round v2.3 L1-F5 (W1-DESIGN §2.5): read-time supersession by closure-evidence/v2/v2.3/MUTATION.json "
                   "(--run-affected appends, committed-prefix rule, UNRESOLVED (I7) on an uncommitted newest entry, "

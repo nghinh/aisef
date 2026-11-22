@@ -9,6 +9,7 @@ begins. Nothing here names a raw verdict: product truth is read through the bind
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Callable, Mapping
 
 from aisef2.arch.enums import (
@@ -51,6 +52,41 @@ class _EscapedRange:
 
     def release(self) -> None:
         raise ScopeResidual(self._detail)
+
+
+class Stage(Enum):
+    """E5 (W1-DESIGN §4.2): the attempt's typed stages, in order. `_Stages.advance` refuses a move to an equal or
+    earlier stage before that stage's first write; skips are allowed (a no-work story skips DEVELOP and QUALITY, a
+    typed failure jumps to DECIDE)."""
+    ACQUIRE = 1
+    ADMIT = 2
+    CONTINUE = 3
+    DEVELOP = 4
+    MOVE_CANDIDATE = 5
+    PROVE_CANDIDATE = 6
+    QUALITY = 7
+    REVIEW_SCAN = 8
+    MERGE = 9
+    POST_MERGE = 10
+    DECIDE = 11
+    DISPOSE = 12
+    END = 13
+
+
+class _Stages:
+    """The attempt's position (E5). It writes no event and calls no control function: a guard, not an authority."""
+
+    def __init__(self) -> None:
+        self.at: Stage | None = None
+
+    def advance(self, s: Stage) -> None:
+        if self.at is not None and s.value <= self.at.value:
+            raise InvariantError(f"stage {s.name} after {self.at.name}: an attempt never moves backwards")
+        self.at = s
+
+
+#: E5 H2: the repository state while a merge or revert is in flight — no outcome can be backed (H3)
+_UNKNOWN = object()
 
 
 @dataclass(frozen=True, slots=True)
@@ -184,7 +220,7 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
              measured: dict[str, CompletedStory]) -> Attempt:
     ws, merger = adapters.workspace, adapters.merger
     base = merger.base()
-    run.append(T.STORY_BEGIN, {"story_id": story_id, "parent": base})
+    begun = run.append(T.STORY_BEGIN, {"story_id": story_id, "parent": base})
     number = run.state(P.STORY_STATE)[story_id]["attempt"]
     scope = run.story(story_id)
     checks: list[int] = []
@@ -194,176 +230,247 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
     revision = None
     at_parent: dict[str, object] = {}
     at_merge: dict[str, object] = {}
-    try:
-        scratch = scope.acquire(ws.scratch(f"scratch-{story_id}"))
-        impl = scope.acquire(ws.checkout(f"wt-{story_id}", base))
-        verifier_wt = scope.acquire(ws.checkout(f"verifier-wt-{story_id}", base))
-    except ResourceUnavailable as e:
-        failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"resources: {e}"
-        checks.append(gate.check(run, story_id, "resources", False, detail))
-    if failure is None:
-        held = _Held(scope, "admission")
-        implementer = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec),
-                            "implementer", by_spec=True)
-        verifier = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec), "verifier",
-                         by_spec=True)
-        specs = inputs.specs
-        obligations = obligations_of(plan, story_id)
-        probes = {pid: make(held, str(scratch.path)) for pid, make in inputs.probes.items()}
+    st = _Stages()
+    repo: object = None   # E5 H2: None (clean) | the landed revision (str) | _UNKNOWN (merge/revert in flight)
+    fault: Exception | None = None
+    try:   # E5 H1: one handler from just after story/begin to the end of POST_MERGE; BaseException never caught
+        st.advance(Stage.ACQUIRE)
         try:
-            admission = admit_story(plan, story_id, RevisionRef(base, str(impl.path)), specs=specs, probes=probes,
-                                    env=inputs.env, committed_stories=_committed(run), sink=_Sink(run))
-        finally:
-            held.release()
-        for a in admission.obligations:
-            at_parent[obligations[a.criterion_id][0]] = a.decision.satisfaction
-        blocking = next((a for a in admission.obligations if a.decision.failure is not None), None)
-        checks.append(gate.check(run, story_id, "admission", admission.admitted,
-                                 "admitted" if admission.admitted else f"{blocking.criterion_id}: "
-                                                                        f"{blocking.decision.disposition.value}"))
-        if not admission.admitted:
-            failure, detail = blocking.decision.failure, f"admission: {blocking.decision.disposition.value}"
-        else:
-            continuation = continue_story(plan, admission, inputs.completed, _Sink(run))
-            # §13, §14 (K-NOWORK-001): the developer has work only where an INTRODUCE obligation is READY. With none —
-            # every INTRODUCE PRE_SATISFIED, every PRESERVE and VERIFY SATISFIED at this parent, which on an admitted
-            # story is exactly: every obligation measured SATISFIED here (§13's table) — no product behaviour is left to
-            # introduce: the developer is not called, the candidate is the parent, and every obligation is still proved
-            # there. A VERIFY that is not SATISFIED is not this case: it keeps the developer.
-            no_work = all(a.decision.satisfaction is ContractSatisfaction.SATISFIED for a in admission.obligations)
-            candidate = base
-            if not no_work:
-                request = run.append(T.PROVIDER_REQUEST, {"story_id": story_id,
-                                                          "criteria": list(continuation.developer_work),
-                                                          "budget_owner": Owner.DEVELOPER.value}).seq
-                try:
-                    implemented = adapters.developer.implement(story_id, continuation.developer_work, str(impl.path))
-                except ProviderOutage as e:
-                    failure, detail = classify(FailureCode.PROVIDER_UNAVAILABLE), f"developer outage: {e}"
-                    run.append(T.PROVIDER_RESULT, {"story_id": story_id, "outcome": O.FAILED.value, "synthetic": False,
-                                                   "detail": detail}, source_seqs=(request,))
-                    checks.append(gate.check(run, story_id, "developer", False, detail))
-                except RangeEscaped as e:   # PL-7 (§17.1): the developer session left a live process its release could
-                    # not prove gone. Carry that into the scope so the implementer's checkout and the scratch are held
-                    # RESIDUAL, not force-removed, while it may still write; then refuse the story as the range did.
-                    scope.acquire(_EscapedRange(f"developer {story_id} range", str(e)))
-                    raise
-                else:
-                    run.append(T.PROVIDER_RESULT, {"story_id": story_id, "outcome": implemented.outcome.value,
-                                                   "synthetic": False, "detail": implemented.detail},
-                               source_seqs=(request,))
-                    if implemented.outcome is O.COMPLETED:
-                        candidate = implemented.candidate
-                    checks.append(gate.check(run, story_id, "developer", implemented.outcome is O.COMPLETED,
-                                             implemented.detail))
-            if failure is None:
-                try:
-                    ws.move(impl, candidate)
-                    ws.move(verifier_wt, candidate)   # the verifier's own checkout, never the implementer's
-                except ResourceUnavailable as e:
-                    failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"candidate checkout: {e}"
-                    checks.append(gate.check(run, story_id, "candidate", False, detail))
-            if failure is None:
-                # V2.1 (V21-38): every PRESERVE obligation of a committed story this change could break is proved at the
-                # candidate as well — a regression the developer made is the developer's (CONTRACT_UNSATISFIED, the
-                # criterion fed back on a retry the policy permits), found before any merge. The post-merge re-proof
-                # stays for what the merge itself changes, and that is INTEGRATION's.
-                preserved = {cid: (spec_id, ObligationRole.PRESERVE)
-                             for cid, (_, spec_id) in affected_preserve(plan, story_id, _committed(run)).items()}
-                for cid in (*continuation.verify_at_candidate, *preserved):
-                    spec_id, role = obligations.get(cid) or preserved[cid]
-                    p = prove(run, story_id, cid, specs[spec_id], role, implementer=implementer, verifier=verifier,
-                              candidate=candidate, implementer_root=str(impl.path), verifier_root=str(verifier_wt.path),
-                              env=inputs.env, point=MeasurementPoint.CANDIDATE)
-                    proofs.append(p)
-                    checks.append(gate.check(run, story_id, f"proof:{cid}", p.failure is None,
-                                             "verified" if p.failure is None else p.failure.code.value))
-                    if p.failure is not None:
-                        failure, detail = p.failure, f"proof of {cid}: {p.failure.code.value}"
-                        break
-            if failure is None and not no_work:
-                # §14 (K-PRESAT-001, K-NOWORK-001): a story with no developer work — every obligation PRE_SATISFIED, or
-                # nothing READY to introduce — made no developer call: there is no developer work for engineering
-                # adequacy to judge, so it is not run and can neither fail nor charge it
-                try:
-                    diff = ws.diff(base, candidate)
-                except ResourceUnavailable as e:
-                    failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"candidate diff: {e}"
-                    checks.append(gate.check(run, story_id, "candidate", False, detail))   # reading the candidate, after its move
-                else:
-                    tests_held = _Held(scope, "tests")
+            scratch = scope.acquire(ws.scratch(f"scratch-{story_id}"))
+            impl = scope.acquire(ws.checkout(f"wt-{story_id}", base))
+            verifier_wt = scope.acquire(ws.checkout(f"verifier-wt-{story_id}", base))
+        except ResourceUnavailable as e:
+            failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"resources: {e}"
+            checks.append(gate.check(run, story_id, "resources", False, detail))
+        if failure is None:
+            st.advance(Stage.ADMIT)
+            held = _Held(scope, "admission")
+            implementer = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec),
+                                "implementer", by_spec=True)
+            verifier = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec), "verifier",
+                             by_spec=True)
+            specs = inputs.specs
+            obligations = obligations_of(plan, story_id)
+            probes = {pid: make(held, str(scratch.path)) for pid, make in inputs.probes.items()}
+            try:
+                admission = admit_story(plan, story_id, RevisionRef(base, str(impl.path)), specs=specs, probes=probes,
+                                        env=inputs.env, committed_stories=_committed(run), sink=_Sink(run))
+            finally:
+                held.release()
+            for a in admission.obligations:
+                at_parent[obligations[a.criterion_id][0]] = a.decision.satisfaction
+            blocking = next((a for a in admission.obligations if a.decision.failure is not None), None)
+            checks.append(gate.check(run, story_id, "admission", admission.admitted,
+                                     "admitted" if admission.admitted else f"{blocking.criterion_id}: "
+                                                                            f"{blocking.decision.disposition.value}"))
+            if not admission.admitted:
+                failure, detail = blocking.decision.failure, f"admission: {blocking.decision.disposition.value}"
+            else:
+                st.advance(Stage.CONTINUE)
+                continuation = continue_story(plan, admission, inputs.completed, _Sink(run))
+                # §13, §14 (K-NOWORK-001): the developer has work only where an INTRODUCE obligation is READY. With none —
+                # every INTRODUCE PRE_SATISFIED, every PRESERVE and VERIFY SATISFIED at this parent, which on an admitted
+                # story is exactly: every obligation measured SATISFIED here (§13's table) — no product behaviour is left to
+                # introduce: the developer is not called, the candidate is the parent, and every obligation is still proved
+                # there. A VERIFY that is not SATISFIED is not this case: it keeps the developer.
+                no_work = all(a.decision.satisfaction is ContractSatisfaction.SATISFIED for a in admission.obligations)
+                candidate = base
+                if not no_work:
+                    st.advance(Stage.DEVELOP)
+                    request = run.append(T.PROVIDER_REQUEST, {"story_id": story_id,
+                                                              "criteria": list(continuation.developer_work),
+                                                              "budget_owner": Owner.DEVELOPER.value}).seq
                     try:
-                        q = assess(run, story_id, str(verifier_wt.path), diff, inputs.story_tests,
-                                   inputs.regression_tests, inputs.deps, inputs.runner, policy.tests,
-                                   interpreter=inputs.test_interpreter or inputs.env.interpreter,
-                                   timeout_s=policy.tool_timeout_s, on_range=tests_held)
+                        implemented = adapters.developer.implement(story_id, continuation.developer_work, str(impl.path))
+                    except ProviderOutage as e:
+                        failure, detail = classify(FailureCode.PROVIDER_UNAVAILABLE), f"developer outage: {e}"
+                        run.append(T.PROVIDER_RESULT, {"story_id": story_id, "outcome": O.FAILED.value, "synthetic": False,
+                                                       "detail": detail}, source_seqs=(request,))
+                        checks.append(gate.check(run, story_id, "developer", False, detail))
+                    except RangeEscaped as e:   # PL-7 (§17.1): the developer session left a live process its release could
+                        # not prove gone. Carry that into the scope so the implementer's checkout and the scratch are held
+                        # RESIDUAL, not force-removed, while it may still write; then refuse the story as the range did.
+                        scope.acquire(_EscapedRange(f"developer {story_id} range", str(e)))
+                        raise
+                    else:
+                        run.append(T.PROVIDER_RESULT, {"story_id": story_id, "outcome": implemented.outcome.value,
+                                                       "synthetic": False, "detail": implemented.detail},
+                                   source_seqs=(request,))
+                        if implemented.outcome is O.COMPLETED:
+                            candidate = implemented.candidate
+                        checks.append(gate.check(run, story_id, "developer", implemented.outcome is O.COMPLETED,
+                                                 implemented.detail))
+                if failure is None:
+                    st.advance(Stage.MOVE_CANDIDATE)
+                    try:
+                        ws.move(impl, candidate)
+                        ws.move(verifier_wt, candidate)   # the verifier's own checkout, never the implementer's
+                    except ResourceUnavailable as e:
+                        failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"candidate checkout: {e}"
+                        checks.append(gate.check(run, story_id, "candidate", False, detail))
+                if failure is None:
+                    st.advance(Stage.PROVE_CANDIDATE)
+                    # V2.1 (V21-38): every PRESERVE obligation of a committed story this change could break is proved at the
+                    # candidate as well — a regression the developer made is the developer's (CONTRACT_UNSATISFIED, the
+                    # criterion fed back on a retry the policy permits), found before any merge. The post-merge re-proof
+                    # stays for what the merge itself changes, and that is INTEGRATION's.
+                    preserved = {cid: (spec_id, ObligationRole.PRESERVE)
+                                 for cid, (_, spec_id) in affected_preserve(plan, story_id, _committed(run)).items()}
+                    for cid in (*continuation.verify_at_candidate, *preserved):
+                        spec_id, role = obligations.get(cid) or preserved[cid]
+                        p = prove(run, story_id, cid, specs[spec_id], role, implementer=implementer, verifier=verifier,
+                                  candidate=candidate, implementer_root=str(impl.path), verifier_root=str(verifier_wt.path),
+                                  env=inputs.env, point=MeasurementPoint.CANDIDATE)
+                        proofs.append(p)
+                        checks.append(gate.check(run, story_id, f"proof:{cid}", p.failure is None,
+                                                 "verified" if p.failure is None else p.failure.code.value))
+                        if p.failure is not None:
+                            failure, detail = p.failure, f"proof of {cid}: {p.failure.code.value}"
+                            break
+                if failure is None and not no_work:
+                    st.advance(Stage.QUALITY)
+                    # §14 (K-PRESAT-001, K-NOWORK-001): a story with no developer work — every obligation PRE_SATISFIED, or
+                    # nothing READY to introduce — made no developer call: there is no developer work for engineering
+                    # adequacy to judge, so it is not run and can neither fail nor charge it
+                    try:
+                        diff = ws.diff(base, candidate)
+                    except ResourceUnavailable as e:
+                        failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"candidate diff: {e}"
+                        checks.append(gate.check(run, story_id, "candidate", False, detail))   # reading the candidate, after its move
+                    else:
+                        tests_held = _Held(scope, "tests")
+                        try:
+                            q = assess(run, story_id, str(verifier_wt.path), diff, inputs.story_tests,
+                                       inputs.regression_tests, inputs.deps, inputs.runner, policy.tests,
+                                       interpreter=inputs.test_interpreter or inputs.env.interpreter,
+                                       timeout_s=policy.tool_timeout_s, on_range=tests_held)
+                        finally:
+                            tests_held.release()
+                        checks.append(gate.check(run, story_id, "quality", q.failure is None,
+                                                 q.assembly.outcome.value if q.assembly.outcome else "no AdequacyOutcome"))
+                        if q.failure is not None:
+                            failure, detail = q.failure, f"engineering quality: {q.failure.code.value}"
+                if failure is None:
+                    st.advance(Stage.REVIEW_SCAN)
+                    confined = confine(story_id, str(verifier_wt.path))   # derived from the story's own checkout (§25)
+                    try:
+                        rv = review(run, story_id, confined, adapters.reviewer, continuation.verify_at_candidate)
+                        checks.extend(rv.checks)
+                        if rv.failure is not None:
+                            failure, detail = rv.failure, f"review: {rv.failure.code.value}"
+                        else:
+                            sc = scan(run, story_id, confined, adapters.scanner, str(scratch.path),
+                                      timeout_s=policy.tool_timeout_s, attempt=number)
+                            checks.extend(sc.checks)
+                            if sc.failure is not None:
+                                failure, detail = sc.failure, f"security: {sc.failure.code.value}"
                     finally:
-                        tests_held.release()
-                    checks.append(gate.check(run, story_id, "quality", q.failure is None,
-                                             q.assembly.outcome.value if q.assembly.outcome else "no AdequacyOutcome"))
-                    if q.failure is not None:
-                        failure, detail = q.failure, f"engineering quality: {q.failure.code.value}"
-            if failure is None:
-                confined = confine(story_id, str(verifier_wt.path))   # derived from the story's own checkout (§25)
-                try:
-                    rv = review(run, story_id, confined, adapters.reviewer, continuation.verify_at_candidate)
-                    checks.extend(rv.checks)
-                    if rv.failure is not None:
-                        failure, detail = rv.failure, f"review: {rv.failure.code.value}"
-                    else:
-                        sc = scan(run, story_id, confined, adapters.scanner, str(scratch.path),
-                                  timeout_s=policy.tool_timeout_s, attempt=number)
-                        checks.extend(sc.checks)
-                        if sc.failure is not None:
-                            failure, detail = sc.failure, f"security: {sc.failure.code.value}"
-                finally:
-                    unconfine(confined)
-            if failure is None:
-                m = merge(run, story_id, merger, candidate)
-                checks.append(m.check)
-                if m.failure is not None:
-                    failure, detail = m.failure, f"merge: {m.failure.code.value}"
-            if failure is None:
-                merged = m.merge.revision
-                try:
-                    ws.move(impl, merged)
-                    ws.move(verifier_wt, merged)
-                except ResourceUnavailable as e:
-                    failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"merged checkout: {e}"
-                    checks.append(gate.check(run, story_id, "post-merge", False, detail))
-                    if merged != candidate:     # B7: merged == candidate is a merge git made no commit for — nothing to undo
-                        merger.revert(merged)
-                else:
-                    ps, cs = reprove(run, story_id, plan, specs, merged=merged, implementer=implementer,
-                                     verifier=verifier, implementer_root=str(impl.path),
-                                     verifier_root=str(verifier_wt.path), env=inputs.env, committed=_committed(run))
-                    proofs.extend(ps)
-                    checks.extend(cs)
-                    for p in ps:
-                        at_merge[p.spec_id] = p.satisfaction
-                    broken = next((p for p in ps if p.failure is not None), None)
-                    if broken is not None:
-                        failure, detail = broken.failure, f"post-merge {broken.criterion_id}: {broken.failure.code.value}"
-                        if merged != candidate:     # B7: the tip is the previous story's — this story landed no commit
+                        unconfine(confined)
+                if failure is None:
+                    st.advance(Stage.MERGE)
+                    repo = _UNKNOWN          # E5 H2: the merge is in flight
+                    m = merge(run, story_id, merger, candidate)
+                    repo = None
+                    checks.append(m.check)
+                    if m.failure is not None:
+                        failure, detail = m.failure, f"merge: {m.failure.code.value}"
+                if failure is None:
+                    st.advance(Stage.POST_MERGE)
+                    merged = m.merge.revision
+                    if merged != candidate:   # E5 H2: landed until a revert returns or the story commits
+                        repo = merged
+                    try:
+                        ws.move(impl, merged)
+                        ws.move(verifier_wt, merged)
+                    except ResourceUnavailable as e:
+                        failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"merged checkout: {e}"
+                        checks.append(gate.check(run, story_id, "post-merge", False, detail))
+                        if merged != candidate:     # B7: merged == candidate is a merge git made no commit for — nothing to undo
+                            repo = _UNKNOWN
                             merger.revert(merged)
+                            repo = None
                     else:
-                        revision = merged
-    decision_seq = gate.decision(run, checks, failure is None)
-    if failure is None:
-        run.append(T.STORY_COMMIT, {"story_id": story_id, "revision": revision})
-        outcome = "COMMIT"
-    else:
-        observed = _fail(run, story_id, failure, detail)
-        charge = budget.charge(run.events, story_id, policy.limits)
-        if charge.retry:
-            run.retry(story_id, policy.limits)
-            outcome = "RETRY"
+                        ps, cs = reprove(run, story_id, plan, specs, merged=merged, implementer=implementer,
+                                         verifier=verifier, implementer_root=str(impl.path),
+                                         verifier_root=str(verifier_wt.path), env=inputs.env, committed=_committed(run))
+                        proofs.extend(ps)
+                        checks.extend(cs)
+                        for p in ps:
+                            at_merge[p.spec_id] = p.satisfaction
+                        broken = next((p for p in ps if p.failure is not None), None)
+                        if broken is not None:
+                            failure, detail = broken.failure, f"post-merge {broken.criterion_id}: {broken.failure.code.value}"
+                            if merged != candidate:     # B7: the tip is the previous story's — this story landed no commit
+                                repo = _UNKNOWN
+                                merger.revert(merged)
+                                repo = None
+                        else:
+                            revision = merged
+    except Exception as e:   # §22 at the attempt boundary, as merge() does (merge.py:26-31)
+        fault = e
+        if repo is _UNKNOWN:
+            raise   # E5 H3: this attempt's merge may be on main — no outcome can be backed
+        try:
+            if isinstance(repo, str):   # E5 H4 i: landed — undo this attempt's merge, once
+                rev, repo = repo, _UNKNOWN
+                merger.revert(rev)
+                repo = None
+            stage = st.at.name if st.at is not None else Stage.ACQUIRE.name
+            answered = {ev.source_seqs[0] for ev in run.events if ev.type == T.PROVIDER_RESULT.value}
+            for ev in [ev for ev in run.events if ev.type == T.PROVIDER_REQUEST.value and ev.seq > begun.seq
+                       and ev.data["story_id"] == story_id and ev.seq not in answered]:
+                run.append(T.PROVIDER_RESULT, {"story_id": story_id, "outcome": "OUTCOME_UNKNOWN",
+                                               "synthetic": True,
+                                               "detail": f"{stage} raised {type(e).__name__} before its result"},
+                           source_seqs=(ev.seq,))   # E5 H4 ii: the closer of run_scope.py's interrupt
+            failure = classify(FailureCode.UNKNOWN)
+            detail = f"{stage} raised {type(e).__name__}"   # E5 H4 iii: the last token is the type (_fail)
+            if st.at is Stage.ADMIT or st.at is Stage.CONTINUE:   # E5 H4 iv: one constant label per row (R6)
+                checks.append(gate.check(run, story_id, "admission", False, detail))
+            elif st.at is Stage.DEVELOP:
+                checks.append(gate.check(run, story_id, "developer", False, detail))
+            elif st.at is Stage.MOVE_CANDIDATE or st.at is Stage.PROVE_CANDIDATE:
+                checks.append(gate.check(run, story_id, "candidate", False, detail))
+            elif st.at is Stage.QUALITY:
+                checks.append(gate.check(run, story_id, "quality", False, detail))
+            elif st.at is Stage.REVIEW_SCAN:
+                checks.append(gate.check(run, story_id, "review", False, detail))
+            elif st.at is Stage.MERGE:
+                checks.append(gate.check(run, story_id, "merge", False, detail))
+            elif st.at is Stage.POST_MERGE:
+                checks.append(gate.check(run, story_id, "post-merge", False, detail))
+            else:
+                checks.append(gate.check(run, story_id, "resources", False, detail))
+        except Exception as x:   # E5 H6: the original is never masked
+            e.add_note(f"E5: the attempt could not be closed: {type(x).__name__}: {x}")
+            raise e from None
+    try:   # E5 H5/H6: a fault here writes nothing more
+        st.advance(Stage.DECIDE)
+        decision_seq = gate.decision(run, checks, failure is None)
+        if failure is None:
+            run.append(T.STORY_COMMIT, {"story_id": story_id, "revision": revision})
+            outcome = "COMMIT"
         else:
-            run.append(T.STORY_ROLLBACK, {"story_id": story_id}, source_seqs=(observed.seq,))
-            outcome = "ROLLBACK"
-    run.append(T.STORY_DISPOSE, {"story_id": story_id})
-    scope.dispose()
-    run.append(T.STORY_END, {"story_id": story_id})
+            observed = _fail(run, story_id, failure, detail)
+            charge = budget.charge(run.events, story_id, policy.limits)
+            if charge.retry:
+                run.retry(story_id, policy.limits)
+                outcome = "RETRY"
+            else:
+                run.append(T.STORY_ROLLBACK, {"story_id": story_id}, source_seqs=(observed.seq,))
+                outcome = "ROLLBACK"
+        st.advance(Stage.DISPOSE)
+        run.append(T.STORY_DISPOSE, {"story_id": story_id})
+        scope.dispose()
+        st.advance(Stage.END)
+        run.append(T.STORY_END, {"story_id": story_id})
+    except Exception as x:
+        if fault is None:
+            raise   # E5 H5: reachable only through a journal that refuses appends
+        fault.add_note(f"E5: the attempt could not be closed: {type(x).__name__}: {x}")
+        raise fault from None   # E5 H6
+    if fault is not None:
+        raise fault   # E5 H4 vii: the same object, out of run_story, to run.py's story_errors
     for spec_id in set(at_parent) | set(at_merge):
         measured[spec_id] = CompletedStory(story_id, at_parent.get(spec_id), at_merge.get(spec_id))
     return Attempt(story_id, number, outcome, failure.code if failure else None, revision, tuple(proofs),

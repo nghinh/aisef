@@ -1477,8 +1477,18 @@ AUDIT_CLASSES = ("EQUIVALENT", "AUDITED")
 V23_REL = "closure-evidence/v2/v2.3/MUTATION.json"
 #: round-v2.3 survivor audits, append-only beside the v2.1 ones (audits_at reads both; the key carries source_sha256)
 V23_AUDITS_REL = "closure-evidence/v2/v2.3/SURVIVOR-AUDITS.json"
-#: round-v2.3 targets of NEW modules, outside PHASE_TARGETS/TARGETS; check() requires a round-v2.3 entry for each
-V23_NEW_TARGETS: dict[str, list[str]] = {}
+#: round-v2.3 targets of NEW code, outside PHASE_TARGETS/TARGETS; check() requires a round-v2.3 entry for each
+V23_NEW_TARGETS: dict[str, list[str]] = {
+    # E5 (W1-DESIGN §4.4): the stage guard is a new target; Stage/_Stages.__init__ have 0 mutation sites and are
+    # covered through _attempt's enum-swap mutants
+    "aisef2/orchestrate/story_runner.py::_Stages.advance": ["tests/v2/test_v23_story_lifecycle.py"],
+}
+#: round-v2.3 kill-set growth for EXISTING targets, appended LAST at measurement time (§4.4: the import-time tables,
+#: V21_TARGETS among them, stay byte-identical; the recorded entry's kill_tests carries the grown set)
+V23_KILL_APPEND: dict[str, list[str]] = {
+    "aisef2/orchestrate/story_runner.py::_attempt": ["tests/v2/test_v23_story_lifecycle.py"],
+    "aisef2/app/run.py::execute": ["tests/v2/test_v23_story_lifecycle.py"],
+}
 
 
 def entry_sha256(e: dict) -> str:
@@ -2858,7 +2868,8 @@ def main(argv: list[str] | None = None) -> int:
         with tempfile.TemporaryDirectory(prefix=f"aisef-pristine-{worker}-") as p:
             pristine = _pristine(ROOT, pathlib.Path(p) / "tree")
             for target in chosen:   # the record is appended after every target: a run that dies keeps what it measured
-                kills = TARGETS.get(target) or V23_NEW_TARGETS[target]
+                kills = (TARGETS.get(target) or V23_NEW_TARGETS[target]) + \
+                    [k for k in V23_KILL_APPEND.get(target, []) if k not in (TARGETS.get(target) or ())]
                 try:
                     t = run_target(ROOT, target, kills, pristine, on_mutant=_checkpoint)
                 except Exception as e:   # outside run_target's own guard: named, never lost
