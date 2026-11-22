@@ -215,7 +215,8 @@ class LedgerSeq13(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.ledger = json.loads((ROOT / R.LEDGER_REL).read_text(encoding="utf-8"))
-        assert [e["seq"] for e in cls.ledger["entries"]] == list(range(1, 13))
+        assert [e["seq"] for e in cls.ledger["entries"]][:12] == list(range(1, 13))
+        cls.ledger = dict(cls.ledger, entries=cls.ledger["entries"][:12])   # the committed seq 13 may follow (ROUND-AUTH)
         cls.draft = _lf((ROOT / R.SEQ13_DRAFT_REL).read_bytes())      # its LF bytes, on a CRLF checkout too
         (cls.r3,) = LD.entries(cls.draft.decode("utf-8"))
         cls.d3 = LD.digest(cls.r3)
