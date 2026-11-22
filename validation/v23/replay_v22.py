@@ -308,10 +308,12 @@ def host() -> dict:
 
 @contextlib.contextmanager
 def v22_clone(scratch: pathlib.Path, commit: str = V2_2_0):
-    """A fresh shared clone of this repository detached at `commit` (removed afterwards)."""
+    """A fresh shared clone of this repository detached at `commit` (removed afterwards), checked out as the committed
+    bytes on every host: core.autocrlf=false in the clone's own config, over a system-wide autocrlf=true (Windows)."""
     t = pathlib.Path(tempfile.mkdtemp(prefix="v22-replay-", dir=scratch))
     try:
-        subprocess.run(["git", "clone", "-q", "--shared", "--no-checkout", str(ROOT), str(t / "tree")], check=True)
+        subprocess.run(["git", "clone", "-q", "--shared", "--no-checkout", "-c", "core.autocrlf=false", str(ROOT),
+                        str(t / "tree")], check=True)
         _git(t / "tree", "-c", "advice.detachedHead=false", "checkout", "-q", "--detach", commit)
         yield t / "tree"
     finally:
@@ -360,11 +362,14 @@ def coverage(root: pathlib.Path = ROOT, commit: str = V2_2_0) -> dict:
         path = tid.split("::")[0]
         csrc = _read(root, crel)
         blob = _git(root, "show", f"{commit}:{path}").stdout
-        here = (root / path).read_bytes() if (root / path).is_file() else None
+        # the working-tree file as git stores it (its own conversion: a Windows autocrlf checkout of the same blob is
+        # not different bytes) against the v2.2.0 blob id; with no conversion configured this is the raw bytes
+        here = _git(root, "hash-object", f"--path={path}", "--", str(root / path), check=False)
+        same = here.returncode == 0 and here.stdout.strip() == _git(root, "rev-parse", f"{commit}:{path}").stdout.strip()
         fn = _method(blob.decode("utf-8"), qual)
         cfn = _method(csrc, cqual) if csrc else None
         have = {a for _, a in assertions(cfn)} if cfn else set()
-        entry = {"id": tid, "node": node, "blob_sha256": _sha(blob), "byte_identical_at_head": here == blob,
+        entry = {"id": tid, "node": node, "blob_sha256": _sha(blob), "byte_identical_at_head": same,
                  "counterpart": f"{crel}::{cqual}", "counterpart_found": cfn is not None, "assertions": []}
         for line, a in assertions(fn) if fn else []:
             want = REBOUND.get((tid, a), a)
@@ -401,7 +406,10 @@ def _child(tree: str, tid: str, out: str) -> int:
         unittest.defaultTestLoader.loadTestsFromName(_unittest_name(tid)))
     dur = round(time.monotonic() - t0, 3)
     pre = os.path.realpath(tree) + os.sep
-    rel = sorted({os.path.realpath(p)[len(pre):] for p in opened if os.path.realpath(p).startswith(pre)})
+    # tree-relative and '/'-joined on every host: run_one matches RECORDS_DIR ("closure-evidence/") against these, so a
+    # Windows "closure-evidence\\r.json" would drop every record from the check (fail open)
+    rel = sorted({os.path.realpath(p)[len(pre):].replace(os.sep, "/") for p in opened
+                  if os.path.realpath(p).startswith(pre)})
     if tid == Q0_REPLAYED:
         # the record this very run derived: the class's setUpClass result, rendered by the module it calibrated with
         mod = sys.modules.get(_unittest_name(Q0_REPLAYED).rsplit(".", 1)[0])

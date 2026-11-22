@@ -239,6 +239,9 @@ def _of_popen(name):
 
 
 def _launch(event, a):
+    if event == "_posixsubprocess.fork_exec" and getattr(_tl, "fe", False):
+        _tl.fe = False   # 3.14+: the interpreter's own event of the launch _fork_exec already reported
+        return
     if (event == "os.posix_spawn" and _of_popen("_posix_spawn")) or (
             event == "_posixsubprocess.fork_exec" and _of_popen("_execute_child")):
         return
@@ -337,6 +340,20 @@ def _wrap(f, kind):
     return g
 
 
+def _fork_exec(f):
+    """_posixsubprocess.fork_exec: CPython raises its audit event only from 3.14, so a launch by it alone
+    (multiprocessing's spawnv_passfds) is reported here, on every version; the interpreter's own event, raised inside
+    the call, is then the same launch and ignored (once). Unparsable arguments: a launch of an unknown program."""
+    def g(*a, **k):
+        _audit("_posixsubprocess.fork_exec", (a[1], a[0], a[5]) if len(a) > 5 else ((), (), None))
+        _tl.fe = True
+        try:
+            return f(*a, **k)
+        finally:
+            _tl.fe = False
+    return g
+
+
 def _exit():
     if _st["fd"] is not None:
         _raw("E\t%d\n" % _st["lost"])
@@ -357,6 +374,11 @@ if os.environ.get(_MARK) == _NONCE:
         for _s in (os.supports_dir_fd, os.supports_fd, os.supports_follow_symlinks, os.supports_effective_ids):
             if _old in _s:
                 _s.add(_new)
+    try:
+        import _posixsubprocess
+        _posixsubprocess.fork_exec = _fork_exec(_posixsubprocess.fork_exec)
+    except ImportError:   # no POSIX fork_exec on this host
+        pass
     sys.addaudithook(_audit)
 try:   # a sitecustomize this one shadows still runs
     from importlib.machinery import PathFinder as _pf

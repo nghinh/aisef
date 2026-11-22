@@ -160,8 +160,10 @@ class Review2(TO.Base):
     def test_r2_2_a_namespace_directory_by_find_spec_or_a_relative_name(self):
         """test_snd1 with the directory probed by find_spec of a computed name, or imported by a literal relative
         name: R5 sees no name, so the probe is an R8 site. Δ adds aisef2/plugins/README.txt (a namespace directory)
-        or the module aisef2/plugins.py. 57387ed5 (audit): VERIFIED_REUSE. strace: the import system's stat of the
-        module file it only finds is data (it loads nothing), so R2 may come first."""
+        or the module aisef2/plugins.py. 57387ed5 (audit): VERIFIED_REUSE. strace: the trace holds the import system's
+        stat of the .py the probe looks for (aisef2/plugins/__init__.py, absent; aisef2/plugins.py, found, not loaded)
+        as an opened .py S(F) does not hold, so D2 refuses first (C10, UNRESOLVED); behind it R8, or R2 for the module
+        (that stat is data)."""
         kill = "tests/v2/test_opt.py"
         for name, imports, probe, adds in PROBES:
             for added in adds:
@@ -172,11 +174,16 @@ class Review2(TO.Base):
                     t, b, h = R1.toy(self, "aisef2/opt.py::pick", kill, files,
                                      lambda t, added=added: t.files.update({added: "x = 1\n"}))
                     rec = TO.record(t, [kill])
+                    off = {"D2"} if TO.STRACE else set()
+                    if TO.STRACE:
+                        looked = "aisef2/plugins/__init__.py" if added == NS else MOD
+                        self.assertNonReuse(TO.state(t, b, h, rec, "aisef2/opt.py::pick"), "UNRESOLVED", "D2",
+                                            f"S({kill}) misses {looked}")
                     either = TO.STRACE and added == MOD
-                    self.assertNonReuse(TO.state(t, b, h, rec, "aisef2/opt.py::pick"), "INVALIDATED",
+                    self.assertNonReuse(TO.state(t, b, h, rec, "aisef2/opt.py::pick", off), "INVALIDATED",
                                         ("R8", "R2") if either else "R8", "" if either else "computed-name site at aisef2/opt.py")
                     if not either:
-                        self.assertEqual(TO.state(t, b, h, rec, "aisef2/opt.py::pick", {"R8"}).state, "VERIFIED_REUSE")
+                        self.assertEqual(TO.state(t, b, h, rec, "aisef2/opt.py::pick", off | {"R8"}).state, "VERIFIED_REUSE")
 
     def test_r2_2_site_table(self):
         """Every spelling of SITES is a site; CONTROLS (a literal absolute name, a launch-free module) are not.

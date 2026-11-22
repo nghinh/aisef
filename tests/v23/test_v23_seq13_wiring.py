@@ -1,11 +1,12 @@
 """ROUND-AUTH review findings, fixed fail-closed. Always runs; seconds; throwaway trees and repositories only.
 
-* RA-GP-1 — with the reviewed wiring (SEQ13-WIRING-R5.patch; R3's plus Q0-1, re-pinned) applied, the 11 V22_REPLAYED tests and
+* RA-GP-1 — with the reviewed wiring (SEQ13-WIRING-R6.patch; R5's mechanism, re-pinned for the CI-portability
+  corrections) applied, the 11 V22_REPLAYED tests and
   the V22_REPLAYED_Q0 class are skipped only while every V23_PINNED file is exactly as pinned. Deleting or editing one
   (the counterparts, the Q0 counterpart, `round_gate`, the replay, q0_round.py, the digest tool, tests/v23/__init__.py)
   un-skips all 12: they run under AISEF_SEALING=1 as before seq 13.
 * RA-INT-2 — round v2.3 opens only for exactly one committed seq 13 that is the reviewed draft's ruling, by
-  canonical digest, with the owner's own words quoting that digest. The placeholder, R1-R4, a minimal or doctored
+  canonical digest, with the owner's own words quoting that digest. The placeholder, R1-R5, a minimal or doctored
   entry, a rewritten draft and a second seq 13 are each refused.
 * Q0R-INT-1 — a draft rewritten through a merge (resolved by hand, or `-X theirs`), and any shallow clone, are
   refused; a merge that leaves the draft alone is not.
@@ -51,7 +52,7 @@ def _sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
-class WiringR5(unittest.TestCase):
+class WiringR6(unittest.TestCase):
     """RA-GP-1 + Q0-1, on a throwaway tree holding the patched sealing_gate.py and copies of the pinned files."""
 
     @classmethod
@@ -169,6 +170,17 @@ class WiringR5(unittest.TestCase):
         mod = self.gate(t)
         self.assertTrue(all(self.decorated(mod, t, tid)[0] for tid in RP.V22_REPLAYED))
 
+    def test_R5s_patch_on_this_tree_skips_nothing(self):
+        """R5 is superseded: the CI-portability corrections changed replay_v22.py and the Q0 counterpart, and R6
+        re-points the counterparts file, so R5's pins fail and it skips none."""
+        old = R.wired_sealing_gate((ROOT / "docs/v2.3/drafts/SEQ13-WIRING-R5.patch").read_bytes())
+        t = self.tree()
+        (t / "tests/v2/sealing_gate.py").write_bytes(old)
+        mod = self.gate(t)
+        self.assertEqual(mod.V22_REPLAYED_Q0, (RP.Q0_REPLAYED,))
+        self.assertFalse(mod.V23_PINS_HOLD)
+        self.assertEqual([tid for tid in RP.REPLAYED if self.decorated(mod, t, tid)[0]], [])
+
     def test_R4s_patch_on_this_tree_skips_nothing(self):
         """R4 is superseded: R5 changed q0_round.py and both counterpart files, so R4's pins fail and it skips none."""
         old = R.wired_sealing_gate((ROOT / "docs/v2.3/drafts/SEQ13-WIRING-R4.patch").read_bytes())
@@ -197,13 +209,14 @@ def _git(root, *a) -> str:
 
 class LedgerSeq13(unittest.TestCase):
     """RA-INT-2, Q0R-INT-1, Q0R-INT-2: ledger_seq13_problems on throwaway repositories (ledger 1-12 + one appended
-    entry, the reviewed draft — R5 since the Q0-1 review — and the files it binds; `self.r3` names the reviewed ruling)."""
+    entry, the reviewed draft — R6 since the CI-portability re-pin — and the files it binds; `self.r3` names the
+    reviewed ruling)."""
 
     @classmethod
     def setUpClass(cls):
         cls.ledger = json.loads((ROOT / R.LEDGER_REL).read_text(encoding="utf-8"))
         assert [e["seq"] for e in cls.ledger["entries"]] == list(range(1, 13))
-        cls.draft = (ROOT / R.SEQ13_DRAFT_REL).read_bytes()
+        cls.draft = _lf((ROOT / R.SEQ13_DRAFT_REL).read_bytes())      # its LF bytes, on a CRLF checkout too
         (cls.r3,) = LD.entries(cls.draft.decode("utf-8"))
         cls.d3 = LD.digest(cls.r3)
         cls.bound = cls.r3["decision"]["BOUND_SHA256"]
@@ -260,6 +273,7 @@ class LedgerSeq13(unittest.TestCase):
         r2 = LD.entries((ROOT / "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R2.md").read_text(encoding="utf-8"))[0]
         r3 = LD.entries((ROOT / "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R3.md").read_text(encoding="utf-8"))[0]
         r4 = LD.entries((ROOT / "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R4.md").read_text(encoding="utf-8"))[0]
+        r5 = LD.entries((ROOT / "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R5.md").read_text(encoding="utf-8"))[0]
         doctored = json.loads(json.dumps(self.r3))
         doctored.update(authority="agent wrote this", subject_to="nothing")
         doctored["decision"].update(NOT_AUTHORIZED="", GATED_TEST_WIRING="any wiring")
@@ -274,6 +288,7 @@ class LedgerSeq13(unittest.TestCase):
             "R2 approved in words quoting R2's digest": (self.approved(r2), "is not the reviewed draft's"),
             "R3 (superseded by R4) approved in words quoting R3's digest": (self.approved(r3), "is not the reviewed draft's"),
             "R4 (superseded by R5) approved in words quoting R4's digest": (self.approved(r4), "is not the reviewed draft's"),
+            "R5 (superseded by R6) approved in words quoting R5's digest": (self.approved(r5), "is not the reviewed draft's"),
             "doctored, approved in words quoting its own digest": (self.approved(dict(doctored)), "is not the reviewed draft's"),
             "R3 approved in words that do not quote the digest": (dict(self.r3, authority="owner, 2026-11-22: approved"),
                                                                  "does not quote its ruling digest"),

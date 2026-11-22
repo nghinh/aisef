@@ -14,6 +14,7 @@ root: Amendment A2)."""
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import shutil
 import sys
@@ -31,6 +32,10 @@ from validation.v23 import observe as OBS  # noqa: E402
 
 STRACE = sys.platform.startswith("linux") and shutil.which("strace") is not None
 NO_STRACE = "strace backend: needs strace on a Linux host (this host has none; the parser runs on recorded fixtures)"
+#: the recorder is POSIX-only (observe.py: audit "any POSIX host"): its hook needs os.register_at_fork, so elsewhere a
+#: recording holds the root's start line only — never complete, never admitted (NonPosixRecorder states it)
+RECORDER = os.name == "posix"
+NO_RECORDER = "F5 recorder: POSIX hosts only (its hook needs os.register_at_fork); a recording here is never complete"
 FIXTURE = pathlib.Path(__file__).with_name("fixtures") / "strace-toy.json"
 K, TGT, INC = TI.K, TI.TGT, TI.INC
 CHILD = "tests/v2/test_child.py"
@@ -53,6 +58,8 @@ def without(*branches: str) -> str:
 
 def record(t: TI.Toy, kills, backend: str = "auto", hook: str | None = None) -> dict:
     """observe.record() of each kill file at the toy's HEAD; load()ed as impact.py's --observations would."""
+    if not RECORDER:
+        raise unittest.SkipTest(NO_RECORDER)
     out = pathlib.Path(tempfile.mkdtemp(prefix="rec-", dir=t.root.parent))
     with mock.patch.object(OBS, "HOOK", hook or OBS.HOOK):
         for k in kills:
@@ -408,10 +415,10 @@ class StraceParser(unittest.TestCase):
         self.addCleanup(shutil.rmtree, w, True)
         (w / "strace").mkdir()
         (w / "hook").mkdir()
-        for tid, text in files.items():
-            (w / "strace" / f"tr.{tid}").write_text(text, encoding="utf-8")
+        for tid, text in files.items():   # LF, as strace and the hook write them on every host (no text-mode CR)
+            (w / "strace" / f"tr.{tid}").write_text(text, encoding="utf-8", newline="\n")
         for pid, lines in procs.items():
-            (w / "hook" / f"{pid}-x.ev").write_text("".join(x + "\n" for x in lines), encoding="utf-8")
+            (w / "hook" / f"{pid}-x.ev").write_text("".join(x + "\n" for x in lines), encoding="utf-8", newline="\n")
         (w / "manifest.json").write_text(json.dumps({"tree": "/w/tree", "checkout": "/w/checkout", "backend": backend,
                                                      "kill_file": {"path": K}, "row": {"outcome": "PASS", "exit": 0,
                                                                                        "ran": 1, "pid": 100}}),
@@ -490,6 +497,26 @@ class StraceBackend(Base):
         self.assertEqual(rec["opened"]["aisef2/toy.py"], "data")
         self.assertTrue(rec["tools"]["strace"].startswith("strace"))
         self.assertNonReuse(state(t, b, h, {K: rec}), "INVALIDATED", "R2", "reads aisef2/toy.py as data")
+
+
+class NonPosixRecorder(Base):
+    """Where the recorder cannot run (Windows): a recording made anyway is of another family, holds the root's start
+    line only (no normal exit, the kill file's code never seen), and is never reused — R0, and R1 with R0 off."""
+
+    def test_a_recording_here_is_never_admitted(self):
+        if RECORDER:
+            self.skipTest("a POSIX host: the recorder runs (OwnerNegatives)")
+        t = self.t
+        b = t.commit()
+        t.edit("aisef2/toy.py", "return x * 2", "return x * 3")
+        h = t.commit()
+        rec = OBS.load_one(OBS.record(t.root, K, pathlib.Path(tempfile.mkdtemp(dir=t.root.parent))))
+        self.assertEqual(OBS.verify(rec), (None, []))
+        self.assertNotEqual(rec["platform"]["family"], "posix")
+        self.assertTrue(rec["completeness"]["unterminated_processes"] and rec["completeness"]["kill_file_unseen"],
+                        rec["completeness"])
+        self.assertNonReuse(state(t, b, h, {K: rec}), "UNRESOLVED", "R0", "no admissible observation")
+        self.assertNonReuse(state(t, b, h, {K: rec}, off={"R0"}), "INVALIDATED", "R1", "kill_file_unseen 1")
 
 
 if __name__ == "__main__":

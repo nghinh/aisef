@@ -176,8 +176,8 @@ class Review1(TO.Base):
         stale.parent.mkdir(parents=True)
         stale.write_bytes(b"\0")
         self.assertEqual(impact._dirty(t.root, h, TI.M.COPY), [])   # what _dirty alone cannot see
-        with self.assertRaisesRegex(SystemExit, "no file of HEAD implies: aisef2/plugins"):
-            TO.record(t, [K])
+        with self.assertRaisesRegex(SystemExit, "no file of HEAD implies: aisef2/plugins"):   # refused before any
+            OBS.record(t.root, K, pathlib.Path(tempfile.mkdtemp(dir=t.root.parent)))   # run: on every host
 
     # A3-SND-6 ------------------------------------------------------------------------------------------------------
     def test_snd6_annotated_walrus_and_unpacked_bindings(self):
@@ -378,6 +378,7 @@ class Review1(TO.Base):
         t.files["aisef2/limit.txt"] = "3\n"
         b = t.commit()
         os.chmod(t.root / "aisef2" / "limit.txt", 0o755)
+        TI._git(t.root, "update-index", "--chmod=+x", "aisef2/limit.txt")   # core.filemode=false (Windows): git's mode
         h = t.commit()
         self.assertNotEqual(b, h)
         self.assertNonReuse(TO.state(t, b, h, None), "INVALIDATED", "R1", "no observation")

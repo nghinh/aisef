@@ -68,7 +68,7 @@ class Replay(unittest.TestCase):
             f"    {FAKE + n!r},\n" for n in GATED_NAMES) + ")\n"})
         for rel, text in files.items():
             (cls.tree / rel).parent.mkdir(parents=True, exist_ok=True)
-            (cls.tree / rel).write_text(text, encoding="utf-8")
+            (cls.tree / rel).write_text(text, encoding="utf-8", newline="\n")    # the LF bytes on every host
         _git(cls.tree, "init", "-q")
         _git(cls.tree, "add", "-A")
         _git(cls.tree, "commit", "-q", "-m", "fake v2.2.0")
@@ -106,11 +106,11 @@ class Replay(unittest.TestCase):
 
     def test_a_corrupted_record_is_named_by_path_by_the_clean_tree_rule_and_by_the_test(self):
         p = self.tree / "closure-evidence/r.json"
-        p.write_text('{"ok": false}\n', encoding="utf-8")
+        p.write_text('{"ok": false}\n', encoding="utf-8", newline="\n")
         try:
             doc = self.run_replay("test_reads")
         finally:
-            p.write_text(FILES["closure-evidence/r.json"], encoding="utf-8")
+            p.write_text(FILES["closure-evidence/r.json"], encoding="utf-8", newline="\n")
         probs = doc["problems"]
         self.assertIn("tree not clean: M closure-evidence/r.json", probs)
         self.assertTrue(any(x.startswith(f"{FAKE}test_reads: FAIL") for x in probs), probs)

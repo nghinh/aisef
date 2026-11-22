@@ -766,3 +766,79 @@ This page quotes the digest, so it is the only page named by path alone. No boun
     python3 -P validation/v23/q0_round.py --check                  # round-v2.3 Q0 vs this tree (red today: no record)
     python3 -P -m unittest discover -s tests/v23 -t . -p test_v23_q0_round.py   # Q0-1 controls (Q0RoundV23/Q0Wiring gated)
     python3 -P -c "import sys; sys.path.insert(0, '.'); from tests.v23.test_v23_rounds import reviewed_draft; from validation.v23.ledger_digest import digest; print(digest(reviewed_draft()))"   # R5's digest, from the draft as first committed (§9)
+
+## 10. CI-portability corrections and draft R6 (re-pin; measured 2026-11-22)
+
+The owner-ruled CI-portability corrections (2026-11-22) changed the bytes of two files R5's patch pins, so the seq-13
+draft is re-issued as R6. Nothing here is applied or ratified: the owner status stays **CONDITIONAL HOLD**, R6 is not
+authorized for the ledger, and `tests/v2/**`, `validation/v2/**`, `closure-evidence/**`, `aisef2/**`, R1–R5, their
+patches and every file under `docs/v2.3/evidence` dated 2026-11-21 are unchanged.
+
+**What changed (the fixes are the CI-portability batch's; each keeps or restores a check, none relaxes one).**
+
+* `validation/v23/replay_v22.py` (`3f54e22b…` → `6b7195ec4aafb4cefcb304ad94325331853360206330d25e95af26e4449adc60`):
+  F1 — `_child` reports record paths '/'-joined on every host; on a `\`-separated host the committed-bytes rule had
+  dropped every record (failed open). F2 — `v22_clone` checks out with `-c core.autocrlf=false`, so the replayed tree
+  is the committed bytes over a system-wide `autocrlf=true`. F3 — `coverage` sets `byte_identical_at_head` from
+  `git hash-object --path` of the working-tree file against the v2.2.0 blob id (raw bytes wherever git applies no
+  conversion, so exactly as strict as before on the Linux and macOS legs).
+* `tests/v23/test_v23_q0_round.py` (`653c0642…` → `9b9433f33c1176367a80dd2a3144f37f8f3e2250d6cd62df9a3956bb3ca8c7cb`):
+  the CRLF-checkout fixtures are built from LF-normalised bytes and the synthetic-tree writes pass `newline="\n"`, so
+  each simulation feeds the product genuine CRLF on a CRLF host too; the docstring's wiring reference tracks R6.
+* Not pinned, same batch: `tests/v23/test_v23_replay_v22.py` and `tests/v23/test_v23_seq13_wiring.py` carry the same
+  fixture corrections (`newline="\n"` writes; `LedgerSeq13.setUpClass` takes the draft's LF bytes).
+* For R6 itself: `tests/v23/test_v23_rounds.py` (`a8ab309988a6e9dd66bfa782dd6b5f65b204066ea73b511870d17451690323f3`)
+  points `SEQ13_DRAFT_REL`/`SEQ13_PATCH_REL` at R6; `test_v23_seq13_wiring.py` renames the wiring class to `WiringR6`,
+  adds `test_R5s_patch_on_this_tree_skips_nothing` and refuses R5 approved in words quoting R5's digest;
+  `test_v23_ledger_digest.py` pins R6 and asserts every other ruling field is R5's verbatim.
+
+**The wiring: `SEQ13-WIRING-R6.patch` (sha256 `25e7fc47b8e8bdde6f246daf68445dba5119c56cf3e6e3054c86e84fe45e8758`).**
+R5's mechanism byte-for-byte on `tests/v2/sealing_gate.py` only; only the six pins are re-taken
+(`git apply --check` passes on this tree):
+
+| Pinned file | sha256 (LF) | vs R5 |
+|---|---|---|
+| `tests/v23/__init__.py` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | same |
+| `tests/v23/test_v23_q0_round.py` | `9b9433f33c1176367a80dd2a3144f37f8f3e2250d6cd62df9a3956bb3ca8c7cb` | changed |
+| `tests/v23/test_v23_rounds.py` | `a8ab309988a6e9dd66bfa782dd6b5f65b204066ea73b511870d17451690323f3` | changed |
+| `validation/v23/ledger_digest.py` | `660624c01b47811b8b9d2f41f371d4b721bb8b7c802eaa87b656c05f99ee3df9` | same |
+| `validation/v23/q0_round.py` | `038906381a500a0c40e179803078c471527f960b884644d34eea64b4ff85fccf` | same |
+| `validation/v23/replay_v22.py` | `6b7195ec4aafb4cefcb304ad94325331853360206330d25e95af26e4449adc60` | changed |
+
+R5's patch applied to this tree skips none of the 12, because its pins no longer hold
+(`WiringR6.test_R5s_patch_on_this_tree_skips_nothing`).
+
+**Re-derived evidence (the fixed tool, 2026-11-22; `--out`, written once).** The 2026-11-21 files stay committed as
+measured history; `NEGATIVE-CONTROLS` (both), `Q0-DELTA` and `HISTORY-IDENTITY` came from scratch harnesses that are
+not committed, so they are not re-derived and keep their reviewed bytes (their recorded `tool_sha256` names the
+superseded tool, as measured then).
+
+| File | sha256 (LF) | vs its 2026-11-21 counterpart |
+|---|---|---|
+| `round-auth/REPLAY-V22-2026-11-22.json` | `b72c65ff731b3336db07717a8d4c0299b79217df875a8929558e23a4d557d5ec` | verdict PASS; 12 tests (the tool's replay set includes the Q0 class since Q0-1; the 2026-11-21 file predates it with 11); the 11 shared ids have identical outcomes and record sets |
+| `q0-round/REPLAY-V22-Q0-2026-11-22.json` | `3f49d43a8940cdc8b0e074311a0173ded6ec6cb932e3c43abd3de6ad7a487df3` | verdict PASS, 12/12, 4,734 Q0-class record reads; the field-level diff is exactly {`tool_sha256`, `date_utc`, `tree_source` (given → fresh-clone), `tests[].wall_s`, `tests[].duration_s`, `tests[].log_sha256`} — every record path/sha/committed flag and the Q0 identity (`714625b1…` committed = tree = regenerated) identical |
+| `q0-round/COVERAGE-MAP-2026-11-22.json` | `6415fd11d9f6d2dacfe40ee7d9c6b33f82eaad1983f0681be48eada53b5d7898` | 59 assertions over 20 tests, 0 gaps; the field-level diff is exactly {`tool_sha256`, `counterparts_sha256`, `q0_counterpart_sha256`} |
+
+On this POSIX host F1 and F2 are no-ops and F3 equals the raw-bytes comparison, which the diffs above confirm.
+
+**The revised seq-13 object.** `docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R6.md` (file sha256
+`84cf5291e28899455337700054b16ea37f8c9873f7d4439fdc702033398e7a09`), **canonical ruling digest
+`a1469d009f2456fccde4a3b3e3706a993e6bc1524b5512873dbcefe6ccec01f0`**.
+
+* The authority stays a placeholder that asks for the owner's own words quoting the digest. There is no signature and
+  no approval date. **R6 supersedes R5; R5 is not to be ratified.** R1–R5 digest as recorded.
+* Every ruling field except `GATED_TEST_WIRING`, `EVIDENCE_REVIEWED` and `BOUND_SHA256` is carried over from R5
+  verbatim (`Digest.test_R5_is_unchanged_and_R6_repins_the_wiring_for_the_portability_fixes`).
+* `BOUND_SHA256` swaps exactly the three re-derived files for their 2026-11-22 versions and keeps the two amendments
+  and the five remaining evidence files at their reviewed bytes.
+
+**Measured in the worktree (env guard, no AISEF_SEALING; gated classes skip).**
+
+* `test_v23_rounds.py`: ran 21, OK (16 skipped). `test_v23_seq13_wiring.py`: ran 17, OK.
+  `test_v23_ledger_digest.py`: ran 10, OK. `test_v23_q0_round.py`: ran 36, OK (10 skipped).
+  `test_v23_replay_v22.py`: ran 9, OK.
+* The full replay at v2.2.0 (fresh clone): all 12 PASS, exit 0, twice (the two `--out` runs above).
+* `ruff check` on every touched file: clean.
+* Negative control: in a scratch APFS copy, the R6 draft committed and then rewritten in place is refused by
+  `reviewed_draft` ("is not the draft as first committed"), and `ledger_seq13_problems` returns
+  "the ledger or the reviewed draft is unreadable: ValueError". The real tree is never touched.

@@ -1,4 +1,4 @@
-"""validation/v23/ledger_digest.py: the canonical ruling digest of the seq 13 drafts (R1-R4 unchanged; R5 as stated)."""
+"""validation/v23/ledger_digest.py: the canonical ruling digest of the seq 13 drafts (R1-R5 unchanged; R6 as stated)."""
 from __future__ import annotations
 
 import hashlib
@@ -27,6 +27,9 @@ R4_PATCH = "docs/v2.3/drafts/SEQ13-WIRING-R4.patch"
 R5 = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R5.md"
 R5_DIGEST = "44d73a7851e08eb08b57c96a3b6fe7f03b74dc180a9bda6e6c90a0715b3224f5"
 R5_PATCH = "docs/v2.3/drafts/SEQ13-WIRING-R5.patch"
+R6 = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R6.md"
+R6_DIGEST = "a1469d009f2456fccde4a3b3e3706a993e6bc1524b5512873dbcefe6ccec01f0"
+R6_PATCH = "docs/v2.3/drafts/SEQ13-WIRING-R6.patch"
 
 
 class Digest(unittest.TestCase):
@@ -34,9 +37,9 @@ class Digest(unittest.TestCase):
         (e,) = LD.entries((ROOT / R1).read_text(encoding="utf-8"))
         self.assertEqual(LD.digest(e), R1_DIGEST)
 
-    def test_R2_to_R5_digest_as_their_text_states_each_new(self):
+    def test_R2_to_R6_digest_as_their_text_states_each_new(self):
         seen = {R1_DIGEST}
-        for rel in (R2, R3, R4, R5):
+        for rel in (R2, R3, R4, R5, R6):
             with self.subTest(rel):
                 text = (ROOT / rel).read_text(encoding="utf-8")
                 (e,) = LD.entries(text)
@@ -90,6 +93,41 @@ class Digest(unittest.TestCase):
             self.assertTrue(d5[k].startswith(d4[k]) and len(d5[k]) > len(d4[k]), k)
         self.assertTrue(e5["subject_to"].startswith(e4["subject_to"]) and e5["cost"] == e4["cost"])
         self.assertEqual(set(d5) - set(d4), {"BOUND_SHA256"})
+
+    def test_R5_is_unchanged_and_R6_repins_the_wiring_for_the_portability_fixes(self):
+        (e5,) = LD.entries((ROOT / R5).read_text(encoding="utf-8"))
+        self.assertEqual(LD.digest(e5), R5_DIGEST)
+        text = (ROOT / R6).read_text(encoding="utf-8")
+        (e6,) = LD.entries(text)
+        self.assertEqual(LD.digest(e6), R6_DIGEST)
+        patch = hashlib.sha256((ROOT / R6_PATCH).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        self.assertIn(f"{R6_PATCH} (sha256 {patch})", e6["decision"]["GATED_TEST_WIRING"])
+        self.assertIn(R5_DIGEST, text)                                          # R6 names what it supersedes
+        d5, d6 = e5["decision"], e6["decision"]
+        self.assertEqual(set(d6), set(d5))
+        for k in ("QUALIFICATION_ROUND", "BRANCH", "SCOPE", "Q0_ROUND", "SEALING_GATE", "NOT_AUTHORIZED"):
+            self.assertEqual(d6[k], d5[k], f"{k} is not carried over verbatim")   # R6 changes wiring + evidence only
+        self.assertNotIn("SEQ13-WIRING-R5.patch", d6["GATED_TEST_WIRING"])
+        self.assertEqual((e6["subject_to"], e6["cost"]), (e5["subject_to"], e5["cost"]))
+        self.assertEqual({r for r in d5["BOUND_SHA256"] if r not in d6["BOUND_SHA256"]},
+                         {"docs/v2.3/evidence/q0-round/COVERAGE-MAP-2026-11-21.json",
+                          "docs/v2.3/evidence/q0-round/REPLAY-V22-Q0-2026-11-21.json",
+                          "docs/v2.3/evidence/round-auth/REPLAY-V22-2026-11-21.json"})
+
+    def test_R6_binds_the_amendments_and_the_evidence_by_their_bytes_in_this_tree(self):
+        (e6,) = LD.entries((ROOT / R6).read_text(encoding="utf-8"))
+        bound = e6["decision"]["BOUND_SHA256"]
+        self.assertEqual({r for r in bound if r.startswith("docs/v2.3/amendments/")},
+                         {"docs/v2.3/amendments/Q0-1-V23-ROUND.md", "docs/v2.3/amendments/Q0-1-R5.md"})
+        self.assertEqual(len([r for r in bound if r.startswith("docs/v2.3/evidence/")]), 8)
+        self.assertEqual({r for r in bound if "2026-11-22" in r},
+                         {"docs/v2.3/evidence/q0-round/COVERAGE-MAP-2026-11-22.json",
+                          "docs/v2.3/evidence/q0-round/REPLAY-V22-Q0-2026-11-22.json",
+                          "docs/v2.3/evidence/round-auth/REPLAY-V22-2026-11-22.json"})     # re-derived, fixed tool
+        for rel, sha in bound.items():
+            with self.subTest(rel):
+                self.assertEqual(hashlib.sha256((ROOT / rel).read_bytes().replace(b"\r\n", b"\n")).hexdigest(), sha)
+                self.assertNotIn(R6_DIGEST, (ROOT / rel).read_text(encoding="utf-8"), "a bound file quoting the ruling: a cycle")
 
     def test_R5_binds_the_amendments_and_the_evidence_by_their_bytes_in_this_tree(self):
         (e5,) = LD.entries((ROOT / R5).read_text(encoding="utf-8"))

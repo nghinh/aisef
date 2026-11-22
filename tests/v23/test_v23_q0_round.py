@@ -13,7 +13,7 @@ class at v2.2.0 and requires the record it derives there to be byte-identical to
   keeps its contract (Q0P-1), the round's own modules are covered (Q0P-2), and V23_REL exists and is what this tree
   derives;
 * `Q0Wiring` — the reviewed wiring skips the v2.2 Q0 test at HEAD only together with this file and q0_round.py
-  pinned (SEQ13-WIRING-R5.patch: V22_REPLAYED_Q0, V23_PINNED).
+  pinned (SEQ13-WIRING-R6.patch: V22_REPLAYED_Q0, V23_PINNED).
 
 Both are `round_gate` classes (closed list: test_v23_rounds.V23_GATED). The other classes always run, in seconds, on
 throwaway trees: each way the round-v2.3 record or the v2.2 history can be missing, stale or corrupted is named, and
@@ -211,7 +211,7 @@ class Q0Record(unittest.TestCase):
                 self.assertEqual(len(got), 1, got)
                 self.assertIn(Q.V22_REL, got[0])
                 self.assertIn(why, got[0])
-        self.assertEqual(Q.history_problems(self.root(v22=self.v22.replace(b"\n", b"\r\n"))), [])   # CRLF checkout
+        self.assertEqual(Q.history_problems(self.root(v22=Q._lf(self.v22).replace(b"\n", b"\r\n"))), [])   # CRLF checkout
 
     def test_a_dropped_v22_checker_and_a_short_registry_are_named(self):
         t = self.root(v22=self.v22)
@@ -313,7 +313,7 @@ class Q0Contract(unittest.TestCase):
         t, c = self.tree()
         self.assertEqual(Q.contract_problems(self.v22, t, c), [])
         fx = t / B1_FIXTURE
-        fx.write_bytes(fx.read_bytes().replace(b"\n", b"\r\n"))                   # a CRLF checkout is the same bytes
+        fx.write_bytes(Q._lf(fx.read_bytes()).replace(b"\n", b"\r\n"))            # a CRLF checkout is the same bytes
         self.assertEqual(Q.contract_problems(self.v22, t, c), [])
         moved = [f"v2.2 Q0 checker {B1}: its known-bad fixture {B1_FIXTURE} is not its v2.2.0 bytes"]
         doc = json.loads(fx.read_text(encoding="utf-8"))
@@ -488,7 +488,7 @@ class Q0Replay(unittest.TestCase):
                  RP.Q0_RECORD_REL: record}
         for rel, text in files.items():
             (t / rel).parent.mkdir(parents=True, exist_ok=True)
-            (t / rel).write_text(text, encoding="utf-8")
+            (t / rel).write_text(text, encoding="utf-8", newline="\n")    # the LF bytes on every host
         _git(t, "init", "-q")
         _git(t, "add", "-A")
         _git(t, "commit", "-q", "-m", "fake v2.2.0")
@@ -516,7 +516,7 @@ class Q0Replay(unittest.TestCase):
 
     def test_a_corrupted_record_fails_closed_naming_it(self):
         t, commit = self.tree()
-        (t / RP.Q0_RECORD_REL).write_text('{\n "calibrated": 56\n}\n', encoding="utf-8")
+        (t / RP.Q0_RECORD_REL).write_text('{\n "calibrated": 56\n}\n', encoding="utf-8", newline="\n")
         probs = self.replay(t, commit)["problems"]
         self.assertIn(f"{RP.Q0_REPLAYED}: Q0 record {RP.Q0_RECORD_REL} in the tree is not the v2.2.0 committed bytes "
                       "(corrupted)", probs)

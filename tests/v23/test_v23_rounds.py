@@ -55,8 +55,8 @@ LEDGER_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
 ROUND_ID = "AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED"
 #: the reviewed ruling seq 13 must be, and the wiring it names. Paths, not digests: the ruling names the patch by sha256
 #: and the patch pins this file, so neither digest can be written here (it would be a hash cycle).
-SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R5.md"
-SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R5.patch"
+SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R6.md"
+SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R6.patch"
 OK = ("MEASURED", "VERIFIED_REUSE")
 STALE_SOURCE = ": target changed since the mutation run — re-run it"
 #: the historical phases the v2.2 test reads (m.RECORDS at v2.2.0, minus V2.1 — the runner-2 phase it treats apart)
@@ -88,7 +88,7 @@ def _lf(b: bytes) -> bytes:
 
 def reviewed_draft(root: pathlib.Path = ROOT) -> dict:
     """The entry of SEQ13_DRAFT_REL as committed at HEAD. ValueError unless HEAD's blob is the blob of every commit
-    that added the file: a reviewed draft is never rewritten in place (R1-R4 are each kept as written). Q0R-INT-1:
+    that added the file: a reviewed draft is never rewritten in place (R1-R5 are each kept as written). Q0R-INT-1:
     every add commit is seen — `--full-history`, so a merge that resolves to a rewritten draft cannot hide the reviewed
     one, and never in a shallow clone, whose cut history could hide it."""
     from validation.v23 import ledger_digest as LD

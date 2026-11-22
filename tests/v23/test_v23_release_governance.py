@@ -566,10 +566,17 @@ class EvidenceUntouchedBySuite(unittest.TestCase):
 # --------------------------------------------------------------------------------------- CI-INCR
 
 class IncrementalQualificationJob(unittest.TestCase):
-    """CI-INCR-JOB (W1-DESIGN §7, DAG `F5 -> CI-INCR-JOB`): the F5 engine only. `gate` on release/** pushes and PRs fails
-    on any INVALIDATED/UNRESOLVED target (truthfully, no allowlist); `plan` on dispatch lists them. No mutant runs."""
+    """CI-INCR-JOB under the owner-approved TWO-TIER policy (ruling 2026-11-22 §4; docs/v2.3/amendments/CI-TWO-TIER.md,
+    which supersedes W1-DESIGN §11 exit gate 2's always-fail for DEVELOPMENT pushes — the rc tier keeps it). `gate`
+    (release/** pushes, PRs) runs ci_gate --tier develop: the truthful F5 state table plus the pinned negative
+    controls, exit 0 while evidence is incomplete (final line `EVIDENCE: INCOMPLETE (NOT QUALIFIED)`), non-zero only on
+    checker malfunction, false-current reuse or negative-control regression. `rc` (release tags, or dispatch with
+    tier=rc) runs ci_gate --tier rc: additionally fails while any target lacks valid MEASURED or VERIFIED_REUSE
+    evidence. `plan` (dispatch) lists the affected targets with reasons. No mutant runs; no exception list exists in
+    the gate or the workflow (tested below as the literal string)."""
 
     TEXT = (WF / "mutation-incr.yml").read_text(encoding="utf-8") if (WF / "mutation-incr.yml").exists() else ""
+    GATE_PY = ROOT / "validation" / "v23" / "ci_gate.py"
 
     def test_triggers_permissions_and_no_secret(self):
         c = code(self.TEXT)
@@ -577,23 +584,35 @@ class IncrementalQualificationJob(unittest.TestCase):
         on = c.split("\non:", 1)[1].split("\npermissions:", 1)[0]
         self.assertEqual(re.findall(r"(?m)^  (\w+):", on), ["push", "pull_request", "workflow_dispatch"])
         self.assertIn('branches: ["release/**"]', on)
+        self.assertIn('tags: ["v[0-9]*.[0-9]*.[0-9]*"]', on)   # the rc tier fires on exactly the release-tag shape
         self.assertRegex(c, r"(?m)^permissions:\n  contents: read\n\s*jobs:")
         self.assertNotIn("secrets", c)
         self.assertNotIn("permissions", "".join(jobs(c).values()))     # no job widens the read-only token
 
-    def test_the_engine_only_never_a_campaign(self):
+    def test_two_tiers_the_engine_only_never_a_campaign(self):
         c = code(self.TEXT)
         for forbidden in ("mutation.py", "b1_bindings_check", "run-affected", "pip install"):
             self.assertNotIn(forbidden, c)
         js = jobs(c)
-        self.assertEqual(sorted(js), ["gate", "plan"])
-        self.assertEqual(runs(js["gate"])[-1], "python -P validation/v23/impact.py --classify")
+        self.assertEqual(sorted(js), ["gate", "plan", "rc"])
+        self.assertEqual(runs(js["gate"])[-1], "python -P validation/v23/ci_gate.py --tier develop")
+        self.assertEqual(runs(js["rc"])[-1], "python -P validation/v23/ci_gate.py --tier rc")
         self.assertEqual(runs(js["plan"])[-1], "python -P validation/v23/impact.py --classify --affected")
-        self.assertRegex(js["gate"], r"(?m)^    if: github\.event_name != 'workflow_dispatch'$")
-        self.assertRegex(js["plan"], r"(?m)^    if: github\.event_name == 'workflow_dispatch'$")
+        self.assertRegex(js["gate"],
+                         r"(?m)^    if: github\.event_name != 'workflow_dispatch' && github\.ref_type != 'tag'$")
+        self.assertRegex(js["rc"], r"(?m)^    if: github\.ref_type == 'tag' \|\| \(github\.event_name == "
+                                   r"'workflow_dispatch' && inputs\.tier == 'rc'\)$")
+        self.assertRegex(js["plan"], r"(?m)^    if: github\.event_name == 'workflow_dispatch' && inputs\.tier != 'rc'$")
+
+    def test_no_exception_list_in_the_gate_or_the_workflow(self):
+        """Ruling §4: 'without allowlists masking qualification failures' — the string is absent from both files
+        (comments included), so no variant of the v2.1.0 release-tag exception mechanism can quietly return."""
+        self.assertNotIn("allowlist", self.TEXT.lower())
+        self.assertTrue(self.GATE_PY.exists(), "validation/v23/ci_gate.py is missing")
+        self.assertNotIn("allowlist", self.GATE_PY.read_text(encoding="utf-8").lower())
 
     def test_the_mutation_worker_guard_and_full_history(self):
-        self.assertEqual(sorted(jobs(code(self.TEXT))), ["gate", "plan"])
+        self.assertEqual(sorted(jobs(code(self.TEXT))), ["gate", "plan", "rc"])
         for name, block in jobs(code(self.TEXT)).items():
             with self.subTest(name):
                 self.assertIn("runs-on: ubuntu-latest", block)

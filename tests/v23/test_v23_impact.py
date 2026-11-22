@@ -52,7 +52,10 @@ POSIX_TAIL = 'Traceback (most recent call last):\n  File "<tree>/aisef2/toy.py",
 WIN_TAIL = 'Traceback (most recent call last):\n  File "<tree>\\aisef2\\app\\client.py", line 2, in _is_gone\nAssertionError\n'
 #: a frame of this interpreter's own unittest: the default entries carry this host's flavor and python, as an entry
 #: measured here would (R0 binds an observation to the entry's own flavor and interpreter)
-LOCAL = f'  File "{unittest.case.__file__}", line 58, in run\n'
+#: ILLUSTRATIVE stand-in for the linux agent's fixture fix: this host's flavor, linux where it has none (Windows)
+FLAVOR = OBS.identity()["platform"]["flavor"] or "linux"
+LOCAL = (f'  File "/opt/homebrew/lib/python{PY}/unittest/case.py", line 58, in run\n' if FLAVOR == "darwin"
+         else f'  File "/usr/lib/python{PY}/unittest/case.py", line 58, in run\n')
 FLAVORED = POSIX_TAIL + LOCAL
 WIN_FLAVORED = WIN_TAIL + f'  File "C:\\Python{sys.version_info.major}{sys.version_info.minor}\\Lib\\unittest\\case.py", line 58\n'
 HOMEBREW = '  File "/opt/homebrew/Cellar/python@3.14/3.14.7/lib/python3.14/unittest/case.py", line 58, in run\n'
@@ -138,6 +141,9 @@ class Toy:
         self.extra: dict[str, bytes] = {}
         root.mkdir(parents=True, exist_ok=True)
         _git(root, "init", "-q")
+        # a toy commits the bytes it writes: a host's core.autocrlf=true (the windows runner's system default) would
+        # store RUNNER_FILES' CRLF checkout as LF, and the toy's recorder would no longer be the module that runs
+        _git(root, "config", "core.autocrlf", "false")
 
     def reentry(self) -> None:
         self.entries = {t: entry(self.files, t, WIN_FLAVORED if t in impact.WINDOWS_CLAIM else FLAVORED) for t in TARGETS}
@@ -193,7 +199,7 @@ def synthetic(t: Toy, head: str, kill: str, ops: dict, mods: list, over: dict) -
     tree = w / "tree"   # the path the run's events name; nothing runs there
     ident = OBS.identity()
     fam = over.get("platform") or ("windows" if kill == "tests/v2/test_client.py" else "posix")
-    plat = {**ident["platform"], "family": fam, **({"flavor": None} if fam == "windows" else {})}
+    plat = {**ident["platform"], "family": fam, "flavor": None if fam == "windows" else FLAVOR}
     trace = bool(over.get("os_trace"))
     blob = impact._blob(t.root, commit, kill) or b""
     man = {"format": OBS.FORMAT, "tool": OBS.TOOL, "commit": commit, "tree": str(tree), "checkout": str(t.root),
@@ -226,15 +232,16 @@ def synthetic(t: Toy, head: str, kill: str, ops: dict, mods: list, over: dict) -
         lines.append(f"o\tdata\t{t.root / 'aisef2' / 'toy.py'}")
     lines += [f"L\t{over['lost']}"] if over.get("lost") else []
     lines += ["?garbage"] * (over.get("unparsed_lines") or 0)
-    (w / "hook" / "100-root.ev").write_text("\n".join([*lines, "E\t0"]) + "\n", encoding="utf-8")
+    # newline="\n": the hook and strace write LF on every host (a text-mode write on Windows would add a CR)
+    (w / "hook" / "100-root.ev").write_text("\n".join([*lines, "E\t0"]) + "\n", encoding="utf-8", newline="\n")
     for i in range(kids["hooked"]):
-        (w / "hook" / f"{101 + i}-kid.ev").write_text(f"S\t{101 + i}\t100\t[]\nE\t0\n", encoding="utf-8")
+        (w / "hook" / f"{101 + i}-kid.ev").write_text(f"S\t{101 + i}\t100\t[]\nE\t0\n", encoding="utf-8", newline="\n")
     if trace:
         (w / "strace").mkdir()
         forks = "".join(f"vfork() = {101 + i}\n" for i in range(kids["hooked"]))
-        (w / "strace" / "tr.100").write_text(EXECVE + forks + "+++ exited with 0 +++\n", encoding="utf-8")
+        (w / "strace" / "tr.100").write_text(EXECVE + forks + "+++ exited with 0 +++\n", encoding="utf-8", newline="\n")
         for i in range(kids["hooked"]):
-            (w / "strace" / f"tr.{101 + i}").write_text(EXECVE + "+++ exited with 0 +++\n", encoding="utf-8")
+            (w / "strace" / f"tr.{101 + i}").write_text(EXECVE + "+++ exited with 0 +++\n", encoding="utf-8", newline="\n")
     rec = OBS.finish(w)
     if over.get("witness") is False:
         rec.pop("witness")
@@ -507,7 +514,7 @@ def d5_load_tag_data(t: Toy) -> Case:   # a "load" of a non-.py file is a data r
 
 
 def n9_table(t: Toy) -> Case:   # the target added to mutation.py's Option C table; the pinned ruling intact
-    t.extra = {impact.RULING_REL: (ROOT / impact.RULING_REL).read_bytes()}
+    t.extra = {impact.RULING_REL: impact._blob(ROOT, "HEAD", impact.RULING_REL)}   # the pinned blob, not a CRLF checkout
     t.harness = harness(extra="VERIFIED_REUSE = {'aisef2/toy.py::target': '" + "0" * 64 + "'}\n")
     t.entries[TGT]["source_sha256"] = "f" * 64
     b = t.commit()
