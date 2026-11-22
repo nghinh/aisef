@@ -194,6 +194,10 @@ def _tree(root: pathlib.Path, commit: str) -> str | None:
 
 def synthetic(t: Toy, head: str, kill: str, ops: dict, mods: list, over: dict) -> dict:
     """observe.finish() of a witness written here as the recorder would have written it for `kill` at `head`."""
+
+    def _esc(s: str) -> str:   # the hook's own line escaping (read_set HOOK / observe HOOK)
+        return s.replace("\\", "\\\\").replace("\n", "\\n").replace("\t", "\\t")
+
     commit = over.get("commit", head)
     w = pathlib.Path(tempfile.mkdtemp(prefix="obs-", dir=t.root.parent))
     tree = w / "tree"   # the path the run's events name; nothing runs there
@@ -217,19 +221,21 @@ def synthetic(t: Toy, head: str, kill: str, ops: dict, mods: list, over: dict) -
     (w / OBS.SITE).write_text(OBS.hook_source(w / "hook", man["hook"]["roots"], man["hook"]["nonce"]), encoding="utf-8")
     (w / "manifest.json").write_text(json.dumps(man, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     (w / "log.txt").write_text(f"test_x ({man['module']}.T.test_x) ... ok\n\nRan 1 test in 0.001s\n\nOK\n", encoding="utf-8")
-    at = {p: posixpath.normpath(posixpath.join(str(tree), p)) for p in {*ops, *mods}}
+    # OBS._esc, exactly as the hook writes: a native tree path may hold "\t"-like byte pairs (every Windows runner
+    # path does — D:\a\…\tree), and an unescaped one is unescaped/split by the parser, so the kill file goes unseen
+    at = {p: _esc(posixpath.normpath(posixpath.join(str(tree), p))) for p in {*ops, *mods}}
     lines = ["S\t100\t1\t['-m', 'unittest']"] + [f"o\t{tag}\t{at[p]}" for p, tag in sorted(ops.items())] + [
         f"m\t{at[p]}" for p in sorted(set(mods))]
     listed_by = over.get("listed_by") or {}
     for d in over.get("listed") or []:
-        callers = [posixpath.normpath(posixpath.join(str(tree), c)) for c in listed_by.get(d, [kill])]
-        lines.append("\t".join(["l", "run", posixpath.normpath(posixpath.join(str(tree), d)), *callers]))
+        callers = [_esc(posixpath.normpath(posixpath.join(str(tree), c))) for c in listed_by.get(d, [kill])]
+        lines.append("\t".join(["l", "run", _esc(posixpath.normpath(posixpath.join(str(tree), d))), *callers]))
     kids = {"hooked": 0, "unhooked_python": 0, "other": 0, **(over.get("children") or {})}
     lines += ["C\tsubprocess.Popen\t1\t0\t['python3']"] * kids["unhooked_python"]
     lines += ["C\tsubprocess.Popen\t0\t0\t['wc']"] * kids["other"]
     lines += ["C\tsubprocess.Popen\t1\t1\t['python3']"] * kids["hooked"]
     if over.get("outside_tree"):
-        lines.append(f"o\tdata\t{t.root / 'aisef2' / 'toy.py'}")
+        lines.append(f"o\tdata\t{_esc(str(t.root / 'aisef2' / 'toy.py'))}")
     lines += [f"L\t{over['lost']}"] if over.get("lost") else []
     lines += ["?garbage"] * (over.get("unparsed_lines") or 0)
     # newline="\n": the hook and strace write LF on every host (a text-mode write on Windows would add a CR)
@@ -1059,6 +1065,20 @@ class ImpactTest(unittest.TestCase):
         self.assertEqual(r.state, "VERIFIED_REUSE")   # it rests on an observation: no acceptance basis (PROV-1)
         self.assertTrue(r.basis.startswith("observation:") and "accepted" not in r.basis, r.basis)
         self.assertNotIn("run_base", r.evidence)
+
+    def test_a_tree_path_holding_an_escape_pair_is_still_seen(self):
+        """The witness writer escapes native paths exactly as the hook does (OBS._esc). A tree whose absolute path
+        holds a backslash-letter pair — every Windows runner path does (D:\\a\\...\\tree); on POSIX a directory named
+        so — must not be unescaped or split by the parser, or the kill file goes unseen and R1 swallows every other
+        rule (the 26-failure windows-latest cluster at a0703c44, run 45006442353)."""
+        self.toy = Toy(pathlib.Path(self._tmp.name) / "D:\\a\\tree-alike" / "repo")   # "\t" and "\a" pairs in one name
+        c = n2(self.toy)
+        rec = c.obs[K]
+        self.assertEqual({k: v for k, v in rec["completeness"].items() if v}, {}, rec["completeness"])
+        self.assertIn(K, rec["loaded"])
+        with mock.patch.object(impact, "BASE", c.base):
+            s = state_of(self.toy, c)
+        self.assertEqual((s.state, s.component), ("VERIFIED_REUSE", ""), s.reason)
 
     def test_f2_report_uses_the_shas_the_run_resolved(self):
         """F2 (probe_report_toctou / verify_f2_main): a ref that moves after classify() resolved it does not move
