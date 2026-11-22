@@ -1,0 +1,68 @@
+{
+ "record": "AISEF V2.3 — ROUND SURVIVOR AUDITS (append-only; validation/v2/mutation.py v23_audits_at)",
+ "entries": [
+  {
+   "target": "validation/v2/destructive_authority.py::discover",
+   "index": 41,
+   "mutant": "L224 Eq->NotEq",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b destructive-authority discover survivor (ledger seq 13)",
+   "grounds": "discover L224-225 special-cases in-memory list[x].remove to kind='collection'. Round v2.3 re-measure of the W1b SCOPES widening (ledger seq 13): the same three survivors (L224 Eq->NotEq, L225 'collection' emptied, L224 'remove' emptied). The widened corpus (aisef2/, validation/v2, tests/v2, validation/v23, tests/v23) holds exactly ONE subscript-receiver .remove site — tests/v2/p0/test_arch_catalog.py:47, ledgered COLLECTION_METHOD — and each mutant can only MISCLASSIFY it from 'collection' to 'path', which check() flags as a target_kind mismatch: strictly fail-closed (a problem appears; none disappears). No fail-open, no live authority hole. The live-tree kill assertion (Checker.test_this_tree_passes_and_every_site_is_ledgered) is sealing-gated and skips in a mutant chain, so the misclassification goes unobserved there: a kill-set coverage gap (P2/v2.2.1), not an authority defect. Audited individually, not bulk-accepted (session 845c9f11, round v2.3).",
+   "consumers_checked": [
+    "validation/v2/destructive_authority.py:218-233 discover() site classification; L224-225 the `name=='remove' and isinstance(f.value, ast.Subscript)` special case -> kind='collection'",
+    "validation/v2/destructive_authority.py:431-434 the COLLECTION_METHOD validator (subscripted receiver + .remove, else a problem) — fail-closed on any mismatch",
+    "validation/v2/destructive_authority.py:474-476 check(): `row['target_kind'] != s.kind` cross-check",
+    "grep of aisef2/ validation/ tests/v2 tests/v23 for `]\\s*.(unlink|rmdir|remove|rmtree|kill|terminate|killpg)(`: one site, tests/v2/p0/test_arch_catalog.py:47 (ledgered COLLECTION_METHOD)"
+   ],
+   "exceptions_checked": [
+    "a subscript-receiver destructive call the Eq->NotEq mutant would misclassify: only test_arch_catalog.py:47 exists; misclassified it trips the L474 target_kind cross-check (a NEW problem) — fail-closed, never fail-open",
+    "a list[i].remove() the 'remove'/'collection' emptied mutants would reclassify: the same single site, same fail-closed target_kind mismatch; the emptied mutants are strictly more conservative",
+    "a consumer that reads kind without the downstream re-validation: check() L431-434/L474 re-derive the invariant for every collection site before any authority decision"
+   ],
+   "source_sha256": "fb25de83bd5ec16b52b0be27ceeb2a8566fd33867822af6c59926ee7f28e41f2",
+   "provenance": "run6 2026-11-22 targeted re-measure (W1b, 6 destructive_authority targets) + static corpus grep"
+  },
+  {
+   "target": "validation/v2/destructive_authority.py::discover",
+   "index": 42,
+   "mutant": "L225 string 'collection' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b destructive-authority discover survivor (ledger seq 13)",
+   "grounds": "discover L224-225 special-cases in-memory list[x].remove to kind='collection'. Round v2.3 re-measure of the W1b SCOPES widening (ledger seq 13): the same three survivors (L224 Eq->NotEq, L225 'collection' emptied, L224 'remove' emptied). The widened corpus (aisef2/, validation/v2, tests/v2, validation/v23, tests/v23) holds exactly ONE subscript-receiver .remove site — tests/v2/p0/test_arch_catalog.py:47, ledgered COLLECTION_METHOD — and each mutant can only MISCLASSIFY it from 'collection' to 'path', which check() flags as a target_kind mismatch: strictly fail-closed (a problem appears; none disappears). No fail-open, no live authority hole. The live-tree kill assertion (Checker.test_this_tree_passes_and_every_site_is_ledgered) is sealing-gated and skips in a mutant chain, so the misclassification goes unobserved there: a kill-set coverage gap (P2/v2.2.1), not an authority defect. Audited individually, not bulk-accepted (session 845c9f11, round v2.3).",
+   "consumers_checked": [
+    "validation/v2/destructive_authority.py:218-233 discover() site classification; L224-225 the `name=='remove' and isinstance(f.value, ast.Subscript)` special case -> kind='collection'",
+    "validation/v2/destructive_authority.py:431-434 the COLLECTION_METHOD validator (subscripted receiver + .remove, else a problem) — fail-closed on any mismatch",
+    "validation/v2/destructive_authority.py:474-476 check(): `row['target_kind'] != s.kind` cross-check",
+    "grep of aisef2/ validation/ tests/v2 tests/v23 for `]\\s*.(unlink|rmdir|remove|rmtree|kill|terminate|killpg)(`: one site, tests/v2/p0/test_arch_catalog.py:47 (ledgered COLLECTION_METHOD)"
+   ],
+   "exceptions_checked": [
+    "a subscript-receiver destructive call the Eq->NotEq mutant would misclassify: only test_arch_catalog.py:47 exists; misclassified it trips the L474 target_kind cross-check (a NEW problem) — fail-closed, never fail-open",
+    "a list[i].remove() the 'remove'/'collection' emptied mutants would reclassify: the same single site, same fail-closed target_kind mismatch; the emptied mutants are strictly more conservative",
+    "a consumer that reads kind without the downstream re-validation: check() L431-434/L474 re-derive the invariant for every collection site before any authority decision"
+   ],
+   "source_sha256": "fb25de83bd5ec16b52b0be27ceeb2a8566fd33867822af6c59926ee7f28e41f2",
+   "provenance": "run6 2026-11-22 targeted re-measure (W1b, 6 destructive_authority targets) + static corpus grep"
+  },
+  {
+   "target": "validation/v2/destructive_authority.py::discover",
+   "index": 48,
+   "mutant": "L224 string 'remove' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b destructive-authority discover survivor (ledger seq 13)",
+   "grounds": "discover L224-225 special-cases in-memory list[x].remove to kind='collection'. Round v2.3 re-measure of the W1b SCOPES widening (ledger seq 13): the same three survivors (L224 Eq->NotEq, L225 'collection' emptied, L224 'remove' emptied). The widened corpus (aisef2/, validation/v2, tests/v2, validation/v23, tests/v23) holds exactly ONE subscript-receiver .remove site — tests/v2/p0/test_arch_catalog.py:47, ledgered COLLECTION_METHOD — and each mutant can only MISCLASSIFY it from 'collection' to 'path', which check() flags as a target_kind mismatch: strictly fail-closed (a problem appears; none disappears). No fail-open, no live authority hole. The live-tree kill assertion (Checker.test_this_tree_passes_and_every_site_is_ledgered) is sealing-gated and skips in a mutant chain, so the misclassification goes unobserved there: a kill-set coverage gap (P2/v2.2.1), not an authority defect. Audited individually, not bulk-accepted (session 845c9f11, round v2.3).",
+   "consumers_checked": [
+    "validation/v2/destructive_authority.py:218-233 discover() site classification; L224-225 the `name=='remove' and isinstance(f.value, ast.Subscript)` special case -> kind='collection'",
+    "validation/v2/destructive_authority.py:431-434 the COLLECTION_METHOD validator (subscripted receiver + .remove, else a problem) — fail-closed on any mismatch",
+    "validation/v2/destructive_authority.py:474-476 check(): `row['target_kind'] != s.kind` cross-check",
+    "grep of aisef2/ validation/ tests/v2 tests/v23 for `]\\s*.(unlink|rmdir|remove|rmtree|kill|terminate|killpg)(`: one site, tests/v2/p0/test_arch_catalog.py:47 (ledgered COLLECTION_METHOD)"
+   ],
+   "exceptions_checked": [
+    "a subscript-receiver destructive call the Eq->NotEq mutant would misclassify: only test_arch_catalog.py:47 exists; misclassified it trips the L474 target_kind cross-check (a NEW problem) — fail-closed, never fail-open",
+    "a list[i].remove() the 'remove'/'collection' emptied mutants would reclassify: the same single site, same fail-closed target_kind mismatch; the emptied mutants are strictly more conservative",
+    "a consumer that reads kind without the downstream re-validation: check() L431-434/L474 re-derive the invariant for every collection site before any authority decision"
+   ],
+   "source_sha256": "fb25de83bd5ec16b52b0be27ceeb2a8566fd33867822af6c59926ee7f28e41f2",
+   "provenance": "run6 2026-11-22 targeted re-measure (W1b, 6 destructive_authority targets) + static corpus grep"
+  }
+ ]
+}
