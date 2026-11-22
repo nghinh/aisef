@@ -2801,8 +2801,23 @@ def main(argv: list[str] | None = None) -> int:
         from validation.v23 import impact   # lazy: the engine is the one classification authority, never re-implemented
         v23, pre = v23_newest(ROOT)
         states = impact.classify(ROOT, impact.BASE, "HEAD")
+        dirty_states = [s for s in states if s.state == "UNRESOLVED" and "dirty tree" in s.reason]
+        if dirty_states:   # the engine refused the tree: an empty affected set here would be a lie, not a verdict
+            print(f"FAIL  the engine refused the tree: {dirty_states[0].reason} ({len(dirty_states)} targets)")
+            return 2
         need = [s for s in states if s.state == "INVALIDATED" or (s.state == "UNRESOLVED" and "I6" in s.reason)]
         new = [t for t in sorted(V23_NEW_TARGETS) if t not in v23]
+        # `--run-affected TARGET...` measures the named SUBSET of the affected set (owner 2026-11-22 §C: targeted
+        # qualification for trust-critical changes; the comprehensive campaign is separately authorized). A name
+        # outside the affected set is refused: this flag can only narrow, never add.
+        named = [a for a in argv[1:] if a != "--run-affected"]
+        if named:
+            affected = {s.target for s in need} | set(new)
+            if outside := [t for t in named if t not in affected]:
+                print(f"FAIL  not in the affected set (nothing ran): {outside}")
+                return 2
+            need = [s for s in need if s.target in named]
+            new = [t for t in new if t in named]
         for s in need:
             print(f"AFFECTED {s.state:<12} {s.component:<8} {s.target}: {s.reason}")
         for t in new:
