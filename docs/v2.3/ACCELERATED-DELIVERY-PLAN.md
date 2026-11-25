@@ -88,7 +88,10 @@ Profile tái lập được: `aisef-private-evidence/2026-11-25-accel-plan/{pars
   30,6h/696); top-10 = 95%. Overhead process/fixture chỉ 1,7% — không phải đòn bẩy. T0 3,9% — load-bearing
   (ORD-1/VS-6), không đụng. Bracket confirmed-kill 7,2% — BẮT BUỘC, chỉ báo giá, không đề xuất yếu đi.
 - **(a) Đòn bẩy chính — reorder kill list theo tần suất giết lịch sử:** 79,3% thời gian nằm ở các file chạy TRƯỚC
-  file giết; mô phỏng reorder trên chính timings đo được: **tiết kiệm ~63,7h = 62% (ƯỚC TÍNH)**. Runner ĐÃ hỗ trợ
+  file giết; mô phỏng reorder trên chính timings đo được: **tiết kiệm ~63,7h = 62% (ƯỚC TÍNH)**. **ĐÃ BENCHMARK
+  BOUNDED (2026-11-25, A/B cùng máy cùng lúc, 2 target `delivery`+`client_on_path`, 49 mutant): declared 76,2
+  phút vs ordered 24,5 phút = tiết kiệm 67,8%, verdict hai bên GIỐNG HỆT (49/49 KILLED, 0 survivor) — bằng chứng
+  tại aisef-private-evidence/2026-11-25-accel-plan/ordbench-{ba,bo}.log.** Runner ĐÃ hỗ trợ
   execution-order có trích dẫn nguồn đo (ORD-4, _order_problem): không đổi code, chỉ cần bảng order sinh từ
   per_target.json + **owner ký nhận E5 là measurement được trích dẫn**. Generator/detection/audit/provenance không
   đổi (survivor vẫn chạy đủ mọi file).
