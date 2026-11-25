@@ -20,10 +20,11 @@ Alternate (nếu owner muốn đổi slot): bottle 0.13.4 (web/WSGI) hoặc sqli
 Giới hạn khai báo: slate một ngôn ngữ (Python) — SHOULD "≥2 ngôn ngữ" của §2.3 không đạt trong ràng buộc
 probe-catalog; chấp nhận giới hạn này hoặc chỉ đạo tìm vòng 2 một CLI phi-Python (đánh đổi mốc 26/01).
 
-**Việc còn lại trước khi chốt slate (free theo §5.1, KHÔNG cần spend):** checklist clone-time §2.3 —
-LOC chính xác, suite xanh offline <10′ trên Linux+macOS, chạy thử 1 criterion bằng probe catalog, sha256 tar
-snapshot, re-grep độc lập. Việc này cần clone 3 repo công khai về máy đo: engineering chạy trong môi trường
-cách ly (venv scratch, không mạng khi chạy suite) ngay khi owner gật đầu mục này (một dòng trong quyết định).
+**Checklist clone-time §2.3 — ĐÃ ĐO 2026-11-26 trên macOS** (directive P3 ủy quyền; kết quả đầy đủ:
+`B2-CLONE-CHECKS.md`, log thô: aisef-private-evidence/2026-11-26-b2-clone-checks/): cả ba repo ĐẠT mọi tiêu chí —
+tag khớp SHA ghim, LOC trong khung (7.023 / 9.237 / 4.665), suite xanh 0,35s / 3,53s / 1,25s (bar <10′),
+không cần mạng khi chạy test, sha256 tar snapshot đã ghi, mỗi repo một acceptance probe VERIFIED từ ngoài clone.
+Còn lại trước manifest: leg Linux (CI side), re-grep độc lập §2.3(5) tại thời điểm đề xuất, ghim toolchain.
 
 ## 2. Hai evaluator độc lập — tiêu chuẩn, nguồn, CoI
 
