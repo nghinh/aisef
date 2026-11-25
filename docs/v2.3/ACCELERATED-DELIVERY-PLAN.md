@@ -145,7 +145,7 @@ owner). ETA chi tiết ngoài phần đo được là ước tính lịch, khôn
 | 1 | OD-B1B (re-pin B1 manifest hay chờ RC đo sạch) | chờ RC (fail-closed giữ nguyên) |
 | 2 | PIN-57: giữ 3 checker ngoài registry hay amendment re-pin | giữ ngoài (gói transition đã soạn, §10.4 báo cáo) |
 | 3 | Ký execution-order table trích dẫn đo E5 (lever 62%) | ký sau benchmark bounded tuần 01/12 |
-| 4 | B2-SPEND: danh sách ≥3 repo ngoài + ≥2 evaluator + cap chi phí | owner cung cấp ứng viên; engineering đề xuất 2 dogfood (todo-oc, todo-cli) làm seed nội bộ, KHÔNG thay thế repo ngoài |
+| 4 | B2-SPEND: danh sách ≥3 repo ngoài + ≥2 evaluator + cap chi phí — **hạn chót 08/12** (back-calc từ mốc ký oracle 26/01: tuyển 2 tuần + đệm lễ 1 tuần + onboarding 1 tuần + labeling 2 tuần + adjudication 1 tuần; sau 08/12 là zero slack) | owner cung cấp ứng viên; engineering đề xuất 2 dogfood (todo-oc, todo-cli) làm seed Tier-0, KHÔNG thay thế repo ngoài |
 | 5 | Các QĐ tại freeze, nhận defaults: V21-57(keep), V21-24/25/70/71b(keep), V21-54(A), S4(build), #71(ii)+S3(A), V21-61b/58(keep) | nhận toàn bộ defaults |
 | 6 | C3b thresholds (ratify trước khi bật) + W3 guest/server cho bwrap canary | ratify ở SEC-exit |
 | 7 | Shard mutant-level 2 target nóng (thiết kế record mới) | KHÔNG làm trong v2.3 trừ khi lever (3) không đủ |
