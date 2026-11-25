@@ -149,6 +149,7 @@ owner). ETA chi tiết ngoài phần đo được là ước tính lịch, khôn
 | 5 | Các QĐ tại freeze, nhận defaults: V21-57(keep), V21-24/25/70/71b(keep), V21-54(A), S4(build), #71(ii)+S3(A), V21-61b/58(keep) | nhận toàn bộ defaults |
 | 6 | C3b thresholds (ratify trước khi bật) + W3 guest/server cho bwrap canary | ratify ở SEC-exit |
 | 7 | Shard mutant-level 2 target nóng (thiết kế record mới) | KHÔNG làm trong v2.3 trừ khi lever (3) không đủ |
+| 8 | A2/QA-1 — posture chữ ký: vendored Ed25519 thuần Python (RFC 8032, ~150 dòng, giữ `dependencies=[]`) hay `cryptography` (dependency runtime đầu tiên, wheel biên dịch) | vendored (draft A2 §QA-1; không tốn phí — là quyết định posture chuỗi cung ứng) |
 
 Mọi điều khoản charter §4 giữ nguyên: không false PASS, không allowlist masking, evidence append-only, không đổi
 master/tag/PyPI tới ủy quyền cuối, không giảm scope v2.3, không dời capability bắt buộc sang v2.4 vì lịch.
