@@ -82,7 +82,7 @@ No wall-clock, no prose-as-control, no import beyond `aisef2.arch.enums` (E6: "t
   `probe/evaluated: {BEGIN, BEGIN_REFUSED, ACTIVE}`; `provider/request: {ACTIVE}`;
   `proof/verified: {ACTIVE}`; `tests/adequacy: {ACTIVE}`;
   `failure/observed: every state except ABSENT`;
-  `story/plan-drift: {ACTIVE, BEGIN_REFUSED}` (sec. 14: a blocked story still records drift);
+  `story/plan-drift: {ACTIVE, BEGIN_REFUSED}` (P3-PROJECTION-SEMANTICS.md sec. 14 "MUST emit": a blocked story still records drift);
   `provider/result: every state except ABSENT` (closers may land during unwinding, M7);
   `story/completed: {ENDED_COMMIT}` (sec. 4.5).
   Resource/tool kinds are NOT in the table: their lifecycle rules stay format 2's, as written (sealed).
