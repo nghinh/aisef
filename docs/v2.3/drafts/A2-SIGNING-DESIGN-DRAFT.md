@@ -376,3 +376,30 @@ CORE-2, the flip slips with it (FORMAT-4 Q5's default), never `signer`-as-option
   default NO (YAGNI: it cannot make the run VERIFIED, L3 stands either way; complexity without a consumer).
 - **QA-8 (schedule, = FORMAT-4 Q5):** if W2a slips past CORE-2, the flip slips (default); `signer`-as-optional is
   refused (violates CR-7's discriminator).
+
+---
+
+## 15. Pre-freeze reconciliation (appended 2026-11-26; nothing above edited)
+
+The W2a primitives LANDED 2026-11-26 (`aisef2/journal/sign.py`, commit 648a660b) under the owner directive
+2026-11-26 P2 ("maintained `cryptography` backend; do not implement or vendor a custom Ed25519 primitive").
+Where this draft's text and the landed surface now differ, the following lines are the C-2 freeze-candidate
+truth; the full installation contract is `A2-INSTALL-CONTRACT.md`:
+
+1. **QA-1 is resolved by owner directive, not by this draft's default.** §3.2/§5/§14's "default vendored
+   pure-Python Ed25519" is superseded: the backend is `cryptography`, imported lazily in exactly one module,
+   packaged as the optional extra `aisef[signing]` until the production flip (contract §2).
+2. **The §5 frozen signature of `verify` carries one exception:** malformed INPUT returns False and never
+   raises, but a MISSING BACKEND raises `SigningUnavailable` (fail-closed; a False there would read as
+   "forged"). Same for `generate`/`sign`/`Keypair.pubkey_hex` — the backend probe in `generate()` is eager.
+3. **Limitation L2 (not constant-time) no longer applies**; the chosen direction's declared limitations are
+   backend availability (named refusal, never an unsigned fallback) and the new supply-chain trust root
+   (version policy: contract §3 — floor in pyproject, exact pins in a CI constraints file, CVE procedure).
+4. **§4.1's "generation at run start, BEFORE RunScope.begin" is strengthened** (contract §2.1): for a
+   format-4 run, `sign.generate()` joins the pre-start refusals BEFORE `out.mkdir` (run.py:491) — no run
+   directory, no RUN.started.json and no provider preflight spend happen on a machine that cannot sign.
+5. **§6's V-check table gains a missing-backend row at W2c:** verify of a format-4 run on a machine without
+   the backend is a refusal NAMING the missing package — never a silent consistency-only downgrade. (No
+   integration code references sign.py at HEAD; W2c lands it, as §12 schedules.)
+6. The pyproject comment "the offline wheel smoke stays dependency-free" is true today and becomes false at
+   the flip under either packaging option; the contract's CI wheelhouse section replaces it then.
