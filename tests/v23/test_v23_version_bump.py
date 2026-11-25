@@ -116,10 +116,18 @@ class Bump(unittest.TestCase):
         with imported_as(resolved):
             for r in ("v2.1", "v2.2"):
                 self.assertIn(reason, A.reverify(run_guards=False, round=r)["problems"])
-            self.assertIn(reason, A.reverification_v22_problems())
-            self.assertIn(reason, CR.check_version_forward())
+            # On a tree whose kernel moved past the v2.2 record (E5), the v2.2-ambient consumer refuses one step
+            # earlier, at supersession resolution — still never a silent pass, which is what N12 proves.
+            rev = A.reverification_v22_problems()
+            self.assertTrue(rev, "reverification_v22_problems passed under an invalidated calibration")
+            self.assertTrue(reason in rev or any("missing supersession" in p for p in rev), rev)
+            crp = CR.check_version_forward()
+            self.assertTrue(crp, "check_version_forward passed under an invalidated calibration")
+            self.assertTrue(reason in crp or any("missing supersession" in p for p in crp), crp)
             with mock.patch.object(C, "MODE", "release"):
-                self.assertIn(reason, q2._calibration_cycle2()["problems"])
+                q2p = q2._calibration_cycle2()["problems"]
+                self.assertTrue(q2p, "_calibration_cycle2 passed under an invalidated calibration")
+                self.assertTrue(reason in q2p or any("missing supersession" in p for p in q2p), q2p)
                 self.assertTrue(q2._committed_calibration_keys().isdisjoint(r[:3] for r in rc.derived_rows()))  # no key from it
             result = run(M5)
         failed = {t.id(): trace for t, trace in result.failures + result.errors}
