@@ -1,0 +1,2709 @@
+{
+ "record": "AISEF V2.1 — Q5-KERNEL-COMPARISON: every 2.0 and 2.1 Q5 corpus item under the v2.0.0 kernel and the 2.1 kernel",
+ "status": "ENGINEERING MEASUREMENT (not owner-approved evidence; cited by validation/qualification/v21_q5_changes.py)",
+ "authority": "owner B-03d approval, closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 5 (AISEF_V2_1_B03_REQUALIFICATION_ROUND): 'a ruling naming 2.1's behaviour changes and a new Q5 corpus; 2.0's corpus, rulings and evidence kept'",
+ "tool": "validation/qualification/v21_q5_compare.py",
+ "measured_at": "2026-11-25T01:49:40Z",
+ "execution_commit": "459fd8cadbc05a8fe2ee077f69448ff74ec0b456",
+ "tree_dirty": [],
+ "bindings": {
+  "validation/qualification/q5.py": "6c93a47b9d1b148ec8aabaeb1b0fc02ebf4bf211d3de71281d1a47dadaae2aff",
+  "validation/qualification/v21_q5_compare.py": "8ce7cb0ddd2de5fe8878a37c3831de8e18f60d4bac0cd7b5f3ede7f785c3a6d0",
+  "fixture_helpers": {
+   "contract": "e61ae8a63687eb9e5c67e3480006b1cff520052f305fb8fcdf2768a62907161d",
+   "land": "9e612cebc727f637263c1ba927b5d7f3b71ce19c5f7315b46de545ef1e408783",
+   "make_repo": "d5546b3514cb3fdc24d031025085bd01fe78cd82aee17b05bdd7a6eceeb59848",
+   "obligation": "02a1111fc307341d4d6f243785109145b2b6d1f8d249e4399a9990b147db20a8",
+   "plan_of": "e15b90cbe6d116264c9dbef0e5c45931913e2c4afed25cca1dc9b98e52a3fd8c"
+  },
+  "kernel_2_1": "d9be340e67e1b8ca5938c0d42863518d877633417782e23c7435b8c63551f906",
+  "kernel_v2_0_0": "68042e8d4acd651ff6db822b4b89a00f22043db98dd4fae0bb4b4e39664b3c74"
+ },
+ "kernels": {
+  "v2.0.0": {
+   "commit": "ca2631374602da45dae75b7f6907ff4729d0b2f7",
+   "aisef2_tree": "12ef35b0b25fadc318ea18cb09419693ac65fa0a",
+   "kernel_digest": "68042e8d4acd651ff6db822b4b89a00f22043db98dd4fae0bb4b4e39664b3c74",
+   "fixture_helpers": {
+    "contract": "e61ae8a63687eb9e5c67e3480006b1cff520052f305fb8fcdf2768a62907161d",
+    "land": "9e612cebc727f637263c1ba927b5d7f3b71ce19c5f7315b46de545ef1e408783",
+    "make_repo": "d5546b3514cb3fdc24d031025085bd01fe78cd82aee17b05bdd7a6eceeb59848",
+    "obligation": "02a1111fc307341d4d6f243785109145b2b6d1f8d249e4399a9990b147db20a8",
+    "plan_of": "e15b90cbe6d116264c9dbef0e5c45931913e2c4afed25cca1dc9b98e52a3fd8c"
+   }
+  },
+  "2.1": {
+   "kernel_digest": "d9be340e67e1b8ca5938c0d42863518d877633417782e23c7435b8c63551f906",
+   "fixture_helpers": {
+    "contract": "e61ae8a63687eb9e5c67e3480006b1cff520052f305fb8fcdf2768a62907161d",
+    "land": "9e612cebc727f637263c1ba927b5d7f3b71ce19c5f7315b46de545ef1e408783",
+    "make_repo": "d5546b3514cb3fdc24d031025085bd01fe78cd82aee17b05bdd7a6eceeb59848",
+    "obligation": "02a1111fc307341d4d6f243785109145b2b6d1f8d249e4399a9990b147db20a8",
+    "plan_of": "e15b90cbe6d116264c9dbef0e5c45931913e2c4afed25cca1dc9b98e52a3fd8c"
+   }
+  }
+ },
+ "method": "every item of q5.CORPUS (2.1) and of release/Q5-RC2's corpus (2.0; an item q5.CORPUS no longer has rebuilt from its record's definition) recorded and replayed with q5.execute in temporary directories, its scripted model stream, no provider, in a fresh interpreter whose aisef2 is the v2.0.0 tree (materialised from git) and in one whose aisef2 is this tree's; this tree's q5 in both, its fixture (tests/v2) each kernel tree's own (the helpers q5 calls: their sources recorded, required equal); the kernel's own identity neutralised (c2_orchestration_repair._neutral). identical: no observation differs; identity-only: every differing field is a derived identity (plan_hash, probe_digest, record_digest, request_hash, semantic_hash, spec_id, a criterion's semantic hash in a request, a process-range name differing only by its spec id); differs: anything else",
+ "items": {
+  "normal-completion": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C1",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "b688d04faa797eb5e0fa8edcce3ed0b0fec2d79a310b54d47f5a4e0bd6579865",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C1",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "b688d04faa797eb5e0fa8edcce3ed0b0fec2d79a310b54d47f5a4e0bd6579865",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "classification": "identical",
+   "identity_fields": {},
+   "other_fields": {}
+  },
+  "retry-then-commit": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "RETRY",
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 30,
+      "story_id": "S1",
+      "code": "CONTRACT_UNSATISFIED",
+      "owner": "DEVELOPER",
+      "retryable": true,
+      "detail": "proof of C1: CONTRACT_UNSATISFIED"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C1",
+      true
+     ]
+    ],
+    "events": 91,
+    "tool_calls": 1,
+    "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "89d96e40fc269f753aaacf7343d1ae7b5777b010e212245cd45c64a8b9bbdbce",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 3
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 30,
+      "story_id": "S1",
+      "code": "CONTRACT_UNSATISFIED",
+      "owner": "DEVELOPER",
+      "retryable": true,
+      "detail": "proof of C1: CONTRACT_UNSATISFIED"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C1",
+      true
+     ]
+    ],
+    "events": 91,
+    "tool_calls": 1,
+    "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "89d96e40fc269f753aaacf7343d1ae7b5777b010e212245cd45c64a8b9bbdbce",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 3
+    }
+   },
+   "classification": "identical",
+   "identity_fields": {},
+   "other_fields": {}
+  },
+  "review-finding-rollback": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 41,
+      "story_id": "S1",
+      "code": "REVIEW_FINDING",
+      "owner": "REVIEW",
+      "retryable": true,
+      "detail": "review: REVIEW_FINDING"
+     },
+     {
+      "seq": 80,
+      "story_id": "S1",
+      "code": "REVIEW_FINDING",
+      "owner": "REVIEW",
+      "retryable": true,
+      "detail": "review: REVIEW_FINDING"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review:sql-injection",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review:sql-injection",
+      false
+     ]
+    ],
+    "events": 89,
+    "tool_calls": 0,
+    "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "4e481d95de9ac021be5342e72b949797e60f98a9a004eb55197408871ae8e2e4",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 41,
+      "story_id": "S1",
+      "code": "REVIEW_FINDING",
+      "owner": "REVIEW",
+      "retryable": true,
+      "detail": "review: REVIEW_FINDING"
+     },
+     {
+      "seq": 80,
+      "story_id": "S1",
+      "code": "REVIEW_FINDING",
+      "owner": "REVIEW",
+      "retryable": true,
+      "detail": "review: REVIEW_FINDING"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review:sql-injection",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review:sql-injection",
+      false
+     ]
+    ],
+    "events": 89,
+    "tool_calls": 0,
+    "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "4e481d95de9ac021be5342e72b949797e60f98a9a004eb55197408871ae8e2e4",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "classification": "identical",
+   "identity_fields": {},
+   "other_fields": {}
+  },
+  "pre-satisfied": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C1",
+      true
+     ]
+    ],
+    "events": 53,
+    "tool_calls": 1,
+    "final_tip": "6722fb28d2c35a5a820d9c5575feecf0a6b66072",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "aabfe23b88fdbbd344f376e36c0a1df20c41eacd93ca2adc69b80a260d634e1c",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 1
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C1",
+      true
+     ]
+    ],
+    "events": 53,
+    "tool_calls": 1,
+    "final_tip": "6722fb28d2c35a5a820d9c5575feecf0a6b66072",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "aabfe23b88fdbbd344f376e36c0a1df20c41eacd93ca2adc69b80a260d634e1c",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 1
+    }
+   },
+   "classification": "identical",
+   "identity_fields": {},
+   "other_fields": {}
+  },
+  "security-finding-rollback": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 46,
+      "story_id": "S1",
+      "code": "SECURITY_FINDING",
+      "owner": "SECURITY",
+      "retryable": true,
+      "detail": "security: SECURITY_FINDING"
+     },
+     {
+      "seq": 90,
+      "story_id": "S1",
+      "code": "SECURITY_FINDING",
+      "owner": "SECURITY",
+      "retryable": true,
+      "detail": "security: SECURITY_FINDING"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security:hardcoded-secret",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security:hardcoded-secret",
+      false
+     ]
+    ],
+    "events": 99,
+    "tool_calls": 2,
+    "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "9c82d299eea88ff073cf67a66d5057eb50247d79590d9d09e51f8138d5fb2f1b",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 46,
+      "story_id": "S1",
+      "code": "SECURITY_FINDING",
+      "owner": "SECURITY",
+      "retryable": true,
+      "detail": "security: SECURITY_FINDING"
+     },
+     {
+      "seq": 90,
+      "story_id": "S1",
+      "code": "SECURITY_FINDING",
+      "owner": "SECURITY",
+      "retryable": true,
+      "detail": "security: SECURITY_FINDING"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security:hardcoded-secret",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C1",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security:hardcoded-secret",
+      false
+     ]
+    ],
+    "events": 99,
+    "tool_calls": 2,
+    "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "9c82d299eea88ff073cf67a66d5057eb50247d79590d9d09e51f8138d5fb2f1b",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "classification": "identical",
+   "identity_fields": {},
+   "other_fields": {}
+  },
+  "developer-outage-rollback": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "DEVELOPER_IMPLEMENT S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 22,
+      "story_id": "S1",
+      "code": "PROVIDER_UNAVAILABLE",
+      "owner": "PROVIDER",
+      "retryable": true,
+      "detail": "developer outage: 503 from the developer capability"
+     },
+     {
+      "seq": 42,
+      "story_id": "S1",
+      "code": "PROVIDER_UNAVAILABLE",
+      "owner": "PROVIDER",
+      "retryable": true,
+      "detail": "developer outage: 503 from the developer capability"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      false
+     ]
+    ],
+    "events": 51,
+    "tool_calls": 0,
+    "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "b966af69107f3b994c4045e8e55463e95878c3f5788f30dcf801887ddb3fc90e",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "DEVELOPER_IMPLEMENT S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 22,
+      "story_id": "S1",
+      "code": "PROVIDER_UNAVAILABLE",
+      "owner": "PROVIDER",
+      "retryable": true,
+      "detail": "developer outage: 503 from the developer capability"
+     },
+     {
+      "seq": 42,
+      "story_id": "S1",
+      "code": "PROVIDER_UNAVAILABLE",
+      "owner": "PROVIDER",
+      "retryable": true,
+      "detail": "developer outage: 503 from the developer capability"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      false
+     ]
+    ],
+    "events": 51,
+    "tool_calls": 0,
+    "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "b966af69107f3b994c4045e8e55463e95878c3f5788f30dcf801887ddb3fc90e",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "classification": "identical",
+   "identity_fields": {},
+   "other_fields": {}
+  },
+  "developer-regression-at-candidate": {
+   "in_2_0_corpus": false,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S0": [
+     "COMMIT"
+    ],
+    "S2": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S0": [
+      "COMMIT"
+     ]
+    },
+    "errors": {
+     "replay_request_mismatch": 1
+    },
+    "notes": [
+     "EXTRA_MODEL_CALL: the script has no REVIEWER_REVIEW answer for request 4",
+     "run interrupted after the abort: resources disposed"
+    ],
+    "consumption_ok": false,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S0",
+     "REVIEWER_REVIEW S0",
+     "DEVELOPER_IMPLEMENT S2"
+    ],
+    "refused_request": "EXTRA_MODEL_CALL: the script has no REVIEWER_REVIEW answer for request 4",
+    "failures": [],
+    "gate_checks": [
+     [
+      "S0:admission",
+      true
+     ],
+     [
+      "S0:developer",
+      true
+     ],
+     [
+      "S0:proof:C1",
+      true
+     ],
+     [
+      "S0:proof:C0",
+      true
+     ],
+     [
+      "S0:quality",
+      true
+     ],
+     [
+      "S0:review",
+      true
+     ],
+     [
+      "S0:security",
+      true
+     ],
+     [
+      "S0:merge",
+      true
+     ],
+     [
+      "S0:post-merge:C1",
+      true
+     ],
+     [
+      "S0:post-merge:C0",
+      true
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      true
+     ],
+     [
+      "S2:proof:C2",
+      true
+     ],
+     [
+      "S2:quality",
+      true
+     ]
+    ],
+    "events": 116,
+    "tool_calls": 1,
+    "final_tip": null,
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "fced3f09b327494998eb8eafde01e5d3d8aa145d053e1d47be38c14d65b37246",
+    "replay": {
+     "status": "FAILED",
+     "errors": {
+      "replay_request_mismatch": 1,
+      "workspace_diff": 1
+     },
+     "model_calls": 4
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S0": [
+      "COMMIT"
+     ],
+     "S2": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S0",
+     "REVIEWER_REVIEW S0",
+     "DEVELOPER_IMPLEMENT S2",
+     "DEVELOPER_IMPLEMENT S2"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 109,
+      "story_id": "S2",
+      "code": "CONTRACT_UNSATISFIED",
+      "owner": "DEVELOPER",
+      "retryable": true,
+      "detail": "proof of C0: CONTRACT_UNSATISFIED"
+     },
+     {
+      "seq": 145,
+      "story_id": "S2",
+      "code": "CONTRACT_UNSATISFIED",
+      "owner": "DEVELOPER",
+      "retryable": true,
+      "detail": "proof of C0: CONTRACT_UNSATISFIED"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S0:admission",
+      true
+     ],
+     [
+      "S0:developer",
+      true
+     ],
+     [
+      "S0:proof:C1",
+      true
+     ],
+     [
+      "S0:proof:C0",
+      true
+     ],
+     [
+      "S0:quality",
+      true
+     ],
+     [
+      "S0:review",
+      true
+     ],
+     [
+      "S0:security",
+      true
+     ],
+     [
+      "S0:merge",
+      true
+     ],
+     [
+      "S0:post-merge:C1",
+      true
+     ],
+     [
+      "S0:post-merge:C0",
+      true
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      true
+     ],
+     [
+      "S2:proof:C2",
+      true
+     ],
+     [
+      "S2:proof:C0",
+      false
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      true
+     ],
+     [
+      "S2:proof:C2",
+      true
+     ],
+     [
+      "S2:proof:C0",
+      false
+     ]
+    ],
+    "events": 154,
+    "tool_calls": 1,
+    "final_tip": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "17fd156ff206094119814ff7df3c79b8cc3644aed209f13d40cbca6a171962f8",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "classification": "differs",
+   "identity_fields": {
+    "model_requests[].request_hash": 1
+   },
+   "other_fields": {
+    "consumption.consumed": 1,
+    "consumption.extra_requests": 1,
+    "consumption.missing_unconsumed": 1,
+    "consumption.ok": 1,
+    "errors.replay_request_mismatch": 1,
+    "final_workspace": 1,
+    "journal": 1,
+    "model_requests[].header_class": 1,
+    "model_requests[].matched": 1,
+    "notes": 1,
+    "outcomes.S2": 1,
+    "replay.errors.replay_request_mismatch": 1,
+    "replay.errors.workspace_diff": 1,
+    "replay.status": 1,
+    "replay_failure": 1,
+    "requests": 1,
+    "subprocesses.probe": 1,
+    "subprocesses.scratch": 1,
+    "subprocesses.tests": 1,
+    "subprocesses.worktree": 1
+   }
+  },
+  "post-merge-integration-regression": {
+   "in_2_0_corpus": false,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S0": [
+     "COMMIT"
+    ],
+    "S2": [
+     "ROLLBACK"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S0": [
+      "COMMIT"
+     ],
+     "S2": [
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S0",
+     "REVIEWER_REVIEW S0",
+     "DEVELOPER_IMPLEMENT S2",
+     "REVIEWER_REVIEW S2"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 134,
+      "story_id": "S2",
+      "code": "POST_MERGE_REGRESSION",
+      "owner": "INTEGRATION",
+      "retryable": false,
+      "detail": "post-merge C0: POST_MERGE_REGRESSION"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S0:admission",
+      true
+     ],
+     [
+      "S0:developer",
+      true
+     ],
+     [
+      "S0:proof:C1",
+      true
+     ],
+     [
+      "S0:proof:C0",
+      true
+     ],
+     [
+      "S0:quality",
+      true
+     ],
+     [
+      "S0:review",
+      true
+     ],
+     [
+      "S0:security",
+      true
+     ],
+     [
+      "S0:merge",
+      true
+     ],
+     [
+      "S0:post-merge:C1",
+      true
+     ],
+     [
+      "S0:post-merge:C0",
+      true
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      true
+     ],
+     [
+      "S2:proof:C2",
+      true
+     ],
+     [
+      "S2:quality",
+      true
+     ],
+     [
+      "S2:review",
+      true
+     ],
+     [
+      "S2:security",
+      true
+     ],
+     [
+      "S2:merge",
+      true
+     ],
+     [
+      "S2:post-merge:C2",
+      true
+     ],
+     [
+      "S2:post-merge:C0",
+      false
+     ]
+    ],
+    "events": 143,
+    "tool_calls": 2,
+    "final_tip": "c69ea8b4c6b30397ffe871a6cc7d8bdacfff62ed",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "3b7533c45a5d24a44237a4eb1bc01c68a276dd484471b7e9370283a77efefecb",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S0": [
+      "COMMIT"
+     ],
+     "S2": [
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S0",
+     "REVIEWER_REVIEW S0",
+     "DEVELOPER_IMPLEMENT S2",
+     "REVIEWER_REVIEW S2"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 142,
+      "story_id": "S2",
+      "code": "POST_MERGE_REGRESSION",
+      "owner": "INTEGRATION",
+      "retryable": false,
+      "detail": "post-merge C0: POST_MERGE_REGRESSION"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S0:admission",
+      true
+     ],
+     [
+      "S0:developer",
+      true
+     ],
+     [
+      "S0:proof:C1",
+      true
+     ],
+     [
+      "S0:proof:C0",
+      true
+     ],
+     [
+      "S0:quality",
+      true
+     ],
+     [
+      "S0:review",
+      true
+     ],
+     [
+      "S0:security",
+      true
+     ],
+     [
+      "S0:merge",
+      true
+     ],
+     [
+      "S0:post-merge:C1",
+      true
+     ],
+     [
+      "S0:post-merge:C0",
+      true
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      true
+     ],
+     [
+      "S2:proof:C2",
+      true
+     ],
+     [
+      "S2:proof:C0",
+      true
+     ],
+     [
+      "S2:quality",
+      true
+     ],
+     [
+      "S2:review",
+      true
+     ],
+     [
+      "S2:security",
+      true
+     ],
+     [
+      "S2:merge",
+      true
+     ],
+     [
+      "S2:post-merge:C2",
+      true
+     ],
+     [
+      "S2:post-merge:C0",
+      false
+     ]
+    ],
+    "events": 151,
+    "tool_calls": 2,
+    "final_tip": "c69ea8b4c6b30397ffe871a6cc7d8bdacfff62ed",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "f1ef8431446ef9e14377787cff53bca4d6a6f0dd0bc9b8d7fc32e840b2526f6e",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "classification": "differs",
+   "identity_fields": {},
+   "other_fields": {
+    "journal": 1,
+    "subprocesses.probe": 1
+   }
+  },
+  "cli-proved-story": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C3",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C3",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+    "probe_digests": {
+     "probe.cli_invocation": [
+      "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f"
+     ]
+    },
+    "journal_digest": "03714d3fcae363144168cc1550a766bab5cbb4808d82057710fbcf68afaff8d9",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C3",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C3",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+    "probe_digests": {
+     "probe.cli_invocation": [
+      "330ae4a88cc8ca58e66b462b9dc6ad9b4023e4b1dfebc8373c584eaa95e8de31"
+     ]
+    },
+    "journal_digest": "5b904ae268f7d899b635c550ddb1a2e0da4fae2fed55e9c04ac735f470974a26",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "classification": "identity-only",
+   "identity_fields": {
+    "journal plan/frozen: data.plan_hash": 1,
+    "journal story/resource-acquired: data.resource": 5,
+    "journal probe/evaluated: data.record.probe_digest": 5,
+    "journal probe/evaluated: data.record.record_digest": 5,
+    "journal probe/evaluated: data.record.semantic_hash": 5,
+    "journal probe/evaluated: data.record.spec_id": 5,
+    "journal story/resource-released: data.resource": 5,
+    "journal proof/verified: data.semantic_hash": 2,
+    "journal proof/verified: data.spec_id": 2,
+    "model_requests[].request_hash": 2,
+    "requests[].execution_profile.probe_digest": 2,
+    "requests[].plan_hash": 2,
+    "requests[].semantic_hashes.C3": 2
+   },
+   "other_fields": {}
+  },
+  "cli-refuted-then-commit": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "RETRY",
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 30,
+      "story_id": "S1",
+      "code": "CONTRACT_UNSATISFIED",
+      "owner": "DEVELOPER",
+      "retryable": true,
+      "detail": "proof of C3: CONTRACT_UNSATISFIED"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C3",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C3",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C3",
+      true
+     ]
+    ],
+    "events": 91,
+    "tool_calls": 1,
+    "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+    "probe_digests": {
+     "probe.cli_invocation": [
+      "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f"
+     ]
+    },
+    "journal_digest": "dd56966fc2e849bd6e556aa80825855218f09300bd591c088d32e8a145d3146f",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 3
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 30,
+      "story_id": "S1",
+      "code": "CONTRACT_UNSATISFIED",
+      "owner": "DEVELOPER",
+      "retryable": true,
+      "detail": "proof of C3: CONTRACT_UNSATISFIED"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C3",
+      false
+     ],
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C3",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C3",
+      true
+     ]
+    ],
+    "events": 91,
+    "tool_calls": 1,
+    "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+    "probe_digests": {
+     "probe.cli_invocation": [
+      "330ae4a88cc8ca58e66b462b9dc6ad9b4023e4b1dfebc8373c584eaa95e8de31"
+     ]
+    },
+    "journal_digest": "11da90e134c8ee9846374f9cc61be373da548f4213e1403a86c8ba8cf326a3e4",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 3
+    }
+   },
+   "classification": "identity-only",
+   "identity_fields": {
+    "journal plan/frozen: data.plan_hash": 1,
+    "journal story/resource-acquired: data.resource": 8,
+    "journal probe/evaluated: data.record.probe_digest": 8,
+    "journal probe/evaluated: data.record.record_digest": 8,
+    "journal probe/evaluated: data.record.semantic_hash": 8,
+    "journal probe/evaluated: data.record.spec_id": 8,
+    "journal story/resource-released: data.resource": 8,
+    "journal proof/verified: data.semantic_hash": 3,
+    "journal proof/verified: data.spec_id": 3,
+    "model_requests[].request_hash": 3,
+    "requests[].execution_profile.probe_digest": 3,
+    "requests[].plan_hash": 3,
+    "requests[].semantic_hashes.C3": 3
+   },
+   "other_fields": {}
+  },
+  "file-artifact-prohibition": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C4",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C4",
+      true
+     ]
+    ],
+    "events": 53,
+    "tool_calls": 1,
+    "final_tip": "02e0336e762506e4a432dcbd530755d5f038ff4a",
+    "probe_digests": {
+     "probe.file_artifact": [
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ]
+    },
+    "journal_digest": "96e630c9b50b20b65a4d31b3e30e0bb19d626a5fd883d880bc0187b2e532c9e6",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C4",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C4",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "02e0336e762506e4a432dcbd530755d5f038ff4a",
+    "probe_digests": {
+     "probe.file_artifact": [
+      "ba12a5d244632ccbe0dcd97ae6c218c637b5cf661e9a5f8005c1bec17b273f8c"
+     ]
+    },
+    "journal_digest": "6e184f50a9a258478c773ed0c0ee395aae183471a01431a9d5645c0a450c5e02",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "classification": "differs",
+   "identity_fields": {
+    "model_requests[].request_hash": 2,
+    "requests[].execution_profile.probe_digest": 2,
+    "requests[].plan_hash": 2,
+    "requests[].semantic_hashes.C4": 2
+   },
+   "other_fields": {
+    "journal": 1,
+    "subprocesses.worktree": 1
+   }
+  },
+  "scenario-proved-story": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C5",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C5",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "613fb770fb9d1f65266258be83f80d219534633c",
+    "probe_digests": {
+     "probe.process_effect": [
+      "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273"
+     ]
+    },
+    "journal_digest": "624ce6ae68ac0b6ae9b3cfc6ed1661a60e08a851fceb56c2afb8e953921b6f49",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C5",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C5",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "613fb770fb9d1f65266258be83f80d219534633c",
+    "probe_digests": {
+     "probe.process_effect": [
+      "409c41aea16f8ab2c83406e429fdaed565eaa8dadd945a78bd93ad617b8814f7"
+     ]
+    },
+    "journal_digest": "2227e2a6cca3f254826f97ed2202fb59911620def84cc53140bd47d7ab428e81",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "classification": "identity-only",
+   "identity_fields": {
+    "journal plan/frozen: data.plan_hash": 1,
+    "journal story/resource-acquired: data.resource": 5,
+    "journal probe/evaluated: data.record.probe_digest": 5,
+    "journal probe/evaluated: data.record.record_digest": 5,
+    "journal probe/evaluated: data.record.semantic_hash": 5,
+    "journal probe/evaluated: data.record.spec_id": 5,
+    "journal story/resource-released: data.resource": 5,
+    "journal proof/verified: data.semantic_hash": 2,
+    "journal proof/verified: data.spec_id": 2,
+    "model_requests[].request_hash": 2,
+    "requests[].execution_profile.probe_digest": 2,
+    "requests[].plan_hash": 2,
+    "requests[].semantic_hashes.C5": 2
+   },
+   "other_fields": {}
+  },
+  "bytes-returning-python-callable": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": true,
+   "expected_outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C6",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C6",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "00883720eb60e45d453fee7b7213466d5873f74c",
+    "probe_digests": {
+     "probe.python_callable_v2": [
+      "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae"
+     ]
+    },
+    "journal_digest": "38fc400a0f157c38c5efe89bdc2f57a5f817a6fdb0a0b1787d778cdc9b3a5e06",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S1",
+     "REVIEWER_REVIEW S1"
+    ],
+    "refused_request": null,
+    "failures": [],
+    "gate_checks": [
+     [
+      "S1:admission",
+      true
+     ],
+     [
+      "S1:developer",
+      true
+     ],
+     [
+      "S1:proof:C6",
+      true
+     ],
+     [
+      "S1:quality",
+      true
+     ],
+     [
+      "S1:review",
+      true
+     ],
+     [
+      "S1:security",
+      true
+     ],
+     [
+      "S1:merge",
+      true
+     ],
+     [
+      "S1:post-merge:C6",
+      true
+     ]
+    ],
+    "events": 63,
+    "tool_calls": 1,
+    "final_tip": "00883720eb60e45d453fee7b7213466d5873f74c",
+    "probe_digests": {
+     "probe.python_callable_v2": [
+      "0821c14651a95494b2352ea0447e467595388fc713fd531ced6f75c7bcfa8aae"
+     ]
+    },
+    "journal_digest": "e9511470eb04de6158310fd6ade2aa301d11800a7c81ff55f6634cc94a92f54a",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 2
+    }
+   },
+   "classification": "identity-only",
+   "identity_fields": {
+    "journal plan/frozen: data.plan_hash": 1,
+    "journal story/resource-acquired: data.resource": 5,
+    "journal probe/evaluated: data.record.probe_digest": 5,
+    "journal probe/evaluated: data.record.record_digest": 5,
+    "journal probe/evaluated: data.record.semantic_hash": 5,
+    "journal probe/evaluated: data.record.spec_id": 5,
+    "journal story/resource-released: data.resource": 5,
+    "journal proof/verified: data.semantic_hash": 2,
+    "journal proof/verified: data.spec_id": 2,
+    "model_requests[].request_hash": 2,
+    "requests[].execution_profile.probe_digest": 2,
+    "requests[].plan_hash": 2,
+    "requests[].semantic_hashes.C6": 2
+   },
+   "other_fields": {}
+  },
+  "post-merge-regression": {
+   "in_2_0_corpus": true,
+   "in_2_1_corpus": false,
+   "expected_outcomes": {
+    "S0": [
+     "COMMIT"
+    ],
+    "S2": [
+     "ROLLBACK"
+    ]
+   },
+   "v2.0.0": {
+    "outcomes": {
+     "S0": [
+      "COMMIT"
+     ],
+     "S2": [
+      "ROLLBACK"
+     ]
+    },
+    "errors": {},
+    "notes": [],
+    "consumption_ok": true,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S0",
+     "REVIEWER_REVIEW S0",
+     "DEVELOPER_IMPLEMENT S2",
+     "REVIEWER_REVIEW S2"
+    ],
+    "refused_request": null,
+    "failures": [
+     {
+      "seq": 134,
+      "story_id": "S2",
+      "code": "POST_MERGE_REGRESSION",
+      "owner": "INTEGRATION",
+      "retryable": false,
+      "detail": "post-merge C0: POST_MERGE_REGRESSION"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S0:admission",
+      true
+     ],
+     [
+      "S0:developer",
+      true
+     ],
+     [
+      "S0:proof:C1",
+      true
+     ],
+     [
+      "S0:proof:C0",
+      true
+     ],
+     [
+      "S0:quality",
+      true
+     ],
+     [
+      "S0:review",
+      true
+     ],
+     [
+      "S0:security",
+      true
+     ],
+     [
+      "S0:merge",
+      true
+     ],
+     [
+      "S0:post-merge:C1",
+      true
+     ],
+     [
+      "S0:post-merge:C0",
+      true
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      true
+     ],
+     [
+      "S2:proof:C2",
+      true
+     ],
+     [
+      "S2:quality",
+      true
+     ],
+     [
+      "S2:review",
+      true
+     ],
+     [
+      "S2:security",
+      true
+     ],
+     [
+      "S2:merge",
+      true
+     ],
+     [
+      "S2:post-merge:C2",
+      true
+     ],
+     [
+      "S2:post-merge:C0",
+      false
+     ]
+    ],
+    "events": 143,
+    "tool_calls": 2,
+    "final_tip": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "e4de5221c949e11dfdb71b8cfcf34f920d0d3f5593632872200abc831e1a8bee",
+    "replay": {
+     "status": "GREEN",
+     "errors": {},
+     "model_calls": 4
+    }
+   },
+   "2.1": {
+    "outcomes": {
+     "S0": [
+      "COMMIT"
+     ]
+    },
+    "errors": {
+     "replay_request_mismatch": 1
+    },
+    "notes": [
+     "EXTRA_MODEL_CALL: the script has no DEVELOPER_IMPLEMENT answer for request 4",
+     "run interrupted after the abort: resources disposed"
+    ],
+    "consumption_ok": false,
+    "model_calls": [
+     "DEVELOPER_IMPLEMENT S0",
+     "REVIEWER_REVIEW S0",
+     "DEVELOPER_IMPLEMENT S2"
+    ],
+    "refused_request": "EXTRA_MODEL_CALL: the script has no DEVELOPER_IMPLEMENT answer for request 4",
+    "failures": [
+     {
+      "seq": 109,
+      "story_id": "S2",
+      "code": "CONTRACT_UNSATISFIED",
+      "owner": "DEVELOPER",
+      "retryable": true,
+      "detail": "proof of C0: CONTRACT_UNSATISFIED"
+     },
+     {
+      "seq": 129,
+      "story_id": "S2",
+      "code": "UNKNOWN",
+      "owner": "INTEGRATION",
+      "retryable": false,
+      "detail": "DEVELOP raised ReplayMismatch"
+     }
+    ],
+    "gate_checks": [
+     [
+      "S0:admission",
+      true
+     ],
+     [
+      "S0:developer",
+      true
+     ],
+     [
+      "S0:proof:C1",
+      true
+     ],
+     [
+      "S0:proof:C0",
+      true
+     ],
+     [
+      "S0:quality",
+      true
+     ],
+     [
+      "S0:review",
+      true
+     ],
+     [
+      "S0:security",
+      true
+     ],
+     [
+      "S0:merge",
+      true
+     ],
+     [
+      "S0:post-merge:C1",
+      true
+     ],
+     [
+      "S0:post-merge:C0",
+      true
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      true
+     ],
+     [
+      "S2:proof:C2",
+      true
+     ],
+     [
+      "S2:proof:C0",
+      false
+     ],
+     [
+      "S2:admission",
+      true
+     ],
+     [
+      "S2:developer",
+      false
+     ]
+    ],
+    "events": 139,
+    "tool_calls": 1,
+    "final_tip": null,
+    "probe_digests": {
+     "probe.python_callable": [
+      "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+     ]
+    },
+    "journal_digest": "7e32d273c8cf1ffd60cea92e30c36857689affca4ed79f431331d7a107b23e2e",
+    "replay": {
+     "status": "FAILED",
+     "errors": {
+      "replay_request_mismatch": 1,
+      "workspace_diff": 1
+     },
+     "model_calls": 4
+    }
+   },
+   "classification": "differs",
+   "identity_fields": {
+    "model_requests[].request_hash": 1
+   },
+   "other_fields": {
+    "consumption.consumed": 1,
+    "consumption.extra_requests": 1,
+    "consumption.missing_unconsumed": 1,
+    "consumption.ok": 1,
+    "errors.replay_request_mismatch": 1,
+    "final_workspace": 1,
+    "journal": 1,
+    "model_requests[].header_class": 1,
+    "model_requests[].matched": 1,
+    "notes": 1,
+    "outcomes.S2": 1,
+    "replay.errors.replay_request_mismatch": 1,
+    "replay.errors.workspace_diff": 1,
+    "replay.status": 1,
+    "replay_failure": 1,
+    "requests": 1,
+    "subprocesses.probe": 1,
+    "subprocesses.scratch": 1,
+    "subprocesses.tests": 1,
+    "subprocesses.tool": 1,
+    "subprocesses.worktree": 1,
+    "tool_ledger": 1
+   }
+  }
+ },
+ "summary": {
+  "identical": [
+   "developer-outage-rollback",
+   "normal-completion",
+   "pre-satisfied",
+   "retry-then-commit",
+   "review-finding-rollback",
+   "security-finding-rollback"
+  ],
+  "identity-only": [
+   "bytes-returning-python-callable",
+   "cli-proved-story",
+   "cli-refuted-then-commit",
+   "scenario-proved-story"
+  ],
+  "differs": [
+   "developer-regression-at-candidate",
+   "file-artifact-prohibition",
+   "post-merge-integration-regression",
+   "post-merge-regression"
+  ]
+ },
+ "version_forward": {
+  "version_context": "v2.3",
+  "source_commit": "459fd8cadbc05a8fe2ee077f69448ff74ec0b456",
+  "kernel_digest": "751ba6ffd197daa91e72278f428da117ed6a7961",
+  "supersedes": {
+   "path": "closure-evidence/v2/v2.2/Q5-KERNEL-COMPARISON.json",
+   "record_digest": "ea06a22fac69b9acf0c79648687cf29301b14b90d4b3e0d20f527cffd7182db9"
+  },
+  "record_digest": "791f5c366943c267a6a865230aace164e090876e55e1866eb7cd0c0c1bca2be2"
+ }
+}
