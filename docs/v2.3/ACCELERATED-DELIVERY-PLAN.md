@@ -179,3 +179,20 @@ không phải code), đã rerun; (2) FORMAT-4 freeze prep + A2 primitives: ở t
 E7 và các lane chạm `run.py` xếp sau chữ ký order-table để không trả giá E5-scale hai lần (§5a); (4) gói B2-SPEND
 trước 08/12: feasibility xong, phần evaluator slate + remuneration + cap cần input owner; (5) báo cáo tuần
 critical-path: bắt đầu từ tuần này; (6) RC qualification/sealing/B2 external: giữ bắt buộc, không đổi.
+
+### 7.2 OWNER DIRECTIVE 2026-11-26 — "ACCELERATED EXECUTION WITH UNLIMITED 9ROUTER TOKENS" (đã ban hành)
+
+Hiệu lực ngay, qua kênh owner. Nội dung vận hành: trần token 9router/`mycombo` được gỡ cho phát triển v2.3
+(KHÔNG gỡ kiểm soát security/evidence/release/chi tiêu ngoài); **CẤM DeepSeek tuyệt đối** (kể cả fallback/route
+ẩn); song song hóa tối đa theo DAG + single-writer; chuẩn chất lượng §3 (adversarial review, red-before/
+green-after, không commit khi suite đọc byte sống đang chạy); ưu tiên P0 trust-gates/CI → P1 FORMAT-4 freeze →
+P2 A2 → P3 B2 → P4 mutation-perf; escalate CHỈ 5 loại (trust/arch xung khắc, chi ngoài ủy quyền token, privileged
+ops/secrets, blocker release bất khả giảm, publish/tag/PyPI); "không coi proposal chưa ký là quyết định đã ban
+hành" — gói QĐ #1 vẫn PROPOSED, riêng chất liệu QĐ 8 (backend `cryptography`, cấm vendored Ed25519) nay được
+chỉ thị này ra lệnh trực tiếp ở P2, và clone-time checks B2 được P3 ủy quyền rõ (môi trường cách ly).
+
+**Giới hạn báo cáo theo §1:** cấu hình local chỉ khai `mycombo` là model-name trên provider 9router
+(~/.config/opencode/opencode.json — không có mention DeepSeek local); thành phần route thật nằm server-side
+9router, local KHÔNG chứng minh được loại trừ DeepSeek ⇒ theo đúng điều kiện chỉ thị, **không lượt chạy trả phí
+nào qua mycombo khởi động cho tới khi owner xác nhận thành phần combo (dashboard 9router) không chứa DeepSeek**.
+Hôm nay không lượt paid nào cần thiết — không gì bị chặn; mục xác nhận này vào gói chờ owner.
