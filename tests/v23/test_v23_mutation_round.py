@@ -145,20 +145,43 @@ class QaAcceptance(unittest.TestCase):
                                     "registry_sha256": hashlib.sha256((bc.ROOT / reg).read_bytes()).hexdigest()},
                 "targets": {self.TGT: {"source": self.SRC, "source_sha256": "0" * 64}}}
 
-    def probs(self, newest, target_problems=lambda e, r: []):
+    def probs(self, newest):
         from unittest import mock
         from validation.v2 import b1_bindings_check as bc
         from validation.v2 import mutation as mu
         from validation.v2 import version_forward as vf
-        with mock.patch.object(mu, "v23_newest", return_value=newest), \
-                mock.patch.object(mu, "target_problems", side_effect=target_problems), \
-                vf.in_round("v2.3"):
+        with mock.patch.object(mu, "v23_newest", return_value=newest), vf.in_round("v2.3"):
             return [x for x in bc.problems(self.man(), kernel="k" * 40) if not x.startswith("kernel ")]
 
     def entry(self, **over):
+        """A FULLY admissible round entry (the shared rule, mutation.v23_admissible, really runs — no mocking it):
+        every override below starts from evidence that passes, so each red case isolates exactly one violation."""
+        import hashlib
         from validation.v2 import mutation as mu
         live = mu.source_digest((ROOT / self.SRC).read_text(encoding="utf-8"))
-        return {"target": self.TGT, "runner": 2, "source_sha256": live, **over}
+
+        def lf(rel):   # the admissibility rule checks each identity map against the LIVE tree (LF-normalised)
+            return hashlib.sha256((ROOT / rel).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        identity = {"measured_on": "c" * 40, "dirty": False,
+                    "slice": {"func": "execute", "null_sha256": "d" * 64}, "closure": {self.SRC: lf(self.SRC)},
+                    "kill_files": {"tests/v2/test_app_run.py": lf("tests/v2/test_app_run.py")},
+                    "generator": {"descriptions_sha": "a" * 64, "mutated_slices_sha": "b" * 64},
+                    "enum_modules": {self.SRC: lf(self.SRC)},
+                    "platform": {"family": "posix", "sys_platform": "darwin", "release": "r", "machine": "arm64"},
+                    "env": {"python": "3", "implementation": "cpython", "tree_sha256": "1" * 64,
+                            "runner_sha256": "2" * 64}}
+        kill, hdr = "tests/v2/test_app_run.py", "FAIL: t (v2.test_app_run.T.t) | AssertionError"
+        control = {"file": kill, "role": "control", "exit": 0, "outcome": "PASS", "why": None, "ran": 1}
+        row = {"mutant": "L1 Gt->LtE", "class": "KILLED", "killed": True, "killed_by": {"file": kill, "first": hdr},
+               "files": [{"file": kill, "exit": 1, "outcome": "FAIL", "why": None, "ran": 1, "failures": 1,
+                          "first": hdr}, control, dict(control),
+                         {"file": kill, "role": "rerun", "exit": 1, "outcome": "FAIL", "why": None, "ran": 1,
+                          "failures": 1, "first": hdr}]}
+        return {"target": self.TGT, "runner": 2, "source_sha256": live,
+                "kill_tests": [kill], "mutants": 1, "killed": 1, "killed_by_timeout": 0, "survivors": [],
+                "results": [row],
+                "t0": [{"file": kill, "role": "t0", "exit": 0, "outcome": "PASS", "why": None, "ran": 1}],
+                "identity": identity, **over}
 
     def test_red_before_no_round_entry_keeps_the_target_red(self):
         self.assertEqual(self.probs(({}, [])), [f"{self.TGT}: {self.SRC} moved since the manifest froze"])
@@ -167,8 +190,7 @@ class QaAcceptance(unittest.TestCase):
         from unittest import mock
         from validation.v2 import b1_bindings_check as bc
         from validation.v2 import mutation as mu
-        with mock.patch.object(mu, "v23_newest", return_value=({self.TGT: self.entry()}, [])), \
-                mock.patch.object(mu, "target_problems", return_value=[]):
+        with mock.patch.object(mu, "v23_newest", return_value=({self.TGT: self.entry()}, [])):
             out = [x for x in bc.problems(self.man(), kernel="k" * 40) if not x.startswith("kernel ")]
         self.assertEqual(out, [f"{self.TGT}: {self.SRC} moved since the manifest froze"])
 
@@ -176,16 +198,29 @@ class QaAcceptance(unittest.TestCase):
         self.assertEqual(self.probs(({self.TGT: self.entry()}, [])), [])
 
     def test_fail_closed_on_digest_mismatch_uncommitted_entry_open_problems_or_a_broken_record(self):
+        dirty = self.entry()
+        dirty["identity"] = dict(dirty["identity"], dirty=True)
+        unstated = self.entry()
+        unstated["identity"] = {k: v for k, v in unstated["identity"].items() if k != "dirty"}
+        unaudited = self.entry(survivors=["L1 Gt->LtE"], killed=0,
+                               results=[{"mutant": "L1 Gt->LtE", "class": "SURVIVED"}])
+        no_identity = self.entry()
+        del no_identity["identity"]
         cases = {
-            "digest mismatch": (({self.TGT: self.entry(source_sha256="f" * 64)}, []), lambda e, r: []),
-            "uncommitted newest (I7)": (({self.TGT: {"target": self.TGT, "error": "UNRESOLVED (I7): uncommitted"}}, []),
-                                        lambda e, r: []),
-            "open problems": (({self.TGT: self.entry()}, []), lambda e, r: ["unaudited survivor"]),
-            "broken round record": (({}, ["not a prefix (fail closed)"]), lambda e, r: []),
+            "digest mismatch": ({self.TGT: self.entry(source_sha256="f" * 64)}, []),
+            "uncommitted newest (I7)": ({self.TGT: {"target": self.TGT, "error": "UNRESOLVED (I7): uncommitted"}}, []),
+            "dirty identity (owner ruling 2026-11-25 1)": ({self.TGT: dirty}, []),
+            "dirty key absent (cleanliness unproven)": ({self.TGT: unstated}, []),
+            "no identity at all": ({self.TGT: no_identity}, []),
+            "no T0 observation": ({self.TGT: self.entry(t0=[])}, []),
+            "unaudited survivor": ({self.TGT: unaudited}, []),
+            "malformed entry (missing kill_tests)": ({self.TGT: {"target": self.TGT, "runner": 2,
+                                                                 "source_sha256": self.entry()["source_sha256"]}}, []),
+            "broken round record": ({}, ["not a prefix (fail closed)"]),
         }
-        for name, (newest, tp) in cases.items():
+        for name, newest in cases.items():
             with self.subTest(name):
-                self.assertEqual(self.probs(newest, tp),
+                self.assertEqual(self.probs(newest),
                                  [f"{self.TGT}: {self.SRC} moved since the manifest froze"])
 
 

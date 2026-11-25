@@ -452,7 +452,9 @@ class Propagated(Base):
             with self.assertRaises(Boom) as ctx:
                 self.go(dev=RaisingDev())
         self.assertIs(ctx.exception, fault)
-        self.assertTrue(any("JournalError" in n for n in getattr(ctx.exception, "__notes__", [])), ctx.exception.__notes__)
+        notes = getattr(ctx.exception, "__notes__", [])
+        self.assertTrue(any(n.startswith("E5: the attempt could not be closed: JournalError: ") for n in notes),
+                        notes)   # H6 prescribes the note verbatim: prefix, the later type, ": ", then its text
         self.assertEqual(len([e for e in self.attempt_events()
                               if e.type == T.PROVIDER_RESULT.value and e.data.get("synthetic")]), 1)
         self.assertNotIn("gate/decision", [e.type for e in self.attempt_events()])
@@ -468,7 +470,9 @@ class Propagated(Base):
             with self.assertRaises(Boom) as ctx:
                 self.go(dev=RaisingDev())
         self.assertIs(ctx.exception, fault)
-        self.assertTrue(any("JournalError" in n for n in getattr(ctx.exception, "__notes__", [])))
+        notes = getattr(ctx.exception, "__notes__", [])
+        self.assertTrue(any(n.startswith("E5: the attempt could not be closed: JournalError: ") for n in notes),
+                        notes)   # H6's verbatim note format, on the closure path too
         self.assertEqual(self.run.events[-1].type, T.FAILURE_OBSERVED.value)
         self.run.interrupt()
 

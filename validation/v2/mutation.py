@@ -2694,6 +2694,54 @@ def target_problems(t: dict, root: pathlib.Path = ROOT) -> list[str]:
     return out
 
 
+def v23_admissible(t: dict, root: pathlib.Path = ROOT) -> list[str]:
+    """The ONE round-v2.3 admissibility rule (owner ruling 2026-11-25 §1): what a round entry must prove before ANY
+    consumer — B1 Q-a, check()'s read-time supersession, Q0, the DAG or a release gate — may treat it as current
+    qualification. Source, committed record (v23_newest's I7 at read time), platform, generator, environment,
+    observation and identity.dirty; anything missing or unproven fails CLOSED. `[]` is admissible. An inadmissible
+    entry stays in the record untouched (append-only; provenance and supersession still bind it) — it just never
+    counts as MEASURED or currently qualified until fresh, clean evidence supersedes it."""
+    if not isinstance(t, dict):
+        return [f"{t!r}: not an entry object — inadmissible in round v2.3"]
+    name = t.get("target")
+    if t.get("error"):   # an error stub (I7 above all) is inadmissible with its own cause, verbatim
+        return [f"{name}: {t['error']}"]
+    if t.get("runner") != 2:
+        return [f"{name}: not a runner-2 result — inadmissible in round v2.3"]
+    try:
+        out = _problems_v2(t, root)
+    except Exception as e:  # noqa: BLE001 — a malformed entry proves nothing: it fails CLOSED, it never crashes a gate
+        return [f"{name}: malformed round entry ({type(e).__name__}: {e}) — inadmissible in round v2.3"]
+    ident = t.get("identity")
+    if not isinstance(ident, dict) or not ident:
+        return out + [f"{name}: no measurement identity — inadmissible in round v2.3"]
+    if "dirty" not in ident:
+        out.append(f"{name}: identity does not state dirty — cleanliness unproven, inadmissible in round v2.3")
+    elif ident["dirty"]:
+        out.append(f"{name}: measured on a dirty tree (identity.dirty) — can never be MEASURED or currently "
+                   "qualified; re-measure cleanly")
+    for k in ("measured_on", "slice", "closure", "kill_files", "generator", "enum_modules", "platform", "env"):
+        if not ident.get(k):
+            out.append(f"{name}: identity.{k} is missing — inadmissible in round v2.3")
+    env = ident.get("env") if isinstance(ident.get("env"), dict) else {}
+    for k in ("tree_sha256", "runner_sha256"):
+        if not env.get(k):
+            out.append(f"{name}: identity.env.{k} is missing — inadmissible in round v2.3")
+    for group in ("closure", "kill_files", "enum_modules"):   # "current" means NOTHING in the measured context moved:
+        for rel, recorded in (ident.get(group) or {}).items() if isinstance(ident.get(group), dict) else ():
+            try:
+                live = hashlib.sha256((root / rel).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+            except OSError:
+                live = None
+            if live != recorded:
+                out.append(f"{name}: identity.{group}[{rel}] no longer matches the tree — stale evidence, "
+                           "re-measure cleanly")
+    t0 = t.get("t0")
+    if not isinstance(t0, list) or not t0 or any(not isinstance(x, dict) or x.get("outcome") != "PASS" for x in t0):
+        out.append(f"{name}: T0 missing or not all PASS — the observation is unproven")
+    return out
+
+
 def phase_of(target: str) -> str:
     return next(ph for ph, targets in PHASE_TARGETS.items() if target in targets)
 
@@ -2724,12 +2772,19 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
     known = set(TARGETS) | set(V23_NEW_TARGETS)
     out += [f"{V23_REL}: {t}: not a mutation target" for t in sorted(v23) if t not in known]
     out += [f"{t} has no mutation result ({V23_REL})" for t in sorted(V23_NEW_TARGETS) if t not in v23]
-    out += [p for t in sorted(V23_NEW_TARGETS) if t in v23 for p in target_problems(v23[t], root)]
+    out += [p for t in sorted(V23_NEW_TARGETS) if t in v23 for p in v23_admissible(v23[t], root)]
+    # read-time supersession substitutes ONLY admissible entries (owner ruling 2026-11-25 §1): an inadmissible one —
+    # dirty identity above all — leaves the historical entry in force, so its red stays visible until a clean
+    # re-measure. An UNCOMMITTED newest entry (I7) still turns check() red itself, even where the historical entry
+    # is current — committing the record is a precondition, never silently waived.
+    out += [f"{t}: {e['error']}" for t, e in sorted(v23.items()) if "UNRESOLVED (I7)" in (e.get("error") or "")
+            and t not in V23_NEW_TARGETS]
+    adm = {t: e for t, e in v23.items() if not v23_admissible(e, root)}
     for phase, rel in RECORDS.items():
         if not PHASE_TARGETS[phase]:
             continue
         path = root / rel
-        out += problems_of(v23_substituted(json.loads(path.read_text(encoding="utf-8")), v23), root, phase) \
+        out += problems_of(v23_substituted(json.loads(path.read_text(encoding="utf-8")), adm), root, phase) \
             if path.exists() else [f"{rel} is missing"]
     return out
 
@@ -2816,7 +2871,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FAIL  the engine refused the tree: {dirty_states[0].reason} ({len(dirty_states)} targets)")
             return 2
         need = [s for s in states if s.state == "INVALIDATED" or (s.state == "UNRESOLVED" and "I6" in s.reason)]
-        new = [t for t in sorted(V23_NEW_TARGETS) if t not in v23]
+        new = [t for t in sorted(V23_NEW_TARGETS)   # re-measurable while unmeasured OR the newest entry is
+               if t not in v23 or v23_admissible(v23[t], ROOT)]   # inadmissible (clean supersession stays possible)
         # `--run-affected TARGET...` measures the named SUBSET of the affected set (owner 2026-11-22 §C: targeted
         # qualification for trust-critical changes; the comprehensive campaign is separately authorized). A name
         # outside the affected set is refused: this flag can only narrow, never add.

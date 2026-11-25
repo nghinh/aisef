@@ -88,3 +88,12 @@ FROZEN before results; measured results are appended below, never edited above.
 * **Post-merge gates:** `validation/v2/mutation.py --check` PASS at the record commit; round-v2.3 `b1_bindings`
   under `in_round("v2.3")`: all 25 manifest target rows accepted (Q-a), only the owner-held `kernel ` pin line
   remains (filtered by the calibration consumer per Q0-1 §2; OD-B1B unchanged).
+
+## Correction (appended 2026-11-25; owner ruling 2026-11-25 §1 — nothing above is edited)
+
+The post-merge-gates bullet above reported "all 25 manifest target rows accepted (Q-a)". That acceptance is
+**retracted for the 22 targets whose only round evidence is dirty** (FINDING-B1-DIRTY-ACCEPT-001): the acceptance
+path never read `identity.dirty`, which is a trust-critical defect, now fixed by the shared admissibility rule
+`mutation.v23_admissible`. Current state: the 3 clean-measured B1 targets (`OCR_CHECKS`, `calibrations`,
+`ocr_refusal`) are accepted on admissible evidence; the 22 dirty-measured ones are NOT QUALIFIED until fresh, clean
+evidence supersedes their entries; `mutation --check` truthfully reports the dirty set as needing re-measure.

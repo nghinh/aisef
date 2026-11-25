@@ -15,16 +15,20 @@ def _v23_accepts(t: str, e: dict) -> bool:
     """Round v2.3 only (Q0-1 option Q-a; owner ruling 2026-11-22 §D: a live, version-aware, fail-closed B1 check):
     a target whose source moved since the manifest froze is accepted ONLY while its newest COMMITTED round-v2.3
     mutation entry measured exactly the live source (the entry's LF digest equals the live file's) and the entry is
-    clean under the mutation rules (killed or audited, nothing open). No entry, an uncommitted newest entry, a digest
-    mismatch or any open problem keeps the target red. The manifest itself is never re-pinned here (OD-B1B stays the
-    owner's)."""
+    ADMISSIBLE under the one shared round rule, `mutation.v23_admissible` (owner ruling 2026-11-25 §1): source,
+    committed record, platform, generator, environment, observation — and `identity.dirty` false. No entry, an
+    uncommitted newest entry, a digest mismatch, a dirty identity or any open problem keeps the target red. The
+    manifest itself is never re-pinned here (OD-B1B stays the owner's)."""
     from validation.v2 import mutation as mu
     newest, pre = mu.v23_newest(ROOT)
     entry = newest.get(t)
     if pre or entry is None or entry.get("error"):
         return False
-    live = mu.source_digest((ROOT / e["source"]).read_text(encoding="utf-8"))
-    return entry.get("source_sha256") == live and not mu.target_problems(entry, ROOT)
+    try:
+        live = mu.source_digest((ROOT / e["source"]).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError):   # an unreadable live source can never be currently qualified
+        return False
+    return entry.get("source_sha256") == live and not mu.v23_admissible(entry, ROOT)
 
 
 def problems(man: dict, targets: list[str] | None = None, *, kernel: str | None = None) -> list[str]:
