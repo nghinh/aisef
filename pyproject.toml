@@ -32,6 +32,13 @@ classifiers = [
 ]
 dependencies = []          # toàn bộ khung chạy bằng thư viện chuẩn
 
+[project.optional-dependencies]
+# A2 evidence signing (v2.3, C-2): the only non-stdlib surface, imported lazily by exactly one module
+# (aisef2/journal/sign.py) and fail-closed when absent — never an unsigned fallback. A maintained library, not a
+# vendored Ed25519 (owner package #1, decision 8 direction); it becomes a hard dependency only if the owner issues
+# that decision at the C-2 freeze. The offline wheel smoke (--no-index --no-deps) stays dependency-free.
+signing = ["cryptography>=43"]
+
 [project.urls]
 # the repository is private (owner, 2026-10-06): no link a reader of the package page cannot open
 Homepage = "https://aisef.io/"

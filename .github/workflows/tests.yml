@@ -38,6 +38,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      # A2 (v2.3): the Ed25519 vectors in tests/v2/test_v23_sign.py run against the real backend; that test FAILS
+      # (never skips) on CI when the backend is missing, so removing this line turns the suite red, not silent.
+      - run: pip install "cryptography>=43"
       # WP-4.2 / process-leak discipline: the suite runs inside an OS-owned process range; the job fails when an owned
       # process outlives it (or escapes it), even if every test passed. Measured, never grepped.
       #
