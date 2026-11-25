@@ -63,6 +63,728 @@
    ],
    "source_sha256": "fb25de83bd5ec16b52b0be27ceeb2a8566fd33867822af6c59926ee7f28e41f2",
    "provenance": "run6 2026-11-22 targeted re-measure (W1b, 6 destructive_authority targets) + static corpus grep"
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 191,
+   "mutant": "L470 string 'E5: the attempt could not be closed: ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:445/470 are the H5/H6 closure-fault notes: `e.add_note('E5: the attempt could not be closed: ...')` on an exception that is already propagating. The matrix proves the behavior that matters — the original exception object, its type, `raise ... from None`, and that closure faults write nothing more (F6, F13, F14, F22) — and no test pins the note's prose. The mutants change diagnostic wording only; propagation, masking rules and journal writes are unchanged.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:444-446 H6: add_note then `raise e from None` — the raise is what tests assert",
+    "aisef2/orchestrate/story_runner.py:468-471 same shape on the DECIDE..END closure try"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F6/F13/F14/F22: assert the original type escapes unmasked and nothing more is written; note text unasserted by design"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 192,
+   "mutant": "L470 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:445/470 are the H5/H6 closure-fault notes: `e.add_note('E5: the attempt could not be closed: ...')` on an exception that is already propagating. The matrix proves the behavior that matters — the original exception object, its type, `raise ... from None`, and that closure faults write nothing more (F6, F13, F14, F22) — and no test pins the note's prose. The mutants change diagnostic wording only; propagation, masking rules and journal writes are unchanged.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:444-446 H6: add_note then `raise e from None` — the raise is what tests assert",
+    "aisef2/orchestrate/story_runner.py:468-471 same shape on the DECIDE..END closure try"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F6/F13/F14/F22: assert the original type escapes unmasked and nothing more is written; note text unasserted by design"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 327,
+   "mutant": "L418 Stage.ACQUIRE->ADMIT",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 328,
+   "mutant": "L418 Stage.ACQUIRE->CONTINUE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 329,
+   "mutant": "L418 Stage.ACQUIRE->DEVELOP",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 330,
+   "mutant": "L418 Stage.ACQUIRE->MOVE_CANDIDATE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 331,
+   "mutant": "L418 Stage.ACQUIRE->PROVE_CANDIDATE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 332,
+   "mutant": "L418 Stage.ACQUIRE->QUALITY",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 333,
+   "mutant": "L418 Stage.ACQUIRE->REVIEW_SCAN",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 334,
+   "mutant": "L418 Stage.ACQUIRE->MERGE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 335,
+   "mutant": "L418 Stage.ACQUIRE->POST_MERGE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 336,
+   "mutant": "L418 Stage.ACQUIRE->DECIDE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 337,
+   "mutant": "L418 Stage.ACQUIRE->DISPOSE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 338,
+   "mutant": "L418 Stage.ACQUIRE->END",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:418 is the H4 handler's stage-label fallback: `stage = st.at.name if st.at is not None else Stage.ACQUIRE.name`. The mutant changes only the LABEL used in the synthetic PROVIDER_RESULT closer detail and the failure detail when a fault precedes the FIRST advance (st.at is None). Containment, classify(UNKNOWN), the gate row (the `else` branch's constant 'resources') and propagation are unchanged and matrix-proven (F1-F25). The frozen fault matrix has no row injecting a fault before the first advance, so the label in that corner is unobserved: a named coverage gap of the frozen matrix (candidate tightening row for W2, owner's call), not an authority or classification defect. The wrong label cannot flip any decision: failure is already classify(UNKNOWN) and the row label does not come from this expression.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:418 the fallback label expression (st.at is None corner only)",
+    "aisef2/orchestrate/story_runner.py:419-425 synthetic closer: detail carries the label; outcome OUTCOME_UNKNOWN fixed",
+    "aisef2/orchestrate/story_runner.py:426-427 failure/detail: classify(FailureCode.UNKNOWN) independent of the label",
+    "aisef2/orchestrate/story_runner.py:428-443 the elif chain keys on st.at identity, never on `stage`"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F1-F25: every injected fault happens at or after the first advance, so st.at is never None there; the fallback corner has no matrix row (gap named in the W1b report)"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 402,
+   "mutant": "L317 ObligationRole.PRESERVE->INTRODUCE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:317 records ObligationRole.PRESERVE for the V21-38 candidate re-proof of committed stories' PRESERVE obligations; the role reaches control only as a routing-table key. The CANDIDATE rows of the routing table (aisef2/control/routing.py:15-17, table rows keyed role=None with explicit None-fallback in row_for) are role-independent ('any' role), so routing — SATISFIED nothing-to-charge, UNSATISFIED CONTRACT_UNSATISFIED-DEVELOPER, PRECONDITION_ABSENT SUBJECT_ABSENT_AT_CANDIDATE — is provably identical for every role value at this measurement point, covered or not. Residual exposure is only the role repr inside an UnroutableOutcome message (diagnostic). Flagged for the final RC campaign: a future role-specific CANDIDATE row would make this expression load-bearing.",
+   "consumers_checked": [
+    "aisef2/control/routing.py:96-130 route/row_for: (point, satisfaction, reason, role) with None-fallback",
+    "aisef2/control/routing.py:15-17 CANDIDATE rows declare 'any' role (no role-specific CANDIDATE row exists)",
+    "aisef2/orchestrate/proof.py:80-107 prove() passes role only into route()"
+   ],
+   "exceptions_checked": [
+    "tests/v2 V21-38 candidate re-proof kill files assert outcome/charging, both role-invariant at CANDIDATE by the table itself"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 403,
+   "mutant": "L317 ObligationRole.PRESERVE->VERIFY",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:317 records ObligationRole.PRESERVE for the V21-38 candidate re-proof of committed stories' PRESERVE obligations; the role reaches control only as a routing-table key. The CANDIDATE rows of the routing table (aisef2/control/routing.py:15-17, table rows keyed role=None with explicit None-fallback in row_for) are role-independent ('any' role), so routing — SATISFIED nothing-to-charge, UNSATISFIED CONTRACT_UNSATISFIED-DEVELOPER, PRECONDITION_ABSENT SUBJECT_ABSENT_AT_CANDIDATE — is provably identical for every role value at this measurement point, covered or not. Residual exposure is only the role repr inside an UnroutableOutcome message (diagnostic). Flagged for the final RC campaign: a future role-specific CANDIDATE row would make this expression load-bearing.",
+   "consumers_checked": [
+    "aisef2/control/routing.py:96-130 route/row_for: (point, satisfaction, reason, role) with None-fallback",
+    "aisef2/control/routing.py:15-17 CANDIDATE rows declare 'any' role (no role-specific CANDIDATE row exists)",
+    "aisef2/orchestrate/proof.py:80-107 prove() passes role only into route()"
+   ],
+   "exceptions_checked": [
+    "tests/v2 V21-38 candidate re-proof kill files assert outcome/charging, both role-invariant at CANDIDATE by the table itself"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 450,
+   "mutant": "L445 string 'E5: the attempt could not be closed: ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:445/470 are the H5/H6 closure-fault notes: `e.add_note('E5: the attempt could not be closed: ...')` on an exception that is already propagating. The matrix proves the behavior that matters — the original exception object, its type, `raise ... from None`, and that closure faults write nothing more (F6, F13, F14, F22) — and no test pins the note's prose. The mutants change diagnostic wording only; propagation, masking rules and journal writes are unchanged.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:444-446 H6: add_note then `raise e from None` — the raise is what tests assert",
+    "aisef2/orchestrate/story_runner.py:468-471 same shape on the DECIDE..END closure try"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F6/F13/F14/F22: assert the original type escapes unmasked and nothing more is written; note text unasserted by design"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 451,
+   "mutant": "L445 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:445/470 are the H5/H6 closure-fault notes: `e.add_note('E5: the attempt could not be closed: ...')` on an exception that is already propagating. The matrix proves the behavior that matters — the original exception object, its type, `raise ... from None`, and that closure faults write nothing more (F6, F13, F14, F22) — and no test pins the note's prose. The mutants change diagnostic wording only; propagation, masking rules and journal writes are unchanged.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:444-446 H6: add_note then `raise e from None` — the raise is what tests assert",
+    "aisef2/orchestrate/story_runner.py:468-471 same shape on the DECIDE..END closure try"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py F6/F13/F14/F22: assert the original type escapes unmasked and nothing more is written; note text unasserted by design"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 664,
+   "mutant": "L438 Stage.MERGE->ADMIT",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 665,
+   "mutant": "L438 Stage.MERGE->CONTINUE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 666,
+   "mutant": "L438 Stage.MERGE->DEVELOP",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 667,
+   "mutant": "L438 Stage.MERGE->MOVE_CANDIDATE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 668,
+   "mutant": "L438 Stage.MERGE->PROVE_CANDIDATE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 669,
+   "mutant": "L438 Stage.MERGE->QUALITY",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 670,
+   "mutant": "L438 Stage.MERGE->REVIEW_SCAN",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 672,
+   "mutant": "L438 Stage.MERGE->DECIDE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 673,
+   "mutant": "L438 Stage.MERGE->DISPOSE",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 674,
+   "mutant": "L438 Stage.MERGE->END",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:438 `elif st.at is Stage.MERGE` is the containment row reachable ONLY in the window after merger.merge() returned (repo = landed revision string) and before advance(POST_MERGE): a fault DURING merge leaves repo is _UNKNOWN and re-raises at H3 (story_runner.py:411-413) without entering the chain. No frozen-matrix row faults inside that window (post-merge rows fault after advance(POST_MERGE)), so this row's label is unobserved. The revert-once path itself (H4 i, L414-417) IS matrix-proven. Swapping the compared member cannot mis-route any covered fault: every other stage's row keys on its own member and the chain ends in the constant-label else. A named coverage gap of the frozen matrix (candidate W2 row), not an authority defect.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:411-413 H3: during-merge faults re-raise before the chain",
+    "aisef2/orchestrate/story_runner.py:414-417 H4 i revert-once (matrix-proven, F11/F16..)",
+    "aisef2/orchestrate/story_runner.py:428-443 chain: each row keyed on its own Stage member; else row constant 'resources'"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: post-merge fault rows (F15, F11) advance to POST_MERGE before faulting; no row faults between the merge return and that advance"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 690,
+   "mutant": "L439 string 'merge' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:439 `gate.check(run, story_id, 'merge', False, detail)` sits in the same unreachable-in-matrix window as L438 (landed-but-before-POST_MERGE fault). Emptying the row label or flipping the ok flag there cannot change the attempt's outcome: `failure` is already classify(FailureCode.UNKNOWN) (L426) and gate.decision(run, checks, failure is None) decides on `failure is None` alone, so the decision stays False regardless of the single check row's flag; the row is diagnostic journal content in that window. No kill test or matrix row drives the window (same gap as L438, named for W2).",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:426 failure = classify(FailureCode.UNKNOWN) precedes the chain",
+    "aisef2/orchestrate/story_runner.py:445-449 H5 block: gate.decision(run, checks, failure is None) — decision independent of a row's ok flag",
+    "aisef2/orchestrate/story_runner.py:439 the row itself: label and flag journal-only in this path"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: decision assertions key on failure classification, which this line cannot touch; the window has no matrix row"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_attempt",
+   "index": 691,
+   "mutant": "L439 False->True",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:439 `gate.check(run, story_id, 'merge', False, detail)` sits in the same unreachable-in-matrix window as L438 (landed-but-before-POST_MERGE fault). Emptying the row label or flipping the ok flag there cannot change the attempt's outcome: `failure` is already classify(FailureCode.UNKNOWN) (L426) and gate.decision(run, checks, failure is None) decides on `failure is None` alone, so the decision stays False regardless of the single check row's flag; the row is diagnostic journal content in that window. No kill test or matrix row drives the window (same gap as L438, named for W2).",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:426 failure = classify(FailureCode.UNKNOWN) precedes the chain",
+    "aisef2/orchestrate/story_runner.py:445-449 H5 block: gate.decision(run, checks, failure is None) — decision independent of a row's ok flag",
+    "aisef2/orchestrate/story_runner.py:439 the row itself: label and flag journal-only in this path"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py: decision assertions key on failure classification, which this line cannot touch; the window has no matrix row"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 17,
+   "mutant": "L492 dict entry 6 dropped",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:492-493: the initial `rec` literal's 'stage': 'repository' placeholder (entry 6 dropped / value emptied). Provably unobservable: the STARTED file projection (run.py:496-498) lists explicit keys WITHOUT 'stage', and every later path overwrites rec['stage'] at run.py:515 ('invariants') before any artifact that carries the key is written (RUN.json is written only in the stage>=515 region). No reachable output contains the initial value.",
+   "consumers_checked": [
+    "aisef2/app/run.py:496-498 STARTED writes the explicit key subset, no 'stage'",
+    "aisef2/app/run.py:515 first overwrite precedes every RUN.json write (earliest at the finally, after 515)"
+   ],
+   "exceptions_checked": [
+    "tests/v2 execute kill files read RUN.json['stage'] only after later stages set it"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 48,
+   "mutant": "L493 string 'repository' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:492-493: the initial `rec` literal's 'stage': 'repository' placeholder (entry 6 dropped / value emptied). Provably unobservable: the STARTED file projection (run.py:496-498) lists explicit keys WITHOUT 'stage', and every later path overwrites rec['stage'] at run.py:515 ('invariants') before any artifact that carries the key is written (RUN.json is written only in the stage>=515 region). No reachable output contains the initial value.",
+   "consumers_checked": [
+    "aisef2/app/run.py:496-498 STARTED writes the explicit key subset, no 'stage'",
+    "aisef2/app/run.py:515 first overwrite precedes every RUN.json write (earliest at the finally, after 515)"
+   ],
+   "exceptions_checked": [
+    "tests/v2 execute kill files read RUN.json['stage'] only after later stages set it"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 334,
+   "mutant": "L485 string '--parent ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:485/487 are RunRefused MESSAGE strings on the --parent validation path ('--parent ' and ': ' fragments). The refusals themselves — raise RunRefused on a missing record or a LineageRefused — are covered and unchanged; only the diagnostic prose differs and no kill file matches on it.",
+   "consumers_checked": [
+    "aisef2/app/run.py:482-487 both raises unchanged; fragments only in the message f-strings"
+   ],
+   "exceptions_checked": [
+    "tests/v2 lineage/--parent kill files assert RunRefused is raised on these paths, not its wording"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 336,
+   "mutant": "L487 string '--parent ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:485/487 are RunRefused MESSAGE strings on the --parent validation path ('--parent ' and ': ' fragments). The refusals themselves — raise RunRefused on a missing record or a LineageRefused — are covered and unchanged; only the diagnostic prose differs and no kill file matches on it.",
+   "consumers_checked": [
+    "aisef2/app/run.py:482-487 both raises unchanged; fragments only in the message f-strings"
+   ],
+   "exceptions_checked": [
+    "tests/v2 lineage/--parent kill files assert RunRefused is raised on these paths, not its wording"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 337,
+   "mutant": "L487 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:485/487 are RunRefused MESSAGE strings on the --parent validation path ('--parent ' and ': ' fragments). The refusals themselves — raise RunRefused on a missing record or a LineageRefused — are covered and unchanged; only the diagnostic prose differs and no kill file matches on it.",
+   "consumers_checked": [
+    "aisef2/app/run.py:482-487 both raises unchanged; fragments only in the message f-strings"
+   ],
+   "exceptions_checked": [
+    "tests/v2 lineage/--parent kill files assert RunRefused is raised on these paths, not its wording"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 357,
+   "mutant": "L647 True->False",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:647 `(xdg_home / sub).mkdir(parents=True, exist_ok=True)` -> exist_ok=False. The run directory `out` is created fresh by run.py:491 `out.mkdir(parents=True)` (which itself refuses an existing out), and the client-xdg block runs once per execute() before the story loop (run.py:674); out/client-xdg/* therefore cannot pre-exist on any reachable path in-process, making exist_ok dead in context. Flagged for the final RC campaign: a future re-entrant execute would make the flag load-bearing.",
+   "consumers_checked": [
+    "aisef2/app/run.py:491 out.mkdir(parents=True) — fresh out or the run refuses earlier",
+    "aisef2/app/run.py:640-647 fence block runs once, before the story loop at :674"
+   ],
+   "exceptions_checked": [
+    "tests/v2 execute kill files all drive a fresh out directory (the product contract)"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 389,
+   "mutant": "L732 string '\\n' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:732 writes the MANIFEST file ('\\n' suffix emptied / sort_keys True->False). The evidence anchor is anchor_of (run.py:446-449): the digest of the manifest's CANONICAL JSON (sort_keys, tight separators) computed from the parsed dict — and anchor_in (run.py:438-443) re-parses the file before anchoring, so file byte formatting (key order, trailing newline) never reaches any digest, comparison or decision. Content identical.",
+   "consumers_checked": [
+    "aisef2/app/run.py:438-449 anchor_in parses then anchor_of canonicalises — byte-format independent",
+    "aisef2/app/run.py:732 the only consumer-visible artifact of this line is the parsed JSON content"
+   ],
+   "exceptions_checked": [
+    "tests/v2 manifest/anchor kill files compare parsed content and canonical anchors, not file bytes"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 439,
+   "mutant": "L732 True->False",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:732 writes the MANIFEST file ('\\n' suffix emptied / sort_keys True->False). The evidence anchor is anchor_of (run.py:446-449): the digest of the manifest's CANONICAL JSON (sort_keys, tight separators) computed from the parsed dict — and anchor_in (run.py:438-443) re-parses the file before anchoring, so file byte formatting (key order, trailing newline) never reaches any digest, comparison or decision. Content identical.",
+   "consumers_checked": [
+    "aisef2/app/run.py:438-449 anchor_in parses then anchor_of canonicalises — byte-format independent",
+    "aisef2/app/run.py:732 the only consumer-visible artifact of this line is the parsed JSON content"
+   ],
+   "exceptions_checked": [
+    "tests/v2 manifest/anchor kill files compare parsed content and canonical anchors, not file bytes"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::check_repository",
+   "index": 32,
+   "mutant": "L238 string 'aisef-check-' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:238 `tempfile.TemporaryDirectory(prefix='aisef-check-')` — the prefix is a cosmetic namespace for the probe clone's temporary directory. Emptied, tempfile falls back to its default prefix; creation, the B4 clone probe, cleanup (context manager) and every refusal path are unchanged. Nothing reads the directory name.",
+   "consumers_checked": [
+    "aisef2/app/run.py:238-242 the probe clone lives and dies inside the context manager; the name is never recorded"
+   ],
+   "exceptions_checked": [
+    "tests/v2 B4 kill files assert the refusal/acceptance semantics, never the temp path"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_Stages.advance",
+   "index": 4,
+   "mutant": "L84 string 'stage ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:84 is the InvariantError MESSAGE of the backward-move guard. The guard itself — the comparison and the raise — is killed (4/7 of this target's mutants, including the operator and raise mutants) and matrix-proven (G1/G2, R1); InvariantError is BaseException and escapes every handler regardless of its text. The mutants empty fragments of the message prose only; no test pins the wording.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:82-85 advance(): comparison and raise unchanged; only f-string fragments mutated",
+    "aisef2/orchestrate/story_runner.py H1/H4: InvariantError(BaseException) never caught — text-independent"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py G1/G2/R1: assert the refusal and the type, not the message prose"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_Stages.advance",
+   "index": 5,
+   "mutant": "L84 string ' after ' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:84 is the InvariantError MESSAGE of the backward-move guard. The guard itself — the comparison and the raise — is killed (4/7 of this target's mutants, including the operator and raise mutants) and matrix-proven (G1/G2, R1); InvariantError is BaseException and escapes every handler regardless of its text. The mutants empty fragments of the message prose only; no test pins the wording.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:82-85 advance(): comparison and raise unchanged; only f-string fragments mutated",
+    "aisef2/orchestrate/story_runner.py H1/H4: InvariantError(BaseException) never caught — text-independent"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py G1/G2/R1: assert the refusal and the type, not the message prose"
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_Stages.advance",
+   "index": 6,
+   "mutant": "L84 string ': an attempt never moves backwards' emptied",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "grounds": "story_runner.py:84 is the InvariantError MESSAGE of the backward-move guard. The guard itself — the comparison and the raise — is killed (4/7 of this target's mutants, including the operator and raise mutants) and matrix-proven (G1/G2, R1); InvariantError is BaseException and escapes every handler regardless of its text. The mutants empty fragments of the message prose only; no test pins the wording.",
+   "consumers_checked": [
+    "aisef2/orchestrate/story_runner.py:82-85 advance(): comparison and raise unchanged; only f-string fragments mutated",
+    "aisef2/orchestrate/story_runner.py H1/H4: InvariantError(BaseException) never caught — text-independent"
+   ],
+   "exceptions_checked": [
+    "tests/v2/test_v23_story_lifecycle.py G1/G2/R1: assert the refusal and the type, not the message prose"
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::unfinished",
+   "index": 2,
+   "mutant": "L411 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "round v2.3 W1b E5 targeted campaign (9b30df44, 2026-11-22..25)",
+   "source_sha256": "ce7e8f27aeb40d92aad5850490bbc632aea445e886da706629f3a785cdfe5cfa",
+   "grounds": "run.py:411 returns the begun-more-than-ended story ids; the mutant replaces sorted() with list() (insertion = first-begin order, deterministic under dict ordering). The one consumer is verify.py:217/238, which turns the ids into report error rows: membership, not order, is asserted, and no digest or decision derives from the ordering. Presentation order only.",
+   "consumers_checked": [
+    "aisef2/app/verify.py:217 refused = R.unfinished(events); :238 errors built per id — content identical",
+    "no other caller (grep: the only use outside the def)"
+   ],
+   "exceptions_checked": [
+    "tests/v2 verify kill files assert which stories are refused, not row order"
+   ]
   }
  ]
 }
