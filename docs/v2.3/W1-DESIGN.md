@@ -1403,3 +1403,38 @@ flavor-unproven** over the 994 live entries, with the corrected §2.4.4 and §11
   orders fail closed) can therefore depend on the order of its kill set.
 - T3: several fail-closed branches have no regression test yet: a shadowed head, file removals, an unparsable target,
   a generator failure, and a malformed record.
+
+## Amendment A3 (2026-11-23, W1b) — W1b engineering acceptance vs final source-frozen RC qualification
+
+**Authority.** Owner ruling 2026-11-22 §C ("Do NOT execute the proposed ~988-target RC campaign … Maintain targeted
+mutation qualification for trust-critical changes … Comprehensive campaign waits for the final source-frozen RC
+under separate authorization") and the owner direction 2026-11-23 ("E5 TARGETED CAMPAIGN CONTROL": resolve the W1
+exit-gate inconsistency explicitly; distinguish W1b engineering acceptance from final RC qualification; preserve the
+original requirements as historical decisions; do not weaken the mandatory release gate). Appended per this file's
+freeze rule; nothing above this line is edited.
+
+**The inconsistency.** §11's exit gates (gate 5 among them) and §4.7 were written for a W1 whose single targeted run
+covers every re-opened target, so the gated mutation legs (`tests/v23/test_v23_rounds.py::RoundV23.test_MUTATION_historical`,
+the rc tier of the F5 gate) could be green at W1 exit. The owner's one-final-campaign strategy moves that coverage to
+the final source-frozen RC: at W1b exit the F5 engine truthfully reports the seq-13 wiring's I4 re-opens (653) and
+the historical I6 set (327) as not current, and those gated legs are RED BY DEFERRAL, not by defect.
+
+**Resolution — two named acceptance levels, neither weakened:**
+
+1. **W1b ENGINEERING ACCEPTANCE** (this wave's exit) requires, all measured on the W1b tree:
+   the frozen E5 design landed (Stage/_Stages, the H1–H9 handler, the run.py:693 refusal branch) with H9 intact and
+   NO checker edit; the §4.5 fault matrix and §4.6 golden byte-identity green; the full unit suite green on every CI
+   leg; the TARGETED campaign of the milestone's own trust-critical re-opens (the frozen 37-target manifest,
+   docs/v2.3/evidence/E5-CAMPAIGN/) merged append-only with worker-parity proof, every mutant KILLED or individually
+   audited; the v2.2-rule mutation check green under round-v2.3 read-time supersession; the round currency nodes
+   re-derived (MEASURED or VERIFIED_REUSE) under ledger seq 13; and every remaining red named truthfully in the W1b
+   report. It never labels a target outside the measured scope as qualified.
+2. **FINAL SOURCE-FROZEN RC QUALIFICATION** (unchanged, mandatory, owner-authorized separately): the ONE
+   comprehensive campaign at the frozen RC clears every INVALIDATED/UNRESOLVED engine state (I4/I6 included); the
+   F5 rc tier exits 0 with no incomplete target; the sealing job (AISEF_SEALING=1), the round-v2.3 battery and the
+   release-qualification tag gates run green. **No release, tag or publication happens on W1b engineering acceptance
+   alone; the mandatory release gate is not weakened, re-scoped or bypassed by this amendment.**
+
+**Historical decisions preserved.** §11's original gate texts and §4.7's single-targeted-run wording stay above,
+unedited, as the design's history; where they conflict with the owner's 2026-11-22/23 rulings, the rulings govern and
+this amendment records how.
