@@ -402,3 +402,29 @@ batch (CORE-2, week 15-21/12) with ONE integration measurement.
   predecessor?) -- G6's W4 design; the schema here admits both (marker cites this run's `story/commit` only,
   so reuse-without-replay in a NEW run journals its own admission trail instead). Default: no marker without
   a same-run commit.
+
+---
+
+## 13. Pre-freeze measurements and freeze-candidate status (appended 2026-11-26)
+
+The two "measure before freeze" questions are now MEASURED; nothing above this line was edited.
+
+- **Q2 = NO zero-proof commit on the golden path => R-COMMIT takes the STRICT form of sec. 4.8.** The K-NOWORK
+  no-developer-work path (the one suspected zero-proof committer) commits WITH `proof/verified`: every obligation
+  is proved at the candidate by both parties and again post-merge — `tests/v2/test_c2_k_nowork_001.py`
+  `assertNoDeveloperWork` pins `[(c, True, "SATISFIED", parent)] * 2` per criterion and `5 * len(criteria)`
+  `probe/evaluated` events. The only zero-`proof/verified` case in that family (case D, PRECONDITION_BROKEN)
+  ROLLS BACK and never reaches `story/commit`. The fallback form ("no `proof/verified` AND no `probe/evaluated`")
+  is therefore NOT taken.
+- **Q3 = plain-form re-derivation HOLDS => R-SEALED takes its primary form.** Measured on golden sealed
+  ProbeRecords of all three result shapes (`Executed`, `Executed` + `IndeterminateReason`, `Unrunnable`):
+  `digest({k: v for k, v in plain(record).items() if k != "record_digest"}) == record_digest` in every case
+  (script run 2026-11-26; `probe/protocol.py` seals with `digest(content_of(self, without="record_digest"))`
+  and `content_of` is itself plain-form, so the journaled mapping re-derives byte-for-byte).
+- **Q5 pacing prerequisite met:** the A2 primitives merged 2026-11-26 (`aisef2/journal/sign.py`,
+  `sign.fingerprint` available to L2-ACCOUNTING) — the flip no longer waits on W2a; the default order stands.
+
+**Freeze-candidate status:** with Q2/Q3 measured and Q5's prerequisite landed, every remaining open question
+(Q1, Q4, Q6-Q10) carries a stated default and none is marked STOP. This document at its commit digest is the
+C-1 freeze candidate; the freeze itself is an owner act (owner package #1, decision 5 names FORMAT-4 the highest
+design-freeze priority but "does not automatically certify C-1"). No owner signature is synthesized here.

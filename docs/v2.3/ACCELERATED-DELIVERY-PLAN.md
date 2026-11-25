@@ -153,3 +153,29 @@ owner). ETA chi tiết ngoài phần đo được là ước tính lịch, khôn
 
 Mọi điều khoản charter §4 giữ nguyên: không false PASS, không allowlist masking, evidence append-only, không đổi
 master/tag/PyPI tới ủy quyền cuối, không giảm scope v2.3, không dời capability bắt buộc sang v2.4 vì lịch.
+
+### 7.1 Trạng thái gói QĐ #1 — bản PROPOSED nhận 2026-11-26 (chưa phải authority)
+
+Owner gửi "OWNER DECISION PACKAGE #1 (PROPOSED)" với điều khoản tự thân: *"These decisions become Owner authority
+only when explicitly issued through the authorized Owner channel. Do not synthesize an Owner signature from this
+draft."* Vậy: các hướng dưới đây được dùng làm **định hướng kỹ thuật** (công việc thuận chiều, đảo được), KHÔNG
+ghi bản ghi authority/ledger nào từ bản này; mọi gate cần chữ ký owner (C-1/C-2 freeze, order-table ratification,
+OD-B1B, PIN-57 amendment, B2 slate + cap) vẫn chờ bản ban hành chính thức.
+
+| # | Hướng PROPOSED | Đã thi hành 2026-11-26 |
+|---|---|---|
+| 1 | OD-B1B: ACCEPT DEFAULT (chờ RC đo sạch; fail-closed dev reporting) | không đổi gì — trùng trạng thái hiện hành |
+| 2 | PIN-57: CONDITIONAL GO — giữ ngoài registry NẾU chứng minh được vai trò non-checker từng module | gói tài liệu PIN-57-MODULE-ROLES.md (identities/callers/trust boundary/negative tests) đang soạn |
+| 3 | Order-table: GO development + qualification proof; E5 timings = performance-study input; benchmark thêm target đại diện (survivor + long-running) trước khi ratify bảng RC | 6 nghĩa vụ chứng minh ghi nhận; benchmark bổ sung xếp lịch chạy nền (chưa chạy — tránh đụng commit window) |
+| 4 | B2-SPEND: PREP GO / external HOLD — gói trước 08/12; Tier-0 + feasibility read-only ngay | B2-REPO-FEASIBILITY.md: 9 ứng viên, slate top-3 (jello MIT / mistune BSD-3 / tinydb MIT, có SHA snapshot) + 2 alternate; cờ: SHOULD "≥2 ngôn ngữ chính" không đạt trong ràng buộc probe-Python |
+| 5 | Defaults: ACCEPT; FORMAT-4 ưu tiên freeze cao nhất; "không tự động certify C-1" | Q2/Q3 ĐO XONG (draft §13): R-COMMIT dạng nghiêm ngặt, R-SEALED dạng chính; draft hết mục STOP — thành freeze candidate chờ owner |
+| 6 | C3b: DEFER ACTIVATION, not development; threshold ratify ở SEC-exit | không đổi gì — trùng kế hoạch §2 |
+| 7 | Shard mutant-level: NO-GO for now | giữ nguyên default KHÔNG |
+| 8 | A2/QA-1: CHỌN `cryptography` (không vendored Ed25519) + fail-closed + RFC vectors + no silent unsigned fallback | primitives đã land (`aisef2/journal/sign.py`, 16 test, vectors ghim từ văn bản RFC 8032): optional extra `aisef[signing]`, lazy import một chỗ, `SigningUnavailable` fail-closed; thành hard dependency CHỈ khi QĐ 8 ban hành tại C-2 freeze. Nghĩa vụ còn lại của QĐ 8 (reproducible wheels, offline-install test trên các nền hỗ trợ, escrow anchor off-box) = việc của C-2 freeze + L2-CI |
+
+**Immediate actions của bản PROPOSED — trạng thái:** (1) leg macOS 3.12 tại bc8668f0: chẩn đoán = runner-capacity
+("not acquired by Runner of type hosted", 3 notice thiếu capacity arm64; job chưa chạy bước nào — lỗi hạ tầng,
+không phải code), đã rerun; (2) FORMAT-4 freeze prep + A2 primitives: ở trên; (3) E3/D2/E7/L5-EARLY/B2 Tier-0:
+E7 và các lane chạm `run.py` xếp sau chữ ký order-table để không trả giá E5-scale hai lần (§5a); (4) gói B2-SPEND
+trước 08/12: feasibility xong, phần evaluator slate + remuneration + cap cần input owner; (5) báo cáo tuần
+critical-path: bắt đầu từ tuần này; (6) RC qualification/sealing/B2 external: giữ bắt buộc, không đổi.
