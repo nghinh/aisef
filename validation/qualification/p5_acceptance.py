@@ -964,19 +964,56 @@ def reverify(run_guards: bool = True, round: str = "v2.1") -> dict:
     return json.loads(json.dumps(body))
 
 
-def guard_problems(ran: dict) -> list[str]:
-    """Guard runs as `guards` records them: exactly GUARDS, each with its own command, exit 0, a tail list and seconds > 0
-    (a hand-written guards block is refused)."""
-    if not isinstance(ran, dict) or set(ran) != set(GUARDS):
-        return [f"the recorded guard runs are not exactly {sorted(GUARDS)}"]
+def guard_problems(ran: dict, table: dict[str, list[str]] | None = None) -> list[str]:
+    """Guard runs as `guards` records them: exactly the table's guards (GUARDS unless given), each with its own
+    command, exit 0, a tail list and seconds > 0 (a hand-written guards block is refused)."""
+    table = GUARDS if table is None else table
+    if not isinstance(ran, dict) or set(ran) != set(table):
+        return [f"the recorded guard runs are not exactly {sorted(table)}"]
     out = []
     for k, g in ran.items():
-        if not (isinstance(g, dict) and g.get("command") == "python -P " + " ".join(GUARDS[k]) and isinstance(g.get("tail"), list)
+        if not (isinstance(g, dict) and g.get("command") == "python -P " + " ".join(table[k]) and isinstance(g.get("tail"), list)
                 and type(g.get("seconds")) in (int, float) and g["seconds"] > 0):
             out.append(f"guard {k}: not a recorded run of its command")
         elif g.get("exit") != 0:
             out.append(f"guard {k}: exit {g.get('exit')}")
     return out
+
+
+#: The round-v2.3 guard table (owner ruling 2026-11-25 §2): the round's own Q0 guard — validation/v23/q0_round.py,
+#: which runs the SAME calibration in round v2.3 against its own committed record — replaces the v2.2-ambient
+#: checker_calibration; the other four guards are round-independent and stay. The v2.2 replay keeps GUARDS verbatim.
+GUARDS_V23 = {**{k: v for k, v in GUARDS.items() if k != "checker_calibration"},
+              "q0_round": ["validation/v23/q0_round.py", "--check"]}
+
+
+def guards_v23() -> dict:
+    """The round-v2.3 guard runs, recorded exactly as guards() records the v2.2 table."""
+    out = {}
+    for name, argv in GUARDS_V23.items():
+        t = time.monotonic()
+        r = subprocess.run([sys.executable, "-P", *argv], cwd=ROOT, capture_output=True, encoding="utf-8")
+        elapsed = time.monotonic() - t
+        tail = (r.stdout + r.stderr).strip().splitlines()[-3:]
+        out[name] = {"command": "python -P " + " ".join(argv), "exit": r.returncode, "tail": tail,
+                     "seconds": max(round(elapsed, 3), 0.001) if elapsed > 0 else 0}
+    return out
+
+
+def write_v23_reverification() -> tuple[int, str]:
+    """Append the round-v2.3 supersession of the C2-P5 re-verification (owner ruling 2026-11-25 §2: narrowly scoped,
+    round-aware). The derivation is reverify(round="v2.2") unchanged — substantive C2-P5 acceptance checks preserved,
+    upstreams resolved for the ambient round through the committed version-forward chain head — and the guard table
+    is GUARDS_V23 (the round's own Q0 guard for a round record; the historical v2.2 record keeps its original
+    guards). STRICT: refused with every problem; a failing guard is never waived and no Q0 PASS is implied."""
+    from validation.v2 import version_forward as vf
+    rec = reverify(run_guards=False, round="v2.2")
+    rec["guards"] = guards_v23()
+    problems = list(rec["problems"]) + guard_problems(rec["guards"], GUARDS_V23)
+    rec["problems"], rec["verdict"] = problems, (V22_VERDICT if not problems else "PROBLEMS")
+    if problems:
+        raise SystemExit("refused: " + "; ".join(problems))
+    return vf.write_supersession(ROOT, V21_OUT_REL, V22_OUT_REL, rec, render=_render)
 
 
 def write_v21() -> dict:
@@ -1072,15 +1109,17 @@ def reverification_v22_problems() -> list[str]:
     not repeated); [] when current. Mirrors `reverification_problems` for the v2.2 round."""
     from validation.v2 import version_forward as vf
     try:
-        _, committed = vf.resolve_upstream(ROOT, V21_OUT_REL, V22_OUT_REL)
+        head, committed = vf.resolve_upstream(ROOT, V21_OUT_REL, V22_OUT_REL)
     except LookupError as e:
         return [str(e)]
     ran = committed.pop("guards", {})
     fresh = reverify(run_guards=False, round="v2.2")
     out = list(fresh["problems"])
+    # a round-v2.3 chain head was written under GUARDS_V23 (its own Q0 guard); the v2.2 record keeps GUARDS verbatim
+    table = GUARDS_V23 if str(head).startswith(vf.V23_DIR + "/") else None
     if committed != fresh:
         out.append(f"{V22_OUT_REL} is not what this tree re-verifies")
-    out += [f"{V22_OUT_REL}: {p}" for p in guard_problems(ran)]
+    out += [f"{V22_OUT_REL}: {p}" for p in guard_problems(ran, table)]
     return out
 
 
