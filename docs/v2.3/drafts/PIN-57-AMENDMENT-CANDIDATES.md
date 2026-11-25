@@ -272,3 +272,16 @@ Bảng digest của C = bảng 2.6 ∪ 3.5 (bảy file sửa + hai file mới + 
 *Soạn 2026-11-26 theo owner directive 2026-11-26 P0. Tài liệu này là bản nháp các ứng viên: không ứng viên nào có
 hiệu lực cho tới khi owner ban hành nó như một entry ledger mới (seq 14) với mọi digest trong bảng tương ứng đã điền
 bằng sha đo thật sau khi sửa, và authority bằng chính lời owner trích digest của ruling, theo đúng cơ chế seq 13.*
+
+---
+
+## Addendum 2026-11-26 (sau khi land B2 Tier-0 tooling): seq-14 phải phủ thêm 4 module ground_truth
+
+`validation/v23/ground_truth/{__init__,corpus,labels,metrics}.py` (B2 prep, protocol §8 — KHÔNG phải checker
+calibration-sense: không fixture known-bad committed, không gate nào tiêu thụ verdict của chúng hôm nay) làm danh
+sách "module with no calibration" của Q0P-2 tăng 4→8 mục. Gate này vốn đỏ-có-chủ-đích (gated-only) — đo trước/sau:
+không gate xanh nào lật. HỆ QUẢ cho tu chính án: dù owner chọn A, B hay C cho ba checker PIN-57, entry seq-14 cũng
+phải định đoạt 4 module ground_truth — hợp lý nhất là NOT_CHECKERS_V23 += 4 file này dưới MỌI ứng viên (chúng là
+tooling, không phải checker), kèm điều khoản: khi `corpus.py --check` trở thành gate tại B2 manifest (W6), nó vào
+registry + calibration như một checker thật. Bảng digest của các ứng viên cần cập nhật q0_round.py tương ứng tại
+thời điểm ban hành.
