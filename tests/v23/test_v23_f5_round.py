@@ -202,7 +202,9 @@ class DagStates(unittest.TestCase):
         table = {nid: ok for nid in cd.NODES}
         table["PLAN"] = fail
         table["CONFORMANCE-RULING"] = boom
-        with mock.patch.object(cd, "_checks", return_value=table):
+        with mock.patch.object(cd, "_checks", return_value=table), \
+                mock.patch.object(vf, "load_series",   # the real tree now holds round heads (MEASURED is the
+                                  lambda root, legacy, v22: [(v22 or legacy, {}, b"")]):   # sibling test's branch)
             rep = cd.validate(ROOT, round="v2.3")
         n = rep["nodes"]
         self.assertEqual(n["P5-PROPOSAL"]["state"], "VERIFIED_REUSE")
