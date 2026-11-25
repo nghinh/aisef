@@ -195,4 +195,6 @@ chỉ thị này ra lệnh trực tiếp ở P2, và clone-time checks B2 đư�
 (~/.config/opencode/opencode.json — không có mention DeepSeek local); thành phần route thật nằm server-side
 9router, local KHÔNG chứng minh được loại trừ DeepSeek ⇒ theo đúng điều kiện chỉ thị, **không lượt chạy trả phí
 nào qua mycombo khởi động cho tới khi owner xác nhận thành phần combo (dashboard 9router) không chứa DeepSeek**.
-Hôm nay không lượt paid nào cần thiết — không gì bị chặn; mục xác nhận này vào gói chờ owner.
+**ĐÃ XÁC NHẬN 2026-11-26 (owner, kênh chat): combo `mycombo` không chứa DeepSeek** ⇒ gate paid-run qua
+9router/`mycombo` MỞ theo chỉ thị (không trần token); các kiểm soát khác (evidence, release, chi ngoài token)
+giữ nguyên. Chưa có lượt paid nào trong hàng đợi; lượt đầu tiên sẽ ghi lại model/provider identity theo §1.
