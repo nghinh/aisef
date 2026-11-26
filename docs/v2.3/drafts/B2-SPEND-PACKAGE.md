@@ -30,29 +30,38 @@ Còn lại trước manifest: leg Linux (CI side), re-grep độc lập §2.3(5)
 
 - **Tiêu chuẩn (Q2 default):** kỹ sư phần mềm chuyên nghiệp ≥3 năm, đọc được Python test suite, KHÔNG có đóng
   góp/lịch sử dogfood với AISEF, không quan hệ báo cáo với owner; đủ 25–30h trong cửa sổ 29/12–19/01.
-- **Nguồn (owner chọn một hoặc trộn):** (a) mạng lưới cá nhân owner (nhanh nhất, CoI phải khai); (b) nền tảng
-  freelance (Upwork/Toptal — hồ sơ công khai, thanh toán qua nền tảng, chậm hơn ~1 tuần); (c) cộng đồng dev
-  VN (rate thấp hơn, cùng múi giờ). Gói này KHÔNG nêu tên người thật — danh tính do owner cấp hoặc duyệt từ
-  kênh (b)/(c) sau khi quyết.
+- **Nguồn — ĐÃ NGHIÊN CỨU CÓ SỐ ĐO 2026-11-26** (hồ sơ riêng kèm ứng viên ĐÍCH DANH + rate + CoI screen
+  từng người: `aisef-private-evidence/2026-11-26-b2-evaluators/EVALUATOR-SHORTLIST.md` — tên người giữ ngoài
+  repo công khai, chưa liên hệ ai): kênh vừa túi mục tiêu là **Upwork (gồm hồ sơ VN/khu vực)** và thị trường
+  VN trực tiếp; Codementor sát mép; **Toptal/Fiverr-hourly KHÔNG vừa** ($60–150+/h). 10 hồ sơ công khai, top-4
+  có đoạn đánh giá phù hợp; một standby được đề xuất. Giới hạn khai báo: Upwork chặn fetch tự động nên cột
+  ứng viên Upwork-native cần owner duyệt bằng phiên đăng nhập của chính owner.
 - **CoI form (mỗi evaluator ký trước onboarding):** quan hệ với owner/dự án; đã từng thấy mã AISEF chưa; quan
   hệ với các repo ứng viên (maintainer/contributor = loại với repo đó); cam kết không dùng LLM có truy cập
   internet khi label (offline-only, §3.3).
 - **Độc lập khi label (§3.3):** evaluator thấy BUNDLE yêu cầu + snapshot repo + harness label; KHÔNG thấy
   kernel, seeding recipe, nhãn của nhau (hash-commit rồi mới reveal, §3.5).
 
-## 3. Thù lao + trần chi (ƯỚC TÍNH — owner đặt số cuối)
+## 3. Thù lao + trần chi (SỐ ĐO 2026-11-26 — ruling §4: mục tiêu $1.500–2.500; $6.000 chỉ là trần ĐỀ XUẤT)
 
 Khối lượng mỗi evaluator: onboarding+pilot ~6h, label 3 repo × ≥9 item ≈ 27 item × 45–60′ ≈ 20–27h,
-hỗ trợ adjudication ~3h → **~30h/người**.
+hỗ trợ adjudication ~3h → **~30h/người** (60h tổng). Rate đo được (nguồn + ngày trong hồ sơ riêng):
 
-| Kịch bản | Rate | Chi 2 evaluator | Ghi chú |
+| Kênh | Rate đo | Tổng 2×30h | Vừa mục tiêu $1.500–2.500? |
 |---|---|---|---|
-| VN/khu vực | $25–40/h | $1.500–2.400 | cùng múi giờ, kênh (c) |
-| Quốc tế | $60–90/h | $3.600–5.400 | kênh (b), nền tảng thu phí thêm ~10% |
+| Upwork mid-senior Python/QA (toàn cầu) | $20–45/h | $1.200–2.700 | VỪA ở ≤~$41/h |
+| Upwork VN/khu vực senior | $20–35/h | $1.200–2.100 | VỪA thoải mái |
+| VN trực tiếp (ITviec median ×1,5–2,5 freelance) | $15–35/h | $900–2.100 | VỪA NHẤT về giá (owner tự lo hợp đồng/escrow) |
+| Codementor | $32–120/h | ≥$2.400 | sát mép |
+| Toptal / Fiverr-hourly | $60–150+/h | $3.600–9.000+ | KHÔNG vừa |
 
-**Đề xuất:** cap **$6.000** (phủ kịch bản quốc tế + đệm 10–15%); chi kỳ vọng $1.500–2.500 nếu kênh VN.
-Giải ngân 2 đợt: 50% sau onboarding+pilot đạt, 50% sau khi oracle ký (26/01). Mọi dòng chi ghi
-`closure-evidence/v2/v2.3/B2-SPEND.json` (append-only, mở ngay khi quyết). Vượt cap = một quyết định owner mới.
+**Cấu trúc đề xuất (trong mục tiêu):** Upwork fixed-price **$1.000–1.200/evaluator** (~$33–40/h cho scope 30h),
+mỗi ghế 2 milestone: 40% khi onboarding + repo 1 label xong (≤05/01), 60% khi repo 2–3 + adjudication xong
+(≤19/01); vet 3 chọn 2, người thứ ba làm standby văn bản (tùy chọn retainer onboarding ~$150–200); hai evaluator
+label cùng thứ tự repo để drop giữa chừng thay người được ở ranh giới repo; drop sau 10/01 → thu scope đối xứng,
+ghi là protocol deviation. **Trần:** $6.000 giữ nguyên là TRẦN ĐỀ XUẤT (ruling §4); chi kỳ vọng $2.000–2.600 gồm
+phí nền tảng. Mọi dòng chi ghi `closure-evidence/v2/v2.3/B2-SPEND.json` (append-only, mở khi quyết); vượt trần =
+một quyết định owner mới.
 
 ## 4. Bảo mật + điều khoản (Q7 default)
 
