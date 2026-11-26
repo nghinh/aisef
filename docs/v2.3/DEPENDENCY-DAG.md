@@ -64,13 +64,13 @@ first); `G` = gate (owner action, freeze, or qualification must precede Y).
 | W4 | L4-CONTEXT | **C10**, **G10**, **V21-03** |
 | W4 | L4-RESUME | **G6** |
 | W4 | L4-MONITOR | **C1**, **C3b** (gap R1) |
-| W4 | integrator | **DO-DOT-4**. Closes at W4 exit, when its last v2.3-homed constituent (C1/G6) is measured. B2, also a Đợt-4 item, is re-homed to W6 by plan:81, so DO-DOT-4 cites B2's W6 gate instead of waiting for it. |
+| W4 | integrator | **DO-DOT-4**. Closes at W4 exit, when its last v2.3-homed constituent (C1/G6) is measured. ~~B2, also a Đợt-4 item, is re-homed to W6 by plan:81, so DO-DOT-4 cites B2's W6 gate instead of waiting for it.~~ [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md] B2's W6 gate no longer exists; DO-DOT-4 closes at the W4 exit on C1/G6 alone. |
 | **W5** | L5-EARLY | **V21-43**, **V21-47**, **V21-52** |
 | W5 | L5-AUTHOR | **B6a**, **B6b**, **B6c**, **B6d**, **B4**, **V21-44**, **V21-45**, **V21-46**, **V21-48**, **V21-50**, **V21-51**, **V21-53**, **V21-64** |
 | W5 | L5-FEEDBACK | **G4**, **V21-04** |
 | W5 | L5-GATEWAY | **B5**, **E8** (NEW_WORK: written re-evaluation at B5's design freeze; reversal only if B5/C8 require it) |
 | W5 | integrator | **DO-CUOI-DOT-3**, **DO-CUOI-DOT-5**. Both close at W5 exit: B5, B4, B6\* and G4 are their last constituents. G3 was measured at W3. |
-| **W6** | L6-EVAL | **B2** (owns `aisef2/cohort/**` for #64–#66 by the §4(d) amendment) |
+| **W6** | L6-EVAL | **B2** — status REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER [SCOPE AMENDMENT 2026-11-26: see amendments/SCOPE-B2-EXTERNAL-REMOVED.md]. Node kept because other rows reference it; the external evaluation campaign is out of release scope (Tier-0 code/tests retained). (Historically: owned `aisef2/cohort/**` for #64–#66 by the §4(d) amendment.) |
 
 ### 1c. W0-closure additions (R13) — the remaining open rows, each in exactly one wave
 
@@ -131,6 +131,9 @@ W1 30 · W1b 2 · W2 21 · W3 30 · W4 8 · W5 12 · W6 3 (over 106 rows: #6 spl
 hardening defects (#47–#59 family: `destructive_authority`, `cleanup_authority`, `except_boundaries`,
 `refmodel_independence`, `kernel_static_checks`, `probe_static_checks`, `authority_limits`) under the §4(d)
 amendment below. The three `aisef2/cohort/` defects go to W6 L6-EVAL (B2 preregistration is their only consumer).
+[SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md —
+B2 external evaluation is out of release scope; #64–#66's only consumer was B2 preregistration, so their disposition
+is an open question for the owner, not silently dropped.]
 
 Duplicates, not separate work: #13≡V21-19; #20 is the egress face of #9/D3; #21≡D1; #22 is the verify face of #10/A2;
 #43≡D2; V21-23≡E5. Already-fixed residues stay closed: V21-30 (MASTER-CHECKLIST) is subsumed only as A2's
@@ -234,11 +237,16 @@ E1, E5, A2, C8, D1, #4
 B5-FREEZE            -> E8 re-evaluation     [G] E8 only if B5/C8 require it (IMPROVEMENT-ROADMAP.md:143; ROADMAP-2.2-CHECKLIST.md:142)
 V21-11 (D1, W3)      -> B5, C6               [S] the verifier probe runs in its own StoryScope sandbox/worktree (proof.py:89-98); decided, not a gate
 
-# --- W5 → W6 (B2 last)
+# --- W5 → W6
 W2..W5 exits         -> CODE-FREEZE          [G]
-B2-ORACLE-SIGNED     -> B2-MEASURE           [G] freeze + sign labels before measuring (IMPROVEMENT-ROADMAP.md:45; plan:81)
-CODE-FREEZE          -> B2-MEASURE           [S] the oracle measures the RC kernel's delivery()
-B2-MEASURE           -> RC-FREEZE            [G] a P0/P1 false-PASS here = NO-GO with one owner decision, no loop (plan:83)
+# [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+# The three B2 edges below are REMOVED by the owner ruling (kept, commented, for history — no longer in force):
+#   B2-ORACLE-SIGNED   -> B2-MEASURE         [G] freeze + sign labels before measuring (IMPROVEMENT-ROADMAP.md:45; plan:81)
+#   CODE-FREEZE        -> B2-MEASURE         [S] the oracle measures the RC kernel's delivery()
+#   B2-MEASURE         -> RC-FREEZE          [G] a P0/P1 false-PASS here = NO-GO with one owner decision, no loop (plan:83)
+CODE-FREEZE          -> RC-FREEZE            [G] direct edge since 2026-11-26. RC-FREEZE's prerequisites are exactly:
+                                                 CODE-FREEZE, VERSION-BUMP-2.3.0, BUILD-REPRO-01, PUBLIC-DOCS (README)
+                                                 — no B2 item among them.
 VERSION-BUMP-2.3.0   -> RC-FREEZE            [S]
 RC-FREEZE            -> XPLAT-QUAL -> REL-GOV-OBSERVED -> OWNER-PUBLISH-AUTH -> PUBLISH
 PUBLIC-DOCS (README) -> RC-FREEZE           [S] README is SHIPPED (release_rc.py:73) and frozen at RC-FREEZE (:105, :118-121); W1-DESIGN §6
@@ -286,7 +294,8 @@ flowchart LR
   B5 --> W5X((W5 exit))
   B6 --> W5X
   G4 --> W5X
-  W5X --> CF[code freeze] --> B2 --> RC[RC freeze]
+  W5X --> CF[code freeze] --> RC[RC freeze]
+  %% [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md] former edge: CF --> B2 --> RC
   EVC --> VB[version bump 2.3.0] --> RC
   REPRO --> RC
   RC --> XQ[x-platform qual] --> RGO[REL-GOV observed] --> PA[owner publish auth]
@@ -307,13 +316,17 @@ W0-FREEZE → DISC-1 (CI available) → V21-36/#34 → F5-DESIGN → F5-NEG → 
 → C8 → D3 → C7 → [W3 exit]          (tie: E3(W2) → D2 → D1-macOS acceptance → [W3 exit])
 → #5 → C5 → G6 → [W4 exit]          (tie: C5 → C1)
 → B5  ∥  B6a → B6b → B4 → [W5 exit] (B5 needs D1, C8, E1, A2 — all already upstream)
-→ CODE-FREEZE → B2-ORACLE-SIGNED → B2-MEASURE → VERSION-BUMP-2.3.0 (needs EVID-COUPLING-01) → RC-FREEZE
+→ CODE-FREEZE → VERSION-BUMP-2.3.0 (needs EVID-COUPLING-01) → RC-FREEZE
 → XPLAT-QUAL → REL-GOV-OBSERVED → OWNER-PUBLISH-AUTH
+
+# [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+# was: → CODE-FREEZE → B2-ORACLE-SIGNED → B2-MEASURE → VERSION-BUMP-2.3.0 (needs EVID-COUPLING-01) → RC-FREEZE
 ```
 
 Off-path but release-blocking (they must finish before their join node): BUILD-REPRO-01 → RC-FREEZE; REL-GOV-01
-owner config → REL-GOV-OBSERVED; PUBLIC-DOCS on master → PUBLISH. The owner STOPs DISC-1, EVC-1 and B2-SPEND (§5)
-sit **on** the path.
+owner config → REL-GOV-OBSERVED; PUBLIC-DOCS on master → PUBLISH. The owner STOPs DISC-1 and EVC-1 sit **on** the
+path. ~~and B2-SPEND (§5)~~ [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see
+amendments/SCOPE-B2-EXTERNAL-REMOVED.md — B2-SPEND is no longer an owner STOP on the path.]
 
 ---
 
@@ -389,7 +402,7 @@ messages unchanged); if it cannot, STOP Q0-1. In W6 only, L6-EVAL may edit `aise
 
 | Lane | Items | Owns (edit) |
 |---|---|---|
-| L6-EVAL | B2 | NEW `validation/v23/ground_truth/**`; NEW `closure-evidence/v2/v2.3/B2-*.json` |
+| L6-EVAL | B2 — REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER [SCOPE AMENDMENT 2026-11-26: see amendments/SCOPE-B2-EXTERNAL-REMOVED.md] | ~~NEW `validation/v23/ground_truth/**`; NEW `closure-evidence/v2/v2.3/B2-*.json`~~ (Tier-0 code/tests already landed stay; no further B2-specific engineering unless another retained capability requires it) |
 | L6-RELEASE | version bump, RC, release records, docs | `pyproject.toml`, `CHANGELOG.md`, `validation/qualification/{release_rc,release_bundle,release_smoke}.py`, NEW `closure-evidence/v2/v2.3/RELEASE-*.json`. `README.md` / public `docs/**` land on **master only**, under owner authorization. |
 
 ---
@@ -449,8 +462,8 @@ V21-61b (W5). None is a W1 STOP.
 | W4 — control policy | C3b thresholds | not a STOP for building it | built default-OFF; owner ratifies before enabling (plan:69) | enabling C3b only |
 | W5 — architecture | E8 reversal, only if the B5/C8 freeze shows it is required | security guarantee? no — reverses a recorded non-goal; asked only if triggered | E8 stays a non-goal; written re-evaluation at B5 freeze | E8 only |
 | W5 — none | #37 V1/V2 interop intent | not a STOP | V1 commands refuse V2 run dirs (V21-43) + documented | — |
-| **W6 — spending** | **B2-SPEND**: ≥3 real repos, ≥2 external evaluators, any paid model trial (cap + ledger) | spending authority (RELEASE-CHARTER.md:66) | offline seeded corpus only; no paid call | B2 external part |
-| W6 — gate (not a decision) | B2 labels signed by the owner/independent evaluator before measurement | not a STOP: an owner **act** at a gate (oracle independence, plan:81) | measurement waits for the signature | B2-MEASURE |
+| **W6 — spending** | ~~**B2-SPEND**: ≥3 real repos, ≥2 external evaluators, any paid model trial (cap + ledger)~~ [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md] | ~~spending authority (RELEASE-CHARTER.md:66)~~ | decision no longer required: zero USD was ever spent; no ledger opened | — |
+| W6 — gate (not a decision) | ~~B2 labels signed by the owner/independent evaluator before measurement~~ [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md] | ~~not a STOP: an owner **act** at a gate (oracle independence, plan:81)~~ | gate no longer exists; owner-led evaluation happens post-release (ruling §2) | — |
 | W6 — publication | master merge, public README/docs, `v2.3.0` tag, PyPI | publication control | nothing published | PUBLISH |
 
 ### 5c. Mutually exclusive option sets (choose one; the excluded side is excluded by the charter)
@@ -488,4 +501,4 @@ V21-61b (W5). None is a W1 STOP.
 | **W3** | plan:65. In addition:<ul><li>Linux and macOS positive/negative sandbox canaries for developer, test and probe (D1/D2).</li><li>No route except the broker; env and logs carry no key (D3, #9, #20).</li><li>A `.git`-object-hidden stimulus is detected or unreachable (#19).</li><li>A served-model switch mid-session is detected and journaled (C7, offline fake provider).</li><li>OpenCode runs through ClientAdapter with no behaviour change (C8).</li><li>Source-pin preflight refuses a moved or patched checkout (G3).</li><li>Native Windows CI has no kill-by-liveness (V21-41, #31). No live-Windows claim.</li></ul> |
 | **W4** | plan:71. In addition:<ul><li>Parallel and serial runs give identical typed outcomes and satisfy the event-order constraints. The closing-identity check holds (C5/G9).</li><li>An under-declared story dependency is refused at seal/load (#5).</li><li>Resume after kill-in-window never replays unaccounted spend, never rewrites signed history, and prints `why_not` (G6).</li><li>The stall monitor grades snapshots only (C1).</li><li>C3b stays OFF unless ratified.</li><li>Reviewer route has its own ledger + cost line (C6).</li><li>C10/G10 content is tripwire-scanned and never admitted as evidence (V21-19).</li></ul> |
 | **W5** | plan:77. In addition:<ul><li>A clean-wheel new-user guest goes from no git identity to an approved bundle (V21-52).</li><li>Draft cannot approve (B4).</li><li>`grade` gives PASS/FAIL on one real external-agent diff with zero OpenCode, with the candidate confined (B5, D1).</li><li>A within_s chosen by the reviewer cannot false-block (#4).</li><li>2.2 project/1 bundles still load and approve.</li><li>E8 is dispositioned in writing.</li></ul> |
-| **W6** | plan:83 + RELEASE-CHARTER §2:<ul><li>The B2 oracle was signed before the run. False accept and false reject are reported by contract scope.</li><li>The RC wheel/sdist SHA is reproducible and equals what is published.</li><li>REL-GOV-01 observed `status: waiting`.</li><li>No P0/P1 open.</li><li>One owner authorization immediately before publish.</li><li>Any failed mandatory gate → NO-GO with the exact blocker.</li></ul> |
+| **W6** | plan:83 + RELEASE-CHARTER §2:<ul><li>~~The B2 oracle was signed before the run. False accept and false reject are reported by contract scope.~~ [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md]</li><li>The RC wheel/sdist SHA is reproducible and equals what is published.</li><li>REL-GOV-01 observed `status: waiting`.</li><li>No P0/P1 open.</li><li>One owner authorization immediately before publish.</li><li>Any failed mandatory gate → NO-GO with the exact blocker.</li></ul> |

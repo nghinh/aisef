@@ -1,3 +1,5 @@
+> **BỊ THAY THẾ BỞI SỬA ĐỔI SCOPE — chỉ giữ làm hồ sơ chuẩn bị lịch sử.** [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+
 # B2-SPEND — gói trình owner quyết (một quyết định, hạn ≤ 2026-12-08)
 
 **Trạng thái:** ĐỀ XUẤT (soạn 2026-11-26, theo Decision 4 PROPOSED: "PREPARATION GO; EXTERNAL ACTION AND

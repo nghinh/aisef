@@ -1,3 +1,5 @@
+> **SUPERSEDED BY SCOPE AMENDMENT — retained as historical prep only.** [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+
 # AISEF v2.3 — B2 GROUND-TRUTH PROTOCOL (DRAFT for the freeze review)
 
 **Status:** DRAFT (owner directive 2026-11-25 §5: "Draft and freeze the B2 ground-truth protocol before

@@ -307,3 +307,5 @@ Original index (severities as first reported; CODE-AUDIT is authoritative):
 
 **Reconciliation note.** GF-SEC-1 sits beside CA#19 and is not a duplicate. GF-QUAL-3 shares a family with CA#2 (E5). GF-PLAN-3 is a
 hazard input to F5. GF-AUTH-7 is the mechanical form of the CLAUDE.md manual rule. The other GF IDs map to CODE-AUDIT as above.
+
+[SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md: hàng "External evaluators (B2)" bên trên là giả định lịch sử của mô hình đe dọa, không còn là yêu cầu v2.3; đánh giá owner-led sau phát hành.]

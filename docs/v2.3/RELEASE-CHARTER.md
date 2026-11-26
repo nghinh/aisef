@@ -77,3 +77,27 @@ pass alone never establishes live-Windows `aisef run` support.
 (1) a genuinely incompatible trust/architecture ruling; (2) paid provider/cloud spend; (3) privileged operations
 or secrets; (4) release/tag/PyPI irreversible publication; (5) a mandatory blocker whose only remedy would weaken
 an invariant or the agreed full scope.
+
+---
+
+## Amendment 2026-11-26 — external B2 evaluation removed from v2.3 release scope
+
+[SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+
+This charter is frozen at W0, so the owner ruling of 2026-11-26 is applied by this appended, dated amendment —
+no inline edit. The following clauses are struck as v2.3 release / W6 exit requirements. Mandated status:
+`REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER` — never PASSED or QUALIFIED; no claim is made that external
+independent validation, false-acceptance rates or cross-repository generalization have been demonstrated.
+
+- **§1 claim 8** (lines 28–29): "**Independent ground-truth evaluation** — a frozen oracle corpus + ≥3
+  representative repos + ≥2 external evaluators, reporting false-accept/false-reject by contract scope
+  separately (`B2`)." — removed as a mandatory v2.3 product claim. B2 Tier-0 code, tests and research docs are
+  retained (ruling §3); further B2-specific engineering stops unless another retained capability requires it.
+- **§3 KPI "Real value"** (lines 56–57): "≥3 repos, ≥2 external evaluators, in-scope/out-of-scope truth not
+  conflated, real or clearly-estimated wallclock/tokens/USD." — removed as a mandatory KPI proof.
+
+**Not weakened** (ruling §5): every §2 mandatory release gate, the §3 "Efficiency" and "Usability" KPI proofs,
+and every §4 non-negotiable rule are unchanged. **B5** (agent-independent acceptance gateway, §1 claim 7)
+**stays in scope**. Owner-led evaluation happens separately after release (ruling §2) and is NOT a prerequisite
+for CODE-FREEZE, RC-FREEZE, release qualification or v2.3.0 publication; the requirement is not moved to any
+other gate and no new mandatory evaluation deadline is created.

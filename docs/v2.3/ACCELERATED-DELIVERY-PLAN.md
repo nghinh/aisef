@@ -17,12 +17,15 @@ B1-evidence (đóng W1b)
         ├─ E1 ∥ (E7→A2-INT) ─ #6 signed-CI                                            ├─ CODE-FREEZE
         ├─ C5 (L4-PARALLEL) ─ G6 / C1                                                 │
         └─ BUNDLE-FORMAT-2 ─ C10/G10 ─ G4; B6a→B6b→B4; B5                             ┘
-             CODE-FREEZE → B2-ORACLE-SIGNED [OD] → B2-MEASURE → RC-FREEZE → XPLAT-QUAL
+             CODE-FREEZE → RC-FREEZE → XPLAT-QUAL
              → REL-GOV-OBSERVED → OWNER-PUBLISH-AUTH → PUBLISH
+
+             (dòng cũ: CODE-FREEZE → B2-ORACLE-SIGNED [OD] → B2-MEASURE → RC-FREEZE — cạnh B2 đã gỡ
+              [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md])
 ```
 
 **Cái 4 track mua được:** E3, A2-primitives, E7, L2-LIFECYCLE, D2, cụm quality/tripwire không tranh file, toàn bộ
-L5-EARLY, B6a và B2-prep **rời khỏi spine và chạy NGAY HÔM NAY** thay vì xếp hàng sau exit W2/W3/W4. Gate theo đợt
+L5-EARLY, B6a ~~và B2-prep~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md] **rời khỏi spine và chạy NGAY HÔM NAY** thay vì xếp hàng sau exit W2/W3/W4. Gate theo đợt
 (mỗi wave một lần đóng băng + requalify cả cây) được thay bằng **gate theo batch capability** (mục 4).
 
 ## 2. Bốn track — lane, file ownership, hợp đồng giao diện
@@ -36,7 +39,7 @@ INV-MUTATION-AUTHORITY; mọi byte aisef2/ đổi ⇒ F5 qualification của bat
 | **CORE** | đóng W1b; L2-LIFECYCLE; L2-SIGN→L2-AUTH (A2); L2-PROBE-OS (E3)*; L2-JOURNAL (E6/FORMAT-4); L2-RECORD (E7); L2-ACCOUNTING (E2/E4); L2-CI (#6) | E2/E4 ← C-1; E1/A2-INT ← C-1,C-2; #6 ← C-2 |
 | **SECURITY** | L3-SANDBOX (D1,D2,quality anti-gaming); L3-CLIENT (C8→C7/G3/D3); L3-PLATFORM (V21-41) | D1 ← E3; C8 ← client.py từ E2; V21-41 ← A2 |
 | **ORCHESTRATION** | L4-PARALLEL (C5, BUNDLE-FORMAT-2); L4-REVIEWER (C6); L4-CONTEXT (C10/G10); L4-RESUME (G6); L4-MONITOR (C1,C3b) | **toàn track ← C-1 (FORMAT-4 freeze)** đúng luật directive |
-| **PRODUCT** | L5-EARLY (ngay); L5-AUTHOR (B6*,B4); L5-FEEDBACK (G4); L5-GATEWAY (B5); L6-EVAL (B2 prep ngay, measure sau CODE-FREEZE); L6-RELEASE | B6b/B4 ← C-6 (BUNDLE-FORMAT-2); G4 ← C10/G10; B5 ← E1,A2,C8,D1 |
+| **PRODUCT** | L5-EARLY (ngay); L5-AUTHOR (B6*,B4); L5-FEEDBACK (G4); L5-GATEWAY (B5 — GIỮ trong scope); ~~L6-EVAL (B2 prep ngay, measure sau CODE-FREEZE)~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md]; L6-RELEASE | B6b/B4 ← C-6 (BUNDLE-FORMAT-2); G4 ← C10/G10; B5 ← E1,A2,C8,D1 |
 
 (*) E3 nằm ở W2/CORE theo wave nhưng là tiền đề cứng của SECURITY (`E3 → D1 [S/F]`): CORE staff E3 ĐẦU TIÊN.
 
@@ -64,8 +67,8 @@ INV-MUTATION-AUTHORITY; mọi byte aisef2/ đổi ⇒ F5 qualification của bat
    event.py chờ L2-SIGN merge [F].
 7. **SECURITY/D2** (Seatbelt macOS) + cụm quality anti-gaming/tripwire không tranh file (#79–#96 subset).
 8. **PRODUCT/L5-EARLY** trọn gói (B6a module, V21-43/47/52/42b, #35–#37).
-9. **B2 PREP** (L6-EVAL prep): dựng `validation/v23/ground_truth/**` corpus offline + soạn protocol B2 (freeze
-   trước khi đo); chưa tốn tiền, chưa cần external.
+9. ~~**B2 PREP** (L6-EVAL prep): dựng `validation/v23/ground_truth/**` corpus offline + soạn protocol B2 (freeze
+   trước khi đo); chưa tốn tiền, chưa cần external.~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md — Tier-0 đã land thì giữ; không làm thêm việc B2-riêng trừ khi capability khác còn giữ yêu cầu.]
 10. **Mutation order-table prototype** (mục 5a): sinh bảng execution-order từ per_target.json của E5, benchmark
     trên 2–3 target bounded, trình owner ký nguồn-trích-dẫn.
 
@@ -78,7 +81,7 @@ INV-MUTATION-AUTHORITY; mọi byte aisef2/ đổi ⇒ F5 qualification của bat
   MEASURED, reuse = VERIFIED_REUSE, 0 UNRESOLVED, known-bad vẫn FAIL) + closure-evidence sạch. Một batch = một lần
   đo (LÔ) — không đóng băng cả cây, không requalify toàn bộ.
 - **RC:** sealing đầy đủ + toàn bộ qualification bắt buộc + **chiến dịch mutation toàn diện** (ngân sách mục 5c)
-  + security verification + reproducibility + B2 external evaluation. Không gate nào bị bỏ; không bằng chứng dở
+  + security verification + reproducibility ~~+ B2 external evaluation~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md]. Không gate nào KHÁC bị bỏ; không bằng chứng dở
   dang nào được dán QUALIFIED (chuẩn admissibility 455c6bbc).
 
 ## 5. Hiệu năng mutation — số đo thật từ E5 (1.880 mutant / 103,4 giờ đo được)
@@ -111,12 +114,12 @@ Profile tái lập được: `aisef-private-evidence/2026-11-25-accel-plan/{pars
 | 08/12–14/12 | **C-1 FORMAT-4 FREEZE** → mở ORCH track (thiết kế C5/#5) + E2/E4; A2-primitives + D2 land |
 | 15/12–21/12 | E2/E4 land (batch CORE-2); **D1 bắt đầu** (E3 xong); E7 golden land |
 | 22/12–28/12 | E1 + A2-INT; **C8 bắt đầu** (nhận client.py); C5 land (batch ORCH-1) |
-| 29/12–04/01 | #6 signed-CI; D3→C7; BUNDLE-FORMAT-2 freeze (QĐ #71+S3); **B2 protocol freeze** |
+| 29/12–04/01 | #6 signed-CI; D3→C7; BUNDLE-FORMAT-2 freeze (QĐ #71+S3); ~~**B2 protocol freeze**~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md] |
 | 05/01–11/01 | Batch CORE-exit (≈W2 gate); G3; C10/G10; B6a→B6b |
 | 12/01–18/01 | C6; G6; C1+C3b (built, OFF); V21-41; D1–D3 acceptance (batch SEC-exit ≈W3 gate) |
 | 19/01–25/01 | B4; G4; **B5 bắt đầu**; batch ORCH-exit (≈W4 gate) |
-| 26/01–01/02 | B5 land; batch PROD-exit (≈W5 gate); **B2-ORACLE-SIGNED [owner]**; **CODE-FREEZE** |
-| 02/02–08/02 | **Chiến dịch mutation RC** (~50h wall/4w với lever, dự phòng 5 ngày; gồm đo sạch 33 target dirty + _attempt) + B2-MEASURE |
+| 26/01–01/02 | B5 land; batch PROD-exit (≈W5 gate); ~~**B2-ORACLE-SIGNED [owner]**~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md]; **CODE-FREEZE** |
+| 02/02–08/02 | **Chiến dịch mutation RC** (~50h wall/4w với lever, dự phòng 5 ngày; gồm đo sạch 33 target dirty + _attempt) ~~+ B2-MEASURE~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md] |
 | 09/02–15/02 | XPLAT-QUAL (Linux+Windows+mac), reproducibility, release records, REL-GOV-OBSERVED |
 | 16/02–26/02 | Buffer sửa NO-GO một vòng; OWNER-PUBLISH-AUTH; **PUBLISH ≤ 26/02** |
 
@@ -136,8 +139,8 @@ owner). ETA chi tiết ngoài phần đo được là ước tính lịch, khôn
    dây chuyền; lịch bàn giao ở mục 2 là hợp đồng, đổi phải qua integrator.
 4. **Ngân sách RC** — 430–480 wh chưa lever; lever 62% là ƯỚC TÍNH chưa benchmark + cần owner ký trích dẫn E5;
    nếu không có lever, cần 8 worker (~60h wall) hoặc +2–3 ngày lịch.
-5. **Phụ thuộc ngoài W6** — ≥3 repo đại diện + ≥2 evaluator độc lập + B2-SPEND: lead time tuyển chọn nằm ngoài
-   engineering; không khởi động tuần này thì mốc 26/01 (oracle signed) vỡ.
+5. ~~**Phụ thuộc ngoài W6** — ≥3 repo đại diện + ≥2 evaluator độc lập + B2-SPEND: lead time tuyển chọn nằm ngoài
+   engineering; không khởi động tuần này thì mốc 26/01 (oracle signed) vỡ.~~ **RỦI RO ĐÃ RÚT — resolved-by-scope-change** [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md]: đánh giá external không còn trong scope release v2.3; owner tự tổ chức đánh giá sau phát hành (ruling §2). Không đánh số lại các rủi ro khác.
 
 **Gói quyết định owner #1 (quyết một lần, mỗi mục có default):**
 | # | Quyết định | Default đề xuất |
@@ -145,7 +148,7 @@ owner). ETA chi tiết ngoài phần đo được là ước tính lịch, khôn
 | 1 | OD-B1B (re-pin B1 manifest hay chờ RC đo sạch) | chờ RC (fail-closed giữ nguyên) |
 | 2 | PIN-57: giữ 3 checker ngoài registry hay amendment re-pin | giữ ngoài (gói transition đã soạn, §10.4 báo cáo) |
 | 3 | Ký execution-order table trích dẫn đo E5 (lever 62%) | ký sau benchmark bounded tuần 01/12 |
-| 4 | B2-SPEND: danh sách ≥3 repo ngoài + ≥2 evaluator + cap chi phí — **hạn chót 08/12** (back-calc từ mốc ký oracle 26/01: tuyển 2 tuần + đệm lễ 1 tuần + onboarding 1 tuần + labeling 2 tuần + adjudication 1 tuần; sau 08/12 là zero slack) | owner cung cấp ứng viên; engineering đề xuất 2 dogfood (todo-oc, todo-cli) làm seed Tier-0, KHÔNG thay thế repo ngoài |
+| 4 | ~~B2-SPEND: danh sách ≥3 repo ngoài + ≥2 evaluator + cap chi phí — **hạn chót 08/12** (back-calc từ mốc ký oracle 26/01: tuyển 2 tuần + đệm lễ 1 tuần + onboarding 1 tuần + labeling 2 tuần + adjudication 1 tuần; sau 08/12 là zero slack)~~ [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md — quyết định B2-SPEND và hạn chót 08/12 không còn tồn tại; zero USD đã chi] | ~~owner cung cấp ứng viên; engineering đề xuất 2 dogfood (todo-oc, todo-cli) làm seed Tier-0, KHÔNG thay thế repo ngoài~~ |
 | 5 | Các QĐ tại freeze, nhận defaults: V21-57(keep), V21-24/25/70/71b(keep), V21-54(A), S4(build), #71(ii)+S3(A), V21-61b/58(keep) | nhận toàn bộ defaults |
 | 6 | C3b thresholds (ratify trước khi bật) + W3 guest/server cho bwrap canary | ratify ở SEC-exit |
 | 7 | Shard mutant-level 2 target nóng (thiết kế record mới) | KHÔNG làm trong v2.3 trừ khi lever (3) không đủ |
@@ -250,3 +253,34 @@ lập; deviation chưa giải quyết chạm schema/binding/completeness/E5-path
 → fix + review lại trước tích hợp. §3: tiếp tục CORE-2/C5/G6/B2 nơi phụ thuộc cho phép; không báo CI PASS trước
 khi workflow đúng-HEAD kết thúc; báo cáo kế = verdict review A2′ + 4 disposition + quyết định tích hợp + CI + độ
 sẵn sàng outreach B2.
+
+> [SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+> Ghi chú append-only cho §7.1–§7.5 (bản ghi lịch sử, giữ nguyên văn): mọi hạng mục B2 external trong các mục trên
+> (B2-SPEND/slate/outreach/evaluator sourcing/oracle) đã bị gỡ khỏi scope release v2.3 bởi ruling owner 2026-11-26;
+> không outreach nào từng được gửi, không tài khoản nào được tạo, zero USD đã chi. Không mục nào ở trên được coi là
+> yêu cầu còn hiệu lực.
+
+### 7.6 Scope change 2026-11-26: B2 external REMOVED — critical path tính lại
+
+[SỬA ĐỔI SCOPE 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — xem amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+
+**Critical path tính lại (thuần engineering — không còn mắt xích B2 nào):**
+
+```
+CORE-2 measured batch → W2c integration → C5/G6 (W4) → W3 → W5/B5 → CODE-FREEZE → RC campaign → PUBLISH
+```
+
+RC-FREEZE giờ chỉ còn các tiền đề: CODE-FREEZE, VERSION-BUMP-2.3.0, BUILD-REPRO-01, PUBLIC-DOCS (README) —
+không có hạng mục B2 nào (DEPENDENCY-DAG §2, cạnh trực tiếp CODE-FREEZE → RC-FREEZE từ 2026-11-26).
+
+**Quyết định owner còn MỞ (không còn mục B2 nào):**
+- A2′ integration gate — verdict chưa có (§7.5 §2: review độc lập + disposition 4 deviation trước khi tích hợp);
+- Order-table ratification — bảng RC chưa QUALIFIED tới khi round-writer + source-bound checks xanh trên đúng RC
+  source (§7.3 §2);
+- C-2 (A2 signing) freeze — gồm nghĩa vụ QĐ 8 còn lại (reproducible wheels, offline-install, escrow anchor off-box).
+
+**Dự báo trung thực:** mốc cam kết **26/02/2027 KHÔNG đổi**. Phần sức làm W6 external-prep (tuyển chọn, protocol
+freeze, oracle signing, B2-MEASURE) được chuyển về engineering, nên CODE-FREEZE **có thể** kéo sớm ~1 tuần so với
+lịch mục 6 — đây là biên sớm-nhất-có-thể nêu dè dặt, KHÔNG phải cam kết ngày sớm hơn; mọi ETA ngoài phần đo được
+vẫn là ước tính lịch (mục 6 giữ nguyên nguyên tắc đó). Không gate §5-charter nào yếu đi; không claim nào về
+external validation/false-acceptance/cross-repo generalization được đưa ra.

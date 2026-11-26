@@ -1,3 +1,5 @@
+> **SUPERSEDED BY SCOPE AMENDMENT — retained as historical prep only.** [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md]
+
 # B2 — External repository slate: feasibility research (read-only)
 
 **Date:** 2026-11-26
