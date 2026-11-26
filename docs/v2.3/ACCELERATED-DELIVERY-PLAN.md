@@ -237,3 +237,16 @@ gói ≤08/12. §5 CORE-2 tiến hành (A2′, E2/E4, enum+vocabulary, projectio
 single-writer; không bật writer f4 production trước các gate; RULE-2 chỉ với provenance tái lập; qualification
 đích tại biên tích hợp; KHÔNG RC campaign. §6 chỉ nói 6-platform PASS khi CI đúng-HEAD kết luận; báo cáo kế =
 commit thật + ma trận negative A2′ + tiến độ C5/G6 + Q0 + CI + B2 shortlist + dự báo critical-path.
+
+### 7.5 OWNER DIRECTION 2026-11-26 — danh tính outreach B2 + cổng tích hợp A2′
+
+§1: danh tính người gửi outreach B2 đã cấp (ghi trong hồ sơ riêng aisef-private-evidence/2026-11-26-b2-evaluators/
+— không vào repo; năng lực cá nhân độc lập, không đại diện VNPT-IT/VGS); kênh ưu tiên Upwork/Codementor qua TÀI
+KHOẢN XÁC THỰC CỦA OWNER; không tạo tài khoản, không lách xác thực, không nhãn hiệu VNPT; zero-USD giữ nguyên
+(liên hệ không ràng buộc, screening, availability, báo giá — không hợp đồng/cam kết/chi). §2: KHÔNG tích hợp A2′
+chỉ vì 79 test xanh — mỗi deviation trong 4 cái đã khai phải có: lệch chính xác so với ruling, hệ quả an
+ninh/đúng đắn, bằng chứng negative-control, fix đề xuất hoặc amendment chính xác, disposition của reviewer độc
+lập; deviation chưa giải quyết chạm schema/binding/completeness/E5-path/parity f1–3 = STOP; bypass trust-critical
+→ fix + review lại trước tích hợp. §3: tiếp tục CORE-2/C5/G6/B2 nơi phụ thuộc cho phép; không báo CI PASS trước
+khi workflow đúng-HEAD kết thúc; báo cáo kế = verdict review A2′ + 4 disposition + quyết định tích hợp + CI + độ
+sẵn sàng outreach B2.
