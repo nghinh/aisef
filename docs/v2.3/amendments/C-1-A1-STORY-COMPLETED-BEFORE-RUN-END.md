@@ -22,3 +22,16 @@ construction.
 | No alteration of valid historical format-1/2/3 journals | the rule is registered only in format4's `_rules()` for the f4-only kind `story/completed`; formats ≤3 delegate unchanged (pinned by the existing T16 delegation tests and the f3 fixture suite, all green) |
 | No weakening of G6 fold-before-trust | G6-RESUME-DESIGN-DRAFT.md addendum 2026-11-26 unchanged: fold-before-trust stays NORMATIVE — defense in depth, not replaced by A1 |
 | Independent adversarial review | queued as its own lane immediately after this landing (reviewer ≠ implementer); its report files against the flip gate with the first review |
+
+## Addendum — independent adversarial review of A1 itself (2026-11-26, reviewer ≠ implementer)
+
+Verdict: SOUND for the ruled class (both-site refusal with event+seq+rule, three-site consistency measured
+including an UNFILTERED full-stream fold, f1–f3 untouched across 200+ tests, G6 fold-before-trust unweakened,
+zero over-rejection). ONE surviving finding, F1: the identical forge aimed at an ABANDONED run (run/interrupted
+abandoned=true, no run/end) was still accepted at A/R. Disposition implemented the same day: the ruling's own
+second sentence — "must never be appended after the run has closed" — read against the terminal states
+(ENDED/ABANDONED both closed) covers abandonment, so the A1 branch gained the one condition "an abandoning
+interrupt closes the run"; a FIRST (non-abandoning) interrupt does not close the run and the marker stays legal
+there (pinned by test). _attestation4's narrower "before run/end" matches its own frozen §4.4 text and stays
+as-is (recorded for the flip gate). If the owner prefers the narrower reading of A1 ("closed" = run/end only),
+reverting is one branch condition + one test — say so and it is done; silence keeps the fail-closed reading.

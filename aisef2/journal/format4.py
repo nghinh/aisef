@@ -302,9 +302,10 @@ def _completed4(event: Event, prior: Sequence[Event]) -> str | None:
     marker is never appended after the run has closed (refused at append AND reconstruct, naming event, seq and
     rule); and at most one marker per story per run (the table holds it WITHIN ENDED_COMMIT; the cites check binds
     it to exactly one story/commit of the same story_id)."""
-    if any(e.type == T.RUN_END.value for e in prior):
+    if any(e.type == T.RUN_END.value or (e.type == T.RUN_INTERRUPTED.value and e.data.get("abandoned") is True)
+           for e in prior):
         return (f"{event.type} at seq {event.seq}: a completed-story marker appears before run/end — never "
-                "appended after the run has closed (C-1 amendment A1)")
+                "appended after the run has closed (C-1 amendment A1; an abandoning interrupt closes the run)")
     story_id = event.data["story_id"]
     if any(e.type == STORY_COMPLETED and e.data["story_id"] == story_id for e in prior):
         return f"{event.type} at seq {event.seq}: {story_id} is marked completed at most once per story per run"

@@ -438,6 +438,20 @@ class StoryCompletedEnvelope(Base):
         """TerminalState folds whole journals in production; here the minimal stream that reaches ENDED."""
         return [e for e in events if e.type.startswith(("run/", "story/")) and e.type != "story/plan-drift"]
 
+    def test_a1_marker_after_an_abandoning_interrupt_refused_too(self):
+        """A1's second sentence ("never be appended after the run has closed") under the terminal-state reading:
+        ABANDONED is a closed run (adversarial review F1, 2026-11-26) — the same forge aimed at an abandoned run
+        is refused at both sites; a FIRST (non-abandoning) interrupt does NOT close the run and stays legal."""
+        w, commit = self.ended_commit()
+        w.append(T.RUN_INTERRUPTED, {"abandoned": False})
+        data = {"story_id": "S1", "revision": SHA, "fingerprint": HEX}
+        probe = Event(len(w.w.events), f4.STORY_COMPLETED, carried(f4.STORY_COMPLETED, data), 10.0 ** 6,
+                      False, (commit.seq,))
+        f4.reconstruct(w.plus(f4.STORY_COMPLETED, probe.data, (commit.seq,)))   # INTERRUPTED is not closed: legal
+        w.append(T.RUN_INTERRUPTED, {"abandoned": True})
+        self.refused(w, f4.STORY_COMPLETED, data, source_seqs=(commit.seq,),
+                     pattern=r"story/completed at seq \d+: .*an abandoning interrupt closes the run")
+
     def test_missing_or_malformed_fields_refused(self):
         w, commit = self.ended_commit()
         self.refused(w, f4.STORY_COMPLETED, {"story_id": "S1", "revision": SHA},
