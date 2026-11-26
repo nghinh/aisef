@@ -57,6 +57,11 @@ ROUND_ID = "AISEF_V2_3_QUALIFICATION_ROUND_AUTHORIZED"
 #: and the patch pins this file, so neither digest can be written here (it would be a hash cycle).
 SEQ13_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-13-DRAFT-R6.md"
 SEQ13_PATCH_REL = "docs/v2.3/drafts/SEQ13-WIRING-R6.patch"
+#: ledger seq 14 (PIN-57 Option C, owner ruling 2026-11-26 §3): the amendment's cumulative wiring patch and its
+#: ledger-entry draft. Committing entry 14 is the owner's act; until then the draft names the patch by sha256
+#: (a path here, not a digest — the patch pins this file, so a digest would be a hash cycle, as for seq 13).
+SEQ14_DRAFT_REL = "docs/v2.3/drafts/LEDGER-SEQ-14-DRAFT.md"
+SEQ14_PATCH_REL = "docs/v2.3/drafts/SEQ14-PIN57-C.patch"
 OK = ("MEASURED", "VERIFIED_REUSE")
 STALE_SOURCE = ": target changed since the mutation run — re-run it"
 #: the historical phases the v2.2 test reads (m.RECORDS at v2.2.0, minus V2.1 — the runner-2 phase it treats apart)
@@ -157,15 +162,18 @@ def round_v23_missing() -> list[str]:
     return out
 
 
-def wired_sealing_gate(patch: bytes, root: pathlib.Path = ROOT) -> bytes:
-    """v2.2.0's tests/v2/sealing_gate.py with `patch` applied (git apply in a repository of its own), LF."""
+def wired_sealing_gate(*patches: bytes, root: pathlib.Path = ROOT) -> bytes:
+    """v2.2.0's tests/v2/sealing_gate.py with each patch's sealing_gate.py hunks applied in order (git apply in a
+    repository of its own; --include ignores the other files of a cumulative patch such as seq 14's), LF."""
     with tempfile.TemporaryDirectory(prefix="aisef-seq13-wiring-") as t:
         t = pathlib.Path(t)
         (t / "tests/v2").mkdir(parents=True)
         (t / "tests/v2/sealing_gate.py").write_bytes(_git("show", f"{RP.V2_2_0}:tests/v2/sealing_gate.py", root=root))
-        (t / "wiring.patch").write_bytes(_lf(patch))
         subprocess.run(["git", "init", "-q", str(t)], capture_output=True, check=True)
-        subprocess.run(["git", "-C", str(t), "apply", "wiring.patch"], capture_output=True, check=True)
+        for i, patch in enumerate(patches):
+            (t / f"wiring{i}.patch").write_bytes(_lf(patch))
+            subprocess.run(["git", "-C", str(t), "apply", "--include=tests/v2/sealing_gate.py", f"wiring{i}.patch"],
+                           capture_output=True, check=True)
         return _lf((t / "tests/v2/sealing_gate.py").read_bytes())
 
 
@@ -368,8 +376,12 @@ class Seq13Wiring(unittest.TestCase):
     def test_the_applied_wiring_is_exactly_the_reviewed_patch_and_its_pins_hold(self):
         patch = _lf((ROOT / SEQ13_PATCH_REL).read_bytes())
         self.assertIn(hashlib.sha256(patch).hexdigest(), reviewed_draft()["decision"]["GATED_TEST_WIRING"])
-        self.assertEqual(_lf((ROOT / "tests/v2/sealing_gate.py").read_bytes()), wired_sealing_gate(patch),
-                         "tests/v2/sealing_gate.py is not v2.2.0's plus the reviewed patch")
+        # ledger seq 14 (PIN-57 Option C): the cumulative re-pin patch, named by sha256 in the seq-14 ledger draft;
+        # committing entry 14 is the owner's act, so until then the draft file is the wiring's review trail
+        seq14 = _lf((ROOT / SEQ14_PATCH_REL).read_bytes())
+        self.assertIn(hashlib.sha256(seq14).hexdigest(), (ROOT / SEQ14_DRAFT_REL).read_text(encoding="utf-8"))
+        self.assertEqual(_lf((ROOT / "tests/v2/sealing_gate.py").read_bytes()), wired_sealing_gate(patch, seq14),
+                         "tests/v2/sealing_gate.py is not v2.2.0's plus the reviewed seq-13 and seq-14 patches")
         self.assertTrue(getattr(sealing_gate, "V23_PINS_HOLD", False), "a V23_PINNED file is not as pinned")
 
     def test_V22_REPLAYED_is_the_replayed_set_and_each_is_gated(self):

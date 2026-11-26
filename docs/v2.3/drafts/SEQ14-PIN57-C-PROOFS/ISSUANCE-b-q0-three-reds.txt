@@ -1,0 +1,47 @@
+...........................FFFF.......
+======================================================================
+FAIL: test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='b1_bindings')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/tests/v23/test_v23_q0_round.py", line 89, in test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason
+    self.assertTrue(r["clean_passes"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='currency_dag')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/tests/v23/test_v23_q0_round.py", line 89, in test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason
+    self.assertTrue(r["clean_passes"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='mutation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/tests/v23/test_v23_q0_round.py", line 89, in test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason
+    self.assertTrue(r["clean_passes"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_checker_is_calibrated_and_the_committed_record_is_current (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_is_calibrated_and_the_committed_record_is_current)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/tests/v23/test_v23_q0_round.py", line 71, in test_every_checker_is_calibrated_and_the_committed_record_is_current
+    self.assertEqual(R.round_v23_missing() + Q.problems(self.result), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["b1_bindings is NOT calibrated: {'checker[4878 chars]ing'] != []
+
+First list contains 8 additional elements.
+First extra element 0:
+"b1_bindings is NOT calibrated: {'checker': 'b1_bindings', 'package': 'B1 risk gate (owner 2026-11-12 section B)', 'fixture': 'tests/v2/fixtures/known_bad/b1_bindings.json', 'clean_passes': False, 'clean_problems': ['aisef2/app/run.py::_close: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::_content_sha: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::admit: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::anchor_in: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::anchor_of: aisef2/app/run.py moved since the manifest froze'], 'rejects_known_bad': True, 'rejects_for_the_expected_reason': True, 'expected': 'moved since the manifest froze', 'observed': ['kernel e865d65c80e2 is not the frozen 000000000000', 'the registry moved since the manifest froze', 'aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze'], 'calibrated': False, 'always_pass_mutant_rejected_by_calibration': True}"
+
+Diff is 5271 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 36 tests in 303.815s
+
+FAILED (failures=4)

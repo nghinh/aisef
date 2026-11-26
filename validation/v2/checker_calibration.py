@@ -670,14 +670,20 @@ REGISTRY: list[Callable[[], Checker]] = [
     _profile_freeze,
 ]
 
-#: Round v2.3 (owner ruling 2026-11-22 §D: every new validation/v23 checker registered and calibrated): the three
-#: checkers covering validation/v23/{impact,ci_gate,observe,released_evidence_guard}.py, built and calibrated
-#: (fixtures committed) but NOT YET in REGISTRY — the pinned tests/v23/test_v23_q0_round.py asserts the registry
-#: count 57 against the v2.2 record (its own amendment Q0-1 §2.2 row "registry" prescribes growth, so the pin and
-#: the mandate conflict), and ledger seq 13 forbids re-pinning V23_PINNED. Registration is one line
-#: (`REGISTRY += V23_CHECKERS`) under the owner's pin ruling; until then q0_round's scope rule names the four
-#: modules uncovered, truthfully red.
-V23_CHECKERS: tuple[Callable[[], Checker], ...] = (_f5_gate, _f5_recorder, _released_evidence)
+#: Round v2.3, ledger seq 14 (PIN-57 Option C, owner ruling 2026-11-26 §3): the two verdict-determining checkers —
+#: f5_gate (accept and refuse; sources validation/v23/{impact,ci_gate}.py) and released_evidence (refuse; source
+#: validation/v23/released_evidence_guard.py) — are REGISTERED and calibrated (57 -> 59, fixtures committed), per
+#: owner ruling 2026-11-22 §D and docs/v2.3/evidence/PIN-57-MODULE-ROLES.md §2.5/§4.5. The pinned counts in
+#: tests/v23/test_v23_q0_round.py are re-pinned by the same ruling (docs/v2.3/drafts/SEQ14-PIN57-C.patch).
+REGISTRY += [_f5_gate, _released_evidence]
+
+#: Ledger seq 14 (PIN-57 Option C): the one checker kept OUTSIDE the registry — f5_recorder
+#: (validation/v23/observe.py) — ONLY while its observation data cannot serve as qualification authority
+#: (PIN-57-MODULE-ROLES.md §3.3/§3.5: no gate feeds the engine observation records, and the authority sentinel
+#: impact.OBSERVATION_AUTHORITY stays "none: ...").
+#: Its calibration and that condition are drift-pinned, always-run, by tests/v23/test_v23_unregistered_checkers.py;
+#: validation/v23/observe.py is ruled into q0_round.NOT_CHECKERS_V23 by the same entry.
+V23_CHECKERS: tuple[Callable[[], Checker], ...] = (_f5_recorder,)
 
 
 # --------------------------------------------------------------------------------------- calibration

@@ -54,11 +54,26 @@ CHECK_ARGV = ("validation/v23/q0_round.py", "--check")
 CONTRACT = ("package", "fixture", "expected")
 #: Q0P-2, round v2.3 only. v2.2's module rule (checker_calibration.uncovered_checker_modules) sees validation/v2 alone,
 #: and Amendment A2 puts every new v2.3 module in validation/v23. There each module is a registered checker's source,
-#: or one of these, ruled by ledger seq 13 (R5 Q0_ROUND): the round's own calibration (as NOT_CHECKERS keeps
-#: checker_calibration.py) and the round's gate tools, each pinned by V23_PINNED with its own always-run negative tests.
+#: or one of these, ruled by ledger seq 13 (R5 Q0_ROUND) and ledger seq 14 (PIN-57 Option C): the round's own
+#: calibration (as NOT_CHECKERS keeps checker_calibration.py) and the round's gate tools, each pinned by V23_PINNED
+#: with its own always-run negative tests.
 #: The list is closed: adding a module to it is a new q0_round.py, so a new patch and a new ruling.
 NOT_CHECKERS_V23 = frozenset({"validation/v23/__init__.py", "validation/v23/ledger_digest.py",
-                              "validation/v23/q0_round.py", "validation/v23/replay_v22.py"})
+                              "validation/v23/q0_round.py", "validation/v23/replay_v22.py",
+                              # ledger seq 14 (PIN-57 Option C, owner ruling 2026-11-26 §3): the F5 recorder stays an
+                              # owner-ruled non-checker ONLY while no gate consumes its observation data as
+                              # qualification authority (docs/v2.3/evidence/PIN-57-MODULE-ROLES.md §3.3); that
+                              # condition and its calibration are drift-pinned, always-run, by
+                              # tests/v23/test_v23_unregistered_checkers.py
+                              "validation/v23/observe.py",
+                              # ledger seq 14 (owner ruling 2026-11-26 §3): B2 Tier-0 ground-truth tooling (protocol
+                              # §8 prep) — tooling, not checkers: no gate consumes their output and no known-bad
+                              # fixture exists (absence pinned by tests/v23/test_v23_unregistered_checkers.py).
+                              # Promotion clause: when ground_truth/corpus.py --check becomes a gate at the B2
+                              # manifest (W6), it enters cc.REGISTRY with a calibrated checker and leaves this list
+                              # (a new q0_round.py, a new patch, a new ruling).
+                              "validation/v23/ground_truth/__init__.py", "validation/v23/ground_truth/corpus.py",
+                              "validation/v23/ground_truth/labels.py", "validation/v23/ground_truth/metrics.py"})
 #: Q0P-2: the v2.3 code destructive_authority must scan (L1-AUTHCHK widens its SCOPES and ledgers the sites there)
 V23_SCOPES = ("validation/v23", "tests/v23")
 DA_REL = "validation/v2/destructive_authority.py"

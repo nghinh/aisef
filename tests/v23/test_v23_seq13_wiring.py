@@ -53,12 +53,15 @@ def _sha(b: bytes) -> str:
 
 
 class WiringR6(unittest.TestCase):
-    """RA-GP-1 + Q0-1, on a throwaway tree holding the patched sealing_gate.py and copies of the pinned files."""
+    """RA-GP-1 + Q0-1, on a throwaway tree holding the patched sealing_gate.py and copies of the pinned files.
+    Since ledger seq 14 (PIN-57 Option C) the applied wiring is the seq-13 R6 patch plus the seq-14 re-pin patch:
+    `wired` carries both, and the seq-13 patch alone is superseded (it skips nothing on this tree)."""
 
     @classmethod
     def setUpClass(cls):
         cls.patch = (ROOT / R.SEQ13_PATCH_REL).read_bytes()
-        cls.wired = R.wired_sealing_gate(cls.patch)
+        cls.seq14 = (ROOT / R.SEQ14_PATCH_REL).read_bytes()
+        cls.wired = R.wired_sealing_gate(cls.patch, cls.seq14)
         cls._tmp = tempfile.TemporaryDirectory(prefix="aisef-seq13-gate-")
 
     @classmethod
@@ -169,6 +172,27 @@ class WiringR6(unittest.TestCase):
         (t / "tests/v2/sealing_gate.py").write_bytes(old)
         mod = self.gate(t)
         self.assertTrue(all(self.decorated(mod, t, tid)[0] for tid in RP.V22_REPLAYED))
+
+    def test_the_seq14_patch_is_the_drafted_one_and_its_file_set_is_closed(self):
+        """Ledger seq 14 (PIN-57 Option C): the cumulative patch touches exactly the Option C files, and its sha256
+        is the one the seq-14 ledger draft names (committing the entry stays the owner's act)."""
+        files = re.findall(rb"^diff --git a/(\S+) ", _lf(self.seq14), re.M)
+        self.assertEqual(files, [b"tests/v2/sealing_gate.py", b"tests/v23/test_v23_q0_round.py",
+                                 b"tests/v23/test_v23_rounds.py", b"tests/v23/test_v23_seq13_wiring.py",
+                                 b"tests/v23/test_v23_unregistered_checkers.py",
+                                 b"validation/v2/checker_calibration.py", b"validation/v23/q0_round.py"])
+        self.assertIn(_sha(_lf(self.seq14)), (ROOT / R.SEQ14_DRAFT_REL).read_text(encoding="utf-8"))
+
+    def test_the_seq13_patch_alone_on_this_tree_skips_nothing(self):
+        """Seq 14 re-pinned three V23_PINNED files, so the seq-13 R6 wiring alone no longer matches this tree:
+        applied without the seq-14 re-pin it skips none of the 12 (they run under AISEF_SEALING=1)."""
+        old = R.wired_sealing_gate(self.patch)
+        t = self.tree()
+        (t / "tests/v2/sealing_gate.py").write_bytes(old)
+        mod = self.gate(t)
+        self.assertEqual(mod.V22_REPLAYED_Q0, (RP.Q0_REPLAYED,))
+        self.assertFalse(mod.V23_PINS_HOLD)
+        self.assertEqual([tid for tid in RP.REPLAYED if self.decorated(mod, t, tid)[0]], [])
 
     def test_R5s_patch_on_this_tree_skips_nothing(self):
         """R5 is superseded: the CI-portability corrections changed replay_v22.py and the Q0 counterpart, and R6

@@ -58,12 +58,15 @@ V22_REPLAYED_Q0 = ("tests/v2/p0/test_checker_calibration.py::CheckerCalibration"
 #: the (empty) package file that lets `discover` find them. The skip holds only while every pinned file is exactly as
 #: pinned; a deleted or edited one un-skips all 12, which then run under AISEF_SEALING=1 as they did before seq 13. Changing a pinned file therefore needs an edit of this file, which
 #: is wiring other than the one ledger seq 13 names.
+#: Ledger seq 14 (PIN-57 Option C, owner ruling 2026-11-26 §3) re-pins tests/v23/test_v23_q0_round.py,
+#: tests/v23/test_v23_rounds.py and validation/v23/q0_round.py through docs/v2.3/drafts/SEQ14-PIN57-C.patch
+#: (registry 57 -> 59; observe.py and the ground_truth tooling ruled into NOT_CHECKERS_V23 with drift pins).
 V23_PINNED = {
     "tests/v23/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "tests/v23/test_v23_q0_round.py": "9b9433f33c1176367a80dd2a3144f37f8f3e2250d6cd62df9a3956bb3ca8c7cb",
-    "tests/v23/test_v23_rounds.py": "a8ab309988a6e9dd66bfa782dd6b5f65b204066ea73b511870d17451690323f3",
+    "tests/v23/test_v23_q0_round.py": "c16fef76d0f5f45448736142bbab080f490f2ad53ff30a61145acc02b2c75ee7",
+    "tests/v23/test_v23_rounds.py": "e2922d9e8f2784046fe2e0d97b24a5bae9ae97d4479e8f05f78758622a975f1b",
     "validation/v23/ledger_digest.py": "660624c01b47811b8b9d2f41f371d4b721bb8b7c802eaa87b656c05f99ee3df9",
-    "validation/v23/q0_round.py": "038906381a500a0c40e179803078c471527f960b884644d34eea64b4ff85fccf",
+    "validation/v23/q0_round.py": "36be24327caa33efe8a7b03d6608c8c13f54c04a1b7ff341bd74b26253322c10",
     "validation/v23/replay_v22.py": "6b7195ec4aafb4cefcb304ad94325331853360206330d25e95af26e4449adc60",
 }
 

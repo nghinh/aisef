@@ -169,6 +169,14 @@ class Q0Record(unittest.TestCase):
     def setUpClass(cls):
         cls.v22 = (ROOT / Q.V22_REL).read_bytes()
         cls.result = json.loads(cls.v22)          # the committed v2.2 record is a calibration result itself
+        # ledger seq 14 (PIN-57 Option C): the registry grew 57 -> 59 (f5_gate, released_evidence) while the committed
+        # v2.2 record keeps its 57 rows, so the fully-calibrated result these round-trips assume carries one synthetic
+        # calibrated row per registered v2.3 checker (docs/v2.3/drafts/PIN-57-AMENDMENT-CANDIDATES.md §2.2, third pin)
+        for name in ("f5_gate", "released_evidence"):
+            cls.result["checkers"].append({"checker": name, "calibrated": True,
+                                           "always_pass_mutant_rejected_by_calibration": True,
+                                           "fixture": f"tests/v2/fixtures/known_bad/{name}.json"})
+        cls.result["checker_count"] = cls.result["calibrated_count"] = len(cls.result["checkers"])
 
     def root(self, *, v22: bytes | None = None, v23: bytes | None = None) -> pathlib.Path:
         t = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory(prefix="aisef-q0-round-")))
@@ -216,11 +224,11 @@ class Q0Record(unittest.TestCase):
     def test_a_dropped_v22_checker_and_a_short_registry_are_named(self):
         t = self.root(v22=self.v22)
         self.assertEqual(Q.dropped(self.result, t), [])
-        fewer = dict(self.result, checkers=self.result["checkers"][1:], calibrated_count=56)
+        fewer = dict(self.result, checkers=self.result["checkers"][1:], calibrated_count=58)
         self.assertEqual(Q.dropped(fewer, t), [f"v2.2 Q0 checker {self.result['checkers'][0]['checker']} is not "
                                                "calibrated in round v2.3"])
         with _tree_rules_hold():
-            self.assertIn("calibrated 56 of 57 registered checkers", Q.problems(fewer, t, record_too=False))
+            self.assertIn("calibrated 58 of 59 registered checkers", Q.problems(fewer, t, record_too=False))
             self.assertEqual(Q.problems(self.result, t, record_too=False), [])
 
     def test_the_writer_refuses_a_closed_round_writes_once_and_never_rewrites(self):
