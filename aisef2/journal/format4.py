@@ -29,7 +29,13 @@ Declared limitations (C-1 §11): L1 the chain is unkeyed until A2 integration �
 verifier binds later; L2 `reservation` is owner-typed DATA, no monetary cap is enforced here; L3 `segment` seals
 the LOCAL stream bytes, not what the provider served; L4 formats ≤2 keep their own sealed rules entirely; L7 the
 R-rules are defense in depth against hand-built journals — the kernel already cannot write the negatives (M3).
-"""
+
+
+Scope note (adversarial review 2026-11-26, C2): the lifecycle table and the R-rules are STORY-scoped at the
+append/reconstruct sites; RUN-level ordering (a second run/end, events after run/end other than the attestation
+rule's own bound) is enforced by the projections (TerminalState), exactly as in formats 2-3 — R-CLOSED does not
+close the run surface here. Consumers that trust a journal MUST fold the control projections, never reconstruct
+alone (G6's fold-before-trust obligation)."""
 
 from __future__ import annotations
 

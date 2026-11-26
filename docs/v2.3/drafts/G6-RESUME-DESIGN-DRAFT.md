@@ -215,3 +215,17 @@ ends without `run/end`). Mutant classes for `resume.py`: drop a §3.1 gate → i
 - **QG5 route identity source for the prospective side:** the resumed run's settings identity (§3.3), read
   BEFORE preflight; the preflight still attests it as today (run.py:610-624) — a route that fails attestation
   refuses the run before any reuse decision matters. Default stands.
+
+---
+
+## Addendum 2026-11-26 — fold-before-trust is LOAD-BEARING (adversarial review C1)
+
+The independent adversarial review of the C-1 landing (2026-11-26, evidence aisef-private-evidence/2026-11-26-
+advrev-f4/) CONFIRMED: a `story/completed` marker appended AFTER `run/end` is accepted by both the f4 writer and
+`format4.reconstruct`; only the projection fold refuses it. G2's verify rule already contains the fold leg ("no
+control-projection refusal") — this addendum makes it NORMATIVE, not incidental: **the resume MUST fold the
+predecessor's control projections (TerminalState included) and refuse on any projection refusal BEFORE trusting
+any marker; reconstruct alone is NEVER sufficient.** A marker in the reconstructed stream that the fold refuses
+(e.g. after `run/end`) ⇒ the FINGERPRINT_FORGED / tampering class: refuse the whole resume. This holds
+regardless of whether the owner issues the proposed C-1 amendment A1 (the §4.5 run/end bound) — defense in depth,
+not an alternative to it.
