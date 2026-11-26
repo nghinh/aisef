@@ -298,8 +298,13 @@ def _attestation4(event: Event, prior: Sequence[Event]) -> str | None:
 
 
 def _completed4(event: Event, prior: Sequence[Event]) -> str | None:
-    """§4.5: at most one marker per story per run (the table holds it WITHIN ENDED_COMMIT; the cites check binds
+    """§4.5 + C-1 amendment A1 (owner ruling 2026-11-26): the marker MUST appear before run/end — a completed-story
+    marker is never appended after the run has closed (refused at append AND reconstruct, naming event, seq and
+    rule); and at most one marker per story per run (the table holds it WITHIN ENDED_COMMIT; the cites check binds
     it to exactly one story/commit of the same story_id)."""
+    if any(e.type == T.RUN_END.value for e in prior):
+        return (f"{event.type} at seq {event.seq}: a completed-story marker appears before run/end — never "
+                "appended after the run has closed (C-1 amendment A1)")
     story_id = event.data["story_id"]
     if any(e.type == STORY_COMPLETED and e.data["story_id"] == story_id for e in prior):
         return f"{event.type} at seq {event.seq}: {story_id} is marked completed at most once per story per run"

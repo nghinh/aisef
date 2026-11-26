@@ -413,6 +413,31 @@ class StoryCompletedEnvelope(Base):
         self.refused(w, f4.STORY_COMPLETED, {"story_id": "S1", "revision": SHA, "fingerprint": HEX},
                      source_seqs=(commit.seq,), pattern="at most once per story per run")
 
+    def test_a1_marker_after_run_end_refused_at_all_three_sites(self):
+        """C-1 amendment A1 (owner ruling 2026-11-26) — the adversarial finding C1's reproducer. Red-before: the
+        pre-A1 code ACCEPTED this exact sequence at append and reconstruct (probe preserved in
+        aisef-private-evidence/2026-11-26-advrev-f4/); green-after: refused at BOTH sites naming event, seq and
+        rule — and the fold refuses the same forbidden sequence, so all three sites agree."""
+        w, commit = self.ended_commit()
+        w.append(T.RUN_END, {})
+        data = {"story_id": "S1", "revision": SHA, "fingerprint": HEX}
+        self.refused(w, f4.STORY_COMPLETED, data, source_seqs=(commit.seq,),
+                     pattern=r"story/completed at seq \d+: .*before run/end.*C-1 amendment A1")
+        from aisef2.journal.projections.terminal_state import TerminalState
+        from aisef2.journal.projections import ProjectionError
+        ts, state = TerminalState(), TerminalState().initial()
+        for e in self.only_terminal_kinds(w.w.events):
+            state = ts.step(state, e)
+        forged = Event(len(w.w.events), f4.STORY_COMPLETED, carried(f4.STORY_COMPLETED, data), 10.0 ** 6,
+                       False, (commit.seq,))
+        with self.assertRaisesRegex(ProjectionError, "after the run is ENDED"):
+            ts.step(state, forged)
+
+    @staticmethod
+    def only_terminal_kinds(events):
+        """TerminalState folds whole journals in production; here the minimal stream that reaches ENDED."""
+        return [e for e in events if e.type.startswith(("run/", "story/")) and e.type != "story/plan-drift"]
+
     def test_missing_or_malformed_fields_refused(self):
         w, commit = self.ended_commit()
         self.refused(w, f4.STORY_COMPLETED, {"story_id": "S1", "revision": SHA},
