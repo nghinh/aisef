@@ -218,3 +218,22 @@ KHÔNG engagement/chi/paid-trial/lộ tài liệu; gói cuối ≤08/12. §5 **A
 với signing BẮT BUỘC cho run format-4 chuẩn; từ chối TRƯỚC preflight/network/journal/paid; wheelhouse offline +
 3 OS native + reader cũ nguyên vẹn; chưa bật writer f4 production tới khi gate cài đặt + signing xanh. §6 tốc độ:
 song song tối đa, worktree cách ly, không serialize sau PIN-57/B2-SPEND; ƯU TIÊN CODE hơn tài liệu kế hoạch.
+
+### 7.4 OWNER RULING 2026-11-26 (thứ tư) — "C-1 AMENDMENT A2′ AND B2 EVALUATOR SOURCING" (đã ban hành, baseline 86de73d8)
+
+§1 **A2′ APPROVED** với điều kiện chấp nhận: schema f4 gate/check+gate/decision bắt buộc story_id non-empty, bind
+đúng attempt đang hoạt động (không phải chuỗi tùy ý), f1–3 nguyên vẹn byte+hành vi; completeness CHỈ cho
+passed:true trong scope = sau decision trước của cùng (gate, story_id) hoặc biên attempt đầu; từ chối cite
+duplicate/missing/cross-story/stale/invalid; cấm PASS rỗng bằng chứng; passed:false chỉ miễn completeness; ma trận
+test bắt buộc (C3 red-before, omit PASS/FAIL, multi-gate/story, C5 interleave, retry boundaries, E5 fault tails,
+story_id sai/cross-story/vacuous, A/R/F consistency, parity f1–3 + golden corpus); amendment dated scoped, KHÔNG
+viết lại design frozen; adversarial review độc lập TRƯỚC khi chấp nhận tích hợp; file pin nào thay đổi → tính
+transition chính xác + xin ủy quyền, không re-pin im lặng. §2 **A1: diễn giải ABANDONED được chấp nhận** (giữ
+nghiêm; interrupt đầu hợp lệ; không rollback). §3 seq-14 acknowledged; 1–14 bất biến; 3 blocker Q0 giữ hiển thị;
+không claim 59/59. §4 **B2 sourcing ZERO-USD**: được liên hệ ứng viên qua kênh nghề nghiệp công khai, xác nhận
+availability/quals/rate/NDA, CoI, xin báo giá fixed-price không ràng buộc, trình top-2+backup; CẤM chia sẻ code/
+bundle/label/secret; không subscription/hợp đồng/thanh toán; cap all-inclusive ĐÍCH $2.500 chờ duyệt slate+terms;
+gói ≤08/12. §5 CORE-2 tiến hành (A2′, E2/E4, enum+vocabulary, projection tests, C5/G6 nơi interface ổn định);
+single-writer; không bật writer f4 production trước các gate; RULE-2 chỉ với provenance tái lập; qualification
+đích tại biên tích hợp; KHÔNG RC campaign. §6 chỉ nói 6-platform PASS khi CI đúng-HEAD kết luận; báo cáo kế =
+commit thật + ma trận negative A2′ + tiến độ C5/G6 + Q0 + CI + B2 shortlist + dự báo critical-path.

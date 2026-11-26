@@ -35,3 +35,7 @@ interrupt closes the run"; a FIRST (non-abandoning) interrupt does not close the
 there (pinned by test). _attestation4's narrower "before run/end" matches its own frozen §4.4 text and stays
 as-is (recorded for the flip gate). If the owner prefers the narrower reading of A1 ("closed" = run/end only),
 reverting is one branch condition + one test — say so and it is done; silence keeps the fail-closed reading.
+
+**Owner acceptance (ruling 2026-11-26 §2):** the stricter ABANDONED-closes-the-run interpretation is ACCEPTED;
+the first non-abandoning interrupt stays legal; the three-site controls and G6 fold-before-trust stay mandatory;
+no rollback to the run/end-only reading is requested. The one-line revert path above is hereby retired.
