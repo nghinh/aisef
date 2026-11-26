@@ -284,3 +284,32 @@ freeze, oracle signing, B2-MEASURE) được chuyển về engineering, nên COD
 lịch mục 6 — đây là biên sớm-nhất-có-thể nêu dè dặt, KHÔNG phải cam kết ngày sớm hơn; mọi ETA ngoài phần đo được
 vẫn là ước tính lịch (mục 6 giữ nguyên nguyên tắc đó). Không gate §5-charter nào yếu đi; không claim nào về
 external validation/false-acceptance/cross-repo generalization được đưa ra.
+
+> **Closure có ngày (2026-11-26, owner ruling "A2′ Closure, Cohort Defect Disposition and RC Preparation" §1):**
+> dòng "A2′ integration gate — verdict chưa có" ở trên ĐÃ ĐÓNG — A2′ ACCEPTED for engineering integration tại
+> `f0c230f3` (Option A giữ nguyên, không mở lại); disposition review độc lập + 4 deviation + số đo 79→84 ghi trong
+> amendments/C-1-A2-GATE-COMPLETENESS.md (phụ lục có ngày). Engineering CI closure còn chờ workflow `tests` xanh
+> trên ĐÚNG `f0c230f3` — chưa gọi PASS khi run còn queued/in-progress.
+
+### 7.7 OWNER RULING 2026-11-26 — "A2′ Closure, Cohort Defect Disposition and RC Preparation"
+
+§1 A2′: ACCEPTED for engineering integration (`f0c230f3`, Option A — không mở lại); nghĩa vụ ghi chép đã thực hiện
+(phụ lục review-disposition + closure §7.6 ở trên); CI closure = `tests` xanh trên đúng HEAD. §2 #64–#66:
+**NON-RELEASE B2 DISPOSITION** — gỡ remediation khỏi critical path v2.3, CÓ ĐIỀU KIỆN kiểm phụ thuộc nguồn cụ thể
+(aisef2/cohort preregistration/generalization không có consumer hoạt động trong năng lực giữ lại; nếu có → STOP
+reclassification); ba finding P3 giữ nguyên hiển thị trong CODE-AUDIT, provenance nguyên vẹn, KHÔNG FIXED/PASSED/
+QUALIFIED; Tier-0 code/tests/evidence giữ, không che CI. §3 thứ tự mutation: **DUYỆT PHƯƠNG PHÁP, KHÔNG PHẢI RC
+QUALIFICATION** — dữ liệu timing E5 + benchmark order-table được dùng làm input nghiên cứu hiệu năng; cho phép
+ordered execution trong trial development/qualification CÓ GIỚI HẠN, giữ nguyên T0/confirmed-kill/survivor-audit/
+provenance/source-bound; KHÔNG relabel số đo dirty thành clean; ratification bảng RC cuối = HOLD tới khi round
+writer + provenance guards + source-bound checks + validation trên đúng RC source chứng minh detection/results không
+đổi; không sharding mutant-level. §4 C-2: **PREPARATION GO, FREEZE HOLD** — soạn trọn gói freeze signing/install
+(reproducible wheel+sdist identities, offline wheelhouse install, native-platform tests, external trusted-anchor
+semantics, fail-before-preflight bắt buộc, historical-format compatibility, adversarial negative controls); KHÔNG
+flip production FORMAT-4 writer trước khi các gate install/signing + review độc lập đạt. §5 E1/E2: APPROVED —
+amendment có ngày amendments/C-1-E1-E2-EDITORIAL.md (phi hành vi; FAILED với `detail` rỗng vẫn hợp lệ; không thêm
+required field/schema chặt hơn). §6: B2 external giữ REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER; Tier-0/B5/mọi gate
+bắt buộc/RC mutation campaign nguyên vẹn; mốc **26/02/2027** là target, không phải cam kết publication vô điều
+kiện; tiến hành CORE-2, E2/E4, C5/G6 theo file-ownership + qualification controls hiện hành; báo cáo kế = HEAD
+chính xác + CI verdict đầy đủ + Q0 blocker count + tiến độ CORE-2 + độ sẵn sàng gói C-2 + thay đổi critical path.
+KHÔNG tag/merge master/PyPI.

@@ -84,3 +84,11 @@ prose-only (FAILED với detail rỗng hợp lệ — nếu owner muốn bắt b
 
 - C2 (RUN-scope không đóng ở A/R — parity f3): đã thành scope-note trong docstring format4.py + nghĩa vụ
   fold-before-trust của G6. C4 (proof tươi trên probe cũ — parity f3, L7): ghi vào kế hoạch test W2c.
+
+---
+
+**Trạng thái có ngày (append 2026-11-26, không sửa chữ đề xuất ở trên):** A1 — BAN HÀNH + triển khai
+(amendments/C-1-A1-STORY-COMPLETED-BEFORE-RUN-END.md, cách đọc ABANDONED được owner chấp nhận). A2′ — BAN HÀNH +
+tích hợp `f0c230f3` (amendments/C-1-A2-GATE-COMPLETENESS.md, Option A, review disposition trong phụ lục).
+E1/E2 — **APPROVED** (owner ruling 2026-11-26 §5) qua amendment có ngày amendments/C-1-E1-E2-EDITORIAL.md,
+phi hành vi, không required field mới.

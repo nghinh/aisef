@@ -168,3 +168,38 @@ format-4 journal exists yet** — the production writer flip is still gated — 
 
 Per ruling §1, the independent adversarial review runs AFTER this implementation and BEFORE integration
 acceptance; this record claims no such review and flips nothing to production.
+
+## Independent-review disposition (appended 2026-11-26 per owner ruling "A2′ Closure, Cohort Defect Disposition and RC Preparation" §1)
+
+**Reviewed diff (exact):** commit `f0c230f33499ec314b4bb1968c3e952385262302` on `release/v2.3-big` — 5 files,
+643 insertions / 13 deletions: `aisef2/journal/format4.py` (+76), `tests/v2/test_v23_format4.py` (+390), this
+record (+170), `closure-evidence/v2/v2.3/AUTHORITY-INVENTORY.json` (73→74 active authorities, +`_gate4` row),
+`validation/qualification/release_inventory.py` (pin → `456c6136…`). The reviewer's final confirmation ran on this
+exact diff; `aisef2/journal/format4.py` at integration is **byte-identical** to the reviewed copy (git blob
+`f43eac9302b0df76f9ba4eb34e1b484b1c2f7119`, verified by hash at confirm time).
+
+**Reviewer evidence identity:** independent adversarial review of 2026-11-26 (in-session reviewer isolated from the
+implementation context), two passes: (1) full review — 46 probes against the A2′ surface plus 6 targeted mutants on
+`_gate_schema`/`_gate_bound4`/`_gate4` (**6/6 KILLED** by the committed matrix); verdict **ACCEPT** conditional on
+the F1 record correction; (2) final pass on the exact integrated diff above; verdict **CONFIRM INTEGRATION, no
+blocker**. One disclosed side effect: an unreferenced loose git blob (`6a4cf498…`) created by the reviewer's own
+`git hash-object -w` during byte comparison — harmless, gc-prunable, no ref points at it.
+
+**The four declared deviations and their dispositions:**
+
+| # | Declared deviation (vs the ruling's literal text) | Reviewer finding | Fix | Disposition |
+|---|---|---|---|---|
+| 1 | First-decision scope opens at the story's **latest `story/begin`**, not the draft's `run/begin` | **F1:** this record's original equivalence parenthetical was factually false (the readings differ on hand-built journals) | Parenthetical retracted; corrected, verified justification written (kernel-written journals cannot carry an undecided earlier attempt); question escalated to the owner | **RESOLVED** — owner approved OPTION A and mandated the orphan negative control; `A2OrphanAttempt` (4 legs) SUCCEEDED, no counterexample |
+| 2 | Duplicate-citation refusal rides the frozen Event invariant (`event.py:78-80`); no new A2′ string | **F2:** the original duplicate test was vacuous in the harness (the writer path cannot construct the input) | `test_duplicate_citation_refused_at_reconstruct_on_raw_bytes`: a validly encoded line's `source_seqs` tampered to a duplicate, fed to `reconstruct` — the invariant fires on raw bytes | **ACCEPTED** (proven at both sites) |
+| 3 | Vacuous-PASS refusal rides the frozen cites rule ("cites at least one gate/check"); no new string | None — coverage confirmed, pinned by test | — | **ACCEPTED** as declared |
+| 4 | A/R/F consistency declared honestly as "the fold has no gate leg" (no projection folds gate kinds), not a three-site claim | **F3:** the `FoldHasNoGateLeg` tripwire fixture lacked a `passed: true` decision, weakening the pin | Fixture extended with a passing decision | **ACCEPTED** after fix |
+
+Reporting correction by the reviewer: the integrator's claimed test count (85) was wrong; the measured count is 84.
+
+**Measurements, both retained:** **79 tests** was the landing-time measurement of this record's "Verification at
+this landing" section (correct when observed, before review hardening); **84 tests** is the final post-review
+measurement at `f0c230f3` (`python3 -m unittest tests.v2.test_v23_format4` → `Ran 84 tests … OK`): +4
+`A2OrphanAttempt` legs and +1 raw-bytes duplicate test. The earlier observation is not rewritten.
+
+**Engineering CI closure** requires a successful full `tests` workflow on `f0c230f3` exactly; at the time of this
+appendix that run is queued and is reported as such, not as PASS.
