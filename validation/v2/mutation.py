@@ -23,6 +23,8 @@ made in the parsed script and written back into the constant, so the kill tests 
     python -P validation/v2/mutation.py run [target ...]   # run; writes closure-evidence/v2/P<n>-MUTATION.json
     python -P validation/v2/mutation.py run --order TABLE.json target ...     # each chain in the table's order (§7.2;
                                                                               # TABLE from validation/v2/execution_order.py)
+    python -P validation/v2/mutation.py --run-affected --order TABLE.json [target ...]   # the round-v2.3 measurement
+                                                                              # with the same §7.2 table rule
     python -P validation/v2/mutation.py --check            # every phase record current, every target killed or audited
 """
 
@@ -1491,6 +1493,15 @@ V23_KILL_APPEND: dict[str, list[str]] = {
 }
 
 
+def _v23_kills(target: str) -> list[str] | None:
+    """The kill set a round-v2.3 measurement of `target` runs (§4.4: the declared set plus V23_KILL_APPEND),
+    None for a target outside the registry."""
+    base = TARGETS.get(target) or V23_NEW_TARGETS.get(target)
+    if base is None:
+        return None
+    return list(base) + [k for k in V23_KILL_APPEND.get(target, []) if k not in (TARGETS.get(target) or ())]
+
+
 def entry_sha256(e: dict) -> str:
     """The canonical-JSON digest of one entry — what a round-v2.3 `supersedes` names and the prefix rule compares."""
     return hashlib.sha256(json.dumps(e, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
@@ -2846,6 +2857,30 @@ def _checkpoint(entry: dict) -> None:
     print("MUTANT " + json.dumps(entry, ensure_ascii=False), flush=True)
 
 
+def _order_table(path: pathlib.Path, kill_of) -> tuple[dict, dict]:
+    """(orders, stamp) of an execution-order table (§7.2): every entry is validated against the caller's own kill set
+    `kill_of(target)` (None: not a target) BEFORE the first target runs — a bad one refused at its turn came after
+    hours of earlier targets, and its errored entry replaced that target's result in the record. One rule for the
+    phase path (`run --order`) and the round path (`--run-affected --order`)."""
+    try:
+        raw = path.read_bytes()
+        table = json.loads(raw).get("orders")
+    except (OSError, ValueError, AttributeError) as e:
+        raise SystemExit(f"execution-order table refused, nothing ran: {path}: {e}") from None
+    if not isinstance(table, dict):
+        raise SystemExit(f"execution-order table refused, nothing ran: {path} has no `orders` object")
+    rel, commit = committed(ROOT, path, raw)   # the record ties each result to the committed table
+    stamp = {"table": rel, "table_sha256": hashlib.sha256(raw).hexdigest(), "table_commit": commit}
+    if not commit:
+        print(f"WARNING execution-order table {rel} is not a file committed at HEAD: --check refuses every "
+              "result it orders", flush=True)
+    if unknown := [x for x in table if kill_of(x) is None]:
+        raise SystemExit(f"not a mutation target in the execution-order table: {unknown}")
+    if bad := {x: why for x, e in table.items() if (why := _order_problem(e, kill_of(x)))}:
+        raise SystemExit(f"execution-order table refused, nothing ran: {bad}")
+    return table, stamp
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if argv[:1] == ["--check"]:   # the F5 gate's truthful legs (W1-DESIGN §2.5 staged cut-over): the v2.2 rule with
@@ -2863,6 +2898,15 @@ def main(argv: list[str] | None = None) -> int:
         print("mutation: " + ("FAIL" if problems or states_bad else "PASS"))
         return 1 if problems or states_bad else 0
     if argv[:1] in (["--affected"], ["--run-affected"]):   # §2.5: measure INVALIDATED + UNRESOLVED (I6) + new targets
+        named = [a for a in argv[1:] if a != "--run-affected"]
+        table, stamp = {}, {}
+        # §7.2 in the round: misuse is refused before anything runs, exactly as `run --order` refuses it
+        if "--order" in named:
+            if argv[:1] == ["--affected"] or named[:1] != ["--order"] or len(named) < 2 or "--order" in named[1:]:
+                raise SystemExit("usage: mutation.py --run-affected --order TABLE.json [TARGET...] (--order once, "
+                                 "first, with a table; --affected never takes one)")
+            table, stamp = _order_table(pathlib.Path(named[1]), _v23_kills)
+            named = named[2:]
         from validation.v23 import impact   # lazy: the engine is the one classification authority, never re-implemented
         v23, pre = v23_newest(ROOT)
         states = impact.classify(ROOT, impact.BASE, "HEAD")
@@ -2876,7 +2920,6 @@ def main(argv: list[str] | None = None) -> int:
         # `--run-affected TARGET...` measures the named SUBSET of the affected set (owner 2026-11-22 §C: targeted
         # qualification for trust-critical changes; the comprehensive campaign is separately authorized). A name
         # outside the affected set is refused: this flag can only narrow, never add.
-        named = [a for a in argv[1:] if a != "--run-affected"]
         if named:
             affected = {s.target for s in need} | set(new)
             if outside := [t for t in named if t not in affected]:
@@ -2924,10 +2967,10 @@ def main(argv: list[str] | None = None) -> int:
         with tempfile.TemporaryDirectory(prefix=f"aisef-pristine-{worker}-") as p:
             pristine = _pristine(ROOT, pathlib.Path(p) / "tree")
             for target in chosen:   # the record is appended after every target: a run that dies keeps what it measured
-                kills = (TARGETS.get(target) or V23_NEW_TARGETS[target]) + \
-                    [k for k in V23_KILL_APPEND.get(target, []) if k not in (TARGETS.get(target) or ())]
+                kills = _v23_kills(target)
                 try:
-                    t = run_target(ROOT, target, kills, pristine, on_mutant=_checkpoint)
+                    t = run_target(ROOT, target, kills, pristine, on_mutant=_checkpoint,
+                                   order={**table[target], **stamp} if target in table else None)
                 except Exception as e:   # outside run_target's own guard: named, never lost
                     t = _summarise({"target": target, "runner": 2, "kill_tests": list(kills), "mutants": 0,
                                     "results": [], "error": f"RUNNER_EXCEPTION before the target: {e!r}",
@@ -2976,24 +3019,7 @@ def main(argv: list[str] | None = None) -> int:
                              "and the targets it is for)")
         if chosen[:1] == ["--order"]:   # validation/v2/execution_order.py's table: {"orders": {target: entry}, ...}
             path, chosen = pathlib.Path(chosen[1]), chosen[2:]
-            try:
-                raw = path.read_bytes()
-                table = json.loads(raw).get("orders")
-            except (OSError, ValueError, AttributeError) as e:
-                raise SystemExit(f"execution-order table refused, nothing ran: {path}: {e}") from None
-            if not isinstance(table, dict):
-                raise SystemExit(f"execution-order table refused, nothing ran: {path} has no `orders` object")
-            rel, commit = committed(ROOT, path, raw)   # the record ties each result to the committed table
-            stamp = {"table": rel, "table_sha256": hashlib.sha256(raw).hexdigest(), "table_commit": commit}
-            if not commit:
-                print(f"WARNING execution-order table {rel} is not a file committed at HEAD: --check refuses every "
-                      "result it orders", flush=True)
-            if unknown := [x for x in table if x not in TARGETS]:
-                raise SystemExit(f"not a mutation target in the execution-order table: {unknown}")
-            # every entry, before the first target runs: a bad one refused at its turn came after hours of earlier
-            # targets, and its errored entry replaced that target's result in the record
-            if bad := {x: why for x, e in table.items() if (why := _order_problem(e, TARGETS[x]))}:
-                raise SystemExit(f"execution-order table refused, nothing ran: {bad}")
+            table, stamp = _order_table(path, TARGETS.get)
         if unknown := [t for t in chosen if t not in TARGETS]:
             raise SystemExit(f"not a mutation target: {unknown}")
         chosen = chosen or list(TARGETS)
