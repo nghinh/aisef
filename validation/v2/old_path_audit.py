@@ -237,7 +237,9 @@ RECENCY_ATTRS = {"st_mtime", "st_ctime", "st_atime", "getmtime", "getctime", "li
                  "scandir"}
 RECENCY_KEYS = re.compile(r"latest|newest|most_recent|last_modified|mtime|ctime|\btime\b", re.IGNORECASE)
 #: the journal writers stamp `Event.time`; nothing else in a control module may import or read wall-clock time
-TIME_WRITERS = ("aisef2/journal/writer.py", "aisef2/journal/event.py", "aisef2/journal/format2.py", "aisef2/journal/format3.py")
+#: (format4.py joined 2026-11-26: the C-1 frozen JournalWriter4 stamps Event.time exactly as its siblings do)
+TIME_WRITERS = ("aisef2/journal/writer.py", "aisef2/journal/event.py", "aisef2/journal/format2.py",
+                "aisef2/journal/format3.py", "aisef2/journal/format4.py")
 #: R6: the stage each gate row summarises and the typed call that must precede it in the runner
 STAGE_EVIDENCE = {"admission": "admit_story", "developer": "implement", "candidate": "move", "quality": "assess",
                   "merge": "merge", "post-merge": "move", "resources": "acquire"}

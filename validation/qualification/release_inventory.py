@@ -26,9 +26,12 @@ import pathlib
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-INVENTORY_REL = "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json"
+#: v2.3 era (2026-11-26, C-1 L2-JOURNAL landing): the current inventory moved to a NEW v2.3 path because CIGOV-R1
+#: (released_evidence_guard, 2026-11-22) freezes every committed closure-evidence/v2/** byte — the v2.1 file joined
+#: the protected history, so "a deleted file regenerated" is no longer legal there; each era now gets its own file.
+INVENTORY_REL = "closure-evidence/v2/v2.3/AUTHORITY-INVENTORY.json"
 #: the LF-normalised sha256 of INVENTORY_REL: the one release inventory this tree is audited against
-INVENTORY_SHA256 = "9eaf87693c079b64fb7282a4459977d58ca120fb3569fa58a658fac3ff6eb51a"
+INVENTORY_SHA256 = "7ceb1b87a1506fbf6d07abd4109571757146f8ef7d300da94b601be6b8fbb1b7"
 #: the 2.0 release's inventory, history: never rewritten, byte-identical to this pin and to its blob at tag v2.0.0
 RELEASE_2_0_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
 RELEASE_2_0_SHA256 = "6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c"
