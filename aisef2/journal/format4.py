@@ -18,6 +18,13 @@ table (`journal.transitions`) as the ONE story-lifecycle rule:
   primary form), R-GATE (no passing decision over a failed check), R-COMMIT (no commit in an attempt without a
   `proof/verified` — Q2 measured, STRICT form). **R-CLOSED** (§4.6, C5/G9): `run/end` is refused while any
   `provider/request` is unanswered. `story/resource-acquired` gains optional `base` (sha) for WORKTREE.
+* **A2′** (C-1 amendment, owner ruling 2026-11-26 §1; docs/v2.3/amendments/C-1-A2-GATE-COMPLETENESS.md): format-4
+  `gate/check` and `gate/decision` carry REQUIRED non-empty `story_id` — formats 1–3 never admit the field (CR-3) —
+  bound to a story in an OPEN attempt (R-GATE-BIND); a decision's citations are own-story and in-scope
+  (R-GATE-CITE; distinctness is already the Event invariant's), and a `passed: true` decision cites EVERY in-scope
+  `gate/check` of its (`gate`, `story_id`)
+  (R-GATE-COMPLETE). `passed: false` is exempt from completeness ONLY — the E5 contained-fault tail legitimately
+  strands helper-emitted checks — and stays subject to R-GATE, the binding and the citation rules.
 * **`tests/adequacy`** (§4.7, #93) gains OPTIONAL `audit {reason, vacuity, relevance}` — production always emits it
   (the `quality.payload()` edit lands with the measured batch); synthetic test journals stay writable without it.
 * **`failure/observed`** admits exactly `FORMAT_4_CODES` — the 22 v2.2.0 literals (§4.9, V21-57 KEEP).
@@ -160,6 +167,14 @@ def _adequacy_schema() -> Schema:
     return Schema(base.required, {**base.optional, "audit": _audit}, base.cites, base.rule)
 
 
+def _gate_schema(kind: str) -> Schema:
+    """A2′ (schema): a format-4 gate event names the story attempt it decides — required non-empty `story_id`.
+    The base schema is extended at THIS layer only; formats 1–3 never admit the field (CR-3), and the historical
+    writers emit nothing new (the kernel's gate.py hunk lands with the production writer flip, not here)."""
+    base = f3.SCHEMAS[kind]
+    return Schema({**base.required, "story_id": _str}, base.optional, base.cites, base.rule)
+
+
 #: Format-4 schemas: format 3's (which carry formats 1 and 2 where unchanged), the §4 deltas re-declared, the two
 #: new kinds added. New required fields appear ONLY here; formats 1–3 never admit them (CR-3).
 SCHEMAS: Mapping[str, Schema] = MappingProxyType({**f3.SCHEMAS, **{
@@ -172,6 +187,8 @@ SCHEMAS: Mapping[str, Schema] = MappingProxyType({**f3.SCHEMAS, **{
                                      "detail": _text, "segment": _segment},
                                     cites=ev.Cite(T.PROVIDER_REQUEST, False, "story_id"), rule=_result_rule),
     T.TESTS_ADEQUACY.value: _adequacy_schema(),
+    T.GATE_CHECK.value: _gate_schema(T.GATE_CHECK.value),
+    T.GATE_DECISION.value: _gate_schema(T.GATE_DECISION.value),
     T.STORY_RESOURCE_ACQUIRED.value: Schema({"story_id": _str, "resource": _str,
                                              "kind": ev._enum(f2.ResourceKind)}, {"base": _sha},
                                             rule=_acquired_rule),
@@ -257,14 +274,66 @@ def _verified4(event: Event, prior: Sequence[Event]) -> str | None:
     return None
 
 
+#: A2′ binding: the OPEN-attempt states — between the attempt's story/begin and the outcome move that decides it.
+#: Derived from the frozen table and the kernel's real emission (verified 2026-11-26): orchestrate/gate.py has the
+#: ONE gate id (`GATE = "story"`, gate.py:10) and every check/decision is attempt-scoped (`checks` initialised per
+#: attempt at story_runner.py:226, decided at :449); the resources check (:244) lands in BEGIN (before admission),
+#: the admission check (:263) in ACTIVE or BEGIN_REFUSED (the sink's story/admitted precedes it,
+#: story_admission.py:168), the E5 fault tail (:429-443) in whichever of the three the fault left, and the
+#: decision (:449) before the story/commit|retry|rollback that moves the state out of the set.
+_ATTEMPT_OPEN = frozenset({"BEGIN", "BEGIN_REFUSED", "ACTIVE"})
+
+
+def _gate_bound4(event: Event, prior: Sequence[Event]) -> str | None:
+    """A2′ (rule, part 1): a gate event binds to the story attempt it decides — story_id names a story the table
+    holds in an open attempt at this point of the stream; an arbitrary story_id is refused."""
+    story_id = event.data["story_id"]
+    state = _story_state_of(story_id, prior)
+    if state not in _ATTEMPT_OPEN:
+        return (f"R-GATE-BIND (A2'): {event.type} at seq {event.seq} names {story_id} in state {state}: a format-4 "
+                "gate event binds to a story in an open attempt (BEGIN, BEGIN_REFUSED or ACTIVE)")
+    return None
+
+
 def _gate4(event: Event, prior: Sequence[Event]) -> str | None:
-    """R-GATE (§4.8): a passing decision over a failed check is refused (the cites check has already bound every
-    cited event to a gate/check of the same gate)."""
-    if event.data["passed"] is not True:
+    """R-GATE (§4.8) + A2′ (rule, part 2). The cites check has already bound every cited event to a gate/check of
+    the same gate; this rule adds: the decision binds to an open attempt; its citations are own-story and in-scope
+    (scope = events after the previous gate/decision of the same (gate, story_id), or after the story's
+    latest story/begin when none exists); a passing decision cites EVERY in-scope check of its (gate, story_id).
+    `passed: false` is exempt from completeness ONLY (the E5 contained-fault tail legitimately strands
+    helper-emitted checks, story_runner.py:409-443) and still refuses a cited failed check, as frozen."""
+    why = _gate_bound4(event, prior)
+    if why:
+        return why
+    d = event.data
+    gate, story_id = d["gate"], d["story_id"]
+    # duplicate citations need no A2′ branch: Event.__post_init__ (event.py:78-80) refuses any event whose
+    # source_seqs are not strictly increasing — "each once, in order" — a frozen invariant stronger than A2′ asks.
+    cross = [s for s in event.source_seqs if prior[s].data["story_id"] != story_id]
+    if cross:
+        return (f"R-GATE-CITE (A2'): {event.type} at seq {event.seq} of {story_id} cites {cross}: a gate/check of "
+                "another story is never this decision's evidence")
+    previous = next((e.seq for e in reversed(prior) if e.type == T.GATE_DECISION.value
+                     and e.data.get("gate") == gate and e.data.get("story_id") == story_id), None)
+    start = previous if previous is not None else next(
+        (e.seq for e in reversed(prior) if e.type == T.STORY_BEGIN.value and e.data.get("story_id") == story_id), -1)
+    stale = [s for s in event.source_seqs if s <= start]
+    if stale:
+        boundary = "its previous gate/decision" if previous is not None else "the attempt boundary"
+        return (f"R-GATE-CITE (A2'): {event.type} at seq {event.seq} cites {stale}: stale — before this decision's "
+                f"scope, the events after seq {start} ({boundary} of ({gate}, {story_id}))")
+    if d["passed"] is not True:
         return None
     failed = [s for s in event.source_seqs if prior[s].data["passed"] is False]
     if failed:
         return f"R-GATE: {event.type} at seq {event.seq} with passed true cites failed gate/check {failed}"
+    cited = set(event.source_seqs)
+    uncited = [e.seq for e in prior[start + 1:] if e.type == T.GATE_CHECK.value and e.data.get("gate") == gate
+               and e.data.get("story_id") == story_id and e.seq not in cited]
+    if uncited:
+        return (f"R-GATE-COMPLETE (A2'): {event.type} at seq {event.seq} with passed true leaves gate/check "
+                f"{uncited} of ({gate}, {story_id}) uncited in its scope: a passing decision cites every check of "
+                "its gate and story")
     return None
 
 
@@ -316,6 +385,7 @@ def _rules() -> Mapping[str, Callable[[Event, Sequence[Event]], str | None]]:
     rules = dict(f3._RULES)  # f2/f3 rules for non-lifecycle kinds (resources, tools, capabilities, plan, results)
     del rules[T.TESTS_ADEQUACY.value]       # activity is the table's, not an ad-hoc _story_active
     rules[T.PROOF_VERIFIED.value] = _verified4
+    rules[T.GATE_CHECK.value] = _gate_bound4
     rules[T.GATE_DECISION.value] = _gate4
     rules[T.STORY_COMMIT.value] = _commit4
     rules[T.RUN_END.value] = _closed4

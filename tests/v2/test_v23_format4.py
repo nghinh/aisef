@@ -15,6 +15,7 @@ DEFERRED to the measured CORE-2 batch (frozen obligations needing files this mer
 """
 
 import itertools
+import json
 import pathlib
 import tempfile
 import unittest
@@ -101,6 +102,19 @@ def audit_payload(**over):
 
 def attestation_payload(**over):
     d = {"session": "sessions/s1.jsonl", "expected": "model-x", "observed": "model-x", "passed": True, "detail": ""}
+    d.update(over)
+    return d
+
+
+def gate_check(sid="S1", gate="story", check="admission", passed=True, detail="", **over):
+    """A format-4 gate/check (A2′: story_id required; gate.py's one real gate id is the default)."""
+    d = {"gate": gate, "check": f"{sid}:{check}", "passed": passed, "detail": detail, "story_id": sid}
+    d.update(over)
+    return d
+
+
+def gate_decision(sid="S1", gate="story", passed=True, **over):
+    d = {"gate": gate, "passed": passed, "projections": ("story_state",), "story_id": sid}
     d.update(over)
     return d
 
@@ -586,26 +600,388 @@ class SealedRule(Base):
 class GateRule(Base):
     def gated(self, passed_check):
         w = self.world()
-        w.begin()
-        check = w.append(T.GATE_CHECK, {"gate": "G1", "check": "c1", "passed": passed_check, "detail": ""})
+        w.active()
+        check = w.append(T.GATE_CHECK, gate_check(passed=passed_check))
         return w, check
 
     def test_t9_passing_decision_over_a_failed_check_refused(self):
         w, check = self.gated(False)
-        error = self.refused(w, T.GATE_DECISION, {"gate": "G1", "passed": True, "projections": ("story_state",)},
+        error = self.refused(w, T.GATE_DECISION, gate_decision(passed=True),
                              source_seqs=(check.seq,), pattern="R-GATE")
         self.assertIn("gate/decision", str(error))
         self.assertIn(f"[{check.seq}]", str(error))
 
     def test_failing_decision_over_a_failed_check_is_legal(self):
         w, check = self.gated(False)
-        w.append(T.GATE_DECISION, {"gate": "G1", "passed": False, "projections": ("story_state",)},
-                 source_seqs=(check.seq,))
+        w.append(T.GATE_DECISION, gate_decision(passed=False), source_seqs=(check.seq,))
 
     def test_passing_decision_over_passed_checks_is_legal(self):
         w, check = self.gated(True)
-        w.append(T.GATE_DECISION, {"gate": "G1", "passed": True, "projections": ("story_state",)},
-                 source_seqs=(check.seq,))
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(check.seq,))
+
+
+# --------------------------------------------------------------------- A2′ (C-1 amendment, owner ruling 2026-11-26 §1)
+
+class A2GateSchema(Base):
+    """A2′ (schema): f4 gate/check and gate/decision require non-empty story_id — at the f4 layer ONLY."""
+
+    def test_gate_check_without_story_id_refused(self):
+        """Red-before/green-after of the schema: the pre-A2′ format-4 validator ACCEPTED this exact payload (no
+        story_id — the 2.2.0 gate/check schema, event.py:217). No production format-4 journal exists yet (the
+        production writer flip is gated behind the owner ruling's install/signing gates), so no migration is owed:
+        the intended break refuses only hand-built pre-A2′ journals."""
+        w = self.world()
+        w.active()
+        self.refused(w, T.GATE_CHECK, {"gate": "story", "check": "S1:admission", "passed": True, "detail": ""},
+                     pattern=r"missing \['story_id'\]")
+
+    def test_gate_decision_without_story_id_refused(self):
+        w = self.world()
+        w.active()
+        check = w.append(T.GATE_CHECK, gate_check())
+        self.refused(w, T.GATE_DECISION, {"gate": "story", "passed": True, "projections": ("story_state",)},
+                     source_seqs=(check.seq,), pattern=r"missing \['story_id'\]")
+
+    def test_empty_story_id_refused_on_both_kinds(self):
+        w = self.world()
+        w.active()
+        self.refused(w, T.GATE_CHECK, gate_check(story_id=""), pattern=r"wrong kind or enum \['story_id'\]")
+        check = w.append(T.GATE_CHECK, gate_check())
+        self.refused(w, T.GATE_DECISION, gate_decision(story_id=""), source_seqs=(check.seq,),
+                     pattern=r"wrong kind or enum \['story_id'\]")
+
+    def test_formats_1_to_3_are_untouched_historical_writers_emit_nothing_new(self):
+        """CR-3 both ways on the SAME f3 gate stream: without story_id it reconstructs identically through f3 and
+        f4 (delegation — byte and behavior compatible); with the f4-only field it is refused by BOTH readers."""
+        begin3 = Event(0, "run/begin", {"journal_format": 3, "run_id": "r3"}, 1.0)
+        check3 = Event(1, "gate/check", {"gate": "story", "check": "S1:admission", "passed": True, "detail": ""}, 2.0)
+        decision3 = Event(2, "gate/decision", {"gate": "story", "passed": True, "projections": ["story_state"]},
+                          3.0, False, (1,))
+        text = lines(begin3, check3, decision3)
+        self.assertEqual(f4.reconstruct(text), f3.reconstruct(text))
+        self.assertEqual(len(f3.reconstruct(text).events), 3)
+        leaked = Event(1, "gate/check", {**check3.data, "story_id": "S1"}, 2.0)
+        for reader in (f3.reconstruct, f4.reconstruct):
+            with self.assertRaisesRegex(JournalError, r"not in the schema \['story_id'\]"):
+                reader(lines(begin3, leaked))
+
+
+class A2GateBinding(Base):
+    """A2′ (rule, part 1): a gate event binds to a story the table holds in an OPEN attempt (BEGIN, BEGIN_REFUSED
+    or ACTIVE) at that point of the stream — an arbitrary story_id is refused, naming event, seq and rule."""
+
+    def test_unknown_story_refused(self):
+        w = self.world()
+        w.active()
+        self.refused(w, T.GATE_CHECK, gate_check(sid="GHOST"), pattern="R-GATE-BIND.*GHOST in state ABSENT")
+
+    def test_story_of_a_closed_attempt_refused(self):
+        w = self.world()
+        w.active()
+        w.commit_path()  # S1 -> ENDED_COMMIT
+        self.refused(w, T.GATE_CHECK, gate_check(), pattern="R-GATE-BIND.*S1 in state ENDED_COMMIT")
+
+    def test_decision_for_a_story_after_unwind_refused(self):
+        w = self.world()
+        w.active()
+        check = w.append(T.GATE_CHECK, gate_check(passed=False))
+        w.unwind_path()  # S1 -> ENDED_ROLLBACK
+        self.refused(w, T.GATE_DECISION, gate_decision(passed=False), source_seqs=(check.seq,),
+                     pattern="R-GATE-BIND.*S1 in state ENDED_ROLLBACK")
+
+    def test_gate_events_legal_in_all_three_open_states(self):
+        """The kernel's real emission surface (gate.py:10, story_runner.py:244/:263/:429-443/:449): the resources
+        check lands in BEGIN, the admission check in ACTIVE or BEGIN_REFUSED, the decision in any of the three."""
+        w = self.world()
+        w.begin()
+        w.append(T.STORY_BEGIN, {"story_id": "S1", "parent": SHA})  # BEGIN
+        begin_check = w.append(T.GATE_CHECK, gate_check(check="resources", passed=False))
+        w.append(T.GATE_DECISION, gate_decision(passed=False), source_seqs=(begin_check.seq,))
+        w.story("S2", admitted=False)  # BEGIN_REFUSED
+        refused_check = w.append(T.GATE_CHECK, gate_check(sid="S2", passed=False))
+        w.append(T.GATE_DECISION, gate_decision(sid="S2", passed=False), source_seqs=(refused_check.seq,))
+        w.story("S3")  # ACTIVE
+        active_check = w.append(T.GATE_CHECK, gate_check(sid="S3"))
+        w.append(T.GATE_DECISION, gate_decision(sid="S3", passed=True), source_seqs=(active_check.seq,))
+        f4.reconstruct(w.text())
+
+
+class A2GateCompleteness(Base):
+    """A2′ (rule, part 2) — R-GATE-COMPLETE and R-GATE-CITE: a passing decision cites every in-scope gate/check of
+    its (gate, story_id); citations are distinct, own-story and in-scope; passed:false is exempt from completeness
+    ONLY. Every red case asserts both sites through `refused` (A = append, R = reconstruct); the F site has no gate
+    leg (see FoldHasNoGateLeg)."""
+
+    def two_checks(self, w, sid="S1", first=True, second=True, gate="story"):
+        a = w.append(T.GATE_CHECK, gate_check(sid=sid, gate=gate, check="admission", passed=first))
+        b = w.append(T.GATE_CHECK, gate_check(sid=sid, gate=gate, check="developer", passed=second))
+        return a, b
+
+    def test_c3_attack_passing_decision_hiding_a_failed_check_refused(self):
+        """The original C3 adversarial finding, exact probe shape (aisef-private-evidence/2026-11-26-advrev-f4/
+        probe.py input C3): a passed:true decision citing only the passing check while a FAILED check of the same
+        (gate, story_id) sits in scope. Red-before: the pre-A2′ R-GATE checked only CITED checks and ACCEPTED this.
+        Green-after: refused naming the uncited seq."""
+        w = self.world()
+        w.active()
+        passing, failing = self.two_checks(w, first=True, second=False)
+        error = self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(passing.seq,),
+                             pattern="R-GATE-COMPLETE")
+        self.assertIn(f"[{failing.seq}]", str(error))
+        self.assertIn("gate/decision", str(error))
+
+    def test_omitted_passing_check_refused(self):
+        w = self.world()
+        w.active()
+        cited, omitted = self.two_checks(w, first=True, second=True)
+        error = self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(cited.seq,),
+                             pattern="R-GATE-COMPLETE")
+        self.assertIn(f"[{omitted.seq}]", str(error))
+
+    def test_omitted_failed_check_refused_even_when_every_cited_check_passes(self):
+        w = self.world()
+        w.active()
+        a, b = self.two_checks(w, first=True, second=True)
+        failing = w.append(T.GATE_CHECK, gate_check(check="merge", passed=False))
+        error = self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(a.seq, b.seq),
+                             pattern="R-GATE-COMPLETE")
+        self.assertIn(f"[{failing.seq}]", str(error))
+
+    def test_duplicate_citation_refused_for_both_verdicts(self):
+        """Duplicates are refused by the FROZEN Event invariant (event.py:78-80: source_seqs "each once, in order"),
+        which fires at construction on both sites — structurally stronger than A2′ asks, so A2′ adds no second
+        duplicate gate; this test pins the frozen rule as the matrix row's refusal, stated as-is."""
+        for passed in (True, False):
+            with self.subTest(passed=passed):
+                w = self.world()
+                w.active()
+                check = w.append(T.GATE_CHECK, gate_check(passed=passed))
+                self.refused(w, T.GATE_DECISION, gate_decision(passed=passed),
+                             source_seqs=(check.seq, check.seq), pattern="each once, in order")
+
+    def test_duplicate_citation_refused_at_reconstruct_on_raw_bytes(self):
+        """F2 (adversarial review 2026-11-26): the PRODUCTION R-site leg — the `refused` helper cannot reach it for
+        duplicates (Event construction raises inside the harness first), so the forged line goes in as raw JSON
+        bytes with source_seqs duplicated after encoding; reconstruct must refuse it itself."""
+        w = self.world()
+        w.active()
+        check = w.append(T.GATE_CHECK, gate_check())
+        good = Event(len(w.w.events), T.GATE_DECISION.value,
+                     carried(T.GATE_DECISION.value, gate_decision(passed=True)), 10.0 ** 6, False, (check.seq,))
+        obj = json.loads(encode(good, link(w.w.head, good)))
+        obj["event"]["source_seqs"] = [check.seq, check.seq]
+        with self.assertRaisesRegex(JournalError, "each once, in order"):
+            f4.reconstruct(w.text() + json.dumps(obj) + "\n")
+
+    def test_vacuous_pass_citing_zero_checks_refused(self):
+        """A passed:true decision over no evidence. The refusal is the FROZEN citation-count rule (event.py
+        `_cites`: every gate/decision cites at least one gate/check — it refuses the vacuous FAIL too), which fires
+        before the A2′ rules; A2′ adds no second vacuity gate because none is reachable past this one. The message
+        names the kind; rule+seq shape is the frozen rule's, documented here as-is — no false claim."""
+        w = self.world()
+        w.active()
+        w.append(T.GATE_CHECK, gate_check())
+        self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(),
+                     pattern="gate/decision cites at least one gate/check")
+
+    def test_completeness_is_per_gate_a_second_gate_id_scopes_apart(self):
+        """The rule is per (gate, story_id) even though the kernel has ONE gate id (gate.py:10 GATE = "story")."""
+        w = self.world()
+        w.active()
+        own_a = w.append(T.GATE_CHECK, gate_check(check="admission"))
+        other = w.append(T.GATE_CHECK, gate_check(gate="G2", check="x"))
+        own_b = w.append(T.GATE_CHECK, gate_check(check="developer"))
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(own_a.seq, own_b.seq))  # G2 not owed
+        w.append(T.GATE_DECISION, gate_decision(gate="G2", passed=True), source_seqs=(other.seq,))
+        w2 = self.world()
+        w2.active()
+        a2, _ = self.two_checks(w2)
+        w2.append(T.GATE_CHECK, gate_check(gate="G2", check="x"))
+        error = self.refused(w2, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(a2.seq,),
+                             pattern="R-GATE-COMPLETE")
+        self.assertIn(f"[{a2.seq + 1}]", str(error))  # the omitted own-gate check, never the G2 one
+
+    def test_c5_interleaved_stories_completeness_is_own_story_exactly(self):
+        """C5-PARALLEL's shape (C-1 adversarial evidence 3): two stories' checks interleaved through one journal
+        under the one gate id — each decision owes exactly its own-story in-scope set, never the other story's."""
+        w = self.world()
+        w.begin()
+        w.story("A")
+        w.story("B")
+        a1 = w.append(T.GATE_CHECK, gate_check(sid="A", check="admission"))
+        b1 = w.append(T.GATE_CHECK, gate_check(sid="B", check="admission"))
+        a2 = w.append(T.GATE_CHECK, gate_check(sid="A", check="developer"))
+        error = self.refused(w, T.GATE_DECISION, gate_decision(sid="A", passed=True), source_seqs=(a1.seq,),
+                             pattern="R-GATE-COMPLETE")
+        self.assertIn(f"gate/check [{a2.seq}] of", str(error))  # owes exactly its own second check, never B's
+        self.refused(w, T.GATE_DECISION, gate_decision(sid="A", passed=True),
+                     source_seqs=(a1.seq, b1.seq, a2.seq), pattern="R-GATE-CITE.*another story")
+        w.append(T.GATE_DECISION, gate_decision(sid="A", passed=True), source_seqs=(a1.seq, a2.seq))
+        w.append(T.GATE_DECISION, gate_decision(sid="B", passed=True), source_seqs=(b1.seq,))
+        f4.reconstruct(w.text())
+
+    def test_cross_story_citation_refused(self):
+        w = self.world()
+        w.begin()
+        w.story("A")
+        w.story("B")
+        other = w.append(T.GATE_CHECK, gate_check(sid="B"))
+        mine = w.append(T.GATE_CHECK, gate_check(sid="A"))
+        error = self.refused(w, T.GATE_DECISION, gate_decision(sid="A", passed=True),
+                             source_seqs=(other.seq, mine.seq), pattern="R-GATE-CITE.*another story")
+        self.assertIn(f"[{other.seq}]", str(error))
+
+    def test_retry_the_new_attempts_decision_scopes_from_the_previous_decision(self):
+        """(e) retry/repeated decisions: a second decision citing only the new attempt's checks is ACCEPTED (its
+        scope opens at the previous (gate, story_id) decision); reaching back across the boundary is refused STALE."""
+        w = self.world()
+        w.active()
+        old = w.append(T.GATE_CHECK, gate_check(passed=False))
+        w.append(T.GATE_DECISION, gate_decision(passed=False), source_seqs=(old.seq,))
+        w.unwind_path(outcome=T.STORY_RETRY)  # -> ENDED_RETRY
+        w.story()                             # the new attempt: BEGIN -> ACTIVE
+        new = w.append(T.GATE_CHECK, gate_check())
+        error = self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(old.seq, new.seq),
+                             pattern="R-GATE-CITE.*stale")
+        self.assertIn(f"[{old.seq}]", str(error))
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(new.seq,))  # ACCEPTED
+        f4.reconstruct(w.text())
+
+    def test_e5_fault_tail_false_decision_with_stranded_checks_is_accepted(self):
+        """The NON-NEGOTIABLE kernel-reality control (C-1 adversarial evidence 2, M7): a helper may append
+        gate/checks and then raise BEFORE the runner captures their seqs (merge.py:44-60 reprove, review.py:43-46,
+        security.py:51-52); the E5 handler (story_runner.py:409-443) appends ONE more failed check and the decision
+        (:449) cites only the captured list — passed:false, with in-scope same-(gate, story_id) checks UNCITED.
+        A2′ accepts this at both sites: passed:false is exempt from completeness."""
+        w = self.world()
+        w.active()
+        captured = w.append(T.GATE_CHECK, gate_check(check="admission", passed=True))
+        w.append(T.GATE_CHECK, gate_check(check="proof:C1", passed=True))   # stranded by the raise
+        w.append(T.GATE_CHECK, gate_check(check="proof:C2", passed=True))   # stranded by the raise
+        handler = w.append(T.GATE_CHECK, gate_check(check="developer", passed=False))  # the E5 handler's one row
+        w.append(T.GATE_DECISION, gate_decision(passed=False), source_seqs=(captured.seq, handler.seq))
+        w.unwind_path()
+        w.append(T.RUN_END, {})
+        journal = f4.reconstruct(w.text())
+        self.assertEqual(journal.events, w.w.events)
+
+    def test_second_decision_of_the_same_attempt_scopes_from_the_first(self):
+        """A decision does not move the table state: a later decision of the same (gate, story_id) owes only the
+        checks appended after the previous one."""
+        w = self.world()
+        w.active()
+        first = w.append(T.GATE_CHECK, gate_check(check="admission"))
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(first.seq,))
+        second = w.append(T.GATE_CHECK, gate_check(check="developer"))
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(second.seq,))  # first no longer owed
+        self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(first.seq,),
+                     pattern="R-GATE-CITE.*stale")
+
+    def test_failing_decision_still_subject_to_binding_and_citation_rules(self):
+        """passed:false is exempt from COMPLETENESS only — schema, binding, R-GATE and the citation rules hold."""
+        w = self.world()
+        w.active()
+        old = w.append(T.GATE_CHECK, gate_check(passed=False))
+        w.append(T.GATE_DECISION, gate_decision(passed=False), source_seqs=(old.seq,))
+        w.unwind_path(outcome=T.STORY_RETRY)
+        w.story()
+        self.refused(w, T.GATE_DECISION, gate_decision(passed=False), source_seqs=(old.seq,),
+                     pattern="R-GATE-CITE.*stale")
+
+
+class A2OrphanAttempt(Base):
+    """Owner ruling 2026-11-26 (A2′ scope decision §1): a hand-built journal with an UNRESOLVED earlier attempt —
+    demonstrate that orphaned checks can never be silently converted into a successful authoritative outcome.
+    Four legs: there IS no silent path to a second attempt; the orphan is uncitable from the new attempt; the
+    passing outcome rests only on the new attempt's complete evidence; and the orphan stays visible forever."""
+
+    def orphaned(self):
+        """Attempt 1 leaves a FAILED check cited by NO decision; the only legal road to attempt 2 is the journaled
+        failure/observed + story/retry + dispose + end chain."""
+        w = self.world()
+        w.active()
+        orphan = w.append(T.GATE_CHECK, gate_check(check="developer", passed=False))
+        w.unwind_path(outcome=T.STORY_RETRY)
+        w.append(T.STORY_BEGIN, {"story_id": "S1", "parent": SHA})
+        w.append(T.STORY_ADMITTED, admission("S1"))
+        return w, orphan
+
+    def test_leg1_no_silent_second_attempt_exists(self):
+        """story/begin straight out of ACTIVE (skipping the journaled failure+retry) is refused by the frozen
+        table at BOTH sites — an attempt cannot be abandoned invisibly, so every orphan sits behind an explicit
+        failed-attempt record."""
+        w = self.world()
+        w.active()
+        w.append(T.GATE_CHECK, gate_check(check="developer", passed=False))
+        self.refused(w, T.STORY_BEGIN, {"story_id": "S1", "parent": SHA}, pattern="story/begin")
+
+    def test_leg2_the_orphan_is_uncitable_from_the_new_attempt(self):
+        w, orphan = self.orphaned()
+        fresh = w.append(T.GATE_CHECK, gate_check())
+        self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(orphan.seq, fresh.seq),
+                     pattern="R-GATE-CITE.*stale")
+
+    def test_leg3_the_passing_outcome_rests_on_the_new_attempts_complete_evidence_only(self):
+        """The approved latest-begin reading's acceptance, pinned WITH its guarantees: the new attempt's passing
+        decision must cite the new attempt's whole in-scope set (completeness still fires inside the new scope),
+        and the decision carries no orphan authority (leg 2 refused it)."""
+        w, orphan = self.orphaned()
+        fresh1 = w.append(T.GATE_CHECK, gate_check())
+        fresh2 = w.append(T.GATE_CHECK, gate_check(check="developer", passed=True))
+        self.refused(w, T.GATE_DECISION, gate_decision(passed=True), source_seqs=(fresh1.seq,),
+                     pattern="R-GATE-COMPLETE")                     # even here, partial new-scope evidence refuses
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(fresh1.seq, fresh2.seq))
+
+    def test_leg4_the_orphan_and_the_failed_attempt_stay_visible_forever(self):
+        w, orphan = self.orphaned()
+        fresh = w.append(T.GATE_CHECK, gate_check())
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(fresh.seq,))
+        events = f4.reconstruct(w.text()).events
+        kinds = [e.type for e in events]
+        row = next(e for e in events if e.seq == orphan.seq)
+        self.assertEqual((row.type, row.data["passed"]), (T.GATE_CHECK.value, False))   # the orphan, intact
+        self.assertIn(T.FAILURE_OBSERVED.value, kinds)                                  # the failure, journaled
+        self.assertIn(T.STORY_RETRY.value, kinds)                                       # the retry, journaled
+        self.assertIn(encode_line_of(w, orphan.seq), w.text())                          # bytes still in the file
+
+
+def encode_line_of(w, seq):
+    """The journal's own stored line for seq — append-only means it is still there verbatim."""
+    return w.text().splitlines()[seq]
+
+
+class FoldHasNoGateLeg(Base):
+    """(h) fold consistency, stated honestly: NO control projection folds gate kinds — gate/check and gate/decision
+    pass through every one of the six unchanged, so the A/R verdicts in this file are the whole A2′ surface and
+    there is no F-site leg to assert. This test pins that fact instead of claiming a fold refusal that nowhere
+    exists; if a projection ever grows a gate leg, it goes red and the A2′ fold obligations must be rewritten."""
+
+    def test_every_projection_ignores_gate_events(self):
+        from aisef2.journal.fold import fold
+        from aisef2.journal.projections.budgets import Budgets
+        from aisef2.journal.projections.failure_owner import FailureOwner
+        from aisef2.journal.projections.qualification_counters import QualificationCounters
+        from aisef2.journal.projections.retry_target import RetryTarget
+        from aisef2.journal.projections.story_state import StoryState
+        from aisef2.journal.projections.terminal_state import TerminalState
+        w = self.world()
+        w.begin()
+        w.append(T.PLAN_FROZEN, {"plan_id": "PLAN-1", "plan_hash": HEX, "roles": {"O1": "VERIFY"}})
+        w.story()
+        a0 = w.append(T.GATE_CHECK, gate_check(passed=True))
+        w.append(T.GATE_DECISION, gate_decision(passed=True), source_seqs=(a0.seq,))   # F3: a PASSING decision too,
+        a = w.append(T.GATE_CHECK, gate_check(passed=True))                            # so a future projection leg
+        b = w.append(T.GATE_CHECK, gate_check(check="developer", passed=False))        # keyed on passed:true trips
+        w.append(T.GATE_DECISION, gate_decision(passed=False), source_seqs=(a.seq, b.seq))
+        w.unwind_path()
+        w.append(T.RUN_END, {})
+        events = f4.reconstruct(w.text()).events
+        stripped = [e for e in events if e.type not in (T.GATE_CHECK.value, T.GATE_DECISION.value)]
+        self.assertLess(len(stripped), len(events))
+        for projection in (Budgets(), FailureOwner(), QualificationCounters(), RetryTarget(), StoryState(),
+                           TerminalState()):
+            with self.subTest(projection=projection.id):
+                self.assertEqual(fold(projection, events), fold(projection, stripped))
 
 
 class CommitRule(Base):

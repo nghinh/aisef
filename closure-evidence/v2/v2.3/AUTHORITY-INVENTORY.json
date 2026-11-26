@@ -2249,6 +2249,20 @@
    "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\"], \"types\": []}; import graph from run_story: not reachable"
   },
   {
+   "id": "aisef2/journal/format4.py::_gate4",
+   "path": "aisef2/journal/format4.py",
+   "symbol": "_gate4",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"GATE_CHECK\", \"GATE_DECISION\"], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
    "id": "aisef2/journal/format4.py::_rules",
    "path": "aisef2/journal/format4.py",
    "symbol": "_rules",
@@ -2263,7 +2277,7 @@
    ],
    "disposition": "ACTIVE_V2_AUTHORITY",
    "replacement": null,
-   "evidence": "AST: {\"calls\": [], \"events\": [\"GATE_DECISION\", \"PROOF_VERIFIED\", \"STORY_COMMIT\", \"TESTS_ADEQUACY\"], \"types\": []}; import graph from run_story: not reachable"
+   "evidence": "AST: {\"calls\": [], \"events\": [\"GATE_CHECK\", \"GATE_DECISION\", \"PROOF_VERIFIED\", \"STORY_COMMIT\", \"TESTS_ADEQUACY\"], \"types\": []}; import graph from run_story: not reachable"
   },
   {
    "id": "aisef2/journal/projections/__init__.py::project",
@@ -3817,7 +3831,7 @@
   "v2_console_script": false
  },
  "summary": {
-  "ACTIVE_V2_AUTHORITY": 73,
+  "ACTIVE_V2_AUTHORITY": 74,
   "COMPATIBILITY_NONAUTHORITATIVE": 37,
   "HISTORICAL_ONLY": 2,
   "REMOVED": 0,

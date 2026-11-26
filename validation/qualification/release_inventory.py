@@ -31,7 +31,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 #: the protected history, so "a deleted file regenerated" is no longer legal there; each era now gets its own file.
 INVENTORY_REL = "closure-evidence/v2/v2.3/AUTHORITY-INVENTORY.json"
 #: the LF-normalised sha256 of INVENTORY_REL: the one release inventory this tree is audited against
-INVENTORY_SHA256 = "7ceb1b87a1506fbf6d07abd4109571757146f8ef7d300da94b601be6b8fbb1b7"
+INVENTORY_SHA256 = "456c6136165d4d567f43ceb4064f2ab0fb6137220a3d0e1854eab85f0a4e479c"
 #: the 2.0 release's inventory, history: never rewritten, byte-identical to this pin and to its blob at tag v2.0.0
 RELEASE_2_0_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
 RELEASE_2_0_SHA256 = "6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c"
