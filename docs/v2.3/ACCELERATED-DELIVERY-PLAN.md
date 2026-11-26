@@ -198,3 +198,23 @@ nào qua mycombo khởi động cho tới khi owner xác nhận thành phần co
 **ĐÃ XÁC NHẬN 2026-11-26 (owner, kênh chat): combo `mycombo` không chứa DeepSeek** ⇒ gate paid-run qua
 9router/`mycombo` MỞ theo chỉ thị (không trần token); các kiểm soát khác (evidence, release, chi ngoài token)
 giữ nguyên. Chưa có lượt paid nào trong hàng đợi; lượt đầu tiên sẽ ghi lại model/provider identity theo §1.
+
+### 7.3 OWNER RULING 2026-11-26 — "ACCELERATED EXECUTION, C-1 FREEZE AND ORDER-TABLE" (đã ban hành)
+
+§1 **C-1 FREEZE APPROVED** — identities xác minh byte-exact (amendments/C-1-FORMAT-4-FREEZE.md), lane mở:
+L2-JOURNAL, L2-ACCOUNTING (E2/E4), L4-PARALLEL (C5), L4-RESUME (G6) + ORCH đủ tiền đề; flip production cần
+independent adversarial review + đủ negative controls; V21-57 KEEP. §2 **RULE-2 APPROVED**: hai benchmark nhận là
+performance-study evidence (49/49 −67,8%; 56/56 −62,8% survivor-vững); E5 làm nguồn trích dẫn cho ordering (KHÔNG
+làm dirty entries thành qualified); sửa round-writer để execution_order + declared order kiểm chứng độc lập;
+negatives missing/stale/tampered/uncommitted/mismatched; tích hợp vào dev pipeline sau khi controls xanh; RC
+ordered chưa QUALIFIED tới khi round-writer + source-bound checks xanh trên đúng RC source; KHÔNG shard. §3
+**PIN-57 = OPTION C**: đăng ký+calibrate f5_gate + released_evidence (57→59), f5_recorder ngoài CHỪNG NÀO
+observation chưa thể làm authority; chuẩn bị seq-14 exact (digest sau-patch + wiring tích lũy); dev+test được
+phép, KHÔNG append ledger/thay pin tới khi owner duyệt bản cuối; 3 fail Q0 54/57 giữ hiển thị; ground_truth phải
+được định đoạt rõ trong Q0 scope. §4 **B2**: slate jello/mistune/tinydb nhận về kỹ thuật (còn Linux +
+independence-re-grep + toolchain đóng băng); giới hạn một-ngôn-ngữ chấp nhận cho planning (không tổng quát hóa
+chéo ngôn ngữ); mục tiêu kinh tế $1.500–2.500, $6.000 chỉ là trần đề xuất; chuẩn bị ứng viên đích danh + rate;
+KHÔNG engagement/chi/paid-trial/lộ tài liệu; gói cuối ≤08/12. §5 **A2**: cryptography xác nhận; hợp đồng cài đặt
+với signing BẮT BUỘC cho run format-4 chuẩn; từ chối TRƯỚC preflight/network/journal/paid; wheelhouse offline +
+3 OS native + reader cũ nguyên vẹn; chưa bật writer f4 production tới khi gate cài đặt + signing xanh. §6 tốc độ:
+song song tối đa, worktree cách ly, không serialize sau PIN-57/B2-SPEND; ƯU TIÊN CODE hơn tài liệu kế hoạch.
