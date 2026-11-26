@@ -134,6 +134,11 @@ amendment below. The three `aisef2/cohort/` defects go to W6 L6-EVAL (B2 preregi
 [SCOPE AMENDMENT 2026-11-26: REMOVED_FROM_V2.3_RELEASE_SCOPE_BY_OWNER — see amendments/SCOPE-B2-EXTERNAL-REMOVED.md —
 B2 external evaluation is out of release scope; #64–#66's only consumer was B2 preregistration, so their disposition
 is an open question for the owner, not silently dropped.]
+[RESOLVED 2026-11-26, owner ruling "A2′ Closure, Cohort Defect Disposition and RC Preparation" §2: #64–#66 =
+NON-RELEASE B2 DISPOSITION — remediation off the v2.3 critical path, conditional dependency check PASSED and
+independently verified (no active consumer of the affected lifecycle surface in retained capabilities; full evidence
+in CODE-AUDIT.md at the #64–#66 disposition block). The findings stay visible, NOT FIXED/PASSED/QUALIFIED;
+Tier-0 cohort code/tests/evidence stay in CI unmasked.]
 
 Duplicates, not separate work: #13≡V21-19; #20 is the egress face of #9/D3; #21≡D1; #22 is the verify face of #10/A2;
 #43≡D2; V21-23≡E5. Already-fixed residues stay closed: V21-30 (MASTER-CHECKLIST) is subsumed only as A2's
@@ -343,6 +348,9 @@ checkers (+ `kernel_static_checks.py`, `probe_static_checks.py`, `validation/qua
 append rows to `destructive_sites.json`. Each edit lands with a red-before fixture, never removes a rule, never relaxes
 a match, and keeps INV-MUTATION-AUTHORITY. The Q0 record must stay byte-identical (live-tree `clean()` = [], known-bad
 messages unchanged); if it cannot, STOP Q0-1. In W6 only, L6-EVAL may edit `aisef2/cohort/**` for #64–#66.
+[2026-11-26 ruling §2: #64–#66 remediation is out of the v2.3 release scope (NON-RELEASE B2 DISPOSITION) — this
+edit-right is therefore dormant in v2.3; it survives for the later owner-led remediation, which must also regenerate
+P10-COHORT-MACHINERY.json through the version-forward chain (see CODE-AUDIT #64–#66 disposition block).]
 
 ### W1 — two phases. **W1a: no `aisef2/` file is edited** (kernel tree stays `e865d65c`, BASELINE.md:77); lanes parallel. **W1b: L1-LIFECYCLE edits `aisef2/orchestrate/story_runner.py` and `aisef2/app/run.py:693` (refusal branch) only**, after W1a's F5 gates pass (R11). Exact files per lane: identical to W1-DESIGN.md §8 (copied at the W0 freeze).
 

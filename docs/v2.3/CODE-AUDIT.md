@@ -389,6 +389,33 @@ Source audit on `release/v2.3-big` (local only — security findings, owner ruli
 *Impact:* Latent. 'An EXPOSED or DEVELOPMENT workload never seals again' (rule 4) and 'only a FRESH preregistration' (rule 2) depend on caller discipline. Reproduced: seal(T.prereg(1)) with no prior -> SEALED; a stale C-1 plus a copy that changes only cohort_id -> SEALED, with frozen_inputs equal to the invalidated cohort's.  
 *Acceptance:* The reuse check compares frozen_inputs digests with cohort_id excluded. Red-before: deepcopy(T.prereg(1)) with only cohort_id changed to 'C-1-bis' and seal(same, [stale]) returns SEALED today; after, it gives PREREGISTRATION_REUSED. seal() takes a registry (or a digest-bound complete prior set) and refuses when it is absent; sealing a workload the registry records as EXPOSED with prior omitted gives WORKLOAD_DEMOTED.
 
+> **Disposition #64–#66 (dated 2026-11-26, owner ruling "A2′ Closure, Cohort Defect Disposition and RC Preparation"
+> §2): NON-RELEASE B2 DISPOSITION.** Remediation is removed from the v2.3 critical path. The three findings stay
+> exactly as written above — they are **NOT FIXED, NOT PASSED, NOT QUALIFIED**; provenance and acceptance criteria
+> are preserved for the later owner-led remediation. Tier-0 cohort code, tests and evidence remain in the tree and
+> in normal CI; nothing is masked.
+>
+> **Mandated source-level dependency check (2026-11-26, HEAD `f0c230f3`, independently adversarially verified):**
+> no active consumer of the affected `aisef2/cohort/lifecycle.py` surface (construction history-trust, `seal`
+> prior/reuse, `advance`, `record_run`, `observe_inputs`, `generalization`) exists in the retained release
+> capabilities. Evidence: (a) the import surface is closed and Q0-enforced (`cohort_static_checks.py:35`
+> `ALLOWED_IMPORTERS`, rule COHORT_CONFINED, AST scan incl. importlib/`__import__` forms); (b) the product runtime
+> imports zero cohort modules (runtime import-closure probe over `run`, `cli`, `bundle_cli`, `review_verify`,
+> `lineage`, `orchestrate`, `journal`) and `run.py:716` hard-codes `generalization_claim="NONE"`, which
+> `qualification/p10.py:214-215` refuses to see otherwise using its OWN local state machine (`p10.py:64`), not
+> lifecycle.py; (c) no cohort record can exist (Q0 checker NO_COHORT_RECORD, `cohort_static_checks.py:133-149`);
+> (d) `profile_freeze.py` consumes only `preregistration.execution_profile`/`runspec_of` (content-addressed
+> identity re-derivation), never lifecycle; (e) the B5 gateway does not exist at HEAD (scheduled W5), and the
+> current acceptance surface (`run.py` delivery, `bundle_cli.py`, `review_verify.py`) holds zero cohort references;
+> (f) `lineage.py` (the findings' group label) never touches cohort. Precision caveat recorded by the reviewer:
+> the C2-P10 cohort validator is LIVE in the v2.3 round (`test_v23_rounds.py` `test_P10_COHORT` → `currency_dag`
+> node P10-COHORT → `version_forward.check_supersession` re-runs `c2_p10_cohort.build()` each round) — it is a
+> deliberate exerciser of the module, the #64–#66 weaknesses are missing-refusal (overly permissive) so every
+> probed refusal still fires and the verdict stays "machinery qualified; cohort count = 0", and node P10-COHORT
+> has no dependents. **Change-impact note for the future remediation:** fixing #64–#66 changes `build()`'s record
+> bytes, so P10-COHORT-MACHINERY.json must be regenerated through the version-forward chain or `test_P10_COHORT`
+> goes red — a planned cost of the later fix, not a current-verdict exposure.
+
 **#67 [P2] plan/admission** — `aisef2/plan/static_admission.py:120-129 (check_ownership); aisef2/plan/obligation.py:89-102 (no criterion uniqueness); aisef2/app/bundle_cli.py:581-601 (seal: facts[cr['id']] silently overwritten)`  
 *Impact:* Repro (fixture world): plan [C1→BC-ADD INTRODUCE, C1→BC-NO-TEL INTRODUCE] in S1 is admitted with zero failed checks; admit_story returns [PRE_SATISFIED, READY] but journals {C1: READY}; continue_story emits plan-drift naming the wrong spec (b instead of a); the journal _admission_rule accepts it. In production the run then dies late with an untyped ProjectionError/InvariantError (qualification_counters.py:49-51 / event.py:173 / format3.py:146 _distinct_strs) after admission probes ran, or — all-PRE_SATISFIED path — the first spec is never proved at CANDIDATE (only at POST_MERGE via merge.py:49, where a developer regression routes to INTEGRATION, defeating V21-38). Reachable by a plain authoring copy-paste of a criterion id.  
 *Acceptance:* Red-before: engine.admit(plan((ob('C1','BC-ADD','S1',INTRODUCE), ob('C1','BC-NO-TEL','S1',VERIFY))), INPUTS).admitted is True today. After: it is False and check 3 names 'criterion C1 has 2 obligations'. bundle_cli seal of an authoring document with a duplicate criteria id in one story is refused, naming $.stories.S1.criteria[1]. The engine digest change goes through the F5 impact path (p5_acceptance.py:845 identity), not a blanket requalification.
