@@ -35,3 +35,29 @@ carried as **performance-study input only**, exactly as the proposed decision cl
   frequency-ordered 24.5 min = **−67.8%**, identical verdicts 49/49 KILLED / 0 SURVIVED both sides.
 - E5 fleet profile: only 56.5% of kills die in the first 2 files; 79.3% of wall time is spent on files that
   precede the killer; simulated fleet-wide reorder saving −62% (ESTIMATE).
+
+## 4. Supplementary benchmark MEASURED (2026-11-26) — the decision-3 "survivors + representative targets" item
+
+A/B at pin 466c9f94, isolated clones + env guard, sequential for timing fairness; targets
+`run.py::check_repository` (38 mutants, 1 survivor, 10 kill files) + `run.py::unfinished` (18, 1, 9) — chosen
+BECAUSE their dominant killer already sits first in declared order (the representative case, unlike the
+cherry-favorable first benchmark). Frequency table derived from the COMMITTED E5 record's killed_by fields
+(evidence: aisef-private-evidence/2026-11-26-ordbench2/).
+
+- **Verdict identity: 56/56** mutant classes identical (including one same-label pair, two distinct L249 sites);
+  survivors identical; **ORD-4 held: each survivor ran the complete kill set in both orders**.
+- **Whole-target wall −62.8%** (8,448 s → 3,142 s); the kill-file component alone **−77.0%**; T0 parity between
+  the sides (ratio 1.019) bounds the machine-load confound at ~2%, so the saving is the lever's, not the load's.
+- The order APPLIED is proven by the v2.1 phase record (`execution_order` present; the survivor's file sequence
+  equals the table), not assumed from timings.
+- Corroborates the first benchmark's −67.8%: two independent target pairs, both verdict-identical, savings
+  −62.8%/−67.8% whole-target and up to −77% on the kill-file component.
+
+**New gap found (added to §2):**
+
+4. **The v2.3 ROUND record drops `execution_order` and normalizes result-row order to the declared list** — the
+   run-order provenance (obligation 5) survives today only in the v2.1 phase record inside the run tree. No false
+   acceptance results (survivor full-set checks are set-semantic, verdicts identical), but the RC protocol needs
+   the round-record writer to carry `execution_order` (or cite the phase record) before ordered RC results are
+   qualified. Engine edit in `validation/v2/mutation.py`'s round-append path ⇒ ruling-row re-derivation; schedule
+   WITH the RULE-2 development batch (§2.1).
