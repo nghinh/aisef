@@ -1,0 +1,34 @@
+# Proof — tests/v23/test_v23_seq13_wiring.py (always-run), AFTER the patch (2026-11-26 10:57:59 +0700)
+
+$ python3 -m unittest tests.v23.test_v23_seq13_wiring -v
+test_a_draft_rewritten_through_a_merge_is_refused (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_a_draft_rewritten_through_a_merge_is_refused) ... ok
+test_a_rewritten_draft_is_refused_even_when_the_entry_matches_it (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_a_rewritten_draft_is_refused_even_when_the_entry_matches_it) ... ok
+test_a_second_seq_13_is_refused (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_a_second_seq_13_is_refused) ... ok
+test_a_shallow_clone_is_refused (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_a_shallow_clone_is_refused) ... ok
+test_an_uncommitted_ledger_change_is_refused (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_an_uncommitted_ledger_change_is_refused) ... ok
+test_every_bound_file_must_stay_as_reviewed (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_every_bound_file_must_stay_as_reviewed) ... ok
+test_the_reviewed_ruling_in_the_owners_words_quoting_its_digest_opens (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_the_reviewed_ruling_in_the_owners_words_quoting_its_digest_opens) ... ok
+test_the_reviewers_six_entries_are_refused (tests.v23.test_v23_seq13_wiring.LedgerSeq13.test_the_reviewers_six_entries_are_refused) ... ok
+test_R2s_patch_would_have_skipped_with_the_counterparts_deleted (tests.v23.test_v23_seq13_wiring.WiringR6.test_R2s_patch_would_have_skipped_with_the_counterparts_deleted)
+The finding itself, on R2's wiring: the contrast the fix removes. ... ok
+test_R3s_patch_never_skips_q0_and_on_this_tree_skips_nothing (tests.v23.test_v23_seq13_wiring.WiringR6.test_R3s_patch_never_skips_q0_and_on_this_tree_skips_nothing)
+R3 is superseded, not unsafe: it never names Q0, and its pins no longer hold, so applied now it skips none. ... ok
+test_R4s_patch_on_this_tree_skips_nothing (tests.v23.test_v23_seq13_wiring.WiringR6.test_R4s_patch_on_this_tree_skips_nothing)
+R4 is superseded: R5 changed q0_round.py and both counterpart files, so R4's pins fail and it skips none. ... ok
+test_R5s_patch_on_this_tree_skips_nothing (tests.v23.test_v23_seq13_wiring.WiringR6.test_R5s_patch_on_this_tree_skips_nothing)
+R5 is superseded: the CI-portability corrections changed replay_v22.py and the Q0 counterpart, and R6 ... ok
+test_a_CRLF_checkout_keeps_the_pins (tests.v23.test_v23_seq13_wiring.WiringR6.test_a_CRLF_checkout_keeps_the_pins) ... ok
+test_a_dropped_or_edited_pinned_file_un_skips_all_12 (tests.v23.test_v23_seq13_wiring.WiringR6.test_a_dropped_or_edited_pinned_file_un_skips_all_12) ... ok
+test_the_patch_is_current_and_keeps_GATED (tests.v23.test_v23_seq13_wiring.WiringR6.test_the_patch_is_current_and_keeps_GATED) ... ok
+test_the_seq13_patch_alone_on_this_tree_skips_nothing (tests.v23.test_v23_seq13_wiring.WiringR6.test_the_seq13_patch_alone_on_this_tree_skips_nothing)
+Seq 14 re-pinned three V23_PINNED files, so the seq-13 R6 wiring alone no longer matches this tree: ... ok
+test_the_seq14_patch_is_the_drafted_one_and_its_file_set_is_closed (tests.v23.test_v23_seq13_wiring.WiringR6.test_the_seq14_patch_is_the_drafted_one_and_its_file_set_is_closed)
+Ledger seq 14 (PIN-57 Option C): the cumulative patch touches exactly the Option C files, and its sha256 ... ok
+test_with_every_pin_holding_the_11_and_q0_are_skipped_naming_the_replay (tests.v23.test_v23_seq13_wiring.WiringR6.test_with_every_pin_holding_the_11_and_q0_are_skipped_naming_the_replay) ... ok
+test_without_the_sealing_tier_a_broken_pin_is_the_ordinary_visible_skip (tests.v23.test_v23_seq13_wiring.WiringR6.test_without_the_sealing_tier_a_broken_pin_is_the_ordinary_visible_skip) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 9.283s
+
+OK
+exit: 0

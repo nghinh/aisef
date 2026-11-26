@@ -1,0 +1,17 @@
+# Proof — v2.2 replay UNCHANGED, AFTER the patch (2026-11-26 10:58:39 +0700)
+
+$ python3 -P validation/v23/replay_v22.py
+PASS       0.91s  records=14  tests/v2/test_c2_delivery_experiment.py::PlanCorrection.test_the_committed_record_is_what_this_tree_derives
+PASS      0.408s  records=5  tests/v2/test_c2_k_nowork_001.py::Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after
+PASS      6.473s  records=35  tests/v2/test_c2_orchestration_conformance.py::Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story
+PASS     14.778s  records=4428  tests/v2/test_c2_p10_cohort_static.py::Record.test_the_evidence_record_re_derives_from_the_tree
+PASS      1.304s  records=4  tests/v2/test_c2_p10_profile_freeze.py::Checker.test_the_evidence_record_re_derives
+PASS      0.873s  records=21  tests/v2/test_c2_p5_acceptance.py::Acceptance.test_the_acceptance_re_derives_on_this_tree
+PASS      0.382s  records=11  tests/v2/test_c2_p5_acceptance.py::KernelProvenance.test_on_this_tree_the_committed_proposal_is_current
+PASS      0.256s  records=9  tests/v2/test_v21_mutation_runner.py::Classify.test_historical_records_read_as_before
+PASS       0.42s  records=11  tests/v2/test_p5_plan_v22_proposal.py::Record.test_P5_8_committed_record_is_current
+PASS      0.644s  records=16  tests/v2/test_p9_reproduction.py::KernelComparison.test_Q5_19_the_kernel_comparison_record_binds_this_tree
+PASS      3.673s  records=29  tests/v2/test_v21_conformance_ruling.py::CommittedRuling.test_the_committed_ruling_is_what_this_tree_derives
+PASS    231.651s  records=4734  tests/v2/p0/test_checker_calibration.py::CheckerCalibration
+replay v2.2 @ da3ea33f3b69: PASS
+exit: 0

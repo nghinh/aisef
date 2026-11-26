@@ -1,0 +1,5 @@
+# Proof — ruff over every touched file, AFTER the patch (2026-11-26 10:58:21 +0700)
+
+$ ruff check <the seven files>
+All checks passed!
+exit: 0

@@ -1,0 +1,93 @@
+# Proof — tests/v23/test_v23_q0_round.py under the sealing tier, AFTER the patch (2026-11-26 11:00:19 +0700)
+# Expect: the re-pinned Q0Record assertions pass; Q0Wiring passes (pins re-pinned); the ONLY reds are the
+# Q0RoundV23 tests that depend on the three known waits (OD-B1B / P5-PROPOSAL currency / F5 cut-over)
+# and the still-unwritten round record.
+
+$ AISEF_SEALING=1 python3 -m unittest tests.v23.test_v23_q0_round -v
+test_a_changed_missing_or_unreadable_fixture_file_is_named (tests.v23.test_v23_q0_round.Q0Contract.test_a_changed_missing_or_unreadable_fixture_file_is_named) ... ok
+test_a_weakened_expected_reason_or_a_changed_package_or_fixture_path_is_named (tests.v23.test_v23_q0_round.Q0Contract.test_a_weakened_expected_reason_or_a_changed_package_or_fixture_path_is_named) ... ok
+test_corrupted_history_is_left_to_history_problems (tests.v23.test_v23_q0_round.Q0Contract.test_corrupted_history_is_left_to_history_problems) ... ok
+test_the_writer_refuses_a_weakened_contract_and_prints_the_delta (tests.v23.test_v23_q0_round.Q0Contract.test_the_writer_refuses_a_weakened_contract_and_prints_the_delta) ... ok
+test_this_tree_keeps_every_v22_contract (tests.v23.test_v23_q0_round.Q0Contract.test_this_tree_keeps_every_v22_contract) ... ok
+test_a_dropped_q0_assertion_is_a_gap (tests.v23.test_v23_q0_round.Q0Coverage.test_a_dropped_q0_assertion_is_a_gap) ... ok
+test_every_v22_q0_assertion_has_its_counterpart_and_the_methods_pair_exactly (tests.v23.test_v23_q0_round.Q0Coverage.test_every_v22_q0_assertion_has_its_counterpart_and_the_methods_pair_exactly) ... ok
+test_reuse_passes_and_a_re_derived_record_must_name_the_round_v23_q0 (tests.v23.test_v23_q0_round.Q0Guard.test_reuse_passes_and_a_re_derived_record_must_name_the_round_v23_q0) ... ok
+test_a_dropped_v22_checker_and_a_short_registry_are_named (tests.v23.test_v23_q0_round.Q0Record.test_a_dropped_v22_checker_and_a_short_registry_are_named) ... ok
+test_constants_agree_with_the_replay_and_the_history (tests.v23.test_v23_q0_round.Q0Record.test_constants_agree_with_the_replay_and_the_history) ... ok
+test_run_enters_round_v23_when_the_selection_exists (tests.v23.test_v23_q0_round.Q0Record.test_run_enters_round_v23_when_the_selection_exists) ... ok
+test_the_round_v23_record_missing_corrupted_stale_or_current (tests.v23.test_v23_q0_round.Q0Record.test_the_round_v23_record_missing_corrupted_stale_or_current) ... ok
+test_the_v22_history_missing_or_corrupted_fails_closed_naming_it (tests.v23.test_v23_q0_round.Q0Record.test_the_v22_history_missing_or_corrupted_fails_closed_naming_it) ... ok
+test_the_writer_refuses_a_closed_round_writes_once_and_never_rewrites (tests.v23.test_v23_q0_round.Q0Record.test_the_writer_refuses_a_closed_round_writes_once_and_never_rewrites) ... ok
+test_the_writer_refuses_an_uncalibrated_tree (tests.v23.test_v23_q0_round.Q0Record.test_the_writer_refuses_an_uncalibrated_tree) ... ok
+test_a_class_that_cannot_calibrate_is_named (tests.v23.test_v23_q0_round.Q0Replay.test_a_class_that_cannot_calibrate_is_named) ... ok
+test_a_corrupted_record_fails_closed_naming_it (tests.v23.test_v23_q0_round.Q0Replay.test_a_corrupted_record_fails_closed_naming_it) ... ok
+test_a_missing_record_fails_closed_naming_it (tests.v23.test_v23_q0_round.Q0Replay.test_a_missing_record_fails_closed_naming_it) ... ok
+test_a_regeneration_that_differs_is_named_even_when_the_test_would_pass (tests.v23.test_v23_q0_round.Q0Replay.test_a_regeneration_that_differs_is_named_even_when_the_test_would_pass) ... ok
+test_an_intact_record_regenerates_byte_identically (tests.v23.test_v23_q0_round.Q0Replay.test_an_intact_record_regenerates_byte_identically) ... ok
+test_the_replayed_set_is_the_11_and_the_gated_q0_class (tests.v23.test_v23_q0_round.Q0Replay.test_the_replayed_set_is_the_11_and_the_gated_q0_class) ... ok
+test_a_checker_that_fails_everything_fails_calibration (tests.v23.test_v23_q0_round.Q0RoundV23.test_a_checker_that_fails_everything_fails_calibration) ... ok
+test_a_checker_that_rejects_for_the_wrong_reason_fails_calibration (tests.v23.test_v23_q0_round.Q0RoundV23.test_a_checker_that_rejects_for_the_wrong_reason_fails_calibration) ... ok
+test_a_missing_fixture_means_not_calibrated (tests.v23.test_v23_q0_round.Q0RoundV23.test_a_missing_fixture_means_not_calibrated) ... ok
+test_a_stale_fixture_that_no_longer_fails_is_a_calibration_failure (tests.v23.test_v23_q0_round.Q0RoundV23.test_a_stale_fixture_that_no_longer_fails_is_a_calibration_failure) ... ok
+test_an_always_pass_checker_fails_calibration (tests.v23.test_v23_q0_round.Q0RoundV23.test_an_always_pass_checker_fails_calibration) ... ok
+test_an_uncalibrated_checker_module_is_a_failure (tests.v23.test_v23_q0_round.Q0RoundV23.test_an_uncalibrated_checker_module_is_a_failure) ... ok
+test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) ... 
+  test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='b1_bindings') ... FAIL
+  test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='currency_dag') ... FAIL
+  test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='mutation') ... FAIL
+test_every_checker_is_calibrated_and_the_committed_record_is_current (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_is_calibrated_and_the_committed_record_is_current) ... FAIL
+test_the_2_0_record_is_history (tests.v23.test_v23_q0_round.Q0RoundV23.test_the_2_0_record_is_history) ... ok
+test_every_rule_reaches_problems (tests.v23.test_v23_q0_round.Q0Rules.test_every_rule_reaches_problems) ... ok
+test_a_registered_checkers_source_is_covered (tests.v23.test_v23_q0_round.Q0Scope.test_a_registered_checkers_source_is_covered) ... ok
+test_destructive_authority_scopes_must_cover_validation_v23_and_tests_v23 (tests.v23.test_v23_q0_round.Q0Scope.test_destructive_authority_scopes_must_cover_validation_v23_and_tests_v23) ... ok
+test_the_reviewers_probe_module_is_named_for_calibration_and_encoding (tests.v23.test_v23_q0_round.Q0Scope.test_the_reviewers_probe_module_is_named_for_calibration_and_encoding) ... ok
+test_the_round_modules_alone_with_the_widened_scopes_are_clean (tests.v23.test_v23_q0_round.Q0Scope.test_the_round_modules_alone_with_the_widened_scopes_are_clean) ... ok
+test_the_Q0_test_is_skipped_at_head_only_together_with_its_pinned_counterpart (tests.v23.test_v23_q0_round.Q0Wiring.test_the_Q0_test_is_skipped_at_head_only_together_with_its_pinned_counterpart) ... ok
+
+======================================================================
+FAIL: test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='b1_bindings')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/agent-a5a81b64262edb629/tests/v23/test_v23_q0_round.py", line 89, in test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason
+    self.assertTrue(r["clean_passes"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='currency_dag')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/agent-a5a81b64262edb629/tests/v23/test_v23_q0_round.py", line 89, in test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason
+    self.assertTrue(r["clean_passes"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason) (checker='mutation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/agent-a5a81b64262edb629/tests/v23/test_v23_q0_round.py", line 89, in test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason
+    self.assertTrue(r["clean_passes"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_checker_is_calibrated_and_the_committed_record_is_current (tests.v23.test_v23_q0_round.Q0RoundV23.test_every_checker_is_calibrated_and_the_committed_record_is_current)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/agent-a5a81b64262edb629/tests/v23/test_v23_q0_round.py", line 71, in test_every_checker_is_calibrated_and_the_committed_record_is_current
+    self.assertEqual(R.round_v23_missing() + Q.problems(self.result), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["b1_bindings is NOT calibrated: {'checker[4834 chars]ing'] != []
+
+First list contains 8 additional elements.
+First extra element 0:
+"b1_bindings is NOT calibrated: {'checker': 'b1_bindings', 'package': 'B1 risk gate (owner 2026-11-12 section B)', 'fixture': 'tests/v2/fixtures/known_bad/b1_bindings.json', 'clean_passes': False, 'clean_problems': ['aisef2/app/run.py::_close: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::_content_sha: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::admit: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::anchor_in: aisef2/app/run.py moved since the manifest froze', 'aisef2/app/run.py::anchor_of: aisef2/app/run.py moved since the manifest froze'], 'rejects_known_bad': True, 'rejects_for_the_expected_reason': True, 'expected': 'moved since the manifest froze', 'observed': ['kernel e865d65c80e2 is not the frozen 000000000000', 'the registry moved since the manifest froze', 'aisef2/app/run.py::execute: aisef2/app/run.py moved since the manifest froze'], 'calibrated': False, 'always_pass_mutant_rejected_by_calibration': True}"
+
+Diff is 5219 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 36 tests in 313.913s
+
+FAILED (failures=4)
+exit: 1

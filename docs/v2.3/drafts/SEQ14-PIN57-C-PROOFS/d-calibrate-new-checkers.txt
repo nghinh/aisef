@@ -1,0 +1,38 @@
+# Proof — cc.calibrate of the two NEWLY REGISTERED checkers against their committed known-bad fixtures (2026-11-26 10:58:46 +0700)
+
+$ python3 -P -c '<driver below>'
+{
+ "checker": "f5_gate",
+ "package": "round v2.3 (ledger seq 13, L1-F5)",
+ "fixture": "tests/v2/fixtures/known_bad/f5_gate.json",
+ "clean_passes": true,
+ "rejects_known_bad": true,
+ "rejects_for_the_expected_reason": true,
+ "expected": "unknown state",
+ "observed": [
+  "aisef2/x.py: unknown state 'QUALIFIED'",
+  "counts[MEASURED] says None, the table holds 0 such rows",
+  "counts[VERIFIED_REUSE] says None, the table holds 0 such rows",
+  "counts[INVALIDATED] says None, the table holds 0 such rows",
+  "counts[UNRESOLVED] says None, the table holds 0 such rows"
+ ],
+ "calibrated": true,
+ "always_pass_mutant_rejected_by_calibration": true
+}
+{
+ "checker": "released_evidence",
+ "package": "round v2.3 (ledger seq 13, CIGOV-R1)",
+ "fixture": "tests/v2/fixtures/known_bad/released_evidence.json",
+ "clean_passes": true,
+ "rejects_known_bad": true,
+ "rejects_for_the_expected_reason": true,
+ "expected": "a protected entry changed",
+ "observed": [
+  "ledger append-only rule (calibration): closure-evidence/v2/cycle2/RELEASE-DECISIONS.json: the protected bytes up to the final protected entry are not a byte prefix",
+  "ledger append-only rule (calibration): closure-evidence/v2/cycle2/RELEASE-DECISIONS.json: a protected entry changed"
+ ],
+ "calibrated": true,
+ "always_pass_mutant_rejected_by_calibration": true
+}
+both newly registered checkers: calibrated=True, always-PASS mutant rejected
+exit: 0

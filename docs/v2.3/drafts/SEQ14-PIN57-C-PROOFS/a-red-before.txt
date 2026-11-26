@@ -1,0 +1,26 @@
+# Proof (a) — red-before, clean tree at HEAD 50960ffa1f398a0ae112a38f70540d65d7bbfa33 (2026-11-26 10:48:04 +0700)
+
+$ git status --porcelain   # (clean: prints nothing but the proofs dir being assembled)
+?? docs/v2.3/drafts/SEQ14-PIN57-C-PROOFS/
+
+$ grep -rn 'V23_CHECKERS' tests/   # no test references the tuple
+(no match)
+
+$ grep -rnE 'known_bad/(f5_gate|f5_recorder|released_evidence)' tests/ validation/   # the three fixtures: no consumer
+(no match)
+
+$ grep -rlE '"(f5_gate|f5_recorder|released_evidence)"' tests/   # checker-name string literals in tests
+(no match)
+
+$ python3 -P -c 'registry length + scope problems on the clean tree'
+len(cc.REGISTRY) = 57
+V23_CHECKERS = ('f5_gate', 'f5_recorder', 'released_evidence')
+v23_scope_problems:
+  round v2.3: validation/v23 module with no calibration: validation/v23/ci_gate.py
+  round v2.3: validation/v23 module with no calibration: validation/v23/ground_truth/__init__.py
+  round v2.3: validation/v23 module with no calibration: validation/v23/ground_truth/corpus.py
+  round v2.3: validation/v23 module with no calibration: validation/v23/ground_truth/labels.py
+  round v2.3: validation/v23 module with no calibration: validation/v23/ground_truth/metrics.py
+  round v2.3: validation/v23 module with no calibration: validation/v23/impact.py
+  round v2.3: validation/v23 module with no calibration: validation/v23/observe.py
+  round v2.3: validation/v23 module with no calibration: validation/v23/released_evidence_guard.py

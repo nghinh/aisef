@@ -1,0 +1,14 @@
+# Proof — tests/v23/test_v23_unregistered_checkers.py (new, always-run), AFTER the patch (2026-11-26 10:57:53 +0700)
+
+$ python3 -m unittest tests.v23.test_v23_unregistered_checkers -v
+test_f5_recorder_stays_calibrated_against_its_committed_fixture (tests.v23.test_v23_unregistered_checkers.UnregisteredCheckers.test_f5_recorder_stays_calibrated_against_its_committed_fixture) ... ok
+test_no_gate_or_kernel_consumes_the_ground_truth_tooling (tests.v23.test_v23_unregistered_checkers.UnregisteredCheckers.test_no_gate_or_kernel_consumes_the_ground_truth_tooling) ... ok
+test_the_observations_input_of_the_engine_stays_unwired (tests.v23.test_v23_unregistered_checkers.UnregisteredCheckers.test_the_observations_input_of_the_engine_stays_unwired) ... ok
+test_the_registry_split_is_exactly_the_option_c_ruling (tests.v23.test_v23_unregistered_checkers.UnregisteredCheckers.test_the_registry_split_is_exactly_the_option_c_ruling) ... ok
+test_the_seq14_scope_additions_are_exactly_the_ruled_five (tests.v23.test_v23_unregistered_checkers.UnregisteredCheckers.test_the_seq14_scope_additions_are_exactly_the_ruled_five) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.366s
+
+OK
+exit: 0

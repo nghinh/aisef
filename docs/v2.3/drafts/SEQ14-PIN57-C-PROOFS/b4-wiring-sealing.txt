@@ -1,0 +1,13 @@
+# Proof — Seq13Wiring (round-gated) + Q0Wiring under the sealing tier, AFTER the patch (2026-11-26 10:58:15 +0700)
+
+$ AISEF_SEALING=1 python3 -m unittest tests.v23.test_v23_rounds.Seq13Wiring tests.v23.test_v23_q0_round.Q0Wiring -v
+test_V22_REPLAYED_is_the_replayed_set_and_each_is_gated (tests.v23.test_v23_rounds.Seq13Wiring.test_V22_REPLAYED_is_the_replayed_set_and_each_is_gated) ... ok
+test_each_replayed_test_is_skipped_at_head_naming_the_replay (tests.v23.test_v23_rounds.Seq13Wiring.test_each_replayed_test_is_skipped_at_head_naming_the_replay) ... ok
+test_the_applied_wiring_is_exactly_the_reviewed_patch_and_its_pins_hold (tests.v23.test_v23_rounds.Seq13Wiring.test_the_applied_wiring_is_exactly_the_reviewed_patch_and_its_pins_hold) ... ok
+test_the_Q0_test_is_skipped_at_head_only_together_with_its_pinned_counterpart (tests.v23.test_v23_q0_round.Q0Wiring.test_the_Q0_test_is_skipped_at_head_only_together_with_its_pinned_counterpart) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.668s
+
+OK
+exit: 0
