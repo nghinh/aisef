@@ -25,8 +25,8 @@ requires the code to agree with the frozen RFC.
 | `TestSelection` | F1 | §15.0 | `STORY_TESTS_RAN`, `NO_STORY_TESTS_MATCHED`, `STORY_TESTS_NOT_COLLECTABLE` |
 | `Owner` | F3 | §22 | `PLAN`, `DEVELOPER`, `ENVIRONMENT`, `PROVIDER`, `REVIEW`, `SECURITY`, `INTEGRATION` |
 | `IdentityGrade` | F9 | §23 | `VERIFIED`, `ATTESTED`, `OPAQUE` |
-| `EventType` | F1 | §20.1 | `run/begin`, `run/spec-resolved`, `run/dispose-begin`, `run/interrupted`, `run/end`, `plan/static-admitted`, `plan/frozen`, `story/begin`, `story/admitted`, `story/plan-drift`, `story/resource-acquired`, `story/resource-released`, `story/commit`, `story/rollback`, `story/retry`, `story/dispose`, `story/end`, `capability/resolved`, `probe/evaluated`, `proof/verified`, `provider/request`, `provider/result`, `tool/invoked`, `tool/result`, `tests/adequacy`, `gate/check`, `gate/decision`, `failure/observed`, `invariant/violated` |
+| `EventType` | F1 | §20.1 | `run/begin`, `run/spec-resolved`, `run/dispose-begin`, `run/interrupted`, `run/end`, `plan/static-admitted`, `plan/frozen`, `story/begin`, `story/admitted`, `story/plan-drift`, `story/resource-acquired`, `story/resource-released`, `story/commit`, `story/rollback`, `story/retry`, `story/dispose`, `story/end`, `story/completed`, `capability/resolved`, `probe/evaluated`, `proof/verified`, `provider/request`, `provider/result`, `provider/attestation`, `tool/invoked`, `tool/result`, `tests/adequacy`, `gate/check`, `gate/decision`, `failure/observed`, `invariant/violated` |
 | `InvariantId` | F10 | §4 | `I`, `II`, `III`, `IV`, `V`, `VI`, `VII`, `VIII`, `IX` |
 | `ControlProjection` | F11 | §21 | `story_state`, `failure_owner`, `budgets`, `retry_target`, `terminal_state`, `qualification_counters` |
 
-22 vocabularies, 106 members.
+22 vocabularies, 108 members.

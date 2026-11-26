@@ -1,23 +1,24 @@
-"""Projection 5 — terminal state: the run's, and each story's (P3-PROJECTION-SEMANTICS.md §5). Nothing follows run/end
-or an abandonment; a second interrupt abandons (§20.2); no story begins once shutdown has started (§18)."""
+"""Projection 5 — terminal state (version 2): the run's, and each story's (P3-PROJECTION-SEMANTICS.md §5), keyed off
+THE transition table (`aisef2/journal/transitions.py`, C-1 §3.2 consumer 4): the run-level part reads `RUN` (the
+table lifted verbatim from this module's v1 `_RUN`), the story outcome words are read off the table's `DECIDED_*`
+states. The fold output is VERSION 1's exactly over every format ≤ 3 journal (the J7 bound, pinned by the
+equivalence test). Nothing follows run/end or an abandonment; a second interrupt abandons (§20.2 — the counter rule
+stays this projection's, as the table module declares); no story begins once shutdown has started (§18)."""
 
 from __future__ import annotations
 
 from aisef2.arch.enums import ControlProjection, EventType as T
 from aisef2.journal.fold import ProjectionError
+from aisef2.journal.transitions import RUN, STORY, symbol_of
 
-#: run-level event (and value of `abandoned` for run/interrupted) -> (states it may follow, state it leads to)
-_RUN = {(T.RUN_BEGIN.value, None): (("NOT_STARTED",), "RUNNING"),
-        (T.RUN_DISPOSE_BEGIN.value, None): (("RUNNING", "INTERRUPTED"), "DISPOSING"),
-        (T.RUN_INTERRUPTED.value, False): (("RUNNING", "DISPOSING"), "INTERRUPTED"),
-        (T.RUN_INTERRUPTED.value, True): (("INTERRUPTED", "DISPOSING"), "ABANDONED"),
-        (T.RUN_END.value, None): (("RUNNING", "DISPOSING", "INTERRUPTED"), "ENDED")}
-_OUTCOME = {T.STORY_COMMIT.value: "COMMIT", T.STORY_ROLLBACK.value: "ROLLBACK", T.STORY_RETRY.value: "RETRY"}
+#: outcome words read off the table states: story/commit -> DECIDED_COMMIT -> "COMMIT", … (C-1 §3.2 consumer 4)
+_OUTCOME = {s: STORY[("ACTIVE", s)].removeprefix("DECIDED_")
+            for s in (T.STORY_COMMIT.value, T.STORY_ROLLBACK.value, T.STORY_RETRY.value)}
 
 
 class TerminalState:
     id = ControlProjection.TERMINAL_STATE.value
-    version = 1
+    version = 2
 
     def initial(self):
         return {"run": "NOT_STARTED", "interrupts": 0, "stories": {}, "pending": {}}
@@ -26,11 +27,12 @@ class TerminalState:
         t, d = event.type, event.data
         if state["run"] in ("ENDED", "ABANDONED"):
             raise ProjectionError(f"terminal_state: {t} after the run is {state['run']}")
-        abandoned = d["abandoned"] if t == T.RUN_INTERRUPTED.value else None
-        if (t, abandoned) in _RUN:
-            after, to = _RUN[(t, abandoned)]
+        symbol = symbol_of(t, d)
+        if symbol in RUN:
+            after, to = RUN[symbol]
             if state["run"] not in after:
                 raise ProjectionError(f"terminal_state: {t} while the run is {state['run']}")
+            abandoned = None if t != T.RUN_INTERRUPTED.value else symbol.endswith(":abandoning")
             if abandoned is not None and abandoned is not (state["interrupts"] > 0):
                 raise ProjectionError(f"terminal_state: run/interrupted with abandoned {abandoned} after "
                                       f"{state['interrupts']} interrupts: only a second interrupt abandons (§20.2)")

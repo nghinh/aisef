@@ -2429,35 +2429,18 @@
    "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\"], \"types\": []}; import graph from run_story: reachable"
   },
   {
-   "id": "aisef2/journal/projections/story_state.py::StoryState",
-   "path": "aisef2/journal/projections/story_state.py",
-   "symbol": "StoryState",
-   "authority_kind": [
-    "ADMISSION",
-    "QUALIFICATION"
-   ],
-   "reachable_from": [
-    "aisef2/orchestrate/story_runner.py::run_story"
-   ],
-   "disposition": "ACTIVE_V2_AUTHORITY",
-   "replacement": null,
-   "evidence": "AST: {\"calls\": [], \"events\": [\"STORY_ADMITTED\", \"STORY_PLAN_DRIFT\"], \"types\": []}; import graph from run_story: reachable"
-  },
-  {
    "id": "aisef2/journal/projections/story_state.py::StoryState.step",
    "path": "aisef2/journal/projections/story_state.py",
    "symbol": "StoryState.step",
    "authority_kind": [
-    "ADMISSION",
-    "TERMINAL_STATE",
-    "QUALIFICATION"
+    "TERMINAL_STATE"
    ],
    "reachable_from": [
     "aisef2/orchestrate/story_runner.py::run_story"
    ],
    "disposition": "ACTIVE_V2_AUTHORITY",
    "replacement": null,
-   "evidence": "AST: {\"calls\": [], \"events\": [\"STORY_ADMITTED\", \"STORY_PLAN_DRIFT\"], \"types\": []}; import graph from run_story: reachable"
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
   },
   {
    "id": "aisef2/journal/projections/terminal_state.py::TerminalState.step",
@@ -3831,7 +3814,7 @@
   "v2_console_script": false
  },
  "summary": {
-  "ACTIVE_V2_AUTHORITY": 74,
+  "ACTIVE_V2_AUTHORITY": 73,
   "COMPATIBILITY_NONAUTHORITATIVE": 37,
   "HISTORICAL_ONLY": 2,
   "REMOVED": 0,

@@ -46,10 +46,14 @@ def _load(name, rel):
 
 opa = _load("aisef_v2_old_path_audit", "validation/v2/old_path_audit.py")
 #: V2.0: the release tree's inventory (validation/qualification/release_inventory.py). P6's stays sealed as the P6
-#: tree's; the release audits its own tree, with the same audit, against its own inventory. V2.1 (B-03c): the 2.1
-#: tree's own inventory; the 2.0 release's stays as released (history).
-RELEASE_INVENTORY_REL = "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json"
-RELEASE_2_0_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
+#: tree's; the release audits its own tree, with the same audit, against its own inventory. V2.1 (B-03c) and V2.3
+#: (C-1 L2-JOURNAL): each era gets its OWN inventory file — CIGOV-R1 freezes every committed closure-evidence/v2/**
+#: byte, so an era's file can no longer be regenerated in place. The current era's is release_inventory.INVENTORY_REL
+#: (mirrored here); the 2.1 and 2.0 files stay as released (history, byte-pinned below).
+RELEASE_INVENTORY_REL = "closure-evidence/v2/v2.3/AUTHORITY-INVENTORY.json"      # the current era == ri.INVENTORY_REL
+RELEASE_2_1_REL = "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json"            # history
+RELEASE_2_1_SHA256 = "9eaf87693c079b64fb7282a4459977d58ca120fb3569fa58a658fac3ff6eb51a"
+RELEASE_2_0_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"         # history (also pinned in release_inventory)
 #: B-03c: the two authorities 2.1 adds to 2.0's inventory, and all they may draw on — product truth by compiling an
 #: approved contract (migrate) and by a bound probe run (verify): no control event, no control type, no merge, gate
 #: or classification (their limits beyond the row: validation/qualification/authority_limits.py)
@@ -59,6 +63,28 @@ V2_1_ROWS = {
     "aisef2/app/review_verify.py::verify": 'AST: {"calls": ["aisef2.probe.protocol.bound_result", '
                                            '"aisef2.probe.protocol.run_probe"], "events": [], "types": []}; import graph '
                                            'from run_story: not reachable'}
+#: C-1 L2-JOURNAL (CORE-2): the six format-4 journal schema owners 2.3 adds to 2.1's inventory — each is a schema /
+#: validator of exactly one control fact family, drawing on no control call or type. Kinds and AST evidence are pinned
+#: here as an independent expectation, NOT read back from the inventory under test.
+V2_3_ADDED = {
+    "aisef2/journal/format4.py::_adequacy_schema": (["GATE_DECISION"],
+        'AST: {"calls": [], "events": ["TESTS_ADEQUACY"], "types": []}; import graph from run_story: not reachable'),
+    "aisef2/journal/format4.py::_closed4": (["BUDGET"],
+        'AST: {"calls": [], "events": ["PROVIDER_REQUEST"], "types": []}; import graph from run_story: not reachable'),
+    "aisef2/journal/format4.py::_commit4": (["PRODUCT_TRUTH"],
+        'AST: {"calls": [], "events": ["PROOF_VERIFIED"], "types": []}; import graph from run_story: not reachable'),
+    "aisef2/journal/format4.py::_failure_schema": (["FAILURE_OWNER"],
+        'AST: {"calls": [], "events": ["FAILURE_OBSERVED"], "types": []}; import graph from run_story: not reachable'),
+    "aisef2/journal/format4.py::_gate4": (["GATE_DECISION"],
+        'AST: {"calls": [], "events": ["GATE_CHECK", "GATE_DECISION"], "types": []}; import graph from run_story: not reachable'),
+    "aisef2/journal/format4.py::_rules": (["PRODUCT_TRUTH", "GATE_DECISION", "TERMINAL_STATE", "MERGE_ROLLBACK_COMMIT"],
+        'AST: {"calls": [], "events": ["GATE_CHECK", "GATE_DECISION", "PROOF_VERIFIED", "STORY_COMMIT", "TESTS_ADEQUACY"], '
+        '"types": []}; import graph from run_story: not reachable')}
+#: 2.3 also consolidates the StoryState projection onto the transition table (aisef2/journal/transitions.py): the class
+#: no longer branches on T.STORY_ADMITTED / T.STORY_PLAN_DRIFT, so the audit heuristic no longer reads it as an
+#: ADMISSION / QUALIFICATION authority (those kinds stay owned by story_admission / drift / story_runner). StoryState.step
+#: remains, as TERMINAL_STATE — symmetric with TerminalState.step: a pure projection, never an authority.
+V2_3_REMOVED = {"aisef2/journal/projections/story_state.py::StoryState"}
 COPIED = ("aisef2", "aisef", "validation/v2", "tests/v2", "pyproject.toml")
 
 
@@ -82,17 +108,21 @@ class Inventory(unittest.TestCase):
 
     def test_the_committed_inventory_matches_reality_in_both_directions(self):
         self.assertEqual(opa.check(snapshot()), [])
-        inv = json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))
+        inv = json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))        # the current era (2.3)
+        v21 = json.loads((ROOT / RELEASE_2_1_REL).read_text(encoding="utf-8"))              # history
         p6 = json.loads((ROOT / opa.INVENTORY_REL).read_text(encoding="utf-8"))
         r20 = json.loads((ROOT / RELEASE_2_0_REL).read_text(encoding="utf-8"))
-        ids = {name: {r["id"] for r in d["rows"]} for name, d in (("2.1", inv), ("P6", p6), ("2.0", r20))}
-        # 2.0 added exactly the product runtime's two authorities to the sealed P6 inventory (history, unchanged) and
-        # 2.1 exactly migrate and the review's verification to 2.0's; neither removed any
+        ids = {name: {r["id"] for r in d["rows"]} for name, d in (("2.3", inv), ("2.1", v21), ("P6", p6), ("2.0", r20))}
+        # the authority surface over the historical chain, each delta pinned independently (never read back from the
+        # inventory under test): 2.0 added the product runtime's two to the sealed P6 set, 2.1 migrate + the review's
+        # verification; 2.3 adds the six format-4 schema owners and consolidates the StoryState class onto the
+        # transition table — exactly that, nothing else moved
         self.assertEqual(ids["2.0"] - ids["P6"], {"aisef2/app/bundle.py::load", "aisef2/app/run.py::execute"})
         self.assertEqual(ids["2.1"] - ids["2.0"], set(V2_1_ROWS))
         self.assertEqual(ids["P6"] - ids["2.0"], set())
         self.assertEqual(ids["2.0"] - ids["2.1"], set())
-        self.assertEqual(ids["P6"] - ids["2.1"], set())
+        self.assertEqual(ids["2.3"] - ids["2.1"], set(V2_3_ADDED))
+        self.assertEqual(ids["2.1"] - ids["2.3"], V2_3_REMOVED)
         self.assertEqual(inv["summary"]["UNCLASSIFIABLE"], 0)
         self.assertEqual(inv["summary"]["REMOVED"], 0)
         self.assertEqual(inv["legacy_references"], [])
@@ -106,11 +136,18 @@ class Inventory(unittest.TestCase):
         self.assertEqual(opa.inventory_digest(inv), opa.inventory_digest(opa.inventory(ROOT)))
 
     def test_the_2_1_authorities_draw_on_product_truth_only(self):
-        rows = {r["id"]: r for r in json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))["rows"]}
+        rows = {r["id"]: r for r in json.loads((ROOT / RELEASE_2_1_REL).read_text(encoding="utf-8"))["rows"]}
         for rid, evidence in V2_1_ROWS.items():
             with self.subTest(row=rid):
                 self.assertEqual((rows[rid]["authority_kind"], rows[rid]["disposition"], rows[rid]["evidence"]),
                                  (["PRODUCT_TRUTH"], "ACTIVE_V2_AUTHORITY", evidence))
+
+    def test_the_2_3_format4_authorities_own_one_fact_family_each(self):
+        rows = {r["id"]: r for r in json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))["rows"]}
+        for rid, (kinds, evidence) in V2_3_ADDED.items():
+            with self.subTest(row=rid):
+                self.assertEqual((rows[rid]["authority_kind"], rows[rid]["disposition"], rows[rid]["evidence"]),
+                                 (kinds, "ACTIVE_V2_AUTHORITY", evidence))
 
     def test_an_unenumerated_authority_and_a_stale_row_each_fail_the_audit(self):
         d = snapshot()
@@ -223,6 +260,13 @@ class ReleaseInventory(unittest.TestCase):
             self.assertEqual(ri.history_problems(), [f"the 2.0 release inventory is history and was changed: {RELEASE_2_0_REL} "
                                                      "has sha256 6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c, "
                                                      f"release_inventory.RELEASE_2_0_SHA256 pins {'0' * 64}"])
+
+    def test_the_2_1_release_inventory_is_history_byte_identical_to_its_pin(self):
+        # the 2.1 era file is frozen history (CIGOV-R1): no longer the tree's inventory, but its LF-normalised bytes
+        # are pinned, and a single byte changed breaks the pin
+        self.assertEqual(ri.digest(ROOT / RELEASE_2_1_REL), RELEASE_2_1_SHA256)
+        changed = (ROOT / RELEASE_2_1_REL).read_bytes().replace(b"\r\n", b"\n").replace(b"migrate", b"migratx", 1)
+        self.assertNotEqual(hashlib.sha256(changed).hexdigest(), RELEASE_2_1_SHA256)
 
     def test_the_sealed_p6_inventory_is_byte_identical_to_its_seal(self):
         seal = json.loads((ROOT / "closure-evidence/v2/P6-FINAL-SEAL.json").read_text(encoding="utf-8"))

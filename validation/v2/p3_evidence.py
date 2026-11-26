@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import contextlib
 import errno
+import hashlib
 import importlib.util
 import inspect
 import json
@@ -569,11 +570,18 @@ def unittest_ok(case) -> bool:
     return result.wasSuccessful() and result.testsRun == 1
 
 
+#: WP-3.4: the control-projection record. The v2.0/v2.2-era file is RELEASED history (released_evidence_guard freezes
+#: its bytes). CORE-2 (C-1 L2-JOURNAL) bumps StoryState to v3 and TerminalState to v2 WITHOUT changing any projected
+#: state — the reference-journal state digests and refusals are identical (J7 non-flip) — so the fresh record is
+#: version-forwarded to the v2.3 path while the frozen history is validated against its own bytes.
+CONTROL_PROJECTIONS_HISTORY_REL = "closure-evidence/v2/P3-CONTROL-PROJECTIONS.json"
+CONTROL_PROJECTIONS_HISTORY_SHA256 = "cc787e9c31597f3fa3b61f78035869ea529ed1005d7a082eb8e3332758d67efb"
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-3.1": ("closure-evidence/v2/P3-JOURNAL-WRITER.json", journal_writer, "aisef2/journal/writer.py"),
     "WP-3.2": ("closure-evidence/v2/P3-FORMAT-COMPAT.json", format_compat, "aisef2/journal/compat.py"),
     "WP-3.3": ("closure-evidence/v2/P3-FOLD-ORACLE.json", fold_oracle, "aisef2/journal/fold.py"),
-    "WP-3.4": ("closure-evidence/v2/P3-CONTROL-PROJECTIONS.json", control_projections,
+    "WP-3.4": ("closure-evidence/v2/v2.3/P3-CONTROL-PROJECTIONS.json", control_projections,
                "aisef2/journal/projections/__init__.py"),
     "WP-3.5": ("closure-evidence/v2/P3-REFERENCE-MODELS.json", reference_models, "tests/v2/refmodel/__init__.py"),
 }
@@ -589,9 +597,26 @@ def problems_of(record: dict) -> list[str]:
     return out + [f"{record.get('work_package')}: property {k} is false" for k, v in props.items() if v is not True]
 
 
+def _control_projections_version_forward(root: pathlib.Path, fresh: dict) -> list[str]:
+    """WP-3.4 version-forward: the v2 history is RELEASED (released_evidence_guard) and CORE-2 only bumps two
+    projection versions, so the fresh v3 record is checked against its own v2.3 path (the check() loop) while the
+    history is validated against its original bytes and must still be the control state the v2.3 projections produce
+    (J7 non-flip). A rewrite of the history, or a changed projected state, FAILs."""
+    hist = root / CONTROL_PROJECTIONS_HISTORY_REL
+    if not hist.exists():
+        return [f"{CONTROL_PROJECTIONS_HISTORY_REL} (v2 history) is missing"]
+    if (got := hashlib.sha256(hist.read_bytes().replace(b"\r\n", b"\n")).hexdigest()) != CONTROL_PROJECTIONS_HISTORY_SHA256:
+        return [f"{CONTROL_PROJECTIONS_HISTORY_REL} is RELEASED history and was changed: {got}"]
+    old = json.loads(hist.read_text(encoding="utf-8"))
+    if (fresh["reference_journal_state_digests"], fresh["refusal_samples"]) != \
+            (old["reference_journal_state_digests"], old["refusal_samples"]):
+        return ["the v2.3 projections do not reproduce the v2 control state (J7 non-flip broken)"]
+    return []
+
+
 def check(root: pathlib.Path = ROOT) -> list[str]:
     out = []
-    for rel, build, needs in BUILDERS.values():
+    for wp, (rel, build, needs) in BUILDERS.items():
         if not (root / needs).exists():
             continue
         fresh = build()
@@ -601,6 +626,8 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
             out.append(f"{rel} is missing")
         elif committed.read_text(encoding="utf-8") != render(fresh):
             out.append(f"{rel} is stale: regenerate it")
+        if wp == "WP-3.4":
+            out += _control_projections_version_forward(root, fresh)
     return out
 
 

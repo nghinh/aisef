@@ -39,7 +39,6 @@ from aisef2.arch.enums import (
     AdequacyOutcome, BehaviorVerdict, EventType as T, InvariantId, Owner, Relevance, TestExecutionStatus, TestOutcome,
     TestSelection, Vacuity,
 )
-from aisef2.control.owner import FailureCode
 from aisef2.journal import compat
 from aisef2.journal import event as ev
 from aisef2.journal import format2 as f2
@@ -134,9 +133,20 @@ def _adequacy_rule(d: Mapping) -> str | None:
     return None
 
 
+#: §4.10 pin (C-1, CORE-2 batch): the 22 FailureCode literals format 3 was written with — never the live enum, so a
+#: future 23rd code (V21-57 reversal) cannot silently widen sealed format-3 journals. format4 pins FORMAT_4_CODES.
+FORMAT_3_CODES: frozenset[str] = frozenset({
+    "PROBE_UNRUNNABLE", "PROBE_INVALID_SPEC", "CONTRACT_UNSATISFIED", "SUBJECT_ABSENT_AT_CANDIDATE",
+    "PRECONDITION_BROKEN", "PLAN_CONTRADICTION", "POST_MERGE_REGRESSION", "POST_MERGE_SUBJECT_LOST",
+    "NON_CONTROLLER_SIGNAL", "MISSING_CREDENTIAL", "INVALID_CREDENTIAL", "PROVIDER_UNAVAILABLE", "UNKNOWN",
+    "VERIFIER_DISAGREEMENT", "PROBE_MISMATCH", "MERGE_CONFLICT", "TESTS_UNRUNNABLE", "TESTS_INADEQUATE",
+    "REVIEW_FINDING", "SECURITY_FINDING", "CAPABILITY_UNRUNNABLE", "RESOURCE_ACQUISITION_FAILED",
+})
+
+
 def _failure_schema() -> Schema:
     base = ev.SCHEMAS[T.FAILURE_OBSERVED.value]  # owner and retryable stay the taxonomy's (event.carried, _failure_rule)
-    return Schema({**base.required, "code": _enum(FailureCode)}, base.optional, base.cites, base.rule)
+    return Schema({**base.required, "code": ev._codes(FORMAT_3_CODES)}, base.optional, base.cites, base.rule)
 
 
 #: The format-3 schemas: formats 1 and 2 as they were, the five re-declared here, the four new.

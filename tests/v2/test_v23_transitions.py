@@ -20,7 +20,6 @@ from aisef2.journal import transitions as tr
 from aisef2.journal.event import JournalError, carried
 from aisef2.journal.fold import ProjectionError
 from aisef2.journal.projections.story_state import StoryState
-from aisef2.journal.projections.terminal_state import _RUN as TERMINAL_RUN
 from aisef2.product.contract import digest
 from tests.v2.test_v23_format4 import (
     SHA, World, adequacy_payload, admission, proof_payload, request_payload, sealed_record,
@@ -58,14 +57,20 @@ class TableValues(unittest.TestCase):
         self.assertEqual(tr.WITHIN["failure/observed"], frozenset(tr.STORY_STATES) - {"ABSENT"})
         self.assertEqual(tr.WITHIN["provider/result"], frozenset(tr.STORY_STATES) - {"ABSENT"})
 
-    def test_run_is_terminal_state_run_lifted_verbatim(self):
-        expected = {}
-        for (event_type, abandoned), value in TERMINAL_RUN.items():
-            if abandoned is None:
-                expected[event_type] = value
-            else:
-                expected["run/interrupted:abandoning" if abandoned else "run/interrupted:first"] = value
-        self.assertEqual(dict(tr.RUN), expected)
+    def test_run_is_the_v1_terminal_state_table_and_the_projection_now_reads_it(self):
+        """CORE-2 reversed the arrow: v1's `_RUN` was lifted verbatim INTO the table; TerminalState v2 reads
+        `tr.RUN` (C-1 §3.2 consumer 4). This pins the lifted values literally — the digest pins the rest."""
+        self.assertEqual(dict(tr.RUN), {
+            "run/begin": (("NOT_STARTED",), "RUNNING"),
+            "run/dispose-begin": (("RUNNING", "INTERRUPTED"), "DISPOSING"),
+            "run/interrupted:first": (("RUNNING", "DISPOSING"), "INTERRUPTED"),
+            "run/interrupted:abandoning": (("INTERRUPTED", "DISPOSING"), "ABANDONED"),
+            "run/end": (("RUNNING", "DISPOSING", "INTERRUPTED"), "ENDED"),
+        })
+        from aisef2.journal.projections.terminal_state import TerminalState, _OUTCOME
+        self.assertEqual(TerminalState.version, 2)
+        self.assertEqual(_OUTCOME, {"story/commit": "COMMIT", "story/rollback": "ROLLBACK", "story/retry": "RETRY"},
+                         "the outcome words are read off the table's DECIDED_* states")
 
     def test_table_digest_is_the_asserted_literal_and_deterministic(self):
         self.assertRegex(tr.TABLE_DIGEST, r"^[0-9a-f]{64}$")
@@ -125,14 +130,17 @@ def table_state_of(cur):
 
 class CellOracle(unittest.TestCase):
     """T10's now-testable half: for every (state, 2.2.0 symbol) cell, the table's verdict AND successor equal
-    StoryState VERSION 2's — the table is exactly the 2.2.0 semantics re-keyed, zero divergences."""
+    StoryState VERSION 2's — the table is exactly the 2.2.0 semantics re-keyed, zero divergences. CORE-2 bumped
+    the live projection to v3 (it now READS the table), so the 2.2.0 side is the verbatim reference copy
+    (tests/v2/test_v23_projections.py), which also pins live-v3 == reference-v2 cell by cell (the J7 bound)."""
 
     def v2_step(self, state, symbol):
+        from tests.v2.test_v23_projections import StoryStateV2Reference
         kind, _, variant = symbol.partition(":")
         data = {"story_id": "S"}
         if variant:
             data["admitted"] = variant == "accepted"
-        projection = StoryState()
+        projection = StoryStateV2Reference()
         prior = {} if state == "ABSENT" else {"S": v2_cur(state)}
         try:
             after = projection.step(prior, SimpleNamespace(type=kind, data=data))
@@ -150,8 +158,8 @@ class CellOracle(unittest.TestCase):
         return None
 
     def test_every_cell_agrees_with_story_state_v2(self):
-        self.assertEqual(StoryState.version, 2, "StoryState bumped: move this oracle to the J7 equality bound "
-                                                "(v3 fold == v2 fold over every format <= 3 journal)")
+        self.assertEqual(StoryState.version, 3, "the J7 oracle lives in test_v23_projections.py; this cell oracle "
+                                                "now runs against the verbatim 2.2.0 reference")
         for state in tr.STORY_STATES:
             for symbol in SYMBOLS_220:
                 with self.subTest(state=state, symbol=symbol):

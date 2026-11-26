@@ -222,7 +222,10 @@ def moved(state):
 
 class Catalog(unittest.TestCase):
     def test_FMT3_1_every_event_type_has_a_format_3_schema(self):
-        self.assertEqual(set(f3.SCHEMAS), {t.value for t in T})
+        # CORE-2 (§4.10): the enum grew the two format-4 kinds; format 3 stays the pinned 29 — V3_VOCABULARY,
+        # never the live enum. FMT3-1 ("every type has a schema") holds over the vocabulary format 3 was written with.
+        self.assertEqual(set(f3.SCHEMAS), ev.V3_VOCABULARY)
+        self.assertEqual({t.value for t in T} - set(f3.SCHEMAS), {"provider/attestation", "story/completed"})
         self.assertEqual((len(f3.SCHEMAS), len(f3.WRITABLE), f3.FORMAT, tuple(f3.KNOWN_FORMATS)), (29, 29, 3, (1, 2, 3)))
         self.assertEqual(f3.WRITABLE, frozenset(f3.SCHEMAS))
         for t in FOUR_NEW:
@@ -831,11 +834,12 @@ class BudgetsV2(unittest.TestCase):
         self.assertTrue(set(NINE) & seen["codes"], seen["codes"])
 
 
-# --------------------------------------------------------------------------------------- story_state v2
+# ----------------------------------------------------------- story_state (v2 semantics, carried verbatim by v3)
 
 class StoryStateV2(unittest.TestCase):
-    def test_version_2_admits_a_proof_and_an_adequacy_record_in_an_active_attempt_only(self):
-        self.assertEqual(StoryState.version, 2)
+    def test_version_3_still_admits_a_proof_and_an_adequacy_record_in_an_active_attempt_only(self):
+        # CORE-2: version 3 re-keys the same semantics off the transition table; this V2-005 behavior pin is J7's
+        self.assertEqual(StoryState.version, 3)
         a, b = evaluated("S1", "C1", record()), evaluated("S1", "C1", record())
         st = plain(fold(PROJECTIONS[P.STORY_STATE], events_of(*ACTIVE, a, b, verified("S1", "C1", (4, 5)), adequacy("S1"))))
         self.assertEqual(st, {"S1": {"state": "ACTIVE", "attempt": 1, "admitted": True, "outcome": None}})

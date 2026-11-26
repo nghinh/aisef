@@ -11,9 +11,9 @@ table (`journal.transitions`) as the ONE story-lifecycle rule:
   never "absent". **`provider/result`** (§4.3, E4) requires `segment` (null, or `{session, sha256, offset, bytes}`)
   under rule R-SEGMENT: COMPLETED ⇒ non-null, synthetic closer ⇒ null, FAILED ⇒ either and `detail` says which.
 * **`provider/attestation`** (§4.4, C7) and **`story/completed`** (§4.5, G6) are the two NEW kinds. Their
-  `EventType` members land with the measured CORE-2 batch (C-1 §7 Q1/M12): until then this module names every kind
-  by its LITERAL string — `VOCABULARY4` is the 29 v2.2.0 names plus the two, never computed from the live enum
-  (§4.10, the M4 sealed-reader defect class).
+  `EventType` members landed with the measured CORE-2 batch (C-1 §7 Q1/M12), alongside the `V3_VOCABULARY` and
+  `FORMAT_3_CODES` pins — `VOCABULARY4` stays the 31 names as LITERALS, never computed from the live enum
+  (§4.10, the M4 sealed-reader defect class), with a test pinning it equal to the enum.
 * **V21-10 hardening** (§4.8): R-SEALED (every cited probe record's `record_digest` re-derives — Q3 measured,
   primary form), R-GATE (no passing decision over a failed check), R-COMMIT (no commit in an attempt without a
   `proof/verified` — Q2 measured, STRICT form). **R-CLOSED** (§4.6, C5/G9): `run/end` is refused while any
@@ -65,10 +65,10 @@ from aisef2.product.contract import digest
 FORMAT = 4
 KNOWN_FORMATS = (1, 2, 3, 4)
 
-#: The two format-4 kinds (C-1 §4.4/§4.5). Their EventType members land with the measured CORE-2 batch; this layer
-#: treats kinds as strings until then (and after: a member's .value is the same string).
-PROVIDER_ATTESTATION = "provider/attestation"
-STORY_COMPLETED = "story/completed"
+#: The two format-4 kinds (C-1 §4.4/§4.5), now EventType members (the measured CORE-2 batch landed the enums hunk);
+#: the module constants stay as the typed members' values — the same strings this layer always used.
+PROVIDER_ATTESTATION = T.PROVIDER_ATTESTATION.value
+STORY_COMPLETED = T.STORY_COMPLETED.value
 
 #: §4.10 — the 29 v2.2.0 event names as LITERALS (never the live enum: enum growth must not re-open this reader)
 #: plus the two new kinds: 31 names.

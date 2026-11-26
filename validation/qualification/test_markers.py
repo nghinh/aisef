@@ -41,8 +41,11 @@ GATE = "tests/v2/sealing_gate.py"
 CATEGORIES = frozenset({"sealing", "platform-harness"})
 PLATFORMS = frozenset({"linux", "darwin", "windows"})
 FIELDS = frozenset({"category", "id", "reason", "platforms", "positive"})
-_ROW = re.compile(r"^\| ([^|\s][^|]*?) \| (?:NEW_WORK|OWNER_DECISION|ALREADY_FIXED|DONE|DUPLICATE|NOT_APPLICABLE) \|",
-                  re.M)
+_STATUS = r"NEW_WORK|OWNER_DECISION|ALREADY_FIXED|DONE|DUPLICATE|NOT_APPLICABLE"
+#: a row struck through and removed from v2.3 release scope by owner ruling (e.g. B2) is still a historical checklist
+#: ID — the historical totals are left unchanged for traceability (MASTER-CHECKLIST.md "147 unique IDs")
+_REMOVED = r"~~(?:" + _STATUS + r")~~ REMOVED_FROM_V2\.3_RELEASE_SCOPE_BY_OWNER"
+_ROW = re.compile(r"^\| ([^|\s][^|]*?) \| (?:" + _STATUS + "|" + _REMOVED + r") \|", re.M)
 
 
 def marker(**fields):

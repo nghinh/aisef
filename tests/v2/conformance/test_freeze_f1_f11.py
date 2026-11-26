@@ -33,7 +33,12 @@ class Conformance(unittest.TestCase):
 
     def test_no_problems_and_committed_record_current(self):
         self.assertEqual(fc.problems_of(self.result), [])
-        self.assertEqual((ROOT / fc.OUT_REL).read_text(encoding="utf-8"), fc.render(self.result))
+        # version-forward: the current record is the v2.3 one, and the v2.0/v2.2 F-CONFORMANCE stays as formats-1-3
+        # history (RELEASED), byte-identical to its pin — the frozen RFC and that record are never rewritten
+        self.assertEqual((ROOT / fc.OUT_V23_REL).read_text(encoding="utf-8"), fc.render(self.result))
+        import hashlib
+        got = hashlib.sha256((ROOT / fc.OUT_REL).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        self.assertEqual(got, fc.OUT_HISTORY_SHA256)
 
     def test_every_required_now_subcheck_passes(self):
         for s in self.result["subchecks"]:

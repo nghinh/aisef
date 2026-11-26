@@ -148,11 +148,13 @@ class EventType(Enum):  # RFC §20.1 · F1
     STORY_RETRY = "story/retry"
     STORY_DISPOSE = "story/dispose"
     STORY_END = "story/end"
+    STORY_COMPLETED = "story/completed"          # format 4 only (C-1 §4.5); formats 1-3 never admit it (§4.10 pin)
     CAPABILITY_RESOLVED = "capability/resolved"
     PROBE_EVALUATED = "probe/evaluated"
     PROOF_VERIFIED = "proof/verified"
     PROVIDER_REQUEST = "provider/request"
     PROVIDER_RESULT = "provider/result"
+    PROVIDER_ATTESTATION = "provider/attestation"  # format 4 only (C-1 §4.4); formats 1-3 never admit it (§4.10 pin)
     TOOL_INVOKED = "tool/invoked"
     TOOL_RESULT = "tool/result"
     TESTS_ADEQUACY = "tests/adequacy"

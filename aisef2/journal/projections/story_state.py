@@ -1,24 +1,44 @@
-"""Projection 1 — story state (version 2): §17's lifecycle per story and attempt (P3-PROJECTION-SEMANTICS.md §1).
-Version 2 (V2-005, journal format 3) admits the newly representable `proof/verified` and `tests/adequacy` inside an
-ACTIVE attempt; the lifecycle itself is unchanged."""
+"""Projection 1 — story state (version 3): §17's lifecycle per story and attempt (P3-PROJECTION-SEMANTICS.md §1),
+keyed off THE transition table (`aisef2/journal/transitions.py`, C-1 §3.2 consumer 3). Version 2's if-chain is
+re-derived as `STORY`/`WITHIN` lookups; the projection keeps only the attempt counter and the admitted flag beside
+the table state. The FOLD OUTPUT IS VERSION 2's EXACTLY — same dict words, same refusal set, same messages — over
+every format ≤ 3 journal (the J7 bound, pinned by the equivalence test in tests/v2/test_v23_projections.py).
+Version 2 (V2-005) admitted `proof/verified` and `tests/adequacy` inside an ACTIVE attempt; the table says the same."""
 
 from __future__ import annotations
 
 from aisef2.arch.enums import ControlProjection, EventType as T
 from aisef2.journal.fold import ProjectionError
+from aisef2.journal.transitions import STORY, WITHIN, symbol_of
 
-_OUTCOMES = {T.STORY_COMMIT.value: ("COMMIT", ("ACTIVE",)), T.STORY_ROLLBACK.value: ("ROLLBACK", ("BEGIN", "ACTIVE")),
-             T.STORY_RETRY.value: ("RETRY", ("BEGIN", "ACTIVE"))}
-#: types that leave the state unchanged, and the states they may occur in (None: any, once the story began)
-_WITHIN = {T.PROBE_EVALUATED.value: ("BEGIN", "ACTIVE"), T.PROVIDER_REQUEST.value: ("ACTIVE",),
-           T.PROOF_VERIFIED.value: ("ACTIVE",), T.TESTS_ADEQUACY.value: ("ACTIVE",), T.FAILURE_OBSERVED.value: None}
-_NAMED = {T.STORY_BEGIN.value, T.STORY_ADMITTED.value, T.STORY_DISPOSE.value, T.STORY_END.value,
-          T.STORY_PLAN_DRIFT.value, *_OUTCOMES, *_WITHIN}
+#: table state -> the v2 fold words (state, admitted, outcome); None keeps the story's current field (J7: the fold
+#: output is v2's exactly). BEGIN keeps admitted None; BEGIN_REFUSED/ACTIVE carry the admission verdict.
+_WORDS = {
+    "BEGIN": ("BEGIN", None, None),
+    "BEGIN_REFUSED": ("BEGIN", False, None),
+    "ACTIVE": ("ACTIVE", True, None),
+    "DECIDED_COMMIT": ("COMMIT", None, "COMMIT"),
+    "DECIDED_ROLLBACK": ("ROLLBACK", None, "ROLLBACK"),
+    "DECIDED_RETRY": ("RETRY", None, "RETRY"),
+    "DISPOSED_COMMIT": ("DISPOSE", None, None),
+    "DISPOSED_ROLLBACK": ("DISPOSE", None, None),
+    "DISPOSED_RETRY": ("DISPOSE", None, None),
+    "ENDED_COMMIT": ("ENDED", None, None),
+    "ENDED_ROLLBACK": ("ENDED", None, None),
+    "ENDED_RETRY": ("ENDED", None, None),
+}
+#: the types this projection folds — exactly v2's named set (J7: `provider/result`, `story/completed` and the gate
+#: kinds stay pass-through; their rules are the validators', see FoldHasNoGateLeg).
+_MOVES = {T.STORY_BEGIN.value, T.STORY_ADMITTED.value, T.STORY_COMMIT.value, T.STORY_ROLLBACK.value,
+          T.STORY_RETRY.value, T.STORY_DISPOSE.value, T.STORY_END.value}
+_STAYS = {T.PROBE_EVALUATED.value, T.PROVIDER_REQUEST.value, T.PROOF_VERIFIED.value, T.TESTS_ADEQUACY.value,
+          T.FAILURE_OBSERVED.value, T.STORY_PLAN_DRIFT.value}
+_NAMED = _MOVES | _STAYS
 
 
 class StoryState:
     id = ControlProjection.STORY_STATE.value
-    version = 2
+    version = 3
 
     def initial(self):
         return {}
@@ -29,43 +49,33 @@ class StoryState:
             return state
         sid = event.data["story_id"]
         cur = state.get(sid)
-        at = cur["state"] if cur is not None else None
-
-        def refuse():
-            raise ProjectionError(f"story_state: {t} for story {sid} in state {at}: not a §17 transition")
-
-        if t == T.STORY_BEGIN.value:
-            if cur is not None and not (at == "ENDED" and cur["outcome"] == "RETRY"):
-                refuse()
-            new = {"state": "BEGIN", "attempt": (cur["attempt"] if cur is not None else 0) + 1, "admitted": None,
-                   "outcome": None}
-        elif cur is None:
-            refuse()
-        elif t == T.STORY_ADMITTED.value:
-            if at != "BEGIN" or cur["admitted"] is not None:
-                refuse()
-            admitted = event.data["admitted"]
-            new = {**cur, "admitted": admitted, "state": "ACTIVE" if admitted else "BEGIN"}
-        elif t in _OUTCOMES:
-            outcome, allowed = _OUTCOMES[t]
-            if at not in allowed:
-                refuse()
-            new = {**cur, "state": outcome, "outcome": outcome}
-        elif t == T.STORY_DISPOSE.value:
-            if at not in ("COMMIT", "ROLLBACK", "RETRY"):
-                refuse()
-            new = {**cur, "state": "DISPOSE"}
-        elif t == T.STORY_END.value:
-            if at != "DISPOSE":
-                refuse()
-            new = {**cur, "state": "ENDED"}
-        elif t == T.STORY_PLAN_DRIFT.value:  # after the attempt's admission; a blocked story still records drift (§14)
-            if not (at == "ACTIVE" or at == "BEGIN" and cur["admitted"] is False):
-                refuse()
-            return state
+        # the v2 words back to the table state — total over every dict the fold can hold (admitted True in BEGIN
+        # is unreachable: an accepted admission is the move to ACTIVE; decided words keep admitted untouched)
+        if cur is None:
+            at = "ABSENT"
+        elif cur["state"] == "BEGIN":
+            at = "BEGIN" if cur["admitted"] is None else "BEGIN_REFUSED"
+        elif cur["state"] in ("COMMIT", "ROLLBACK", "RETRY"):
+            at = f"DECIDED_{cur['state']}"
+        elif cur["state"] == "DISPOSE":
+            at = f"DISPOSED_{cur['outcome']}"
+        elif cur["state"] == "ENDED":
+            at = f"ENDED_{cur['outcome']}"
         else:
-            allowed = _WITHIN[t]
-            if allowed is not None and at not in allowed:
-                refuse()
+            at = cur["state"]  # "ACTIVE"
+        symbol = symbol_of(t, event.data)
+        to = STORY.get((at, symbol))
+        if to is not None:
+            word, admitted, outcome = _WORDS[to]
+            prev_attempt = cur["attempt"] if cur is not None else 0
+            if t == T.STORY_BEGIN.value:
+                new = {"state": word, "attempt": prev_attempt + 1, "admitted": admitted, "outcome": outcome}
+            else:
+                new = {**cur, "state": word,
+                       **({"admitted": admitted} if admitted is not None or to.startswith("BEGIN") else {}),
+                       **({"outcome": outcome} if outcome is not None else {})}
+            return {**state, sid: new}
+        if t in _STAYS and at in WITHIN.get(symbol, ()):
             return state
-        return {**state, sid: new}
+        raise ProjectionError(f"story_state: {t} for story {sid} in state "
+                              f"{cur['state'] if cur is not None else None}: not a §17 transition")

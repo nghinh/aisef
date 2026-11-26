@@ -38,7 +38,19 @@ FORMAT = 1
 GENESIS = "0" * 64
 _SHA = re.compile(r"[0-9a-f]{40}")
 _HEX64 = re.compile(r"[0-9a-f]{64}")
-VOCABULARY = frozenset(t.value for t in EventType)
+#: §4.10 pin (C-1, CORE-2 batch): the 29 v2.2.0 names as LITERALS, never computed from the live enum — the format
+#: 1-3 readers' vocabulary. Enum growth (format-4 kinds) must NOT change sealed-reader behavior: an unknown name
+#: stays "is not in the event vocabulary" / skipped-when-ignorable, byte-stable with 2.2.0. format4 has VOCABULARY4.
+V3_VOCABULARY: frozenset[str] = frozenset({
+    "run/begin", "run/spec-resolved", "run/dispose-begin", "run/interrupted", "run/end",
+    "plan/static-admitted", "plan/frozen",
+    "story/begin", "story/admitted", "story/plan-drift", "story/resource-acquired", "story/resource-released",
+    "story/commit", "story/rollback", "story/retry", "story/dispose", "story/end",
+    "capability/resolved", "probe/evaluated", "proof/verified",
+    "provider/request", "provider/result", "tool/invoked", "tool/result", "tests/adequacy",
+    "gate/check", "gate/decision", "failure/observed", "invariant/violated",
+})
+VOCABULARY = V3_VOCABULARY
 
 
 class JournalError(ValueError):

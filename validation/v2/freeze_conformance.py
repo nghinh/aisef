@@ -30,7 +30,16 @@ from types import SimpleNamespace
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 RFC_REL = "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md"
 MANIFEST_REL = "docs/implementation/v2/cycle1-manifest.json"
-OUT_REL = "closure-evidence/v2/F-CONFORMANCE.json"
+OUT_REL = "closure-evidence/v2/F-CONFORMANCE.json"           # v2.0/v2.2 era, RELEASED history (released_evidence_guard)
+#: CORE-2 (C-1 L2-JOURNAL) extends EventType with two format-4-only members (§4.4/§4.5), so the live F1 event
+#: vocabulary is the frozen RFC §20.1 (formats 1-3) PLUS that approved extension — the record no longer equals the
+#: v2.0/v2.2 F-CONFORMANCE byte-for-byte. That file stays as formats-1-3 history (validated against OUT_HISTORY_SHA256);
+#: the current record is version-forwarded to the v2.3 path.
+OUT_V23_REL = "closure-evidence/v2/v2.3/F-CONFORMANCE.json"
+OUT_HISTORY_SHA256 = "3f7246d825edc4bc834796ea2ae62b262083fb46ae8e879906b4609e234b445a"
+#: C-1 §4.4/§4.5: the format-4-only event types v2.3 adds beyond the frozen RFC §20.1 (formats 1-3 never admit them,
+#: §4.10 pin). Pinned here, never transcribed into the RFC.
+V2_3_FORMAT4_EVENTS = ["story/completed", "provider/attestation"]
 NORMATIVE_MARK = "## 1. Executive architecture decision"
 FROZEN_IDS = [f"F{i}" for i in range(1, 12)]
 
@@ -432,6 +441,38 @@ def _journal_format_3_matches_rfc(rfc: RFC) -> dict:
                                      "budget_owner under format 3 only; formats 1 (18) and 2 (25) unchanged"}
 
 
+def _event_vocabulary_matches_rfc(rfc: RFC, code) -> dict:
+    """F1 (CORE-2, version-forward): EventType is the frozen RFC §20.1 vocabulary, in order (formats 1-3), plus
+    exactly the approved format-4-only v2.3 additions, none of which may enter a format-3 journal (§4.10 pin). A
+    missing RFC member, a reordering, an unapproved extra, or a leak into format 3 FAILs; the RFC is never edited."""
+    want = rfc.event_types()
+    if len(want) != 29:
+        return {"state": FAIL, "detail": f"RFC §20.1 names {len(want)} event types, not 29"}
+    if code is None or "EventType" not in code:
+        return {"state": None, "detail": "EventType absent from aisef2.arch.enums"}
+    got = code["EventType"][1]
+    base = [m for m in got if m not in V2_3_FORMAT4_EVENTS]      # the RFC vocabulary must be exactly what remains
+    added = [m for m in got if m in V2_3_FORMAT4_EVENTS]
+    problems = []
+    if base != want:
+        missing = [m for m in want if m not in got]
+        extra = [m for m in base if m not in want]
+        problems.append(f"the formats-1-3 vocabulary differs from the RFC: missing {missing}, unapproved extra {extra}"
+                        if (missing or extra) else "the RFC vocabulary is present but reordered")
+    if sorted(added) != sorted(V2_3_FORMAT4_EVENTS):
+        problems.append(f"the v2.3 additions are not exactly {V2_3_FORMAT4_EVENTS}: present {added}")
+    if symbol_present("aisef2.journal.format3", "WRITABLE"):
+        f3 = importlib.import_module("aisef2.journal.format3")
+        leaked = [m for m in V2_3_FORMAT4_EVENTS if m in set(f3.WRITABLE) | set(f3.SCHEMAS)]
+        if leaked:
+            problems.append(f"a format-4-only event entered format 3 (§4.10 pin broken): {leaked}")
+    if problems:
+        return {"state": FAIL, "detail": "EventType differs from the RFC §20.1 + the approved v2.3 extension",
+                "problems": problems, "rfc_members": want, "v2_3_additions": V2_3_FORMAT4_EVENTS}
+    return {"state": PASS, "detail": f"EventType is the RFC's {len(want)} event types (formats 1-3) plus the "
+                                     f"{len(added)} format-4-only v2.3 additions; none enter format 3"}
+
+
 def _projections_match_rfc(rfc: RFC) -> dict:
     """F11: exactly the RFC's six control-critical projections, as a closed, read-only registry a gate reads by
     ControlProjection only."""
@@ -827,7 +868,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     def add(item, sid, owner, result):
         S.append({"item": item, "id": sid, "implemented_by": owner, **result})
 
-    add("F1", "F1.event_vocabulary", "WP-0.2", V("EventType", rfc.event_types(), code, by_value=True))
+    add("F1", "F1.event_vocabulary", "WP-0.2", _event_vocabulary_matches_rfc(rfc, code))
     for n in ("Vacuity", "Relevance", "AdequacyOutcome", "TestExecutionStatus", "TestOutcome", "TestSelection"):
         add("F1", f"F1.payload_enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F1", "F1.event_envelope", "WP-3.1", _event_envelope_matches_rfc(rfc))
@@ -940,19 +981,20 @@ def main(argv: list[str] | None = None) -> int:
     result = evaluate(*load_inputs())
     problems = problems_of(result)
     if "--check" in argv:
-        committed = ROOT / OUT_REL
+        committed = ROOT / OUT_V23_REL
         if not committed.exists():
-            problems.append(f"{OUT_REL} is missing")
+            problems.append(f"{OUT_V23_REL} is missing")
         elif committed.read_text(encoding="utf-8") != render(result):
-            problems.append(f"{OUT_REL} is stale: regenerate it")
+            problems.append(f"{OUT_V23_REL} is stale: regenerate it")
     for i in result["items"]:
         print(f"{i['state']:8s} {i['id']:4s}" + (f"  pending on {', '.join(i['pending_on'])}" if i["pending_on"] else ""))
     for p in problems:
         print(f"FAIL  {p}")
     print(f"summary {result['summary']} | ratchet violations {len(result['ratchet_violations'])}")
     if "--check" not in argv and not problems:
-        (ROOT / OUT_REL).write_text(render(result), encoding="utf-8")
-        print(f"wrote {OUT_REL}")
+        (ROOT / OUT_V23_REL).parent.mkdir(parents=True, exist_ok=True)
+        (ROOT / OUT_V23_REL).write_text(render(result), encoding="utf-8")
+        print(f"wrote {OUT_V23_REL}")
     return 1 if problems else 0
 
 

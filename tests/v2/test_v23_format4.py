@@ -27,6 +27,7 @@ from aisef2.journal import format2 as f2
 from aisef2.journal import format3 as f3
 from aisef2.journal import format4 as f4
 from aisef2.journal.compat import UnknownRequiredEvent
+from aisef2.journal import event as ev
 from aisef2.journal.event import GENESIS, Event, JournalError, carried, encode, link
 from aisef2.product.contract import digest
 
@@ -202,27 +203,40 @@ class Base(unittest.TestCase):
         return ctx.exception
 
 
-# --------------------------------------------------------------------------------------- pending enum state
+# --------------------------------------------------------------------- CORE-2 landed enum + §4.10 pin state
 
-class PendingEnum(Base):
-    """LOUD pending-state pin: the two EventType members land with the measured CORE-2 batch, never silently."""
+class LandedEnum(Base):
+    """The CORE-2 batch landed the enums hunk WITH the §4.10 pins (the PendingEnum tripwire's own instruction):
+    the two members exist, V3_VOCABULARY stays the 29 v2.2.0 literals, FORMAT_3_CODES the 22 code literals."""
 
-    def test_the_two_members_are_not_yet_in_the_enum(self):
-        values = {t.value for t in T}
+    def test_the_two_members_are_in_the_enum_and_the_constants_are_their_values(self):
+        self.assertEqual(T.PROVIDER_ATTESTATION.value, f4.PROVIDER_ATTESTATION)
+        self.assertEqual(T.STORY_COMPLETED.value, f4.STORY_COMPLETED)
+
+    def test_v3_vocabulary_is_the_29_v220_literals_exactly(self):
+        self.assertEqual(len(ev.V3_VOCABULARY), 29)
+        self.assertIs(ev.VOCABULARY, ev.V3_VOCABULARY, "the format 1-3 readers read the pinned set (§4.10)")
+        self.assertEqual({t.value for t in T} - {f4.PROVIDER_ATTESTATION, f4.STORY_COMPLETED}, ev.V3_VOCABULARY,
+                         "V3_VOCABULARY is exactly the live enum minus the two format-4 kinds: a third member "
+                         "landed without a vocabulary ruling, or a v2.2.0 name was dropped")
         for kind in (f4.PROVIDER_ATTESTATION, f4.STORY_COMPLETED):
-            self.assertNotIn(
-                kind, values,
-                f"{kind!r} is now an EventType member: the measured CORE-2 batch has landed the enums hunk. "
-                "This state change must not pass silently — land V3_VOCABULARY in event.py and FORMAT_3_CODES in "
-                "format3.py (C-1 §4.10) in the SAME batch, flip format-4 call sites to the typed members, and "
-                "retire this test.")
+            self.assertNotIn(kind, ev.V3_VOCABULARY,
+                             "a format-4 kind leaked into the sealed readers' vocabulary (§4.10, M4 class)")
+
+    def test_format_3_codes_are_the_22_v220_literals(self):
+        self.assertEqual(len(f3.FORMAT_3_CODES), 22)
+        self.assertEqual({c.value for c in FailureCode}, f3.FORMAT_3_CODES,
+                         "FailureCode and FORMAT_3_CODES diverged: a 23rd code (V21-57 reversal) lands with an "
+                         "owner decision and touches format 4 only — the format-3 pin never widens (§4.10)")
+        self.assertEqual(f3.FORMAT_3_CODES, f4.FORMAT_4_CODES, "at V21-57 KEEP the two pins hold the same 22")
 
     def test_vocabulary4_is_the_31_names_and_covers_the_enum(self):
         self.assertEqual(len(f4.VOCABULARY4), 31)
         self.assertEqual(f4.VOCABULARY4,
                          {t.value for t in T} | {f4.PROVIDER_ATTESTATION, f4.STORY_COMPLETED},
-                         "VOCABULARY4 must be the 29 v2.2.0 names plus the two format-4 kinds (§4.10); once the "
-                         "enum lands the two members, this same equality pins VOCABULARY4 == the live enum")
+                         "VOCABULARY4 must be the 29 v2.2.0 names plus the two format-4 kinds (§4.10); the enum "
+                         "landed the two members, so this same equality pins VOCABULARY4 == the live enum")
+        self.assertEqual(f4.VOCABULARY4, {t.value for t in T}, "the enum landed: VOCABULARY4 == the live enum")
         self.assertEqual(frozenset(f4.SCHEMAS), f4.VOCABULARY4, "every format-4 kind has a schema (FMT3-1 pattern)")
         self.assertEqual(f4.KNOWN_FORMATS, (1, 2, 3, 4))
         self.assertEqual(f4.FORMAT, 4)
