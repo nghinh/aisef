@@ -102,6 +102,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import pathlib
 import re
@@ -458,7 +459,7 @@ def _observed_files(observable) -> dict:
 #: file named in the request and nowhere else, each line authenticated with the evaluation's key, which leaves the
 #: request file before the subject's process exists.
 HARNESS = r'''
-import hashlib, hmac, json, os, queue, subprocess, sys, threading
+import hashlib, hmac, json, os, queue, subprocess, sys, threading, time
 from importlib.machinery import PathFinder
 ask_path = sys.argv[1]
 req = json.loads(open(ask_path, encoding="utf-8").read())
@@ -721,7 +722,7 @@ def ended(got, state):
 def main():
     if answer_to(0) is None:
         return None
-    emit("DISPATCHED")
+    emit("DISPATCHED", repr(time.monotonic()))
     spec = resolve(name, SEARCH)
     if spec is None and PathFinder.find_spec(name.split(".")[0], SEARCH) is None:
         spec = resolve(name, None)
@@ -772,6 +773,7 @@ if facts is not None:
         wrong = finish()
         if wrong is not None:
             facts = {"subject": "present", "tampered": wrong}
+    emit("COMPLETED", repr(time.monotonic()))
     emit("RESULT", json.dumps(facts))
     emit("END")
 try:
@@ -897,6 +899,41 @@ class ProcessEffectProbe(HarnessProbe):
             run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
 
 
+def _stamp(bodies) -> float | None:
+    """The controller's monotonic stamp from an authenticated marker body (repr of a float); None if absent or not a
+    finite number (fail closed). Only a line ci._protocol authenticated under the evaluation key reaches `bodies`, so the
+    subject — which never holds the key — cannot forge the timing authority (B1)."""
+    if not bodies:
+        return None
+    try:
+        v = float(bodies[-1])
+    except (TypeError, ValueError):
+        return None
+    return v if math.isfinite(v) else None
+
+
+def _overran(seen: dict, window: float, cls: str) -> Observation | None:
+    """The deadline, decided on the controller's OWN monotonic clock (PE8-DEADLINE-INTEGRITY, B1): the elapsed from its
+    authenticated DISPATCHED stamp to its authenticated COMPLETED stamp. Returns a SUBJECT_DEADLINE observation when the
+    scenario exceeded `window` (strictly: elapsed == window is within), or when that timing evidence is missing, malformed
+    or out of order (fail closed — never a false OBSERVED/SATISFIED); None when it provably completed within the window.
+    Only applied to an ordinary OBSERVED RESULT (see _watch); a signal/absent/harness event outranks a measured overrun.
+    The parent's own observation times are
+    never consulted, so a RESULT the parent saw late is judged by the elapsed, not charged a deadline for being seen late."""
+    t0, t1 = _stamp(seen.get("DISPATCHED")), _stamp(seen.get("COMPLETED"))
+    if t0 is None or t1 is None:
+        why = "its DISPATCHED/COMPLETED timing evidence is missing or malformed"
+    elif t1 < t0:
+        why = "its DISPATCHED/COMPLETED timestamps are out of order"
+    elif t1 - t0 > window:
+        why = f"the controller measured {t1 - t0:g}s from DISPATCHED to COMPLETED"
+    else:
+        return None
+    return Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
+                       detail=f"the scenario's {window:g}s observation window was exceeded or could not be verified: "
+                              f"{why} ({cls})")
+
+
 def _watch(run, proto: str, nonce: str, key: str, cls: str, observable: dict, env: ExecutionEnv) -> Observation:
     """cli_invocation's watch over this probe's lines: READY and DISPATCHED under the harness watchdog, then RESULT
     under the scenario's one window; the exit is lifecycle evidence, the marker file read to its end after it (§9.4)."""
@@ -904,20 +941,33 @@ def _watch(run, proto: str, nonce: str, key: str, cls: str, observable: dict, en
     if state != "LINE":
         return ci._harness_failure(run, state, seen, env.timeout_s)
     window = window_of(observable)
+    # PE8-DEADLINE-INTEGRITY: the deadline is the controller's OWN elapsed — from its authenticated DISPATCHED stamp to
+    # its authenticated COMPLETED stamp, one monotonic clock (the controller's) — not the times the parent happened to
+    # observe either marker. The await below is only a liveness bound; a RESULT is judged by that elapsed (_overran), so
+    # a RESULT the parent observed late is still judged, never charged a deadline merely for being seen late. Timing
+    # evidence that is missing, malformed or out of order fails closed to SUBJECT_DEADLINE, never a false PASS.
     state, seen = ci._await(run, proto, nonce, key, "RESULT", time.monotonic() + window)
-    if state == "TIMEOUT":
-        if run.members():   # measured on the range: the scenario's process is still there at W
-            at = seen["STEP"][-1] if seen.get("STEP") else "none"
-            return _after_dispatch(run, Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
-                                                    detail=f"the scenario's {window:g}s observation window expired "
-                                                           f"at step {at} ({cls})"))
-        if run.wait(_COLLECT_S) is None:   # nothing of it is left, and the range never said how it ended
-            return _after_dispatch(run, Observation(ObservationKind.HARNESS_FAILED,
-                                                    detail="the harness process ended and its exit status was "
-                                                           "never reported"))
-        seen = ci._protocol(proto, nonce, key)
+    if "RESULT" not in seen:
+        seen = ci._protocol(proto, nonce, key)   # read to the file's end: the RESULT may have landed at the bound (§9.4)
+        if "RESULT" not in seen:
+            if run.members():   # the scenario's process is still there and produced no RESULT: it overran the window
+                at = seen["STEP"][-1] if seen.get("STEP") else "none"
+                return _after_dispatch(run, Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
+                                                        detail=f"the scenario's {window:g}s observation window expired "
+                                                               f"at step {at} ({cls})"))
+            if run.wait(_COLLECT_S) is None:   # nothing of it is left, and the range never said how it ended
+                return _after_dispatch(run, Observation(ObservationKind.HARNESS_FAILED,
+                                                        detail="the harness process ended and its exit status was "
+                                                               "never reported"))
+            seen = ci._protocol(proto, nonce, key)
     if "RESULT" in seen:
-        return _after_dispatch(run, _concluded(cls, observable, json.loads(seen["RESULT"][0])))
+        concluded = _concluded(cls, observable, json.loads(seen["RESULT"][0]))
+        # The deadline governs a normal completion only. A NON_CONTROLLER_SIGNAL (a §9.3 signal-ledger integrity event,
+        # INV-MUTATION-AUTHORITY), a SUBJECT_ABSENT or a HARNESS_FAILED outranks a measured overrun — it is never masked
+        # behind SUBJECT_DEADLINE just because the scenario was slow. So _overran applies only when the controller's
+        # RESULT is an ordinary OBSERVED observation.
+        overran = _overran(seen, window, cls) if concluded.kind is ObservationKind.OBSERVED else None
+        return _after_dispatch(run, overran if overran is not None else concluded)
     return _after_dispatch(run, ci._no_result(run))
 
 
