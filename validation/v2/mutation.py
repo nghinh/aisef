@@ -2770,15 +2770,75 @@ def phase_of(target: str) -> str:
     return next(ph for ph, targets in PHASE_TARGETS.items() if target in targets)
 
 
-def superseded(record: dict, phase: str) -> list[str]:
-    """The targets of `record` (phase `phase`) that a later phase took over, or that V2.1 retired because the function
-    is gone: historical entries, never re-checked."""
+# ------------------------------------------------------- v2.3 mutation retirement (owner ruling 2026-11-27 §1-3)
+#: C-1 §3 (CORE-2) consolidated three historical projection symbols into the transition table
+#: (aisef2/journal/transitions.py). Each maps to the registered successor the authority moved to. This mechanism is
+#: NARROW to the v2.3 era: `superseded()` applies it under phase V23_RETIRED_PHASE only, and the frozen v2.1/v2.2
+#: records never hold these symbols — V21_RETIRED, SUPERSEDED, PHASE_TARGETS and the historical replay are untouched.
+#: A retirement takes effect — stops demanding a fresh measurement of the GONE symbol — ONLY when the symbol is provably
+#: absent from the current source. It grants the successor NOTHING: STORY/WITHIN/RUN keep their own measurement
+#: obligation (visible in check() as "has no mutation result"). v23_retirement_problems() fails closed on a resurrected
+#: symbol, a missing/invalid successor or missing historical provenance. Dated amendment:
+#: docs/v2.3/amendments/V23-MUTATION-RETIREMENT.md. `symbol_of` is a NEW authority, not a retired-symbol replacement.
+V23_RETIRED: dict[str, str] = {
+    "aisef2/journal/projections/story_state.py::_OUTCOMES": "aisef2/journal/transitions.py::STORY",
+    "aisef2/journal/projections/story_state.py::_WITHIN": "aisef2/journal/transitions.py::WITHIN",
+    "aisef2/journal/projections/terminal_state.py::_RUN": "aisef2/journal/transitions.py::RUN",
+}
+V23_RETIRED_PHASE = "P3"   # the only phase whose record holds these symbols; v2.1/v2.2 replay is never interpreted here
+
+
+def _resolves(root: pathlib.Path, target: str) -> bool:
+    """Whether `target` (rel::name) is still a symbol of the current source."""
+    rel, name = target.split("::")
+    try:
+        return _root(ast.parse((root / rel).read_text(encoding="utf-8")), name) is not None
+    except OSError:
+        return False
+
+
+def v23_retired_absent(root: pathlib.Path = ROOT) -> set[str]:
+    """The V23_RETIRED symbols provably ABSENT from the current source — the gone symbols whose fresh measurement is no
+    longer demanded. A resurrected symbol (back in the source) is NOT here: it fails closed and stays checked."""
+    return {sym for sym in V23_RETIRED if not _resolves(root, sym)}
+
+
+def v23_retirement_problems(root: pathlib.Path = ROOT) -> list[str]:
+    """Fail-closed controls on the v2.3 retirement mapping (owner ruling 2026-11-27 §1-2). Each retired symbol must be
+    provably absent from the source, present in its historical phase record, and mapped to a REGISTERED successor of the
+    transition-table migration. Retirement never grants a successor PASS/MEASURED/VERIFIED_REUSE/QUALIFIED — the
+    successor keeps its own obligation, reported separately by problems_of."""
+    out = []
+    try:
+        record = json.loads((root / RECORDS[V23_RETIRED_PHASE]).read_text(encoding="utf-8"))
+        historical = {t.get("target") for t in record.get("targets", [])}
+    except (OSError, ValueError):
+        return [f"v2.3 retirement: {RECORDS[V23_RETIRED_PHASE]} is unreadable — provenance cannot be confirmed (fail closed)"]
+    for sym, successor in V23_RETIRED.items():
+        if _resolves(root, sym):
+            out.append(f"v2.3 retirement: {sym} is a resurrected legacy symbol — it is back in the source; retirement refused")
+        if sym not in historical:
+            out.append(f"v2.3 retirement: {sym} has no historical record in {RECORDS[V23_RETIRED_PHASE]} — provenance missing")
+        if not (isinstance(successor, str) and successor.startswith("aisef2/journal/transitions.py::")):
+            out.append(f"v2.3 retirement: {sym} maps to {successor!r}, not a transition-table surface — invalid mapping")
+        elif successor not in TARGETS:
+            out.append(f"v2.3 retirement: successor {successor} of {sym} is not a registered mutation target — missing successor")
+    return out
+
+
+def superseded(record: dict, phase: str, root: pathlib.Path = ROOT) -> list[str]:
+    """The targets of `record` (phase `phase`) that a later phase took over, that V2.1 retired because the function is
+    gone, or (phase V23_RETIRED_PHASE, owner ruling 2026-11-27) that v2.3 retired into the transition table and are
+    provably absent from the current source: historical entries, never re-checked. A resurrected v2.3 retirement is NOT
+    here (fail closed); v2.1/v2.2 replay is never interpreted this way."""
+    v23 = v23_retired_absent(root) if phase == V23_RETIRED_PHASE else set()
     return [t["target"] for t in record["targets"]
-            if SUPERSEDED.get(t["target"], phase) != phase or t["target"] in V21_RETIRED]
+            if SUPERSEDED.get(t["target"], phase) != phase or t["target"] in V21_RETIRED
+            or t["target"] in v23]
 
 
 def problems_of(record: dict, root: pathlib.Path = ROOT, phase: str = "P1") -> list[str]:
-    old = set(superseded(record, phase))
+    old = set(superseded(record, phase, root))
     targets = [t for t in record["targets"] if t["target"] not in old]
     seen = {t["target"] for t in targets}
     out = [f"{t} has no mutation result" for t in PHASE_TARGETS[phase] if t not in seen]
@@ -2804,6 +2864,7 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
     out += [f"{t}: {e['error']}" for t, e in sorted(v23.items()) if "UNRESOLVED (I7)" in (e.get("error") or "")
             and t not in V23_NEW_TARGETS]
     adm = {t: e for t, e in v23.items() if not v23_admissible(e, root)}
+    out += v23_retirement_problems(root)   # fail-closed controls on the v2.3 retirement mapping (owner ruling 2026-11-27)
     for phase, rel in RECORDS.items():
         if not PHASE_TARGETS[phase]:
             continue
