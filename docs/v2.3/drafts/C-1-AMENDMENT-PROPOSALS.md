@@ -25,6 +25,57 @@ không phải lệch triển khai).
   dựng tay. **Chữ đề xuất:** "a `gate/decision` MUST cite every prior `gate/check` of its gate."
 - Chi phí: một vòng đếm tại `_gate4` + red-before test. Không chạm hành vi kernel thật.
 
+### A2 — CẬP NHẬT sau Phase-1 proof (2026-11-26, owner ruling §2 CONDITIONAL GO): KHÔNG triển khai được
+### trong cách đọc đã nêu; cần amendment chính xác dưới đây trước khi đổi authority
+
+**Kết luận đo được (file:line):** chữ A2 gốc ("every prior gate/check of its gate") và mọi biến thể
+"span kể từ decision cùng-gate trước đó" đều từ-chối journal mà kernel VIẾT THẬT hoặc mà thiết kế v2.3
+đã cố định là hợp lệ — vi phạm đúng điều ruling §2 cấm. Ba chứng cứ:
+
+1. **Gate id không phải là biên scope.** Trường `gate` là khóa gộp duy nhất ở tầng format
+   (`event.py:217-219`, `Cite(GATE_CHECK, True, "gate")`), nhưng kernel chỉ có MỘT gate id — `GATE = "story"`
+   (`orchestrate/gate.py:10`) — cho mọi story, mọi attempt. Scope thật của một decision là MỘT STORY ATTEMPT
+   (`checks` khởi tạo mỗi attempt tại `story_runner.py:226`, decision cite đúng list đó tại `:449`); attempt đó
+   KHÔNG hiện diện trong payload: `gate/check` = {gate, check, passed, detail}, không `story_id` — story chỉ nằm
+   trong chuỗi `check` theo quy ước `f"{story_id}:{stage}"` (`gate.py:16`), không phải contract (consumer
+   `app/feedback.py:86-87` đã phải parse prefix này — bằng chứng quy ước, không phải schema).
+2. **Tiền đề "kernel luôn cite đủ (M3)" SAI trên nhánh contained-fault E5.** Helper có thể ghi `gate/check`
+   rồi raise TRƯỚC khi runner bắt được seq: `merge.py:44-60` (`reprove` — `prove()` tại `:52` raise ở vòng ≥2
+   làm mất các check `:56` đã ghi ở vòng trước; `prove` raise được qua `run_probe`/`scope.acquire`,
+   `proof.py:80-112`); cùng dạng cho comprehension `review.py:43-46` và `security.py:51-52`. Handler E5
+   (`story_runner.py:409-443`) chỉ ghi thêm MỘT check theo stage, decision `:449` cite `checks` đã bắt được —
+   journal khi đó chứa gate/check cùng-gate, cùng-span, KHÔNG được cite, và M7 của FORMAT-4-DESIGN-DRAFT đã
+   hợp-pháp-hóa đuôi fault này như chuỗi production. (Decision nhánh này luôn `passed: false`.)
+3. **Span liền kề vỡ dưới C5-PARALLEL.** C5 (DRAFT implementation-ready, viết TRÊN C-1 đã đóng băng, không
+   mở lại schema) chủ định cho append của nhiều story đan xen qua một `LockedRun` (C5 draft §3.4; fact C11:
+   StoryState per-story, bảng RUN story-blind) — check của story B nằm hợp lệ TRONG span của decision story A
+   dưới cùng gate id "story" mà không được A cite.
+
+**Chữ amendment chính xác cần owner ban hành (hai phần, f4-only theo mẫu CR-3):**
+
+> A2′ (schema): In format 4, `gate/check` and `gate/decision` each gain required field `story_id` (non-empty
+> string). Formats 1–3 never admit the field (CR-3). The kernel's `orchestrate/gate.py` writes it from the
+> value it already closes over.
+>
+> A2′ (rule, replacing A2's proposed sentence): A format-4 `gate/decision` with `passed: true` MUST cite
+> every `gate/check` carrying the same (`gate`, `story_id`) appended after the latest prior `gate/decision`
+> of the same (`gate`, `story_id`) (after `run/begin` when none exists); refusal at append AND reconstruct
+> naming event, seq and rule. A `gate/decision` with `passed: false` is EXEMPT from completeness — the E5
+> contained-fault tail legitimately strands helper-emitted checks (evidence item 2) — and stays subject to
+> R-GATE as frozen. The C3 attack dies for passing decisions (hiding a failed check refuses the decision);
+> hiding a check under an already-failing decision changes no authority.
+
+**Nghĩa vụ kèm khi triển khai A2′:** red-before (input C3 của probe); negative controls — passing decision
+bỏ sót check FAIL và bỏ sót check PASS cùng (gate, story_id)-span đều bị từ chối; pinned-ACCEPTED controls —
+multi-gate, retry (span attempt sau tính từ decision attempt trước, cùng story), hai story đan xen kiểu C5,
+và đuôi fault E5 (decision false bỏ sót check bị strand); golden-corpus parity (10 fixture + delegation f1–f3
+không đổi); proof pattern phát xạ kernel đường thành công (`story_runner.py:226-449`: mọi check đều vào
+`checks` khi không có exception — đã kiểm từng call site 2026-11-26).
+
+**Phương án thay thế owner có thể chọn:** gia cố kernel leak-proof (try/finally bắt seq trong
+`reprove`/`review`/`scan`) làm completeness vô-điều-kiện đúng trên nhánh fault — nhưng là thay đổi kernel
+ngoài tầng validation f4 của C-1, và KHÔNG chữa việc thiếu khóa scope (chứng cứ 1, 3): A2′ (schema) vẫn cần.
+
 ## E1/E2 (biên tập, không đổi hành vi) — sửa câu §3.1 "nothing else reads data" (mâu thuẫn nội tại với chính
 bullet RUN của nó — hai split là cách đọc nhất quán duy nhất, đã triển khai đúng); ghi chú §4.3 `detail` là
 prose-only (FAILED với detail rỗng hợp lệ — nếu owner muốn bắt buộc non-empty, đó là một dòng schema).
