@@ -33,20 +33,3 @@ prose-only (FAILED với detail rỗng hợp lệ — nếu owner muốn bắt b
 
 - C2 (RUN-scope không đóng ở A/R — parity f3): đã thành scope-note trong docstring format4.py + nghĩa vụ
   fold-before-trust của G6. C4 (proof tươi trên probe cũ — parity f3, L7): ghi vào kế hoạch test W2c.
-EOF
-cd /Users/nghinh/Downloads/projects/ai-sdlc && git add aisef2/journal/format4.py docs/v2.3/drafts/G6-RESUME-DESIGN-DRAFT.md docs/v2.3/drafts/C-1-AMENDMENT-PROPOSALS.md && cat > /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/cmsg <<'EOF'
-v2.3: adversarial review of the C-1 landing — SOUND; the contract gaps get dispositions, not silence
-
-The independent review (390 adapter-free cells, 0 unpinned divergences, every tripwire proven to trip; evidence in
-the private folder) is the flip-gate artifact the freeze record requires. Four CONFIRMED findings are all gaps of
-the frozen CONTRACT, not implementation divergences. Dispositions landed: C1 (story/completed accepted after
-run/end at append/reconstruct — the M2 asymmetry on exactly the event G6 trusts) -> G6 addendum makes
-fold-before-trust NORMATIVE (reconstruct alone never sufficient; a fold-refused marker = tampering class, whole
-resume refused) + amendment proposal A1 with exact wording and red-before obligations; C3 (R-GATE selective
-citation) -> optional amendment A2; C2 (RUN-scope not closed at A/R, f3 parity) -> scope note in the format4
-module docstring; C4 (fresh proof over stale probes, f3 parity, L7) -> W2c test-plan note. All amendment issuance
-stays the owner's; no frozen text edited.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-EOF
-git commit -F /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/cmsg && git push origin release/v2.3-big 2>&1 | tail -1
