@@ -173,6 +173,10 @@ _WRITER_TESTS = ["tests/v2/p3/test_journal_writer.py"]
 _FOLD_TESTS = ["tests/v2/test_fold_oracle.py"]
 _PROJECTION_TESTS = ["tests/v2/p3/test_control_projections.py"]
 _REFMODEL_TESTS = ["tests/v2/p3/test_reference_models.py"]
+#: C-1 §3 (CORE-2): the lifecycle transition table in aisef2/journal/transitions.py is read by the projections AND
+#: pinned by TABLE_DIGEST — a value-level mutation changes the digest, which tests/v2/test_v23_transitions.py asserts
+#: as a literal. Both the digest pin and the projections that read the table are kill tests for its targets.
+_TABLE_TESTS = _PROJECTION_TESTS + ["tests/v2/test_v23_transitions.py"]
 P3_TARGETS: dict[str, list[str]] = {
     # WP-3.1: the envelope, append-site validation (with each rule and the citation check), the codec, the writer
     "aisef2/journal/event.py::Event.__post_init__": _WRITER_TESTS,
@@ -204,14 +208,23 @@ P3_TARGETS: dict[str, list[str]] = {
     "aisef2/journal/projections/__init__.py::project": _FOLD_TESTS,
     # WP-3.4: every control decision the six projections produce — each step, and the rule tables they read
     "aisef2/journal/projections/story_state.py::StoryState.step": _PROJECTION_TESTS,
-    "aisef2/journal/projections/story_state.py::_OUTCOMES": _PROJECTION_TESTS,
-    "aisef2/journal/projections/story_state.py::_WITHIN": _PROJECTION_TESTS,
     "aisef2/journal/projections/failure_owner.py::FailureOwner.step": _PROJECTION_TESTS,
     "aisef2/journal/projections/budgets.py::Budgets.step": _PROJECTION_TESTS,
     "aisef2/journal/projections/retry_target.py::RetryTarget.step": _PROJECTION_TESTS,
     "aisef2/journal/projections/terminal_state.py::TerminalState.step": _PROJECTION_TESTS,
-    "aisef2/journal/projections/terminal_state.py::_RUN": _PROJECTION_TESTS,
     "aisef2/journal/projections/terminal_state.py::_OUTCOME": _PROJECTION_TESTS,
+    # C-1 §3 (CORE-2) TABLE-AUTHORITY MIGRATION (owner directive 2026-11-26 LANE A §1): story_state._OUTCOMES/_WITHIN
+    # and terminal_state._RUN were consolidated VERBATIM into aisef2/journal/transitions.py (STORY/WITHIN/RUN), the
+    # single table StoryState v3 and TerminalState v2 now read; symbol_of is the new pure discriminant. The mutation
+    # targets move with the authority — killed by the projections that read the table AND by its TABLE_DIGEST pin
+    # (_TABLE_TESTS). Coverage did not shrink: STORY 102 + WITHIN 25 + RUN 44 + symbol_of 23 mutants > the retired
+    # _OUTCOMES 18 + _WITHIN 7 + _RUN 46. The historical P3 records for the retired symbols stay in
+    # closure-evidence/v2/P3-MUTATION.json as provenance (not deleted). tests/v2/p2/test_mutation_targets.py adds the
+    # adversarial controls (surfaces resolve, generate mutants, are kill-linked; the retired symbols cannot linger).
+    "aisef2/journal/transitions.py::STORY": _TABLE_TESTS,
+    "aisef2/journal/transitions.py::WITHIN": _TABLE_TESTS,
+    "aisef2/journal/transitions.py::RUN": _TABLE_TESTS,
+    "aisef2/journal/transitions.py::symbol_of": _TABLE_TESTS,
     "aisef2/journal/projections/qualification_counters.py::QualificationCounters.step": _PROJECTION_TESTS,
     "aisef2/journal/projections/qualification_counters.py::metrics": _PROJECTION_TESTS,
     # WP-3.5: the independent reference models — mutated like the projections, killed by their calibration and the
@@ -374,7 +387,7 @@ P6_TARGETS.update({f"validation/v2/old_path_audit.py::{f}": _OPA_TESTS for f in 
     "decision_table", "decision_problems", "render")})
 P6_TARGETS.update({f"validation/v2/old_path_audit.py::{f}": _OPA_REAL for f in ("inventory", "proofs", "compare", "audit", "check")})
 for _t in ("aisef2/journal/projections/budgets.py::Budgets.step", "aisef2/journal/projections/story_state.py::StoryState.step",
-           "aisef2/journal/projections/story_state.py::_WITHIN", "aisef2/journal/projections/story_state.py::_OUTCOMES",
+           "aisef2/journal/transitions.py::STORY", "aisef2/journal/transitions.py::WITHIN",  # C-1 §3: _OUTCOMES/_WITHIN re-keyed here
            "tests/v2/refmodel/budgets.py::_walk", "tests/v2/refmodel/budgets.py::model",
            "tests/v2/refmodel/story_state.py::_TABLE", "tests/v2/refmodel/story_state.py::model"):
     P3_TARGETS[_t] = [*P3_TARGETS[_t], _V2_005]

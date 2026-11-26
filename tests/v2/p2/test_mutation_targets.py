@@ -36,5 +36,46 @@ class Locator(unittest.TestCase):
                 self.assertIsNotNone(mu._root(ast.parse((ROOT / rel).read_text(encoding="utf-8")), func))
 
 
+class TableAuthorityMigration(unittest.TestCase):
+    """Owner directive 2026-11-26 LANE A §1: story_state._OUTCOMES/_WITHIN and terminal_state._RUN were consolidated
+    into aisef2/journal/transitions.py (STORY/WITHIN/RUN/symbol_of). These adversarial controls prove the mutation
+    coverage moved WITH the authority and did not silently disappear."""
+
+    TABLE = "aisef2/journal/transitions.py"
+    MOVED = ("STORY", "WITHIN", "RUN", "symbol_of")
+    RETIRED = ("aisef2/journal/projections/story_state.py::_OUTCOMES",
+               "aisef2/journal/projections/story_state.py::_WITHIN",
+               "aisef2/journal/projections/terminal_state.py::_RUN")
+
+    def test_the_moved_authority_is_targeted_resolves_and_generates_mutants(self):
+        src = (ROOT / self.TABLE).read_text(encoding="utf-8")
+        tree = ast.parse(src)
+        for sym in self.MOVED:
+            with self.subTest(surface=sym):
+                self.assertIn(f"{self.TABLE}::{sym}", mu.TARGETS, "not registered as a mutation target")
+                self.assertIsNotNone(mu._root(tree, sym), "does not resolve in the source")
+                self.assertTrue(mu.mutants(src, sym, {}), "generates no mutants — coverage vanished")
+                # killed by the table's own digest pin: a value mutation cannot survive it
+                self.assertIn("tests/v2/test_v23_transitions.py", mu.TARGETS[f"{self.TABLE}::{sym}"])
+
+    def test_the_retired_symbols_cannot_linger_as_dead_targets(self):
+        for gone in self.RETIRED:
+            rel, func = gone.split("::")
+            with self.subTest(target=gone):
+                self.assertNotIn(gone, mu.TARGETS, "consolidated symbol still registered as a target")
+                self.assertIsNone(mu._root(ast.parse((ROOT / rel).read_text(encoding="utf-8")), func),
+                                  "consolidated symbol still present in the source")
+
+    def test_a_table_value_mutation_is_caught_by_the_digest_pin(self):
+        # the kill mechanism, demonstrated: any edit to a table value moves TABLE_DIGEST, which
+        # tests/v2/test_v23_transitions.py asserts as a literal (C-1 §3.1) — so the mutant is killed
+        import aisef2.journal.transitions as tr
+        from aisef2.product.contract import digest
+        self.assertEqual(digest(tr._digest_form()), tr.TABLE_DIGEST)                    # the pin matches the live table
+        form = tr._digest_form()
+        form["STORY"] = [row for row in form["STORY"] if row != ["ACTIVE", "story/commit", "DECIDED_COMMIT"]]
+        self.assertNotEqual(digest(form), tr.TABLE_DIGEST)                              # drop one move -> pin breaks -> killed
+
+
 if __name__ == "__main__":
     unittest.main()

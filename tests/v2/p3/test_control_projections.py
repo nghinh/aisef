@@ -20,6 +20,12 @@ from tests.v2.p3 import journal_gen as gen  # noqa: E402
 SHA = "a" * 40
 RUN = ("run/begin", {"journal_format": 1, "run_id": "r"})
 
+#: The ACTIVE v2.3 projection identities (C-1 §3.2, owner directive 2026-11-26 LANE A §2) — distinct from the historical
+#: version expectations. StoryState v3 and TerminalState v2 are the 2.2.0 projections re-keyed off the transition table
+#: (aisef2/journal/transitions.py); their J7 semantic equality to the FROZEN 2.2.0 reference implementations is proved
+#: verbatim in tests/v2/test_v23_projections.py (unchanged, not weakened here). Budgets v2 is V2-005; the rest are v1.
+_V23_ACTIVE_VERSIONS = {P.STORY_STATE: 3, P.TERMINAL_STATE: 2, P.BUDGETS: 2}
+
 
 def run(*specs):
     """Events of a run: run/begin, then (type, data[, cites]) specs; failure owner/retryable carried."""
@@ -80,7 +86,7 @@ class Registry(unittest.TestCase):
         self.assertEqual([k.value for k in PROJECTIONS], [p.value for p in P])
         for k, p in PROJECTIONS.items():
             with self.subTest(projection=k.value):
-                self.assertEqual((p.id, p.version), (k.value, 2 if k in (P.BUDGETS, P.STORY_STATE) else 1))  # V2-005
+                self.assertEqual((p.id, p.version), (k.value, _V23_ACTIVE_VERSIONS.get(k, 1)))  # v2.3 active identities
                 self.assertEqual(vars(p), {})  # no side counter: every value is a fold of the journal
         with self.assertRaises(TypeError):
             PROJECTIONS[P.BUDGETS] = None
