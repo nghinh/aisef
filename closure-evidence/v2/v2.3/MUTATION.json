@@ -226770,6 +226770,512 @@
     "path": "closure-evidence/v2/v2.1/MUTATION.json",
     "entry_sha256": "0dfc7468c147ac513c5b48689483c54c71957d367c4e59993d23fd010858212e"
    }
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_Stages.advance",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_v23_story_lifecycle.py"
+   ],
+   "source_sha256": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+   "tree_sha256": "5e889a8ef7cdc4641ec4e5d3d1808030fe0debd459ed1689e6f965b7c7594ecf",
+   "mutants": 7,
+   "results": [
+    {
+     "mutant": "L83 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "exit": 1,
+       "seconds": 0.53,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+       "tail_sha256": "306558e520ec40a10514c045bea8a1dc968c6ac9896c00fa68e6284b4ce46ba3",
+       "tail": "cle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 401, in _attempt\n    raise fault from None\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 207, in _attempt\n    st.advance(Stage.ACQUIRE)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 73, in advance\n    raise InvariantError(f'stage {s.name} after {self.at.name}: an attempt never moves backwards')\n                                                 ^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'name'\nE5: the attempt could not be closed: AttributeError: 'NoneType' object has no attribute 'name'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.41
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.51,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.41
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "rerun",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 1,
+       "seconds": 0.52,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+       "tail_sha256": "306558e520ec40a10514c045bea8a1dc968c6ac9896c00fa68e6284b4ce46ba3",
+       "tail": "cle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 401, in _attempt\n    raise fault from None\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 207, in _attempt\n    st.advance(Stage.ACQUIRE)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 73, in advance\n    raise InvariantError(f'stage {s.name} after {self.at.name}: an attempt never moves backwards')\n                                                 ^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'name'\nE5: the attempt could not be closed: AttributeError: 'NoneType' object has no attribute 'name'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.41
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v23_story_lifecycle.py",
+      "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+      "seconds": 0.53
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 And swapped",
+     "files": [
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "exit": 1,
+       "seconds": 0.52,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+       "tail_sha256": "4be4faf95327e64e5494291be16d7f39fef80fc0324d3e4688d122fb52e11456",
+       "tail": "):\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 401, in _attempt\n    raise fault from None\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 207, in _attempt\n    st.advance(Stage.ACQUIRE)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 72, in advance\n    if self.at is not None or s.value <= self.at.value:\n                                         ^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'value'\nE5: the attempt could not be closed: AttributeError: 'NoneType' object has no attribute 'value'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.41
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "rerun",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 1,
+       "seconds": 0.52,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+       "tail_sha256": "4be4faf95327e64e5494291be16d7f39fef80fc0324d3e4688d122fb52e11456",
+       "tail": "):\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 401, in _attempt\n    raise fault from None\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 207, in _attempt\n    st.advance(Stage.ACQUIRE)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 72, in advance\n    if self.at is not None or s.value <= self.at.value:\n                                         ^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'value'\nE5: the attempt could not be closed: AttributeError: 'NoneType' object has no attribute 'value'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.4
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v23_story_lifecycle.py",
+      "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+      "seconds": 0.52
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 IsNot->Is",
+     "files": [
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "exit": 1,
+       "seconds": 0.51,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+       "tail_sha256": "059d00882217de051c7d08bee072ef316585f7b97b2509e48edc1c240e268cce",
+       "tail": "l last):\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 401, in _attempt\n    raise fault from None\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 207, in _attempt\n    st.advance(Stage.ACQUIRE)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 72, in advance\n    if self.at is None and s.value <= self.at.value:\n                                      ^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'value'\nE5: the attempt could not be closed: AttributeError: 'NoneType' object has no attribute 'value'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.41
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.47,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "rerun",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 1,
+       "seconds": 0.52,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+       "tail_sha256": "059d00882217de051c7d08bee072ef316585f7b97b2509e48edc1c240e268cce",
+       "tail": "l last):\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 401, in _attempt\n    raise fault from None\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 207, in _attempt\n    st.advance(Stage.ACQUIRE)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 72, in advance\n    if self.at is None and s.value <= self.at.value:\n                                      ^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'value'\nE5: the attempt could not be closed: AttributeError: 'NoneType' object has no attribute 'value'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.4
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v23_story_lifecycle.py",
+      "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | AttributeError",
+      "seconds": 0.51
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 LtE->Gt",
+     "files": [
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "exit": 1,
+       "seconds": 0.59,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | aisef2.errors.InvariantError",
+       "tail_sha256": "5d717391e82b8b4d1f408cb707eb059ee6e2b7e9a7e32bb9a3ba00dbcd43d30f",
+       "tail": "st_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 216, in _attempt\n    st.advance(Stage.ADMIT)\n    ~~~~~~~~~~^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 73, in advance\n    raise InvariantError(f'stage {s.name} after {self.at.name}: an attempt never moves backwards')\naisef2.errors.InvariantError: stage ADMIT after ACQUIRE: an attempt never moves backwards\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.35,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "control",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 0,
+       "seconds": 3.33,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "6abcd7c5d4939ce990def70b12d1412a92011018345c2da4a2f6fc35241cec60",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "role": "rerun",
+       "select": "*v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+       "exit": 1,
+       "seconds": 0.63,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | aisef2.errors.InvariantError",
+       "tail_sha256": "5d717391e82b8b4d1f408cb707eb059ee6e2b7e9a7e32bb9a3ba00dbcd43d30f",
+       "tail": "st_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 252, in test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once\n    self.raising(fault)\n    ~~~~~~~~~~~~^^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 77, in raising\n    self.go(**kw)\n    ~~~~~~~^^^^^^\n  File \"<tree>/tests/v2/test_v23_story_lifecycle.py\", line 71, in go\n    return sr.run_story(self.run, self.plan, \"S1\", inputs, adapters,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        sr.Policy(O.LIMITS, TestsPolicy(True), tool_timeout_s=60))\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 185, in run_story\n    attempt = _attempt(run, plan, story_id, inputs, adapters, policy, measured)\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 216, in _attempt\n    st.advance(Stage.ADMIT)\n    ~~~~~~~~~~^^^^^^^^^^^^^\n  File \"<tree>/aisef2/orchestrate/story_runner.py\", line 73, in advance\n    raise InvariantError(f'stage {s.name} after {self.at.name}: an attempt never moves backwards')\naisef2.errors.InvariantError: stage ADMIT after ACQUIRE: an attempt never moves backwards\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.4
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v23_story_lifecycle.py",
+      "first": "ERROR: test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once (v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once) [review] | aisef2.errors.InvariantError",
+      "seconds": 0.59
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L84 string 'stage ' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "exit": 0,
+       "seconds": 37.27,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 29,
+       "tail_sha256": "065389104a91c1bcc29fb12fe7ebd58cb88194c6e7376de6da4e5279af750f7c",
+       "overhead_s": 0.4
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L84 string ' after ' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "exit": 0,
+       "seconds": 37.09,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 29,
+       "tail_sha256": "065389104a91c1bcc29fb12fe7ebd58cb88194c6e7376de6da4e5279af750f7c",
+       "overhead_s": 0.49
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L84 string ': an attempt never moves backwards' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_v23_story_lifecycle.py",
+       "exit": 0,
+       "seconds": 37.42,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 29,
+       "tail_sha256": "065389104a91c1bcc29fb12fe7ebd58cb88194c6e7376de6da4e5279af750f7c",
+       "overhead_s": 0.48
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    }
+   ],
+   "t0": [
+    {
+     "file": "tests/v2/test_v23_story_lifecycle.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 38.37,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 29,
+     "first_test": "v2.test_v23_story_lifecycle.Contained.test_f10_review_and_scan_faults_are_contained_and_unconfine_runs_once",
+     "tail_sha256": "065389104a91c1bcc29fb12fe7ebd58cb88194c6e7376de6da4e5279af750f7c",
+     "overhead_s": 0.42
+    }
+   ],
+   "killed": 4,
+   "survivors": [
+    "L84 string 'stage ' emptied",
+    "L84 string ' after ' emptied",
+    "L84 string ': an attempt never moves backwards' emptied"
+   ],
+   "classes": {
+    "KILLED": 4,
+    "SURVIVED": 3,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0,
+   "identity": {
+    "measured_on": "b939506c0eb6a515ca3d441a6097523cc06fbb36",
+    "dirty": false,
+    "slice": {
+     "func": "_Stages.advance",
+     "null_sha256": "525894f2c689c6b4b2d760144505a38b7ee4944b04422838d9405939d723d5e5"
+    },
+    "closure": {
+     "aisef2/__init__.py": "0f908d54aa6dab5a7fbec7660699857d4b6cc8818a5779efc6ae859d784428bc",
+     "aisef2/arch/__init__.py": "a1c6bcc8e1a91133e069f29ece5d9f7b1c4171fb8ea721416b1ca4698fa1c8bb",
+     "aisef2/arch/enums.py": "49aae21c38871d2b4d241dc6920a2af22f9dfd7bc07b23d3561ead5ebe619f82",
+     "aisef2/control/__init__.py": "32d3889549ad28e7812525d57380d89aafa4ad7380666858ce803163021b4c80",
+     "aisef2/control/budget.py": "52f865eb82d6635c45ec41efa6d21459195cda68353d59cad078948b17480689",
+     "aisef2/control/owner.py": "a7b218f54bada6811441fc088aaae9a018fa2e6cfe73e3a5dd10f1b291d02ec6",
+     "aisef2/control/routing.py": "4b7c99d7a5002bc7618d9e6414af565e5f95cdafa803df2ad42cad5b59673a98",
+     "aisef2/errors.py": "bad4f867a49ec25acc61519116bdd511880d21c6c89e83a782f4fc68e875b42b",
+     "aisef2/invariants/__init__.py": "5a1ce87fcc45e84be2397aae0152cbf5c6947df02d34ae2c1958eec5878a2f39",
+     "aisef2/invariants/registry.py": "74eced90d1b0807a5105653d43ef8983782bd8851b310ed2b24ae1c833e5a934",
+     "aisef2/journal/__init__.py": "0b04010a8f5be5f4cbe4da7e390d47276e55ce60b8aad82e559b91559e303129",
+     "aisef2/journal/compat.py": "524c3693e1bf2679bd8e786df459f956623ac8945f77b6027dcdb5c3ff7cea9e",
+     "aisef2/journal/event.py": "f95b4674826a3c4d7209b5590856ac1fc813aea7b9490e35a03f1bba84d86758",
+     "aisef2/journal/fold.py": "257daadc114abaac2a57393b901bb528fd5fba4f59c78b91bb63062b16e2610f",
+     "aisef2/journal/format2.py": "9fb177f6697aea097e723e90934f7c2183eea2aad46af8367ccd1f08b3d0d68f",
+     "aisef2/journal/format3.py": "a684c909ab55f3df132a2f5c0c9e99fcc03bc3ed00bdab116b53d3e766ef5a04",
+     "aisef2/journal/projections/__init__.py": "4e370e87175beedf2329f1cf47cf9942dffe1edd51635f208bb33466cb56aaef",
+     "aisef2/journal/projections/budgets.py": "39affae05fc7e2ad45d9253daa6f7577dfba2e19de0c04e293ff57fece0229a2",
+     "aisef2/journal/projections/failure_owner.py": "2fe8594069deefc41ebca8d158f2385df1801d8281c8d63731c3c0bfbec055b6",
+     "aisef2/journal/projections/qualification_counters.py": "962962a899edc000044e4bfa2c9fe8f988036503cdc480ec10d3c3948196634c",
+     "aisef2/journal/projections/retry_target.py": "d3f99e65389729f3ad4961076c52fdead5ca8b0f7151ef1a8b46610ef6d175cd",
+     "aisef2/journal/projections/story_state.py": "d73fa3665ee3f220af9e604b085282285c21a4d6c20fac950765553f48b760ee",
+     "aisef2/journal/projections/terminal_state.py": "a4c25f7688e31184af303306d3b5dfdaec77a22ab4028a92fad49d277fb27020",
+     "aisef2/journal/transitions.py": "37f555f11ce3f30329261bcf4d014d7871c27517f6a47f6c6830a12832ba8d98",
+     "aisef2/orchestrate/__init__.py": "9a1079cd0d725934978040f6fc65801723f014b082d43389c0a1c75253698c39",
+     "aisef2/orchestrate/adapters.py": "dc69ebab3c64f1d2e37f8a5c7db5b652093f6b7fc3ea39c0200f3d23fd7ee1e1",
+     "aisef2/orchestrate/gate.py": "1174867c246d7f71e2c5ce7bca241bd09ea375d17d5632c79c37ef7cb2dcf0ff",
+     "aisef2/orchestrate/merge.py": "2a6a4af092f878539f1a7ad7fb2c98cca8534c27db9b23228fb54d55b237c7ae",
+     "aisef2/orchestrate/proof.py": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+     "aisef2/orchestrate/quality.py": "31a5691c9ea7e212e1c9b1bcaaa80857a86e91249cc2e5b3d176d23382c0697e",
+     "aisef2/orchestrate/review.py": "154f4a6bfa45b20868d7f080eede1d4a8d884dadbe5997487ebd506afa878c06",
+     "aisef2/orchestrate/seam.py": "433b966d97b8b2b86d58765d320c02105f4365ed79d603ca5d33862c6775948f",
+     "aisef2/orchestrate/security.py": "d30b41638f3aafbeb0d25e2fea28f797fe1644f94ba8960b837827bcf9935798",
+     "aisef2/orchestrate/story_runner.py": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+     "aisef2/plan/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "aisef2/plan/drift.py": "f4a0331974b5a4755a38eeb74a785aa1429a5c3f68a130b0c72ec68300f8a13a",
+     "aisef2/plan/obligation.py": "4343a94892bd3ad11a07c132b4f9ea2c541fcd30a5b676fb43edbc5fe432f068",
+     "aisef2/plan/static_admission.py": "739a558cc6565f69045d274f312490892f63c8e43fcbc4389ff9eb6d5e695708",
+     "aisef2/plan/story_admission.py": "da45da125b9544832be950950fa6ff3b474f072a5408497ec2820ccd88bdc2b9",
+     "aisef2/probe/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "aisef2/probe/calibration.py": "ab47bbdee89157970b66e60425a160a7313cab5bb9f4a15f1f25ff0683ca2ef4",
+     "aisef2/probe/protocol.py": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "aisef2/product/__init__.py": "e5060b3e20cf254bb910bef701b38c90f3e596f52c4c9a2f1a65e328b162cc25",
+     "aisef2/product/approval.py": "5c8101e8572d41ee5dac5410c25f2755b06b3fc836071e2452ab9b24c7aa23df",
+     "aisef2/product/compiler.py": "e9be4b579803fd3add23ce5f8e087ac62bd5259a03ee6377c9995f2a2b33cf82",
+     "aisef2/product/contract.py": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+     "aisef2/product/outcome.py": "f169a809350fb42d98673b391b48774f5c4a5b6fa17d127461376e41ab215cef",
+     "aisef2/product/spec.py": "b10b09d5d21cab93d7a4354e46dc4403f57bacf381a33831229ce07990352f61",
+     "aisef2/quality/__init__.py": "894bca6fb612d25f2e44e4c73e10740e3665a8cad212ce4ed4c6bba3295178a0",
+     "aisef2/quality/adequacy.py": "417b008881d02e547f16467d7c1b23d144b4f7f520b93afc6c56d7d6718c9210",
+     "aisef2/quality/relevance.py": "31ac6109122110ee7ddabb180af8be3ddff6de6efbe9420d787c06501baffa9b",
+     "aisef2/quality/test_execution.py": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
+     "aisef2/quality/vacuity.py": "34cc15bca57a827c02b4f83a817399d4c5baded7bcc95ff733c63893d9aa8512",
+     "aisef2/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "aisef2/runtime/process_range.py": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+     "aisef2/runtime/story_scope.py": "43a80491709eb68929e3d74f6b16941c603cc4a54835ac66d1c1c50afdd55202",
+     "aisef2/runtime/tool.py": "b9c61ba9f42ba4cf6acd66b409d2483baff74d17fef68cdb63f2055770bb4ccb"
+    },
+    "kill_files": {
+     "tests/v2/test_v23_story_lifecycle.py": "f10e1a5f78bb4203f28d01a5d10c3937f60d19858168e89c0bf1b356de93bc0c"
+    },
+    "generator": {
+     "descriptions_sha": "b834362af2b813116addb15f325cefc3bcd67dc7850214f4984120e7ca40b214",
+     "mutated_slices_sha": "ce40f2fa39b8caa386d9225d353c994897a97cbdc4f537c4a9d529317c297d07"
+    },
+    "enum_modules": {
+     "aisef2/orchestrate/story_runner.py": "564d6d49b218319339f199d5fbaf8404db15d450e135c31d1163eaf5d25df3b7",
+     "aisef2/arch/enums.py": "49aae21c38871d2b4d241dc6920a2af22f9dfd7bc07b23d3561ead5ebe619f82",
+     "aisef2/control/owner.py": "a7b218f54bada6811441fc088aaae9a018fa2e6cfe73e3a5dd10f1b291d02ec6",
+     "aisef2/errors.py": "bad4f867a49ec25acc61519116bdd511880d21c6c89e83a782f4fc68e875b42b",
+     "aisef2/journal/format2.py": "9fb177f6697aea097e723e90934f7c2183eea2aad46af8367ccd1f08b3d0d68f",
+     "aisef2/orchestrate/adapters.py": "dc69ebab3c64f1d2e37f8a5c7db5b652093f6b7fc3ea39c0200f3d23fd7ee1e1",
+     "aisef2/orchestrate/merge.py": "2a6a4af092f878539f1a7ad7fb2c98cca8534c27db9b23228fb54d55b237c7ae",
+     "aisef2/orchestrate/proof.py": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+     "aisef2/orchestrate/quality.py": "31a5691c9ea7e212e1c9b1bcaaa80857a86e91249cc2e5b3d176d23382c0697e",
+     "aisef2/orchestrate/review.py": "154f4a6bfa45b20868d7f080eede1d4a8d884dadbe5997487ebd506afa878c06",
+     "aisef2/orchestrate/security.py": "d30b41638f3aafbeb0d25e2fea28f797fe1644f94ba8960b837827bcf9935798",
+     "aisef2/plan/drift.py": "f4a0331974b5a4755a38eeb74a785aa1429a5c3f68a130b0c72ec68300f8a13a",
+     "aisef2/plan/obligation.py": "4343a94892bd3ad11a07c132b4f9ea2c541fcd30a5b676fb43edbc5fe432f068",
+     "aisef2/plan/story_admission.py": "da45da125b9544832be950950fa6ff3b474f072a5408497ec2820ccd88bdc2b9",
+     "aisef2/probe/protocol.py": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "aisef2/product/spec.py": "b10b09d5d21cab93d7a4354e46dc4403f57bacf381a33831229ce07990352f61",
+     "aisef2/runtime/process_range.py": "71a008e4044497a6a879e21252d6a4d66c7361b343ab907266df1c65326859ac",
+     "aisef2/runtime/story_scope.py": "43a80491709eb68929e3d74f6b16941c603cc4a54835ac66d1c1c50afdd55202"
+    },
+    "platform": {
+     "family": "posix",
+     "sys_platform": "darwin",
+     "release": "25.5.0",
+     "machine": "arm64"
+    },
+    "env": {
+     "python": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 21.0.0 (clang-2100.1.1.101)]",
+     "implementation": "cpython",
+     "env_keep": [
+      "PATH",
+      "LANG",
+      "USER",
+      "LOGNAME",
+      "SYSTEMROOT",
+      "SystemRoot",
+      "WINDIR"
+     ],
+     "fresh": [
+      "HOME",
+      "TMPDIR",
+      "XDG_CACHE_HOME",
+      "XDG_CONFIG_HOME",
+      "XDG_DATA_HOME",
+      "XDG_STATE_HOME"
+     ],
+     "timeout": 900,
+     "settle_s": 60.0,
+     "bracket": [
+      [
+       "control",
+       "null",
+       "PASS"
+      ],
+      [
+       "control",
+       "null",
+       "PASS"
+      ],
+      [
+       "rerun",
+       "mutant",
+       "FAIL"
+      ]
+     ],
+     "copy": [
+      "aisef2",
+      "tests/v2",
+      "validation/v2",
+      "docs/architecture",
+      "docs/implementation/v2",
+      "closure-evidence/v2",
+      "validation/v21",
+      "docs/v2.1",
+      "aisef",
+      "pyproject.toml"
+     ],
+     "tree_sha256": "5e889a8ef7cdc4641ec4e5d3d1808030fe0debd459ed1689e6f965b7c7594ecf",
+     "runner_sha256": "bcedc6638f8507a4b6fc268b54672e9fbe363ec3f6b96c8487b30edf8149fe24"
+    }
+   },
+   "supersedes": {
+    "path": "closure-evidence/v2/v2.3/MUTATION.json",
+    "entry_sha256": "2f026dabb00dfd81f05e085fc5b113e2f4c04bf6f6b2eb9ba3a9899283270cc2"
+   }
   }
  ]
 }
