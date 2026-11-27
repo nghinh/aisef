@@ -868,7 +868,9 @@ class Identity(_Product):
         defects = {
             "PROTOCOL_CHANNEL_DISCIPLINE": ("    proto.write((req['mark']", "    sys.stdout.write((req['mark']"),
             "SINGLE_PLACEHOLDER_TOKEN": ("value = value.replace(form, '<ws>')", "value = value.replace(form, '<root>')"),
-            "NO_CLOCK_IN_PROBE_FACTS": ("import hashlib,", "import time, hashlib,"),
+            # RFC §9.2 amendment: `import time` and the DISPATCHED/COMPLETED monotonic stamps are allowed in HARNESS;
+            # a clock read under any OTHER marker (here READY) is still flagged — the exception is window-scoped.
+            "NO_CLOCK_IN_PROBE_FACTS": ("emit('READY')", "emit('READY', repr(time.monotonic()))"),
             "CLOSED_DISPATCH_IN_SCENARIO_PROBES": ("    if kind != step['exception']:\n",
                                                   "    if kind == 'x':\n        pass\n    elif kind != step['exception']:\n"),
         }
@@ -884,6 +886,47 @@ class Identity(_Product):
                 self.assertTrue(any(v.startswith(rule) for v in ps.violations("aisef2/probe/process_effect.py",
                                                                                 ast.unparse(tree), ps.SOURCE_RULES,
                                                                                 facts)), rule)
+
+    def test_PE_NO_CLOCK_window_timebase_amendment_is_scoped_to_the_controller(self):
+        """RFC §9.2 amendment (docs/v2.3/amendments/PE8-NO-CLOCK-WINDOW-TIMEBASE.md): the HARNESS controller may read
+        time.monotonic() ONLY as the body of a DISPATCHED/COMPLETED window-stamp emit; every other clock read — a wrong
+        clock, a non-window marker, a read outside an emit, a clock in another child script, in the facts or in a verdict
+        — stays flagged. Positive and negative cases, over parsed probe sources."""
+        sys.path.insert(0, str(ROOT / "validation" / "v2"))
+        import probe_static_checks as ps
+
+        def no_clock(source, facts=None):
+            return [v for v in ps.violations("aisef2/probe/bad.py", source, ("NO_CLOCK_IN_PROBE_FACTS",), facts)
+                    if v.startswith("NO_CLOCK_IN_PROBE_FACTS")]
+
+        emit = 'def emit(tag, body=""):\n    pass\n'
+        # POSITIVE: the sanctioned window timebase — `import time` and the two monotonic stamps — passes clean.
+        positive = f"HARNESS = r'''\nimport json, time\n{emit}emit('DISPATCHED', repr(time.monotonic()))\n" \
+                   f"emit('COMPLETED', repr(time.monotonic()))\n'''\n"
+        self.assertEqual(no_clock(positive), [], "the DISPATCHED/COMPLETED monotonic stamps are the permitted timebase")
+
+        negatives = {
+            "a clock under a non-window marker (READY)":
+                f"HARNESS = r'''\nimport json, time\n{emit}emit('READY', repr(time.monotonic()))\n'''\n",
+            "a non-monotonic clock in a window marker":
+                f"HARNESS = r'''\nimport json, time\n{emit}emit('DISPATCHED', repr(time.time()))\n'''\n",
+            "a monotonic read outside any emit":
+                "HARNESS = r'''\nimport json, time\nt = time.monotonic()\n'''\n",
+            "the controller imports datetime":
+                f"HARNESS = r'''\nimport json, datetime\n{emit}emit('DISPATCHED', repr(datetime.datetime.now()))\n'''\n",
+            "the subject's agent reads the clock (not the controller)":
+                "AGENT = r'''\nimport json, time\nx = time.monotonic()\n'''\n",
+            "the subprocess boot reads the clock":
+                "SUBPROCESS = r'''\nimport time, runpy\nx = time.perf_counter()\n'''\n",
+            "a clock in a RESULT/fact constructor":
+                "import time\nfrom aisef2.probe.protocol import Observation, ObservationKind\n"
+                "def observe(s, a, e, v):\n    return Observation(ObservationKind.OBSERVED, v, detail=str(time.monotonic()))\n",
+            "a clock in a verdict function":
+                "import time\ndef verdict_of(cls, obs, facts):\n    return time.monotonic()\n",
+        }
+        for label, source in negatives.items():
+            with self.subTest(label):
+                self.assertTrue(no_clock(source), f"the amendment must still flag: {label}")
 
     def test_the_catalog_entry_binds_this_probe_as_the_active_process_effect_probe(self):
         e = catalog.active()[SubjectKind.PROCESS_EFFECT]

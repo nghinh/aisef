@@ -10,12 +10,17 @@ to scenario probes is vacuous while there is none and rejects its known-bad fixt
   under `tests/v2/fixtures/calibration/<fixture_root>/<class>/`; one active entry per subject kind; a Cycle-1
   entry carries the digest the Cycle-2 freeze manifest inherits. Closed both ways: an unregistered module and an
   entry without a module both fail.
-* **NO_CLOCK_IN_PROBE_FACTS** (RFC §9.2) — the clock may end an observation window; it never enters an observation.
-  The child script a probe runs inside the subject's process imports neither `time` nor `datetime`; in the probe
-  module no clock read (`time.time/monotonic/perf_counter…`, `datetime.now/utcnow`) appears inside the arguments of
-  an `Observation`, `Executed`, `Unrunnable`, `InvalidSpec` or `ProbeRecord` construction, nor inside `verdict_of`,
-  `observation_class` or `spec_class`. The Cycle-1 probe's deadline helpers read the clock outside every constructor,
-  which is the shape the rule keeps.
+* **NO_CLOCK_IN_PROBE_FACTS** (RFC §9.2, amended — docs/v2.3/amendments/PE8-NO-CLOCK-WINDOW-TIMEBASE.md) — the clock
+  may end an observation window; it never enters an observation. A child script a probe runs imports neither `time`
+  nor `datetime` and reads no clock, with ONE mechanically-scoped exception: the `HARNESS` controller may read
+  `time.monotonic()` — and only that clock — as the authenticated body of an `emit("DISPATCHED"/"COMPLETED", …)`
+  marker, the controller's own window timebase (`PE8-DEADLINE-INTEGRITY`). It may `import time` (and only `time`;
+  `datetime` stays banned); any other clock read in it (a different clock, a non-window marker, anywhere but a window
+  emit body) is still flagged, and every other child script (`SUBPROCESS`, the subject's agent) stays clock-free.
+  In the probe module no clock read (`time.time/monotonic/perf_counter…`, `datetime.now/utcnow`) appears inside the
+  arguments of an `Observation`, `Executed`, `Unrunnable`, `InvalidSpec` or `ProbeRecord` construction, nor inside
+  `verdict_of`, `observation_class` or `spec_class`: the clock never enters the facts or the verdict. The Cycle-1
+  probe's deadline helpers read the clock outside every constructor, which is the shape the rule keeps.
 * **NO_TEST_ARTEFACT_IN_PROBES** (invariant IX) — no string constant of a probe module or its child script, outside
   docstrings, matches the contract rule that refuses developer test artefacts (`aisef2.product.contract`): a probe
   never knows the name of a test.
@@ -56,6 +61,14 @@ CLOCK_CALLS = {("time", "time"), ("time", "monotonic"), ("time", "monotonic_ns")
                ("datetime", "now"), ("datetime", "utcnow"), ("date", "today")}
 RESULT_CONSTRUCTORS = ("Observation", "Executed", "Unrunnable", "InvalidSpec", "ProbeRecord")
 VERDICT_FUNCTIONS = ("verdict_of", "observation_class", "spec_class")
+#: RFC §9.2 amendment (PE8-DEADLINE-INTEGRITY): the clock ban stands for every child script, with ONE scoped exception.
+#: The controller child script named here may read WINDOW_CLOCK — and only that clock — as the authenticated body of an
+#: `emit(<WINDOW_MARKER>, …)` call: the controller's own monotonic timebase that ends the DISPATCHED->COMPLETED window.
+#: It is never admitted into the facts or the verdict (those bans are unchanged), never read in the subject's agent or
+#: any other child script, and never read for anything but those two markers.
+WINDOW_CONTROLLER = "HARNESS"
+WINDOW_MARKERS = ("DISPATCHED", "COMPLETED")
+WINDOW_CLOCK = ("time", "monotonic")
 PLACEHOLDER = "<ws>"
 _TOKEN = re.compile(r"<[a-z][a-z0-9_]*>")
 
@@ -102,6 +115,22 @@ def child_scripts(tree: ast.Module) -> list[tuple[str, int, ast.Module]]:
 def _is_clock_call(n: ast.AST) -> bool:
     return isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and isinstance(n.func.value, ast.Name) \
         and (n.func.value.id, n.func.attr) in CLOCK_CALLS
+
+
+def _window_stamps(inner: ast.AST) -> set[int]:
+    """The ids of the clock reads the RFC §9.2 amendment exempts in the HARNESS controller: a WINDOW_CLOCK call
+    (`time.monotonic()`) that appears inside a positional body argument of an `emit(<WINDOW_MARKER>, …)` call — the
+    controller's authenticated DISPATCHED/COMPLETED window timebase. Only these are exempt; every other clock read in
+    the controller (a different clock, a non-window marker, or a read outside an emit body) is still flagged."""
+    out: set[int] = set()
+    for n in ast.walk(inner):
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "emit" and n.args \
+                and isinstance(n.args[0], ast.Constant) and n.args[0].value in WINDOW_MARKERS:
+            for body in n.args[1:]:
+                for x in ast.walk(body):
+                    if _is_clock_call(x) and (x.func.value.id, x.func.attr) == WINDOW_CLOCK:
+                        out.add(id(x))
+    return out
 
 
 def _callee(n: ast.Call) -> str | None:
@@ -155,12 +184,21 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = SOURCE_RULES, fac
 
     if "NO_CLOCK_IN_PROBE_FACTS" in rules:
         for name, line, inner in scripts:
+            # RFC §9.2 amendment: the HARNESS controller alone may read time.monotonic() as a DISPATCHED/COMPLETED
+            # window-stamp emit body, and may import `time` (not datetime). Every other clock read, and every other
+            # child script, stays banned.
+            controller = name == WINDOW_CONTROLLER
+            allowed = _window_stamps(inner) if controller else set()
             for x in ast.walk(inner):
                 if isinstance(x, ast.Import) and any(a.name.split(".")[0] in CLOCK_MODULES for a in x.names) \
                         or isinstance(x, ast.ImportFrom) and (x.module or "").split(".")[0] in CLOCK_MODULES:
+                    mods = ({a.name.split(".")[0] for a in x.names} if isinstance(x, ast.Import)
+                            else {(x.module or "").split(".")[0]}) & set(CLOCK_MODULES)
+                    if controller and mods <= {"time"}:   # the controller's window timebase; datetime stays banned
+                        continue
                     out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} imports a clock "
                                f"(its line {x.lineno})")
-                elif _is_clock_call(x):
+                elif _is_clock_call(x) and id(x) not in allowed:
                     out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} reads the clock "
                                f"(its line {x.lineno})")
         for n in ast.walk(tree):
