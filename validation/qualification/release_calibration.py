@@ -83,6 +83,7 @@ STATES = ("MEASURED", "VERIFIED_REUSE", "INVALIDATED", "UNRESOLVED")     # valid
 CURRENT = ("MEASURED", "VERIFIED_REUSE")
 BASE = "da3ea33f3b695aaca73e87a704145a0193aced23"   # v2.2.0, whose release gate accepted every legacy record (impact.BASE)
 ROUND = "v2.3"
+ROUND_VERSION = "2.3.0.dev0"   # the v2.3 round's calibration-record version, decoupled from pyproject (owner ruling 2026-11-27 PE8-2)
 _RECORD_NAME = re.compile(r"(?:V(.+?)-)?PROBE-CALIBRATIONS(?:-[0-9]+)?\.json")
 _VERSION = re.compile(r"([0-9]+(?:\.[0-9]+)*)(?:\.dev([0-9]+))?")
 
@@ -90,6 +91,14 @@ _VERSION = re.compile(r"([0-9]+(?:\.[0-9]+)*)(?:\.dev([0-9]+))?")
 def _vkey(version: str) -> tuple | None:
     m = _VERSION.fullmatch(version)
     return (tuple(int(x) for x in m[1].split(".")), m[2] is None, int(m[2] or 0)) if m else None
+
+
+def _record_version() -> str:
+    """The naming and resolution ceiling for this round's calibration record: the v2.3 round's own ROUND_VERSION while it
+    leads the package version (dev, at pyproject 2.2.0), the package version once it catches up at release. Decoupled
+    from pyproject so a v2.3 measurement is a V2.3.0.dev0 record, never a mislabelled V2.2.0 one (owner ruling 2026-11-27)."""
+    pv, rv = _vkey(_version()), _vkey(ROUND_VERSION)
+    return _version() if pv is not None and rv is not None and pv >= rv else ROUND_VERSION
 
 
 def _git(*args: str) -> bytes | None:
@@ -145,7 +154,7 @@ def resolve(version: str | None = None) -> tuple[str, str, str]:
 def _assess(version: str | None = None) -> tuple[str, str, str, set]:
     """resolve(), plus the rows of the cited record that may be carried into a new one (write()): those whose inputs
     equal the tree's, when the record's own provenance holds; none otherwise."""
-    version = version or _version()
+    version = version or _record_version()
     try:
         return _resolve(version)
     except Exception as x:          # noqa: BLE001 — fail closed: unparsable record, missing file, broken import
@@ -333,7 +342,7 @@ def shipped_source(rows: list[dict]) -> str:
 
 def record(rows: list[dict], problems: list[str], fixtures: dict) -> dict:
     from validation.qualification import common as C
-    return {"record": f"AISEF {_version()} — THE PROBE CAPABILITY CALIBRATIONS THE RELEASE SHIPS",
+    return {"record": f"AISEF {_record_version()} (v2.3 round; package {_version()}) — THE PROBE CAPABILITY CALIBRATIONS THE RELEASE SHIPS",
             "keyed_by": "each active probe's EXECUTION_DIGEST (V2.1, V2-007): the bytes the contrast was demonstrated on",
             "generator": {"path": GENERATOR_REL, "sha256": C.lf_sha(HERE / "release_calibration.py")},
             "aisef2_tree": (_git("rev-parse", "HEAD:aisef2") or b"").decode().strip() or None, "shipped": SHIPPED_REL,
@@ -379,7 +388,7 @@ def write() -> int:
     if problems:
         print(json.dumps(rec, indent=1, sort_keys=True))
         return 1
-    version = _version()
+    version = _record_version()
     new, n = newest_rel(version)
     if (ROOT / new).exists():
         new = record_rel(version, n + 1)      # the earlier record stays as history (2.0.0's name never numbers)
@@ -411,7 +420,8 @@ def main(argv: list[str] | None = None) -> int:
     a = ap.parse_args(argv)
     if a.state:
         rel, state, basis = resolve()
-        print(json.dumps({"version": _version(), "record": rel, "state": state, "basis": basis}, indent=1))
+        print(json.dumps({"round_version": _record_version(), "package_version": _version(),
+                          "record": rel, "state": state, "basis": basis}, indent=1))
         return 0 if state in CURRENT else 1
     if a.check:
         problems = check()
