@@ -43,7 +43,8 @@ GEN = "validation/qualification/release_calibration.py"
 DATA = ("closure-evidence/v2/release/", "tests/v2/fixtures/calibration/", "aisef2/app/calibrations.py", "pyproject.toml",
         ".gitignore", GEN)
 V220 = "closure-evidence/v2/release/V2.2.0-PROBE-CALIBRATIONS.json"
-NEW = "closure-evidence/v2/release/V2.2.0-PROBE-CALIBRATIONS-2.json"
+V230 = "closure-evidence/v2/release/V2.3.0.dev0-PROBE-CALIBRATIONS.json"   # this round's shipped record (PE8-2)
+NEW = "closure-evidence/v2/release/V2.3.0.dev0-PROBE-CALIBRATIONS-2.json"  # --write lays the next record here (V230 ships, so -2)
 EXISTS = "tests/v2/fixtures/calibration/file_artifact/exists"
 NEG = f"{EXISTS}/negative/checkout/app/other.toml"
 
@@ -140,7 +141,7 @@ class ShippedRows(unittest.TestCase):
             self.assertEqual(two_way(rc.shipped_rows(), rc.derived_rows()), ["shipped, not derived: ('probe.file_artifact', "
                                                                              f"'{extra['probe_digest']}', 'hand_added')"])
             rel, state, basis = rc.resolve()
-            self.assertEqual((rel, state), (V220, "INVALIDATED"))
+            self.assertEqual((rel, state), (V230, "INVALIDATED"))        # the newest record this tree cites
             self.assertIn(f"probe.file_artifact hand_added: in {rc.SHIPPED_REL}, not in the record", basis)
 
 
@@ -163,8 +164,13 @@ class FixtureTreeOrder(unittest.TestCase):
 
 
 class Resolve(unittest.TestCase):
-    def test_this_tree_cites_the_v2_2_0_record_by_identity_never_as_measured(self):
-        self.assertEqual(rc.resolve(), (V220, "VERIFIED_REUSE", "identical-inputs:V2.2.0"))
+    def test_this_tree_cites_the_v2_3_record_it_measured_as_verified_reuse_never_measured(self):
+        # PE8-2: the kernel moved (process_effect CAP 2), so this tree no longer matches the frozen V2.2.0 rows; it
+        # cites the v2.3 record that re-demonstrated the 3 changed rows and carried the other 16 — VERIFIED_REUSE, not
+        # MEASURED (a carried record is never MEASURED), and never falling back to the older V2.2.0 it supersedes.
+        m = json.loads((rc.ROOT / V230).read_text(encoding="utf-8"))["identity"]["measured_on"]
+        self.assertEqual(rc.resolve(), (V230, "VERIFIED_REUSE",
+                                        f"v2.3-measured@{m}; 16 of 19 rows carried from {V220} by identical inputs"))
         self.assertEqual((rc.RECORD_REL, rc.STATE, rc.BASIS), rc.resolve())
         self.assertEqual(rc.state_problems(), [])
         from validation.v23 import impact
@@ -176,7 +182,7 @@ class Resolve(unittest.TestCase):
             with open(t / NEG, "ab") as f:
                 f.write(b"#")
             rel, state, basis = rc.resolve()
-            self.assertEqual((rel, state), (V220, "INVALIDATED"))
+            self.assertEqual((rel, state), (V230, "INVALIDATED"))                       # the newest record, row-checked against the tree
             self.assertEqual(basis.split("; "), [basis])                               # exactly one reason ...
             self.assertTrue(basis.startswith("probe.file_artifact exists: the negative fixture tree is not the record's"), basis)
             self.assertEqual(_sha(t / rc.SHIPPED_REL), shipped)                         # ... and the kernel unchanged
@@ -206,7 +212,9 @@ class Resolve(unittest.TestCase):
                     p.write_text(p.read_text(encoding="utf-8").replace('"probe_digest": "dcdfe80e', '"probe_digest": "0cdfe80e', 1),
                                  encoding="utf-8")
                 rel, state, basis = rc.resolve()
-                self.assertEqual((rel, state), (V220, "INVALIDATED"))
+                # V230 carries from V220; a tamper of V220 or the kernel makes V230 the cited INVALIDATED record (its
+                # basis still names the underlying reason, so the `why` substrings below hold through the cascade).
+                self.assertEqual((rel, state), (V230, "INVALIDATED"))
                 self.assertIn(why, basis)
 
     def test_without_the_v2_2_0_commit_nothing_resolves(self):
@@ -215,7 +223,7 @@ class Resolve(unittest.TestCase):
                 src, dst = ROOT / p, pathlib.Path(tmp) / p
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copytree(src, dst) if src.is_dir() else shutil.copyfile(src, dst)
-            self.assertEqual(rc.resolve()[1:], ("UNRESOLVED", "basis v2.2.0 is not in this repository (shallow clone or no git)"))
+            self.assertEqual(rc.resolve()[1:], ("UNRESOLVED", "basis HEAD is not in this repository (shallow clone or no git)"))
         self.assertEqual(rc.resolve("2.2.0rc1")[1], "UNRESOLVED")
         self.assertEqual(rc.resolve("1.9.0")[1:], ("UNRESOLVED", "no calibration record of a version <= 1.9.0"))
 
@@ -287,7 +295,9 @@ class Write(unittest.TestCase):
             before = files()
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 self.assertEqual(rc.main(["--write"]), 0)
-            self.assertIn("VERIFIED_REUSE (identical-inputs:V2.2.0) — nothing written", out.getvalue())
+            m = json.loads((t / V230).read_text(encoding="utf-8"))["identity"]["measured_on"]
+            self.assertIn(f"VERIFIED_REUSE (v2.3-measured@{m}; 16 of 19 rows carried from {V220} by identical inputs) "
+                          "— nothing written", out.getvalue())
             self.assertEqual(files(), before)
 
     def test_one_changed_fixture_re_demonstrates_that_row_only_and_carries_the_others(self):
@@ -306,10 +316,10 @@ class Write(unittest.TestCase):
             self.assertEqual(calls, [("probe.file_artifact", "exists")] * 2)
             self.assertIn(f"wrote {NEW} (1 re-demonstrated, 18 carried); {rc.SHIPPED_REL} unchanged (same rows)", out.getvalue())
             self.assertEqual(_sha(t / rc.SHIPPED_REL), shipped)
-            doc, old = (json.loads((t / p).read_text(encoding="utf-8")) for p in (NEW, V220))
+            doc, old = (json.loads((t / p).read_text(encoding="utf-8")) for p in (NEW, V230))
             self.assertEqual((doc["verdict"], doc["identity"]["round"], doc["identity"]["dirty"], doc["identity"]["supersedes"]["state"]),
                              ("CALIBRATED", "v2.3", False, "INVALIDATED"))
-            self.assertEqual((doc["identity"]["measured_on"], doc["identity"]["supersedes"]["path"]), (head, V220))
+            self.assertEqual((doc["identity"]["measured_on"], doc["identity"]["supersedes"]["path"]), (head, V230))
             self.assertEqual(rc._rows(doc["rows"]), rc._rows(old["rows"]))
             self.assertEqual({g: v for g, v in doc["fixtures"].items() if g != EXISTS}, {g: v for g, v in old["fixtures"].items() if g != EXISTS})
             self.assertNotEqual(doc["fixtures"][EXISTS], old["fixtures"][EXISTS])
@@ -317,16 +327,17 @@ class Write(unittest.TestCase):
             self.assertEqual((len(carried), ["probe.file_artifact", "exists"] in carried), (18, False))
             self.assertEqual(rc.resolve()[1], "UNRESOLVED")                              # not committed yet
             commit(t)
-            self.assertEqual(rc.resolve(), (NEW, "VERIFIED_REUSE", f"v2.3-measured@{head}; 18 of 19 rows carried from {V220} by identical inputs"))
+            self.assertEqual(rc.resolve(), (NEW, "VERIFIED_REUSE", f"v2.3-measured@{head}; 18 of 19 rows carried from {V230} by identical inputs"))
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(rc.main(["--write"]), 0)                               # current again: nothing written
-            self.assertFalse((t / "closure-evidence/v2/release/V2.2.0-PROBE-CALIBRATIONS-3.json").exists())
+            self.assertFalse((t / "closure-evidence/v2/release/V2.3.0.dev0-PROBE-CALIBRATIONS-3.json").exists())
             self.assertEqual(len(calls), 2)
             with open(t / V220, "ab") as f:
                 f.write(b" \n")
             rel, state, basis = rc.resolve()
-            self.assertEqual((rel, state), (NEW, "INVALIDATED"))
-            self.assertIn(f"{NEW} carries rows from {V220}, which is INVALIDATED — {V220} differs from its committed bytes", basis)
+            self.assertEqual((rel, state), (NEW, "INVALIDATED"))                         # cascade: NEW <- V230 <- the broken V220
+            self.assertIn(f"{NEW} carries rows from {V230}, which is INVALIDATED", basis)
+            self.assertIn(f"{V220} differs from its committed bytes", basis)
 
 
 if __name__ == "__main__":

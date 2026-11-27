@@ -22,10 +22,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tests.v23.test_v23_calibration_rows import V220, commit, data_clone
+from tests.v23.test_v23_calibration_rows import V220, V230, commit, data_clone
 from validation.qualification import release_calibration as rc
-
-V230 = "closure-evidence/v2/release/V2.3.0.dev0-PROBE-CALIBRATIONS.json"
 
 
 class RecordVersion(unittest.TestCase):
@@ -49,10 +47,13 @@ class RecordVersion(unittest.TestCase):
 
 class NoSpuriousGreen(unittest.TestCase):
     def test_with_no_v2_3_record_present_resolve_never_reports_a_v2_3_record_as_measured(self):
-        self.assertFalse((rc.ROOT / V230).exists())                  # the v2.3 record is not written yet
-        rel, state, _ = rc.resolve()
-        self.assertFalse(state == "MEASURED" and rel == V230)        # no spurious green on a record that is absent
-        self.assertTrue(state not in rc.CURRENT or rel == V220)      # on this tree it cites the frozen V2.2.0 (INVALIDATED)
+        with data_clone() as t:                                      # the world before this round's record was laid down
+            (t / V230).unlink()
+            commit(t)
+            self.assertFalse((t / V230).exists())
+            rel, state, _ = rc.resolve()
+            self.assertFalse(state == "MEASURED" and rel == V230)    # no spurious green on a record that is absent
+            self.assertEqual((rel, state), (V220, "INVALIDATED"))    # cites the frozen V2.2.0, which the PE8 kernel no longer matches
 
 
 class NoFallback(unittest.TestCase):
