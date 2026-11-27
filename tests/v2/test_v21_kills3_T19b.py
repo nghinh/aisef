@@ -348,8 +348,11 @@ class ResultReadDecides(_Watch):
             return [object()]
 
     def observe(self, last_returned):
-        lines = ("READY", "DISPATCHED", "STEP 0", "STEP 1",
-                 "RESULT " + json.dumps({"subject": "present", "trace": [], "last_returned": last_returned}))
+        # PE8-DEADLINE-INTEGRITY: the real HARNESS stamps DISPATCHED and emits COMPLETED on its own monotonic clock just
+        # before the RESULT (units._stamped: 0.0 and 0.1, inside the 0.2s window), so a RESULT present with a within-window
+        # elapsed is the observation — OBSERVED, never SUBJECT_DEADLINE. Without the stamps _overran fails closed.
+        lines = units._stamped(("READY", "DISPATCHED", "STEP 0", "STEP 1",
+                 "RESULT " + json.dumps({"subject": "present", "trace": [], "last_returned": last_returned})))
         s = units.spec([units.NEW, units.CALL], {"returns": 1}, window=0.2)
         with mock.patch.object(pe, "ProcessRange", self.Running(lines, None)):
             return base.P.observe(s, self.at, units.env())

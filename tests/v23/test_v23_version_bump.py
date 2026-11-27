@@ -2,13 +2,13 @@
 
 EVID-COUPLING-01: `release_calibration.RECORD_REL` followed pyproject's version (`newest_rel(_version())[0]`), so a
 code-identical version bump named a record that does not exist; the consumers `p5_acceptance.reverify` (both rounds),
-`v21_conformance_ruling.derive` and `q2` went red with it. Red-before, measured on the base code with pyproject at
-2.3.0.dev0 in a scratch copy of the tree: the three M5 unit tests below fail ("V2.3.0.dev0-PROBE-CALIBRATIONS.json is
-missing"; q2 FileNotFoundError), and so do `p5_acceptance.py --check-v22` and `v21_conformance_ruling.py --check-v22`.
-Now the record is resolved by input identity (`resolve()`): the bump keeps citing V2.2.0's record as VERIFIED_REUSE
-(`identical-inputs:V2.2.0`, never MEASURED), every consumer gives what it gives without the bump, the M5 tests pass and
-`calibrations.py` is not touched (N11); the bump plus one changed fixture byte is INVALIDATED and every consumer fails
-naming that reason (N12); the v2.2-era record under the current version string is resolved the same way (N34).
+`v21_conformance_ruling.derive` and `q2` went red with it. The record is now resolved by input identity (`resolve()`),
+not by the version string. Since the v2.3 round owns 2.3.0.dev0 (ROUND_VERSION) and ships its own
+V2.3.0.dev0-PROBE-CALIBRATIONS.json, the bump that exercises this property is one ABOVE the round ceiling (2.4.0): no
+record is named for it, so resolution falls by identity to the newest existing record — the round's V2.3.0.dev0 record,
+VERIFIED_REUSE (16 of 19 rows carried from V2.2.0), never MEASURED. Every consumer gives what it gives without the bump,
+the M5 tests pass and `calibrations.py` is not touched (N11); the bump plus one changed fixture byte is INVALIDATED and
+every consumer fails naming that reason (N12); the current round version resolves the same record, never MEASURED (N34).
 Every version-keyed reader of the calibration record is enumerated here, so a new one cannot appear unchecked.
 
 #40: `reverify()` dereferenced the 2.0 records with no None guard; a missing record raised TypeError (red-before,
@@ -34,14 +34,14 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tests.v23.test_v23_calibration_rows import NEG, V220, data_clone  # noqa: E402
+from tests.v23.test_v23_calibration_rows import NEG, V220, V230, data_clone  # noqa: E402
 from validation.qualification import common as C  # noqa: E402
 from validation.qualification import p5_acceptance as A  # noqa: E402
 from validation.qualification import q2  # noqa: E402
 from validation.qualification import release_calibration as rc  # noqa: E402
 from validation.qualification import v21_conformance_ruling as CR  # noqa: E402
 
-BUMP = "2.3.0.dev0"
+BUMP = "2.4.0"   # a bump ABOVE the round ceiling (2.3.0.dev0 owns a record): names no record, so resolution is by identity
 #: the unit tests a version-only bump turned red (W1-DESIGN M5; measured red-before on the base code)
 M5 = ("tests.v2.test_c2_p5_acceptance.V21Records.test_each_re_verification_check_refuses_for_its_own_reason",
       "tests.v2.test_c2_p5_acceptance.V21Records.test_the_committed_re_verification_is_current_only_exactly_with_every_guard_run",
@@ -53,6 +53,12 @@ CONSUMERS = {"validation/qualification/p5_acceptance.py", "validation/qualificat
 
 def _sha(rel: str) -> str:
     return hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+
+
+def _v23_basis() -> str:
+    """The VERIFIED_REUSE basis the tree's committed V2.3.0.dev0 record resolves with (measured_on read from it)."""
+    m = json.loads((ROOT / V230).read_text(encoding="utf-8"))["identity"]["measured_on"]
+    return f"v2.3-measured@{m}; 16 of 19 rows carried from {V220} by identical inputs"
 
 
 @contextlib.contextmanager
@@ -77,8 +83,8 @@ class Bump(unittest.TestCase):
             scratch.write_text(re.sub(r'(?m)^version = "[^"]+"$', f'version = "{BUMP}"', text, count=1), encoding="utf-8")
             version = rc._version(scratch)
         self.assertEqual(version, BUMP)
-        self.assertFalse((ROOT / rc.newest_rel(version)[0]).exists())          # the v2.2 rule's pointer: no such file
-        self.assertEqual(rc.resolve(version), (V220, "VERIFIED_REUSE", "identical-inputs:V2.2.0"))
+        self.assertFalse((ROOT / rc.newest_rel(version)[0]).exists())          # a bump above the round: no record named for it
+        self.assertEqual(rc.resolve(version), (V230, "VERIFIED_REUSE", _v23_basis()))  # falls by identity to the round's record
 
     def test_N11_the_import_time_binding_under_the_bump(self):
         code = ("import json, sys, tomllib\nreal = tomllib.loads\n"
@@ -88,7 +94,7 @@ class Bump(unittest.TestCase):
                 "print(json.dumps([rc._version(), rc.RECORD_REL, rc.STATE, rc.BASIS, list(q2.RELEASE_CALIBRATION_RECORDS)]))\n"
                 % (BUMP, str(ROOT)))
         out = subprocess.run([sys.executable, "-P", "-c", code], capture_output=True, encoding="utf-8", check=True, cwd=ROOT).stdout
-        self.assertEqual(json.loads(out), [BUMP, V220, "VERIFIED_REUSE", "identical-inputs:V2.2.0", [V220]])
+        self.assertEqual(json.loads(out), [BUMP, V230, "VERIFIED_REUSE", _v23_basis(), [V230]])
 
     def test_N11_every_consumer_and_the_M5_tests_are_unmoved_by_the_bump_and_calibrations_py_is_untouched(self):
         shipped = _sha(rc.SHIPPED_REL)
@@ -110,8 +116,8 @@ class Bump(unittest.TestCase):
             with open(t / NEG, "ab") as f:
                 f.write(b"#")
             resolved = rc.resolve(BUMP)
-        self.assertEqual(resolved[:2], (V220, "INVALIDATED"))
-        reason = f"{V220}: INVALIDATED — {resolved[2]}"
+        self.assertEqual(resolved[:2], (V230, "INVALIDATED"))
+        reason = f"{V230}: INVALIDATED — {resolved[2]}"
         self.assertIn("probe.file_artifact exists: the negative fixture tree is not the record's", reason)
         with imported_as(resolved):
             for r in ("v2.1", "v2.2"):
@@ -132,12 +138,12 @@ class Bump(unittest.TestCase):
             result = run(M5)
         failed = {t.id(): trace for t, trace in result.failures + result.errors}
         self.assertEqual(set(failed), set(M5))
-        for name in M5[:2]:                                            # their problem lists carry the reason verbatim
-            self.assertIn("the negative fixture tree is not the record's", failed[name], name)
+        for name in M5[:2]:                                            # their problem lists carry the fixture-tree reason
+            self.assertIn("negative fixture tree", failed[name], name)  # short slice: unittest's diff repr wraps the full phrase
 
     def test_N34_the_v2_2_era_record_named_by_the_current_version_is_never_measured(self):
-        self.assertEqual(rc._version(), "2.2.0")
-        self.assertEqual(rc.resolve(), (V220, "VERIFIED_REUSE", "identical-inputs:V2.2.0"))
+        self.assertEqual(rc._version(), "2.2.0")                                # pyproject still trails the round
+        self.assertEqual(rc.resolve(), (V230, "VERIFIED_REUSE", _v23_basis()))  # the round version resolves its own record
         self.assertNotEqual(rc.STATE, "MEASURED")
 
     def test_every_version_keyed_reader_of_the_record_is_enumerated_and_checks_its_state(self):
