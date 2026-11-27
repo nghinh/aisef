@@ -140,6 +140,13 @@ class V23Retirement(unittest.TestCase):
         # an UNRELATED pre-existing stale target is NOT hidden by the retirement (the blocker count is not silently cut)
         self.assertTrue(any("old_path_audit.py::check" in p and "target changed" in p for p in probs))
 
+    def test_NEG_a_reduced_records_without_the_v23_phase_is_a_noop_not_a_crash(self):
+        # test_v21_mutation_runner patches m.RECORDS to a toy/empty dict with no "P3"; v23_retirement_problems (run by
+        # check()) must return [] rather than raise KeyError on RECORDS[V23_RETIRED_PHASE] (regression, owner CI 2026-11-27).
+        for reduced in ({}, {"TOY": "closure-evidence/v2/toy/MUTATION.json"}):
+            with mock.patch.object(mu, "RECORDS", reduced):
+                self.assertEqual(mu.v23_retirement_problems(ROOT), [])
+
     def test_the_integrity_control_is_enforced_by_the_mutation_qualification_path(self):
         """Owner follow-up 2026-11-27: the retirement integrity controls must be enforced BY the mutation
         qualification path — the calibrated `mutation` checker whose clean() == mutation.check() feeds

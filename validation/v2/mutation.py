@@ -2808,6 +2808,8 @@ def v23_retirement_problems(root: pathlib.Path = ROOT) -> list[str]:
     provably absent from the source, present in its historical phase record, and mapped to a REGISTERED successor of the
     transition-table migration. Retirement never grants a successor PASS/MEASURED/VERIFIED_REUSE/QUALIFIED — the
     successor keeps its own obligation, reported separately by problems_of."""
+    if V23_RETIRED_PHASE not in RECORDS:   # no P3 phase registered (e.g. a reduced RECORDS under test) — nothing to retire
+        return []
     out = []
     try:
         record = json.loads((root / RECORDS[V23_RETIRED_PHASE]).read_text(encoding="utf-8"))
