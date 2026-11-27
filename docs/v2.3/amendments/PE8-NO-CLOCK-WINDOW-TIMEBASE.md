@@ -72,13 +72,16 @@ flagged, and any script not named `HARNESS` keeps the full blanket ban (no clock
   clock in a window marker; a monotonic read outside any emit; the controller importing `datetime`; a clock in the
   subject's agent; a clock in the subprocess boot; a clock in a RESULT/fact constructor; a clock in a verdict function.
 - **Calibrated checker** (`validation/v2/checker_calibration.py::_probe_rule("no_clock_in_probe_facts", …)`): clean on
-  this tree, and its committed known-bad fixture (`tests/v2/fixtures/known_bad/no_clock_in_probe_facts.json`, now a
-  `HARNESS` clock under `READY`) is rejected for the expected reason — proving the exception did not become a blanket
-  controller pass.
+  this tree, and its committed known-bad fixture (`tests/v2/fixtures/known_bad/no_clock_in_probe_facts.json`) is
+  **unchanged — frozen to its v2.2.0 bytes by the Q0P-1 contract** (a clock read inside an `Observation(...)` fact
+  constructor, still banned by the unamended parts 2/3), rejected for the expected reason (`…bad.py:6`). The
+  controller-scoping guarantee — a clock under a non-`DISPATCHED`/`COMPLETED` marker is still flagged, so the exception
+  did not become a blanket controller pass — is proven by the negative subTests of
+  `test_PE_NO_CLOCK_window_timebase_amendment_is_scoped_to_the_controller`, not by the frozen fixture.
 
 ## 5. Boundaries
 
-Scoped to the one static rule and its fixture/test. No change to the RFC §9.2 normative text (it already defines the
+Scoped to the one static rule — its enforcement logic and tests; the frozen v2.2 known-bad fixture is unchanged. No change to the RFC §9.2 normative text (it already defines the
 subject observation deadline; this refines only the Q0 enforcement that implements its "clock never enters an
 observation" principle). No frozen evidence altered. No capability-identity logic lives here (see the companion
 `CAPABILITY_VERSION` 1→2 bump and `RELEASES["2.2.0"]` CR-8 entry). No production tag, master merge or publication.

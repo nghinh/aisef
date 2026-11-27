@@ -5,7 +5,6 @@
  "rule": "NO_CLOCK_IN_PROBE_FACTS",
  "path": "aisef2/probe/bad.py",
  "facts": null,
- "note": "RFC §9.2 amendment (PE8-DEADLINE-INTEGRITY): the HARNESS controller may read time.monotonic() ONLY as a DISPATCHED/COMPLETED window-stamp emit body. A clock read in the controller under any other marker (here READY) is still flagged, so the exception stays scoped to the window timebase and never becomes a blanket controller pass.",
- "source": "HARNESS = r'''\nimport json, time\ndef emit(tag, body=\"\"):\n    pass\nemit(\"READY\", repr(time.monotonic()))\n'''\n",
- "expect": "NO_CLOCK_IN_PROBE_FACTS aisef2/probe/bad.py:1"
+ "source": "import time\nfrom aisef2.probe.protocol import Observation, ObservationKind\n\n\ndef observe(spec, at, env, verdict):\n    return Observation(ObservationKind.OBSERVED, verdict, detail=str(time.monotonic()))\n",
+ "expect": "NO_CLOCK_IN_PROBE_FACTS aisef2/probe/bad.py:6"
 }
