@@ -914,6 +914,15 @@ class Identity(_Product):
                 "HARNESS = r'''\nimport json, time\nt = time.monotonic()\n'''\n",
             "the controller imports datetime":
                 f"HARNESS = r'''\nimport json, datetime\n{emit}emit('DISPATCHED', repr(datetime.datetime.now()))\n'''\n",
+            # the exception must not be defeated by aliasing or from-importing the clock (the real threat is a probe edit)
+            "a from-import of the clock (monotonic)":
+                f"HARNESS = r'''\nfrom time import monotonic\n{emit}x = monotonic()\n'''\n",
+            "a from-import of the wall clock renamed":
+                f"HARNESS = r'''\nfrom time import time as t\n{emit}bad = t()\n'''\n",
+            "a callable alias of the wall clock (time.time)":
+                f"HARNESS = r'''\nimport json, time\n{emit}m = time.time\nbad = m()\n'''\n",
+            "an aliased clock-module import":
+                f"HARNESS = r'''\nimport time as _t\n{emit}bad = _t.time()\n'''\n",
             "the subject's agent reads the clock (not the controller)":
                 "AGENT = r'''\nimport json, time\nx = time.monotonic()\n'''\n",
             "the subprocess boot reads the clock":

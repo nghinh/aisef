@@ -34,13 +34,19 @@ A clock read in a child script is permitted **only** when all of the following h
   banned).
 - **only `time.monotonic()`.** No other clock (`time.time`, `perf_counter`, `process_time`, `datetime.now`, …) is
   exempt, even in the controller.
-- **only as a window-stamp emit body.** The read must sit inside a positional body argument of an
-  `emit(<marker>, …)` call whose first argument is a string literal in `{"DISPATCHED", "COMPLETED"}`. A clock read
-  under any other marker (e.g. `READY`), or anywhere outside such an emit body, is still flagged.
-- **import of `time` only.** The controller may `import time` (its timebase needs it); `import datetime` stays banned.
+- **only as a window-stamp emit body.** The exempt node is the `time.monotonic` attribute that is the callee of a
+  `time.monotonic()` call inside a positional body argument of an `emit(<marker>, …)` call whose first argument is a
+  string literal in `{"DISPATCHED", "COMPLETED"}` (`_window_stamps` collects exactly those attribute nodes). **Every
+  other `time.<attr>` access in the controller is flagged** — a different clock (`time.time`, `time.perf_counter`),
+  `time.monotonic` under any other marker or outside an emit, and a callable alias (`m = time.time; m()`).
+- **import of `time` only, as a plain `import time`.** The controller may bind the clock name **only** through a bare
+  `import time` (no `asname`). `import time as x`, `from time import …` (so no clock function is ever bound as a bare
+  name), and any other clock module (`datetime`) are all flagged. Combined with the attribute rule above, this means no
+  clock value can be reached except `time.monotonic()` in a sanctioned stamp — aliasing and from-importing cannot evade
+  the rule (regression closed before batch-1 integration).
 
-The three gates are independent and conjunctive: a script named `HARNESS` that smuggles a clock outside the window-stamp
-pattern is still flagged, and any script not named `HARNESS` gains nothing.
+The gates are conjunctive: a script named `HARNESS` that smuggles a clock outside the window-stamp pattern is still
+flagged, and any script not named `HARNESS` keeps the full blanket ban (no clock import, no clock read) and gains nothing.
 
 ## 3. What stays unchanged (the invariant's principle, preserved)
 

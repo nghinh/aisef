@@ -118,18 +118,20 @@ def _is_clock_call(n: ast.AST) -> bool:
 
 
 def _window_stamps(inner: ast.AST) -> set[int]:
-    """The ids of the clock reads the RFC §9.2 amendment exempts in the HARNESS controller: a WINDOW_CLOCK call
-    (`time.monotonic()`) that appears inside a positional body argument of an `emit(<WINDOW_MARKER>, …)` call — the
-    controller's authenticated DISPATCHED/COMPLETED window timebase. Only these are exempt; every other clock read in
-    the controller (a different clock, a non-window marker, or a read outside an emit body) is still flagged."""
+    """The ids of the `time.monotonic` ATTRIBUTE nodes the RFC §9.2 amendment exempts in the HARNESS controller: the
+    callee of a WINDOW_CLOCK call (`time.monotonic()`) that appears inside a positional body argument of an
+    `emit(<WINDOW_MARKER>, …)` call — the controller's authenticated DISPATCHED/COMPLETED window timebase. Only these
+    are exempt; the controller check flags every OTHER `time.<attr>` access (a different clock, `time.monotonic` outside
+    an emit, a callable alias of it, a non-window marker), so an aliased or from-imported clock cannot evade the rule."""
     out: set[int] = set()
     for n in ast.walk(inner):
         if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "emit" and n.args \
                 and isinstance(n.args[0], ast.Constant) and n.args[0].value in WINDOW_MARKERS:
             for body in n.args[1:]:
                 for x in ast.walk(body):
-                    if _is_clock_call(x) and (x.func.value.id, x.func.attr) == WINDOW_CLOCK:
-                        out.add(id(x))
+                    if isinstance(x, ast.Call) and isinstance(x.func, ast.Attribute) \
+                            and isinstance(x.func.value, ast.Name) and (x.func.value.id, x.func.attr) == WINDOW_CLOCK:
+                        out.add(id(x.func))
     return out
 
 
@@ -184,23 +186,32 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = SOURCE_RULES, fac
 
     if "NO_CLOCK_IN_PROBE_FACTS" in rules:
         for name, line, inner in scripts:
-            # RFC §9.2 amendment: the HARNESS controller alone may read time.monotonic() as a DISPATCHED/COMPLETED
-            # window-stamp emit body, and may import `time` (not datetime). Every other clock read, and every other
-            # child script, stays banned.
-            controller = name == WINDOW_CONTROLLER
-            allowed = _window_stamps(inner) if controller else set()
-            for x in ast.walk(inner):
-                if isinstance(x, ast.Import) and any(a.name.split(".")[0] in CLOCK_MODULES for a in x.names) \
-                        or isinstance(x, ast.ImportFrom) and (x.module or "").split(".")[0] in CLOCK_MODULES:
-                    mods = ({a.name.split(".")[0] for a in x.names} if isinstance(x, ast.Import)
-                            else {(x.module or "").split(".")[0]}) & set(CLOCK_MODULES)
-                    if controller and mods <= {"time"}:   # the controller's window timebase; datetime stays banned
-                        continue
-                    out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} imports a clock "
-                               f"(its line {x.lineno})")
-                elif _is_clock_call(x) and id(x) not in allowed:
-                    out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} reads the clock "
-                               f"(its line {x.lineno})")
+            if name == WINDOW_CONTROLLER:
+                # RFC §9.2 amendment: the HARNESS controller may read ONLY time.monotonic() and ONLY as a
+                # DISPATCHED/COMPLETED emit body. It may import the clock ONLY as a plain `import time` (no `import time
+                # as x`, no `from time import …`, no other clock module) — so no clock name is ever bound except `time`.
+                # Every `time.<attr>` access except the sanctioned window stamps is flagged, which closes aliasing
+                # (`m = time.time`), callable from-imports (`from time import monotonic`) and non-window markers.
+                sanctioned = _window_stamps(inner)
+                for x in ast.walk(inner):
+                    if isinstance(x, ast.Import) and any(a.name.split(".")[0] in CLOCK_MODULES
+                                                         and not (a.name == "time" and a.asname is None) for a in x.names) \
+                            or isinstance(x, ast.ImportFrom) and (x.module or "").split(".")[0] in CLOCK_MODULES:
+                        out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} imports a clock (only a "
+                                   f"plain `import time` is allowed; its line {x.lineno})")
+                    elif isinstance(x, ast.Attribute) and isinstance(x.value, ast.Name) and x.value.id == "time" \
+                            and id(x) not in sanctioned:
+                        out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} reads the clock (only "
+                                   f"time.monotonic() as a DISPATCHED/COMPLETED stamp is allowed; its line {x.lineno})")
+            else:
+                for x in ast.walk(inner):
+                    if isinstance(x, ast.Import) and any(a.name.split(".")[0] in CLOCK_MODULES for a in x.names) \
+                            or isinstance(x, ast.ImportFrom) and (x.module or "").split(".")[0] in CLOCK_MODULES:
+                        out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} imports a clock "
+                                   f"(its line {x.lineno})")
+                    elif _is_clock_call(x):
+                        out.append(f"NO_CLOCK_IN_PROBE_FACTS {rel}:{line}: child script {name} reads the clock "
+                                   f"(its line {x.lineno})")
         for n in ast.walk(tree):
             if isinstance(n, ast.Call) and _callee(n) in RESULT_CONSTRUCTORS:
                 args = [*n.args, *(k.value for k in n.keywords)]
