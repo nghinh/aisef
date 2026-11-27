@@ -244,7 +244,7 @@ class CriterionWithoutAContract(unittest.TestCase):
         migrated, report = bundle_cli.migrate(doc)      # the contracts are untouched, and so are the approvals nothing selects
         rows = self.entries(migrated)
         withheld = {r["contract"] for r in report["approvals_withheld"]}
-        self.assertEqual(len(withheld), 6)     # what a declared capability change evaluates differently: waiting for the owner
+        self.assertEqual(len(withheld), 40)     # what a declared capability change evaluates differently (6 file_artifact counts + 34 process_effect, PE8): waiting for the owner
         self.assertEqual({e["contract"] is None for e in rows.values()}, {False})
         self.assertEqual({e["contract"] for e in rows.values() if e["approved"] is False}, withheld)
         self.assertEqual({e["approved"] for e in rows.values()} - {False}, {True})

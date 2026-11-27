@@ -70,7 +70,8 @@ class ReportScopeStatement(_LedgerLock):
     declares it. Pins aisef2/app/bundle_cli.py::migrate [20, 38, 41, 42, 43, 44, 45, 46, 55, 56, 57, 58, 59, 60]."""
 
     #: USAGE-2.1 §2: "requirement, contract, approval, facts: unchanged" — approvals only while no declared capability
-    #: change selects their contract (UNAFFECTED, below; the LedgerLock bundle has six that it does)
+    #: change selects their contract (UNAFFECTED, below; the LedgerLock bundle has forty that it does: six file_artifact
+    #: counts and, since PE8, every process_effect contract)
     DOCUMENTED = {"requirements", "contracts", "approvals", "facts"}
     SELECTED = {"approvals"}
     #: also declared by the report, and asserted untouched by tests/v2/test_v21_identity.py::Migrate: the stories the
@@ -93,8 +94,8 @@ class ReportScopeStatement(_LedgerLock):
     def test_the_report_names_the_sections_migration_leaves_as_they_were(self):
         _, report = bundle_cli.migrate(self.fresh())
         self.assertLessEqual((self.DOCUMENTED - self.SELECTED) | self.ALSO_STATED, set(report["unchanged"]))
-        self.assertNotIn("approvals", report["unchanged"])      # six of its approvals are not in the candidate
-        self.assertEqual(len(report["approvals_withheld"]), 6)
+        self.assertNotIn("approvals", report["unchanged"])      # forty of its approvals are not in the candidate
+        self.assertEqual(len(report["approvals_withheld"]), 40)
 
     def test_the_approvals_stay_among_the_sections_left_as_they_were_when_no_change_selects_a_contract(self):
         """The statement the owner's decision narrowed, kept where it still holds: a bundle whose contracts no declared
@@ -236,7 +237,7 @@ class MoreThanOneRelease(_LedgerLock):
     def test_an_id_two_releases_both_compile_stays_attributed_to_the_first(self):
         once = bundle_cli.migrate(self.fresh())
         with self.two_releases():
-            self.assertEqual(list(bundle_cli.RELEASES), ["2.0.0", "alias"])
+            self.assertEqual(list(bundle_cli.RELEASES), ["2.0.0", "2.2.0", "alias"])
             twice = bundle_cli.migrate(self.fresh())
         self.assertEqual(twice, once)
         self.assertEqual({v["from_release"] for v in twice[1]["mapping"].values()}, {"2.0.0"})
@@ -247,7 +248,7 @@ class MoreThanOneRelease(_LedgerLock):
             with self.assertRaises(bundle_cli.MigrationError) as c:
                 bundle_cli.migrate(doc)
             tried = list(bundle_cli.RELEASES)
-        self.assertEqual(tried, ["2.0.0", "alias"])
+        self.assertEqual(tried, ["2.0.0", "2.2.0", "alias"])
         for name in tried:
             self.assertRegex(str(c.exception), rf"\b{re.escape(name)}\b")
 

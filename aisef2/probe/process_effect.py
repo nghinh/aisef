@@ -206,9 +206,35 @@ def _probe_digest() -> str:
 #: (a stimulus grammar, a verdict rule, a class's meaning). The bytes that run are EXECUTION_DIGEST: a calibration row
 #: and the run's RunSpec bind them, so a byte change needs its calibrations demonstrated again before anything admits.
 #: A matching digest is not evidence that two executions behave alike; the calibration contrast is the evidence.
-CAPABILITY_VERSION = 1
+CAPABILITY_VERSION = 2     # 1: v2.0.0..v2.2.0; 2: PE8-DEADLINE-INTEGRITY (owner ruling 2026-11-27 B/C) — the window is
+#: measured on the controller's own monotonic clock, so a late-observed overrun is correctly SUBJECT_DEADLINE; see
+#: CAPABILITY_CHANGES. Bumped by hand because it changes a verdict rule (what a class observes at the deadline), per the
+#: identity note above; `bundle_cli.RELEASES["2.2.0"]` carries the version-1 identity so historical bundles migrate (CR-8).
 EXECUTION_DIGEST = _probe_digest()
 DIGEST = hashlib.sha256(json.dumps([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]).encode("utf-8")).hexdigest()
+
+#: What each capability version above 1 changed (ARCHITECTURE-EXCEPTION-V2-007; `aisef bundle migrate` reads it through
+#: `catalog._capability` to tell an approval that still holds from one whose contract now evaluates differently). The
+#: deadline-integrity fix changes the verdict of every scenario class at the window edge, so one selector names all three.
+CAPABILITY_CHANGES = {
+    2: {
+        "summary": "PE8-DEADLINE-INTEGRITY: the scenario's bounded observation window is measured on the controller's "
+                   "own monotonic clock (its authenticated DISPATCHED->COMPLETED elapsed), never on the times the "
+                   "parent observed either marker; an over-window RESULT the parent observed late, or whose controller "
+                   "timing evidence is missing/malformed/out-of-order, is now SUBJECT_DEADLINE (fail-closed), never a "
+                   "false OBSERVED/SATISFIED.",
+        "affects": (
+            {"ref": "PE8-DEADLINE-INTEGRITY",
+             "classes": ("scenario_returns", "scenario_raises", "scenario_files"),
+             "when": "the scenario's RESULT is observed late relative to the within_s window, or the controller's "
+                     "authenticated DISPATCHED/COMPLETED stamps are missing, malformed or out of order",
+             "before": "the window was armed from the parent's observation of DISPATCHED, so an observation lag could "
+                       "let a genuine overrun score OBSERVED and be SATISFIED/REFUTED by the observable",
+             "after": "the verdict is SUBJECT_DEADLINE (REFUTED by ON_DEADLINE) whenever COMPLETED-DISPATCHED exceeds "
+                      "within_s or the timing evidence cannot be verified; a within-window RESULT is unaffected"},
+        ),
+    },
+}
 
 
 # --------------------------------------------------------------------------------------- shapes

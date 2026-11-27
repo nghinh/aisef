@@ -159,8 +159,11 @@ def dump(*, name: str, description: str, requirements_path: str, requirements_sh
             "stories": {k: {"depends_on": list(v["depends_on"]), "tests": list(v["tests"])} for k, v in stories.items()}}
 
 
-def load(data: Mapping) -> Project:
-    """The project a bundle describes, every seal re-checked and every spec compiled under this release's probes."""
+def load(data: Mapping, *, probes: Mapping | None = None) -> Project:
+    """The project a bundle describes, every seal re-checked and every spec compiled under this release's probes. `probes`
+    overrides them with a historical release's identities (CR-8, bundle_cli.load_for_release) to verify a bundle an
+    earlier release ran for IDENTITY — the Project.digest is the bundle's own bytes, so it is reproduced; this re-binds
+    nothing, in contrast to `migrate`. Default (None): this release's active catalog, the only path admission uses."""
     if not isinstance(data, Mapping) or data.get("format") != FORMAT:
         raise BundleError(f"not a project bundle of format {FORMAT}")
     if sorted(data) != sorted(KEYS):
@@ -191,7 +194,8 @@ def load(data: Mapping) -> Project:
         plan = _plan(data["plan"])
     except (KeyError, TypeError, ValueError) as e:
         raise BundleError(f"the bundle's kernel objects do not load: {type(e).__name__}: {e}") from e
-    refs = {kind: ProbeRef(e.probe_id, e.probe_digest) for kind, e in catalog.active().items()}
+    refs = probes if probes is not None else {kind: ProbeRef(e.probe_id, e.probe_digest)
+                                              for kind, e in catalog.active().items()}
     specs: dict[str, ProductProofSpec] = {}
     for c in contracts.values():
         try:

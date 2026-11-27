@@ -155,12 +155,13 @@ class Migrate(unittest.TestCase):
         self.assertEqual({v["from_release"] for v in report["mapping"].values()}, {"2.0.0"})
         for k in ("requirements", "contracts", "facts", "stories", "requirements_document", "name"):
             self.assertEqual(out[k], self.doc[k], k)
-        # the approvals: the input's, less exactly what the report says it withheld — never changed, never added
+        # the approvals: the input's, less exactly what the report says it withheld — never changed, never added.
+        # 40 = six file_artifact counts (PM-9/PM-11) + 34 process_effect (PE8-DEADLINE-INTEGRITY, capability 2)
         withheld = {(r["contract"], r["requirement"]) for r in report["approvals_withheld"]}
-        self.assertEqual(len(withheld), 6)
+        self.assertEqual(len(withheld), 40)
         self.assertEqual(out["approvals"], [a for a in self.doc["approvals"]
                                             if (a["contract_id"], a["requirement_id"]) not in withheld])
-        self.assertEqual(report["approvals_kept"], len(self.doc["approvals"]) - 6)
+        self.assertEqual(report["approvals_kept"], len(self.doc["approvals"]) - 40)
         with self.assertRaises(bundle.BundleError) as c:      # it is not run until the owner has approved them
             bundle.load(out)
         self.assertIn("is not approved", str(c.exception))
@@ -191,10 +192,10 @@ class Migrate(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(bundle_cli.main(["migrate", str(LEDGERLOCK_2_0_0), "--out", str(out)]), 0)
             written = json.loads(out.read_text(encoding="utf-8"))
-            self.assertEqual(written["approvals"],     # the input's approvals, less the six the report names
+            self.assertEqual(written["approvals"],     # the input's approvals, less the forty the report names
                              [a for a in self.doc["approvals"] if a["contract_id"] not in {
                                  r["contract"] for r in bundle_cli.migrate(self.doc)[1]["approvals_withheld"]}])
-            self.assertEqual(len(written["approvals"]), len(self.doc["approvals"]) - 6)
+            self.assertEqual(len(written["approvals"]), len(self.doc["approvals"]) - 40)
             err = io.StringIO()
             with contextlib.redirect_stderr(err):
                 self.assertEqual(bundle_cli.main(["migrate", str(LEDGERLOCK_2_0_0), "--out", str(out)]), 2)

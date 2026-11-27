@@ -68,8 +68,26 @@ def env(interpreter=sys.executable, timeout=20):
     return ExecutionEnv(interpreter, timeout, Enforcement.PARTIAL)
 
 
+def _stamped(tags):
+    """PE8-DEADLINE-INTEGRITY: the controller stamps DISPATCHED and COMPLETED on its own monotonic clock, and a normal
+    OBSERVED RESULT is judged by COMPLETED-DISPATCHED vs within_s (`pe._overran`). Give every synthetic DISPATCHED a
+    stamp and emit a COMPLETED stamp just before the RESULT, 0.1s apart — inside every unit window (the smallest is
+    0.2s) — so a well-formed run is in-window; a RESULT that is not an ordinary observation never consults the stamps,
+    and the deadline-expiry cases drive FakeRange directly, without this helper."""
+    out = []
+    for t in tags:
+        if t == "DISPATCHED":
+            out.append("DISPATCHED 0.0")
+        elif t == "RESULT" or t.startswith("RESULT "):
+            out.append("COMPLETED 0.1")
+            out.append(t)
+        else:
+            out.append(t)
+    return tuple(out)
+
+
 def faked(*tags, returncode, ledger=(), write=True):
-    return mock.patch.object(pe, "ProcessRange", FakeRange(tags, returncode, ledger, write=write))
+    return mock.patch.object(pe, "ProcessRange", FakeRange(_stamped(tags), returncode, ledger, write=write))
 
 
 def never_runs():
@@ -581,7 +599,8 @@ class Decision(_Checkout):
         with mock.patch.object(pe, "ProcessRange", LateResult(("READY", "DISPATCHED", "STEP 1"), 0)), \
                 mock.patch.object(pe, "_COLLECT_S", 0.05):   # B1: the controller ended with no RESULT: the mechanism failed
             self.assertEqual(self.see(s).kind, K.HARNESS_FAILED)
-        with mock.patch.object(pe, "ProcessRange", LateResult(("READY", "DISPATCHED", "STEP 1", "RESULT " + json.dumps(ended)), 0)), \
+        with mock.patch.object(pe, "ProcessRange",
+                               LateResult(_stamped(("READY", "DISPATCHED", "STEP 1", "RESULT " + json.dumps(ended))), 0)), \
                 mock.patch.object(pe, "_COLLECT_S", 0.05):
             o = self.see(s)
         self.assertEqual((o.kind, o.verdict, facts_of(o)["refuted"]["step"]), (K.OBSERVED, R, 1))

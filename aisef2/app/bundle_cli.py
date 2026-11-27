@@ -118,12 +118,22 @@ EXAMPLES = pathlib.Path(__file__).resolve().parent / "examples"      # <name>.js
 #: since). The capability version is the probe's CAPABILITY_VERSION counted from the release that introduced it:
 #: 2.0.0 predates the counter and is version 1 for each probe — the classes it observed are the classes version 1 names
 #: (file_artifact: exists, content, grep_count; python_callable_v2, cli_invocation and process_effect as they are).
+#: 2.2.0 = tag v2.2.0 at da3ea33f (CR-8/CT-7, COMPATIBILITY-MATRIX): the DIGEST each probe carried at that release —
+#: the capability digest sha256([id, CAPABILITY_VERSION, classes]) a 2.2.0 bundle's specs name — added before the
+#: process_effect CAPABILITY_VERSION 1->2 bump (PE8-DEADLINE-INTEGRITY), so a historical 2.2.0 bundle still migrates and
+#: `--verify` compiles it for identity under the release that ran it. file_artifact/python_callable_v2/cli_invocation
+#: were byte-unchanged 2.2.0 -> v2.3 (their digests equal this release's active ones); only process_effect moved.
 RELEASES: Mapping[str, dict] = {
     "2.0.0": {"compiler_digest": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
               "probes": {SubjectKind.FILE_ARTIFACT: ("probe.file_artifact", "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901", 1),
                          SubjectKind.PYTHON_CALLABLE: ("probe.python_callable_v2", "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae", 1),
                          SubjectKind.CLI_INVOCATION: ("probe.cli_invocation", "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f", 1),
                          SubjectKind.PROCESS_EFFECT: ("probe.process_effect", "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273", 1)}},
+    "2.2.0": {"compiler_digest": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
+              "probes": {SubjectKind.FILE_ARTIFACT: ("probe.file_artifact", "ba12a5d244632ccbe0dcd97ae6c218c637b5cf661e9a5f8005c1bec17b273f8c", 3),
+                         SubjectKind.PYTHON_CALLABLE: ("probe.python_callable_v2", "0821c14651a95494b2352ea0447e467595388fc713fd531ced6f75c7bcfa8aae", 1),
+                         SubjectKind.CLI_INVOCATION: ("probe.cli_invocation", "330ae4a88cc8ca58e66b462b9dc6ad9b4023e4b1dfebc8373c584eaa95e8de31", 1),
+                         SubjectKind.PROCESS_EFFECT: ("probe.process_effect", "409c41aea16f8ab2c83406e429fdaed565eaa8dadd945a78bd93ad617b8814f7", 1)}},
 }
 
 
@@ -143,6 +153,26 @@ class JournalRefused(B.BundleError):
 #: what `format3.reconstruct` says (aisef2/journal/event.decode, format3.validate) when the chain or the sequence of
 #: a journal is broken: the journal is not the one that was written. Every other refusal of the reader is its form.
 _INTEGRITY = ("the chain does not link", "seq == index")
+
+
+def load_for_release(data: Mapping, release: str) -> B.Project:
+    """CR-8 (COMPATIBILITY-MATRIX): the project a historical bundle describes, compiled for IDENTITY under `release`'s
+    probe identities (a key of RELEASES) instead of this release's active catalog — so a bundle an earlier release ran,
+    whose plan names spec ids under that release's probe digests, still loads and reproduces its own `bundle_digest`
+    (the bundle's own bytes). No execution, no re-binding: `migrate` carries an approval forward and CHANGES the digest;
+    this verifies what already ran and preserves it. The old capability is read, never rewritten.
+
+    Limited to releases this release's compiler still compiles identically (`compiler_digest == COMPILER_DIGEST`): a
+    spec id binds the compiler digest too, so a release that moved the compiler needs a compiler-aware loader. That is
+    refused here (fail closed) rather than silently producing a wrong identity."""
+    rel = RELEASES.get(release)
+    if rel is None:
+        raise MigrationError(f"no such release {release!r} ({', '.join(RELEASES)})")
+    if rel["compiler_digest"] != COMPILER_DIGEST:
+        raise MigrationError(f"release {release} compiled under a different compiler ({rel['compiler_digest'][:12]} != "
+                             f"{COMPILER_DIGEST[:12]}); a compiler-aware identity loader is needed for it")
+    probes = {kind: ProbeRef(pid, digest) for kind, (pid, digest, _ver) in rel["probes"].items()}
+    return B.load(data, probes=probes)
 
 
 def _earlier(spec: ProductProofSpec, release: dict) -> str | None:

@@ -11,15 +11,17 @@ contract's name.
 * the fail-closed side: a change nobody declared, a malformed record, a probe with no version, a probe that is not the
   release's, an approval that no longer binds — each withholds, and a release already at the current version withholds
   nothing;
-* the real 2.0.0 LedgerLock bundle (closure-evidence, read only): exactly six of its 59 approvals are withheld — its
-  six counts (grep_count, REQUIRES_SUBJECT): the four over the directory `ledgerlock` that the owner named and the two
-  over one .py file each. A selector sees a contract's class and `subject_absence`, never its path or the repository, so
-  PM-9 and PM-11 each select all six; what tells the four from the two is the `when` of each change, which the report
-  prints beside the contract: PM-9's condition (a path that selects no file) can hold for a file only when a directory
-  bears its name, PM-11's (a byte-order mark) holds for a file as for a directory. The candidate lints NOT_READY with
-  those six to approve, and running the printed commands in a scratch copy makes it READY — under the shipped
-  calibration rows re-bound to the bytes that run now (the shipped table is stale for every probe at this commit, so
-  admission itself is the final snapshot's to show);
+* the real 2.0.0 LedgerLock bundle (closure-evidence, read only): forty of its 59 approvals are withheld — six
+  file_artifact counts (grep_count, REQUIRES_SUBJECT): the four over the directory `ledgerlock` that the owner named and
+  the two over one .py file each; and every one of its 34 process_effect contracts, which the capability-2
+  deadline-integrity change selects (PE8-DEADLINE-INTEGRITY, all three scenario classes). A selector sees a contract's
+  class and `subject_absence`, never its path or the repository, so PM-9 and PM-11 each select all six counts; what tells
+  the four from the two is the `when` of each change, which the report prints beside the contract: PM-9's condition (a
+  path that selects no file) can hold for a file only when a directory bears its name, PM-11's (a byte-order mark) holds
+  for a file as for a directory. cli_invocation and python_callable_v2, unchanged since 2.0.0, are kept. The candidate
+  lints NOT_READY with those forty to approve, and running the printed commands in a scratch copy makes it READY — under
+  the shipped calibration rows re-bound to the bytes that run now (the shipped table is stale for every probe at this
+  commit, so admission itself is the final snapshot's to show);
 * what the keep rests on: `approvals_kept_grounds` (which versions were read) and `limits` (what a declaration-reading
   rule cannot see), the commands as the operator pastes them (the candidate's own path, the files they write, the
   placeholder approver refused), the candidate's two digests;
@@ -706,19 +708,22 @@ class NoContractIsNamed(unittest.TestCase):
                 for word in ("BC-V22", "LedgerLock", "ledgerlock"):
                     self.assertNotIn(word, text, f"{rel} names {word}: what is withheld is derived, not listed")
 
-    def test_the_six_come_out_of_the_declarations_by_class_and_absence(self):
-        """Every contract of the LedgerLock bundle read as bound under 2.0.0: nine are file_artifact; the six that are
-        counts under REQUIRES_SUBJECT are selected (PM-9 and PM-11 each), the three existence checks and the other
-        probes are not selected at all."""
+    def test_the_counts_and_every_process_effect_come_out_of_the_declarations_by_class_and_absence(self):
+        """Every contract of the LedgerLock bundle read as bound under 2.0.0: nine are file_artifact (the six counts
+        under REQUIRES_SUBJECT are selected by PM-9 and PM-11 each; the three existence checks are not), and every
+        process_effect contract is selected by the capability-2 deadline-integrity change (PE8-DEADLINE-INTEGRITY, all
+        three scenario classes); cli_invocation and python_callable_v2 — unchanged since 2.0.0 — are not selected."""
         doc = LL.read()
         contracts = {c["id"]: BehaviorContract.from_json(c) for c in doc["contracts"]}
         specs = {cid: bundle_cli._mint(c, bundle_cli._refs()[c.subject.kind]) for cid, c in contracts.items()}
         exposed = bundle_cli._exposure(contracts, specs, {cid: "2.0.0" for cid in contracts})
-        self.assertEqual(set(exposed), LEDGERLOCK_COUNTS)
+        self.assertEqual(set(exposed), LEDGERLOCK_WITHHELD)
         self.assertEqual({c.id for c in contracts.values() if c.subject.kind is FA},
                          LEDGERLOCK_COUNTS | {"BC-V22-S-13-a", "BC-V22-S-13-b", "BC-V22-S-13-c"})
         for cid in LEDGERLOCK_COUNTS:
             self.assertEqual([h["when"].split(":")[0] for h in exposed[cid]["changes"]], ["PM-9", "PM-11"])
+        for cid in LEDGERLOCK_PROCESS_EFFECT:
+            self.assertEqual([h["ref"] for h in exposed[cid]["changes"]], ["PE8-DEADLINE-INTEGRITY"])
 
 
 # ----------------------------------------------------------------------------------------------- LedgerLock
@@ -727,6 +732,11 @@ class NoContractIsNamed(unittest.TestCase):
 #: the contracts of the 2.0.0 LedgerLock bundle that are grep_count under REQUIRES_SUBJECT: four over the directory
 #: `ledgerlock`, two over one .py file (listed here to check the mechanism's answer against, never read by it)
 LEDGERLOCK_COUNTS = {"BC-V22-S-10-a", "BC-V22-S-10-b", "BC-V22-S-10-c", "BC-V22-S-12-a", "BC-V22-S-12-b", "BC-V22-S-12-c"}
+#: PE8-2 (process_effect CAPABILITY_VERSION 1 -> 2, PE8-DEADLINE-INTEGRITY): the deadline-integrity change selects all
+#: three scenario classes, so every process_effect contract of the bundle is re-exposed and withheld for re-approval,
+#: alongside the six file_artifact counts. Derived from the bundle, as the mechanism derives it — never read by it.
+LEDGERLOCK_PROCESS_EFFECT = {c["id"] for c in LL.read()["contracts"] if c["subject"]["kind"] == "process_effect"}
+LEDGERLOCK_WITHHELD = LEDGERLOCK_COUNTS | LEDGERLOCK_PROCESS_EFFECT
 
 
 class TheLedgerLockBundle(unittest.TestCase):
@@ -737,37 +747,44 @@ class TheLedgerLockBundle(unittest.TestCase):
         cls.doc = LL.read()
         cls.out, cls.report = bundle_cli.migrate(json.loads(json.dumps(cls.doc)))
 
-    def test_exactly_six_of_the_59_approvals_are_withheld_and_the_rest_are_kept(self):
+    def test_the_six_counts_and_every_process_effect_are_withheld_and_the_rest_are_kept(self):
         self.assertEqual(len(self.doc["approvals"]), 59)
-        self.assertEqual({r["contract"] for r in self.report["approvals_withheld"]}, LEDGERLOCK_COUNTS)
-        self.assertEqual(len(self.report["approvals_withheld"]), 6)
-        self.assertEqual(self.report["approvals_kept"], 53)
+        self.assertEqual({r["contract"] for r in self.report["approvals_withheld"]}, LEDGERLOCK_WITHHELD)
+        self.assertEqual(len(self.report["approvals_withheld"]), 40)     # the six file_artifact counts + 34 process_effect
+        self.assertEqual(self.report["approvals_kept"], 19)
         self.assertEqual(self.out["approvals"], [a for a in self.doc["approvals"] if a["contract_id"] not in
                                                  {r["contract"] for r in self.report["approvals_withheld"]}])
-        for row in self.report["semantic_changes"]:
+        # file_artifact counts are selected by PM-9/PM-11; every process_effect by the capability-2 deadline change
+        fa_rows = [r for r in self.report["semantic_changes"] if r["probe"] == fa.PROBE_ID]
+        pe_rows = [r for r in self.report["semantic_changes"] if r["probe"] == "probe.process_effect"]
+        self.assertEqual(len(pe_rows), 34)
+        for row in fa_rows:
             self.assertEqual((row["class"], row["subject_absence"], row["from"]["release"]),
                              ("grep_count", "REQUIRES_SUBJECT", "2.0.0"))
-        self.assertEqual({r["subject"] for r in self.report["semantic_changes"]},
+        for row in pe_rows:
+            self.assertEqual((row["subject_absence"], row["from"]["release"]), ("REQUIRES_SUBJECT", "2.0.0"))
+            self.assertIn(row["class"], ("scenario_returns", "scenario_raises", "scenario_files"))
+            self.assertEqual([c["ref"] for c in row["changes"]], ["PE8-DEADLINE-INTEGRITY"])
+        self.assertEqual({r["subject"] for r in fa_rows},
                          {"file_artifact path:ledgerlock", "file_artifact path:ledgerlock/ledger.py",
                           "file_artifact path:ledgerlock/cli.py"})
         for row in self.report["approvals_withheld"]:       # the approval stays in the input, as history: who and when
             self.assertEqual(row["approver"], "human:owner")
 
-    def test_the_ground_of_the_53_kept_approvals_is_read_not_counted(self):
+    def test_the_ground_of_the_kept_approvals_is_read_not_counted(self):
         rows = self.report["approvals_kept_grounds"]
-        self.assertEqual(sum(len(r["contracts"]) for r in rows), 53)
-        self.assertEqual({r["probe"] for r in rows}, {fa.PROBE_ID, "probe.cli_invocation", "probe.process_effect",
-                                                      "probe.python_callable_v2"})
+        self.assertEqual(sum(len(r["contracts"]) for r in rows), 19)
+        # process_effect is no longer kept: its capability-2 deadline change selects every one of its contracts
+        self.assertEqual({r["probe"] for r in rows}, {fa.PROBE_ID, "probe.cli_invocation", "probe.python_callable_v2"})
         for r in rows:
             if r["probe"] != fa.PROBE_ID:
-                # their capability version is the release's: nothing is declared for them, and the report says so
+                # cli_invocation and python_callable_v2 are unchanged since 2.0.0: nothing declared, the report says so
                 self.assertEqual((r["from"]["capability_version"], r["to"]["capability_version"], r["consulted"]), (1, 1, []))
                 self.assertIn("did not move", r["ground"])
             else:
                 self.assertEqual([c["version"] for c in r["consulted"]], [2, 3])
         counts = {p: sum(len(r["contracts"]) for r in rows if r["probe"] == p) for p in {r["probe"] for r in rows}}
-        self.assertEqual(counts, {fa.PROBE_ID: 3, "probe.cli_invocation": 10, "probe.process_effect": 34,
-                                  "probe.python_callable_v2": 6})
+        self.assertEqual(counts, {fa.PROBE_ID: 3, "probe.cli_invocation": 10, "probe.python_callable_v2": 6})
 
     def test_the_plan_is_rebound_as_it_always_was(self):
         self.assertEqual((self.report["specs_rebound"], self.report["obligations"]), (59, 67))
@@ -775,7 +792,7 @@ class TheLedgerLockBundle(unittest.TestCase):
         self.assertEqual(self.report["plan_hash"]["to"], self.out["plan"]["plan_hash"])
         self.assertNotEqual(self.report["plan_hash"]["from"], self.report["plan_hash"]["to"])
 
-    def test_the_candidate_lints_not_ready_with_exactly_those_six_and_ready_once_they_are_approved(self):
+    def test_the_candidate_lints_not_ready_with_the_withheld_and_ready_once_they_are_approved(self):
         now = {e.probe_id: executing(e.factory) for e in catalog.CATALOG if e.active}
         rows = tuple(dict(r, probe_digest=now.get(r["probe_id"], r["probe_digest"])) for r in CALIBRATIONS)
         calibrated = R.calibrations(rows)      # each shipped row re-bound to the bytes that run now: the table's rows, as test_v21_identity
@@ -784,7 +801,7 @@ class TheLedgerLockBundle(unittest.TestCase):
             self.assertEqual(lint["verdict"], "NOT_READY")
             self.assertEqual({x["contract"] for x in lint["to_approve"]},
                              {r["contract"] for r in self.report["approvals_withheld"]})
-            self.assertEqual(len(lint["to_approve"]), 6)
+            self.assertEqual(len(lint["to_approve"]), 40)
             self.assertIn("not run", lint["admission"])
             self.assertEqual(lint["criteria_without_calibration"], [])
             with tempfile.TemporaryDirectory() as t:
@@ -805,10 +822,10 @@ class TheLedgerLockBundle(unittest.TestCase):
             code, printed, err = run_main("migrate", LL.LEDGERLOCK_2_0_0, "--out", out)
             self.assertEqual((code, err), (0, ""))
             self.assertEqual(printed["written"], str(out))
-            self.assertEqual(printed["approvals_kept"], 53)
+            self.assertEqual(printed["approvals_kept"], 19)
             self.assertEqual(printed["candidate"]["bundle_digest"],
                              hashlib.sha256(B._canonical(json.loads(out.read_text(encoding="utf-8")))).hexdigest())
-            self.assertEqual(len(printed["needs_owner_reapproval"]["contracts"]), 6)
+            self.assertEqual(len(printed["needs_owner_reapproval"]["contracts"]), 40)
             self.assertEqual(code, 0)
             code, _, err = run_main("lint", out)
             self.assertEqual(code, 1, err)          # NOT_READY until the owner approves
